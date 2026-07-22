@@ -81,7 +81,6 @@ config/
 
 - Never push directly to main.
 - Work from a feature branch.
-- Open a Pull Request to develop.
 - Wait for at least one review before merging.
 
 ## Code Style
