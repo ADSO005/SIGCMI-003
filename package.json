@@ -1,0 +1,40 @@
+{
+  "name": "sigcmi-003",
+  "version": "1.0.0",
+  "description": "> **Intelligent Medical Appointment Management System**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ADSO005/SIGCMI-003.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ADSO005/SIGCMI-003/issues"
+  },
+  "homepage": "https://github.com/ADSO005/SIGCMI-003#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "csurf": "^1.2.2",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "mysql2": "^3.23.1",
+    "nodemailer": "^9.0.3",
+    "pug": "^3.0.4",
+    "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "eslint": "^10.7.0",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.6"
+  }
+}
