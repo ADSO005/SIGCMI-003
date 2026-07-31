@@ -1,0 +1,69 @@
+extends ../layouts/layout
+
+block contenido
+    main(class="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-6")
+
+        .bg-white.rounded-3xl.shadow-2xl.max-w-lg.w-full.overflow-hidden
+
+            // Encabezado
+            .p-4.text-center.bg-blue-700
+
+                h1.text-4xl.font-extrabold.text-white
+                    | SIGCMI
+
+                p.mt-2.text-white 
+                    | Sistema Integral de Gestión
+                    br
+                    | de Citas Médicas
+
+            // Formulario
+            .p-8
+
+                h2.text-3xl.font-bold.text-center.text-slate-800.mb-2
+                    | Iniciar Sesión
+
+                p.text-center.text-gray-500.mb-6
+                    | Ingresa a tu cuenta para continuar
+
+                form(
+                    action="/login"
+                    method="POST"
+                    class="space-y-5"
+                )
+
+                    include ../partials/forms/inputEmail
+
+                    include ../partials/forms/inputPassword
+
+                    include ../partials/forms/buttonPrimary
+
+                .mt-6.text-center
+
+                    a(
+                        href="/recover-password"
+                        class="text-sm text-blue-600 hover:underline"
+                    )
+                        | ¿Olvidaste tu contraseña?
+
+                .mt-4.text-center
+
+                    p.text-sm.text-gray-500
+                        | ¿No tienes una cuenta?
+
+                        a(
+                            href="/registro"
+                            class="ml-1 text-blue-600 font-semibold hover:underline"
+                        )
+                            | Regístrate
+
+                a(
+                    href="https://wa.me/573001234567?text=Hola,%20necesito%20ayuda."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="flex bottom-15 right-10 w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50"
+                )
+                    img(
+                        src="/img/WhatsApp.svg.png"
+                        alt="WhatsApp"
+                        class="w-8 h-8"
+                    )
