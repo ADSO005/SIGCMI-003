@@ -16,11 +16,12 @@ export const showRegisterForm = (req, res) => {
 export const register = async (req, res) => {
 
   console.log(req.body);
-
+  console.log("Correo recibido:", `"${req.body.email}"`);
   // Verificar si el correo ya existe
   const existeCorreo = await Usuario.findOne({
     where: { correo: req.body.email }
   });
+  console.log("Resultado búsqueda:", existeCorreo);
 
   if (existeCorreo) {
     return res.status(400).render("viewsPaciente/register", {

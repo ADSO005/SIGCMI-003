@@ -517,3 +517,11 @@
     }
 
 }
+
+.input-error{
+    border:2px solid #ef4444 !important;
+}
+
+.input-success{
+    border:2px solid #22c55e !important;
+}
