@@ -1,4 +1,7 @@
 import { validationResult } from "express-validator";
+import bcrypt from "bcrypt";
+import Usuario from "../../models/paciente/Usuario.js";
+import generarToken from "../../helpers/generarToken.js";
 
 // GET /auth/register
 export const showRegisterForm = (req, res) => {
@@ -10,18 +13,56 @@ export const showRegisterForm = (req, res) => {
 
 // POST /auth/register
 export const register = async (req, res) => {
-  const result = validationResult(req);
 
-  // Si hay errores de validación
-  if (!result.isEmpty()) {
+  console.log(req.body);
+
+  // Verificar si el correo ya existe
+  const existeCorreo = await Usuario.findOne({
+    where: { correo: req.body.email }
+  });
+
+  if (existeCorreo) {
     return res.status(400).render("viewsPaciente/register", {
-      errors: result.mapped(),
+      errors: {
+        email: { msg: "Este correo ya está registrado." }
+      },
       formData: req.body,
     });
   }
 
-  // Aquí irá la lógica para guardar el usuario
-  console.log("Nuevo usuario:", req.body);
+  // Verificar si el documento ya existe
+  const existeDocumento = await Usuario.findOne({
+    where: { numero_documento: req.body.numeroDocumento }
+  });
+
+  if (existeDocumento) {
+    return res.status(400).render("viewsPaciente/register", {
+      errors: {
+        numeroDocumento: { msg: "Este número de documento ya está registrado." }
+      },
+      formData: req.body,
+    });
+  }
+  
+  const passwordHash = await bcrypt.hash(req.body.password, 10);
+  const token = generarToken();
+  // Crear usuario
+  const usuario = await Usuario.create({
+    rol_id: 3,
+    nombres: req.body.nombres,
+    apellidos: req.body.apellidos,
+    correo: req.body.email,
+    telefono: req.body.telefono,
+    tipo_documento: req.body.tipoDocumento,
+    numero_documento: req.body.numeroDocumento,
+    password: passwordHash,
+    confirmado: false,
+    estado: true,
+    token
+  });
+
+  console.log("Usuario creado:", usuario.id_usuario);
 
   res.redirect("/auth/login");
+
 };
