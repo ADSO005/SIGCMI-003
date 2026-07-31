@@ -2,6 +2,7 @@ import { validationResult } from "express-validator";
 import bcrypt from "bcrypt";
 import Usuario from "../../models/paciente/Usuario.js";
 import generarToken from "../../helpers/generarToken.js";
+import enviarEmailRegistro from "../../helpers/emailRegistro.js";
 
 // GET /auth/register
 export const showRegisterForm = (req, res) => {
@@ -43,7 +44,7 @@ export const register = async (req, res) => {
       formData: req.body,
     });
   }
-  
+
   const passwordHash = await bcrypt.hash(req.body.password, 10);
   const token = generarToken();
   // Crear usuario
@@ -60,9 +61,44 @@ export const register = async (req, res) => {
     estado: true,
     token
   });
-
+  await enviarEmailRegistro({
+    nombre: usuario.nombres,
+    correo: usuario.correo,
+    token: usuario.token
+  });
   console.log("Usuario creado:", usuario.id_usuario);
 
   res.redirect("/auth/login");
+
+};
+
+export const confirmarCuenta = async (req, res) => {
+
+    const { token } = req.params;
+
+    const usuario = await Usuario.findOne({
+        where: {
+            token
+        }
+    });
+
+    if (!usuario) {
+        return res.render("viewsPaciente/confirmar-cuenta", {
+            pagina: "Confirmar Cuenta",
+            error: true,
+            mensaje: "Token inválido o la cuenta ya fue confirmada."
+        });
+    }
+
+    usuario.confirmado = true;
+    usuario.token = null;
+
+    await usuario.save();
+
+    res.render("viewsPaciente/confirmar-cuenta", {
+        pagina: "Cuenta Confirmada",
+        error: false,
+        mensaje: "Tu cuenta fue confirmada correctamente. Ya puedes iniciar sesión."
+    });
 
 };

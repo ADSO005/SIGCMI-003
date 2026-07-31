@@ -64,4 +64,9 @@ router.post(
     authController.register
 );
 
+router.get(
+    "/confirmar/:token",
+    authController.confirmarCuenta
+);
+
 export default router;
