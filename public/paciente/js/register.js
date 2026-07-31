@@ -1,3 +1,12 @@
+console.log("Archivo cargado");
+
+setTimeout(() => {
+
+    console.log("5 segundos después");
+
+    console.log(document.getElementById("confirmPassword"));
+
+}, 5000);
 // ===============================
 // SIGCMI - Registro de Pacientes
 // ===============================
@@ -766,7 +775,52 @@ password.addEventListener("blur", validarPassword);
 // ===============================
 // Confirmar Contraseña
 // ===============================
-confirmPassword.addEventListener("input", validarConfirmPassword);
+confirmPassword.addEventListener("input",validarConfirmPassword);
 
 
 confirmPassword.addEventListener("blur", validarConfirmPassword);
+
+
+// ===============================
+// Envío del formulario
+// ===============================
+formulario.addEventListener("submit", (e) => {
+
+    e.preventDefault();
+
+    validarNombres();
+    validarApellidos();
+    validarEmail();
+    validarTelefono();
+    validarFechaNacimiento();
+    validarTipoDocumento();
+    validarNumeroDocumento();
+    validarDepartamento();
+    validarCiudad();
+    validarPassword();
+    validarConfirmPassword();
+
+    const formularioValido = Object.values(estadoFormulario).every(valor => valor);
+
+    if (!formularioValido) {
+
+        const primerError = document.querySelector(".input-error");
+
+        if (primerError) {
+
+            primerError.focus();
+
+            primerError.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }
+
+        return;
+
+    }
+
+    formulario.submit();
+
+});
