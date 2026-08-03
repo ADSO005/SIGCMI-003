@@ -4,7 +4,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import registerRoutes from "./routes/paciente/registerRoutes.js";
+import authRoutes from "./routes/paciente/authRoutes.js";
 
 const app = express();
 
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // ---- Rutas ----
-app.use("/auth", registerRoutes);
+app.use("/auth", authRoutes);
 
 // Redirige la raíz al registro
 app.get("/", (req, res) => {

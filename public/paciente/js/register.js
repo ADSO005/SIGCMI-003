@@ -2,9 +2,9 @@ console.log("Archivo cargado");
 
 setTimeout(() => {
 
-    console.log("5 segundos después");
+  console.log("5 segundos después");
 
-    console.log(document.getElementById("confirmPassword"));
+  console.log(document.getElementById("confirmPassword"));
 
 }, 5000);
 // ===============================
@@ -25,9 +25,27 @@ const numeroDocumento = document.getElementById("numeroDocumento");
 const departamento = document.getElementById("departamento");
 const ciudad = document.getElementById("ciudad");
 const password = document.getElementById("password");
-const confirmPassword = document.querySelector("confirmPassword");
+const confirmPassword = document.getElementById("confirmPassword");
 
+const togglePassword = document.getElementById("togglePassword");
+const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
 
+const strengthBar = document.getElementById("strengthBar");
+const strengthText = document.getElementById("strengthText");
+
+console.log(strengthBar);
+console.log(strengthText);
+
+const ruleLength = document.getElementById("ruleLength");
+const ruleUpper = document.getElementById("ruleUpper");
+const ruleLower = document.getElementById("ruleLower");
+const ruleNumber = document.getElementById("ruleNumber");
+const ruleSpecial = document.getElementById("ruleSpecial");
+
+// Temporizador para validar correo
+let timeoutCorreo;
+
+let timeoutDocumento;
 // ===============================
 // Estado de las validaciones
 // ===============================
@@ -75,11 +93,35 @@ function mostrarError(input, mensaje) {
 
     error = document.createElement("span");
     error.className = "form-error";
+
     grupo.appendChild(error);
 
   }
 
   error.textContent = mensaje;
+
+  if (
+    input.id === "password" ||
+    input.id === "confirmPassword"
+  ) {
+    return;
+  }
+  
+  let icono = grupo.querySelector(".validation-icon");
+
+  if (!icono) {
+
+    icono = document.createElement("i");
+
+    icono.className =
+      "validation-icon fa-solid fa-circle-xmark";
+
+    grupo.querySelector(".input-wrapper").appendChild(icono);
+
+  }
+
+  icono.className =
+    "validation-icon fa-solid fa-circle-xmark";
 
 }
 
@@ -93,8 +135,23 @@ function mostrarExito(input) {
   const error = grupo.querySelector(".form-error");
 
   if (error) {
+
     error.textContent = "";
+
   }
+
+  let icono = grupo.querySelector(".validation-icon");
+
+  if (!icono) {
+
+    icono = document.createElement("i");
+
+    grupo.querySelector(".input-wrapper").appendChild(icono);
+
+  }
+
+  icono.className =
+    "validation-icon fa-solid fa-circle-check";
 
 }
 
@@ -635,6 +692,14 @@ email.addEventListener("input", () => {
 
   validarEmail();
 
+  clearTimeout(timeoutCorreo);
+
+  timeoutCorreo = setTimeout(() => {
+
+    verificarCorreo();
+
+  }, 700);
+
 });
 
 email.addEventListener("paste", () => {
@@ -648,7 +713,13 @@ email.addEventListener("paste", () => {
 
 });
 
-email.addEventListener("blur", validarEmail);
+email.addEventListener("blur", () => {
+
+  clearTimeout(timeoutCorreo);
+
+  verificarCorreo();
+
+});
 
 
 // ===============================
@@ -706,6 +777,14 @@ numeroDocumento.addEventListener("input", () => {
 
   validarNumeroDocumento();
 
+  clearTimeout(timeoutDocumento);
+
+  timeoutDocumento = setTimeout(() => {
+
+    verificarDocumento();
+
+  }, 700);
+
 });
 
 numeroDocumento.addEventListener("paste", () => {
@@ -720,7 +799,13 @@ numeroDocumento.addEventListener("paste", () => {
 
 });
 
-numeroDocumento.addEventListener("blur", validarNumeroDocumento);
+numeroDocumento.addEventListener("blur", () => {
+
+  clearTimeout(timeoutDocumento);
+
+  verificarDocumento();
+
+});
 
 // ===============================
 // Validar Departamento
@@ -759,7 +844,9 @@ ciudad.addEventListener("blur", validarCiudad);
 // ===============================
 
 password.addEventListener("input", () => {
-  console.log("Escribiendo contraseña");
+
+  actualizarFortalezaPassword();
+
   validarPassword();
 
   if (confirmPassword.value !== "") {
@@ -775,7 +862,7 @@ password.addEventListener("blur", validarPassword);
 // ===============================
 // Confirmar Contraseña
 // ===============================
-confirmPassword.addEventListener("input",validarConfirmPassword);
+confirmPassword.addEventListener("input", validarConfirmPassword);
 
 
 confirmPassword.addEventListener("blur", validarConfirmPassword);
@@ -786,41 +873,272 @@ confirmPassword.addEventListener("blur", validarConfirmPassword);
 // ===============================
 formulario.addEventListener("submit", (e) => {
 
-    e.preventDefault();
+  e.preventDefault();
 
-    validarNombres();
-    validarApellidos();
-    validarEmail();
-    validarTelefono();
-    validarFechaNacimiento();
-    validarTipoDocumento();
-    validarNumeroDocumento();
-    validarDepartamento();
-    validarCiudad();
-    validarPassword();
-    validarConfirmPassword();
+  validarNombres();
+  validarApellidos();
+  validarEmail();
+  validarTelefono();
+  validarFechaNacimiento();
+  validarTipoDocumento();
+  validarNumeroDocumento();
+  validarDepartamento();
+  validarCiudad();
+  validarPassword();
+  validarConfirmPassword();
 
-    const formularioValido = Object.values(estadoFormulario).every(valor => valor);
+  const formularioValido = Object.values(estadoFormulario).every(valor => valor);
 
-    if (!formularioValido) {
+  if (!formularioValido) {
 
-        const primerError = document.querySelector(".input-error");
+    const primerError = document.querySelector(".input-error");
 
-        if (primerError) {
+    if (primerError) {
 
-            primerError.focus();
+      primerError.focus();
 
-            primerError.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-            });
-
-        }
-
-        return;
+      primerError.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
 
     }
 
-    formulario.submit();
+    return;
+
+  }
+
+  formulario.submit();
 
 });
+
+// ===============================
+// Mostrar/Ocultar contraseña
+// ===============================
+
+togglePassword.addEventListener("click", () => {
+  console.log("CLICK OJO");
+
+  if (password.type === "password") {
+
+    password.type = "text";
+
+    togglePassword.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+
+  } else {
+
+    password.type = "password";
+
+    togglePassword.innerHTML = '<i class="fa-solid fa-eye"></i>';
+
+  }
+
+});
+
+
+toggleConfirmPassword.addEventListener("click", () => {
+
+  if (confirmPassword.type === "password") {
+
+    confirmPassword.type = "text";
+
+    toggleConfirmPassword.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+
+  } else {
+
+    confirmPassword.type = "password";
+
+    toggleConfirmPassword.innerHTML = '<i class="fa-solid fa-eye"></i>';
+
+  }
+
+});
+
+// ===============================
+// Actualizar regla de contraseña
+// ===============================
+
+function actualizarRegla(elemento, cumple) {
+
+  const icono = elemento.querySelector("i");
+
+  if (cumple) {
+
+    elemento.style.color = "#16a34a";
+
+    icono.className = "fa-solid fa-circle-check";
+
+    icono.style.color = "#22c55e";
+
+  } else {
+
+    elemento.style.color = "#dc2626";
+
+    icono.className = "fa-solid fa-circle-xmark";
+
+    icono.style.color = "#ef4444";
+
+  }
+
+}
+
+// ===============================
+// Fortaleza de contraseña
+// ===============================
+
+function actualizarFortalezaPassword() {
+
+  const valor = password.value;
+
+  let puntos = 0;
+
+  const tieneLongitud = valor.length >= 8;
+  const tieneMayuscula = /[A-Z]/.test(valor);
+  const tieneMinuscula = /[a-z]/.test(valor);
+  const tieneNumero = /\d/.test(valor);
+  const tieneEspecial = /[@$!%*?&.#_-]/.test(valor);
+
+  actualizarRegla(ruleLength, tieneLongitud);
+  actualizarRegla(ruleUpper, tieneMayuscula);
+  actualizarRegla(ruleLower, tieneMinuscula);
+  actualizarRegla(ruleNumber, tieneNumero);
+  actualizarRegla(ruleSpecial, tieneEspecial);
+
+  if (tieneLongitud) puntos++;
+  if (tieneMayuscula) puntos++;
+  if (tieneMinuscula) puntos++;
+  if (tieneNumero) puntos++;
+  if (tieneEspecial) puntos++;
+
+  switch (puntos) {
+
+    case 0:
+    case 1:
+
+      strengthBar.style.width = "20%";
+      strengthBar.style.background = "#ef4444";
+      strengthText.textContent = "Muy débil";
+
+      break;
+
+    case 2:
+
+      strengthBar.style.width = "40%";
+      strengthBar.style.background = "#f97316";
+      strengthText.textContent = "Débil";
+
+      break;
+
+    case 3:
+
+      strengthBar.style.width = "60%";
+      strengthBar.style.background = "#eab308";
+      strengthText.textContent = "Media";
+
+      break;
+
+    case 4:
+
+      strengthBar.style.width = "80%";
+      strengthBar.style.background = "#22c55e";
+      strengthText.textContent = "Fuerte";
+
+      break;
+
+    case 5:
+
+      strengthBar.style.width = "100%";
+      strengthBar.style.background = "#16a34a";
+      strengthText.textContent = "Muy fuerte";
+
+      break;
+
+  }
+
+}
+
+// ===============================
+// Verificar correo en la BD
+// ===============================
+
+async function verificarCorreo() {
+
+  const valor = email.value.trim().toLowerCase();
+
+  // Primero validar el formato del correo
+  if (!validarEmail()) {
+    return;
+  }
+
+  try {
+
+    const respuesta = await fetch(`/auth/check-email?email=${encodeURIComponent(valor)}`);
+
+    const datos = await respuesta.json();
+
+    if (datos.existe) {
+
+      mostrarError(email, "Este correo ya está registrado.");
+
+      estadoFormulario.email = false;
+
+    } else {
+
+      mostrarExito(email);
+
+      estadoFormulario.email = true;
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+}
+
+// ===============================
+// Verificar documento en la BD
+// ===============================
+
+async function verificarDocumento() {
+
+  const valor = numeroDocumento.value.trim();
+
+  if (!validarNumeroDocumento()) {
+    return;
+  }
+
+  try {
+
+    const respuesta = await fetch(
+      `/auth/check-document?documento=${encodeURIComponent(valor)}`
+    );
+
+    const datos = await respuesta.json();
+
+    if (datos.existe) {
+
+      mostrarError(
+        numeroDocumento,
+        "Este número de documento ya está registrado."
+      );
+
+      estadoFormulario.numeroDocumento = false;
+
+    } else {
+
+      mostrarExito(numeroDocumento);
+
+      estadoFormulario.numeroDocumento = true;
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+}

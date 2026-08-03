@@ -88,21 +88,83 @@ html(lang="es")
                 +formInput('departamento', 'Departamento de Residencia', 'text', 'Departamento de Residencia', 'fa-solid fa-location-dot')
                 +formInput('ciudad', 'Ciudad/Municipio de Residencia', 'text', 'Ciudad/Municipio', 'fa-solid fa-location-dot')
 
+
                 .form-group
-                  label.form-label(for="password") Contraseña
+                  label.form-label(for="password")
+                    | Contraseña
                     span.form-label__required *
+
                   .input-wrapper
                     i.input-icon.fa-solid.fa-lock
-                    input.form-input(type="password" id="password" name="password" placeholder="••••••••••••")
+
+                    input.form-input(
+                      type="password"
+                      id="password"
+                      name="password"
+                      placeholder="••••••••••••"
+                    )
+
+                    button.password-toggle(
+                      type="button"
+                      id="togglePassword"
+                    )
+                      i(class="fa-solid fa-eye")
+
+                  // Barra de seguridad
+                  .password-strength
+                    .password-strength-bar
+                      span#strengthBar
+
+                    p#strengthText.password-strength-text
+                      | Seguridad de la contraseña
+
+                  // Requisitos
+                  ul.password-rules
+
+                    li#ruleLength
+                      i.fa-solid.fa-circle-xmark
+                      | Mínimo 8 caracteres
+
+                    li#ruleUpper
+                      i.fa-solid.fa-circle-xmark
+                      | Una letra mayúscula
+
+                    li#ruleLower
+                      i.fa-solid.fa-circle-xmark
+                      | Una letra minúscula
+
+                    li#ruleNumber
+                      i.fa-solid.fa-circle-xmark
+                      | Un número
+
+                    li#ruleSpecial
+                      i.fa-solid.fa-circle-xmark
+                      | Un carácter especial
+
                   if typeof errors !== 'undefined' && errors && errors.password
                     span.form-error= errors.password.msg
 
                 .form-group
-                  label.form-label(for="confirmPassword") Confirmar Contraseña
+                  label.form-label(for="confirmPassword")
+                    | Confirmar Contraseña
                     span.form-label__required *
+
                   .input-wrapper
                     i.input-icon.fa-solid.fa-lock
-                    input.form-input(type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••••••")
+
+                    input.form-input(
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="••••••••••••"
+                    )
+
+                    button.password-toggle(
+                      type="button"
+                      id="toggleConfirmPassword"
+                    )
+                      i(class="fa-solid fa-eye")
+
                   if typeof errors !== 'undefined' && errors && errors.confirmPassword
                     span.form-error= errors.confirmPassword.msg
 

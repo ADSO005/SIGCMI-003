@@ -103,3 +103,83 @@ export const confirmarCuenta = async (req, res) => {
     });
 
 };
+
+export const checkEmail = async (req, res) => {
+
+    try {
+
+        const { email } = req.query;
+
+        if (!email) {
+
+            return res.status(400).json({
+                existe: false,
+                mensaje: "Correo no enviado."
+            });
+
+        }
+
+        const usuario = await Usuario.findOne({
+            where: {
+                correo: email
+            }
+        });
+
+        return res.json({
+            existe: !!usuario
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            existe: false,
+            mensaje: "Error interno del servidor."
+        });
+
+    }
+
+};
+
+// ===============================
+// Verificar documento en la BD
+// ===============================
+
+export const checkDocument = async (req, res) => {
+
+    try {
+
+        const { documento } = req.query;
+
+        if (!documento) {
+
+            return res.status(400).json({
+                existe: false,
+                mensaje: "Documento no enviado."
+            });
+
+        }
+
+        const usuario = await Usuario.findOne({
+            where: {
+                numero_documento: documento
+            }
+        });
+
+        return res.json({
+            existe: !!usuario
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        return res.status(500).json({
+            existe: false,
+            mensaje: "Error interno del servidor."
+        });
+
+    }
+
+};

@@ -4,12 +4,17 @@ const enviarEmailRegistro = async ({ nombre, correo, token }) => {
 
     const transport = nodemailer.createTransport({
         host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
+        port: Number(process.env.EMAIL_PORT),
+        secure: false,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         }
     });
+
+    await transport.verify();
+
+    console.log("✅ Conexión SMTP correcta");
 
     const info = await transport.sendMail({
         from: `"SIGCMI" <${process.env.EMAIL_FROM}>`,
