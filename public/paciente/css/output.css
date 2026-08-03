@@ -958,14 +958,15 @@
 }
 .password-toggle {
   position: absolute;
-  top: 50%;
   right: 15px;
+  top: 50%;
   transform: translateY(-50%);
   border: none;
   background: transparent;
   cursor: pointer;
   color: #7c7c7c;
   font-size: 18px;
+  z-index: 2;
 }
 .password-toggle:hover {
   color: #4952d8;
@@ -1035,7 +1036,9 @@
 }
 .validation-icon {
   position: absolute;
-  right: 18px;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 18px;
   pointer-events: none;
 }

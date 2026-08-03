@@ -531,9 +531,9 @@
 
     position:absolute;
 
-    top:50%;
-
     right:15px;
+
+    top:50%;
 
     transform:translateY(-50%);
 
@@ -547,8 +547,9 @@
 
     font-size:18px;
 
-}
+    z-index:2;
 
+}
 .password-toggle:hover{
 
     color:#4952d8;
@@ -698,7 +699,11 @@
 
     position:absolute;
 
-    right:18px;
+    right:50px;   /* antes estaba en 18px */
+
+    top:50%;
+
+    transform:translateY(-50%);
 
     font-size:18px;
 

@@ -100,28 +100,24 @@ function mostrarError(input, mensaje) {
 
   error.textContent = mensaje;
 
+  // No mostrar iconos en los campos de contraseña
   if (
     input.id === "password" ||
     input.id === "confirmPassword"
   ) {
     return;
   }
-  
+
   let icono = grupo.querySelector(".validation-icon");
 
   if (!icono) {
 
     icono = document.createElement("i");
-
-    icono.className =
-      "validation-icon fa-solid fa-circle-xmark";
-
     grupo.querySelector(".input-wrapper").appendChild(icono);
 
   }
 
-  icono.className =
-    "validation-icon fa-solid fa-circle-xmark";
+  icono.className = "validation-icon fa-solid fa-circle-xmark";
 
 }
 
@@ -138,6 +134,14 @@ function mostrarExito(input) {
 
     error.textContent = "";
 
+  }
+
+  // No mostrar iconos en los campos de contraseña
+  if (
+    input.id === "password" ||
+    input.id === "confirmPassword"
+  ) {
+    return;
   }
 
   let icono = grupo.querySelector(".validation-icon");
