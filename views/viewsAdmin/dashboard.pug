@@ -13,7 +13,10 @@ html(lang="es")
 
             //- ============ SIDEBAR ============
             //- id="sidebar" para que el JS de abajo pueda encontrarlo y cambiarle el ancho
-            aside(id="sidebar" class="w-64 bg-indigo-600 text-white flex flex-col transition-all duration-300")
+            aside(
+    id="sidebar"
+    class="sticky top-0 h-screen w-64 bg-indigo-600 text-white flex flex-col"
+)
 
                 div
 
@@ -35,7 +38,7 @@ html(lang="es")
                     //- --- Navegación ---
                     //- Cada link tiene un ícono (siempre visible) y un span.sidebar-text (se oculta)
                     //- --- Navegación ---
-                nav(class="px-3 space-y-1")
+                nav(class="px-3 space-y-1 ")
 
                     // Dashboard
                     a(href="/admin/dashboard" class="flex items-center gap-3 px-3 py-3 rounded-lg bg-indigo-500/60 hover:bg-indigo-500 transition")
@@ -141,15 +144,12 @@ html(lang="es")
                     // Gráfico de Estados
                     // ===============================
 
-                    div(class="bg-white rounded-2xl shadow-lg p-6 mt-6")
+                div(class="bg-white rounded-2xl  p-6 mt-6 w-1/2 mx-auto")
 
-                        h3(class="text-xl font-bold mb-5 flex items-center gap-2")
-
-                            i(class="fa-solid fa-chart-pie text-indigo-600")
-
-                            | Estado de las Citas
-
-                        canvas(id="graficoEstados" height="260")
+                    h3(class="text-xl font-bold mb-5 flex items-center gap-2")
+                        i(class="fa-solid fa-chart-pie text-indigo-600")
+                        | Estado de las Citas
+                    canvas(id="graficoEstados" height="260")
         //- ============ JAVASCRIPT: colapsar/expandir el sidebar ============
         script(src="https://cdn.jsdelivr.net/npm/chart.js")
 
