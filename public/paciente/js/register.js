@@ -410,20 +410,6 @@ function validarNumeroDocumento() {
 
 }
 
-// ===============================
-// Validar Departamento
-// ===============================
-
-function validarDepartamento() {
-
-  return validarCampoTexto(
-    departamento,
-    "Departamento",
-    3,
-    50
-  );
-
-}
 
 
 // ===============================
@@ -842,6 +828,23 @@ ciudad.addEventListener("input", () => {
 
 ciudad.addEventListener("blur", validarCiudad);
 
+
+
+// ===============================
+// Depaartamento
+// ===============================
+
+departamento.addEventListener("keydown", permitirSoloLetras);
+
+departamento.addEventListener("input", () => {
+
+  limpiarSoloLetras(departamento);
+
+  validarDepartamento();
+
+});
+
+ciudad.addEventListener("blur", validarDepartamento);
 
 // ===============================
 // Contraseña
