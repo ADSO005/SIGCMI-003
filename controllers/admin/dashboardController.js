@@ -48,8 +48,11 @@ export const verDashboard = async (req, res) => {
                 ["hora", "ASC"]
             ]
         });
-        console.log(JSON.stringify(citasHoy, null, 2));
 
+        citasHoy.forEach((cita) => {
+            cita.hora = cita.hora.substring(0, 5);
+        });
+        
         const notificacionesHoy = await SolicitudWhatsApp.count();
 
         //=========================================
@@ -66,17 +69,17 @@ export const verDashboard = async (req, res) => {
 
         const stats = {
 
-    citasHoy: citasHoy.length,
+            citasHoy: citasHoy.length,
 
-    pacientesActivos,
+            pacientesActivos,
 
-    medicosDisponibles,
+            medicosDisponibles,
 
-    tiempoEspera: 15,
+            tiempoEspera: 15,
 
-    notificacionesHoy
+            notificacionesHoy
 
-};
+        };
 
 
         //=========================================
