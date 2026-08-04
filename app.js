@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/paciente/authRoutes.js";
+import dashboardRoutes from "./routes/admin/dashboardRoutes.js";
 
 const app = express();
 
@@ -23,6 +24,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // ---- Rutas ----
 app.use("/auth", authRoutes);
+
+app.use("/admin", dashboardRoutes);
 
 // Redirige la raíz al registro
 app.get("/", (req, res) => {

@@ -797,20 +797,24 @@ numeroDocumento.addEventListener("blur", () => {
 
 });
 
+
 // ===============================
-// Validar Departamento
+// Departamento
 // ===============================
 
-function validarDepartamento() {
 
-  return validarCampoTexto(
-    departamento,
-    "Departamento",
-    3,
-    50
-  );
+departamento.addEventListener("keydown", permitirSoloLetras);
 
-}
+departamento.addEventListener("input", () => {
+
+  limpiarSoloLetras(departamento);
+
+  validarDepartamento();
+
+});
+
+departamento.addEventListener("blur", validarDepartamento);
+
 
 // ===============================
 // Ciudad
