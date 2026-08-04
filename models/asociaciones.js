@@ -64,14 +64,6 @@ export default function asociarModelos() {
 
 
 
-    Usuario.hasOne(ConfiguracionNotificacion, {
-        foreignKey: "usuario_id"
-    });
-
-    ConfiguracionNotificacion.belongsTo(Usuario, {
-        foreignKey: "usuario_id"
-    });
-
     //==================================================
     // MEDICOS
     //==================================================
@@ -148,13 +140,15 @@ export default function asociarModelos() {
 
     // Un estado puede pertenecer a muchas citas
 
-    EstadoCita.hasMany(Cita, {
-        foreignKey: "estado_id",
-    });
+EstadoCita.hasMany(Cita, {
+    foreignKey: "estado_id",
+    as: "Citas"
+});
 
-    Cita.belongsTo(EstadoCita, {
-        foreignKey: "estado_id",
-    });
+Cita.belongsTo(EstadoCita, {
+    foreignKey: "estado_id",
+    as: "Estado"
+});
 
 
 

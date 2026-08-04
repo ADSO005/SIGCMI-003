@@ -4,7 +4,7 @@ html(lang="es")
         meta(charset="UTF-8")
         title SIGCMI - Dashboard
         script(src="https://cdn.tailwindcss.com")
-
+        link(rel="stylesheet", href="../admin/css/input.css")
     body(class="bg-white text-slate-800")
 
         div(class="flex min-h-screen")
@@ -27,7 +27,7 @@ html(lang="es")
                     //- --- Bienvenida (se oculta al colapsar) ---
                     div(class="sidebar-text px-6 pb-6")
                         p(class="text-indigo-200 text-sm") Bienvenido
-                        p(class="font-bold")= usuario.nombre
+                        p(class="font-bold")= usuarios.nombre
                         p(class="text-indigo-200 text-sm") Admin
 
                     //- --- Navegación ---
@@ -74,7 +74,7 @@ html(lang="es")
                     h2(class="text-3xl font-bold text-slate-900") Sistema Integral de Gestión de Citas Médicas
                     span(class="text-slate-500")= fechaHoy
 
-                div(class="grid grid-cols-4 gap-8 py-8")
+                div(class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 py-8")
 
                     div(class="flex items-center justify-between")
                         div
@@ -111,19 +111,7 @@ html(lang="es")
 
                     div(class="col-span-2")
                         h3(class="text-2xl font-bold mb-4") Citas Hoy
-
-                        div(class="space-y-3")
-                            each cita in citasHoy
-                                a(href=`/citas/${cita.id}` class="flex items-center justify-between bg-slate-50 hover:bg-slate-100 rounded-xl px-5 py-4")
-                                    div(class="flex items-center gap-4")
-                                        span(class="bg-blue-100 font-semibold px-4 py-2 rounded-lg")= cita.hora
-                                        div
-                                            p(class="font-bold")= cita.paciente
-                                            p(class="text-slate-500 text-sm")= cita.medico
-                                    div(class="flex items-center gap-4")
-                                        - var estadoClases = { "Completado": "bg-emerald-100 text-emerald-700", "En curso": "bg-yellow-100 text-yellow-700", "Pendiente": "bg-slate-200 text-slate-700" }
-                                        span(class=`px-4 py-1.5 rounded-full text-sm font-semibold ${estadoClases[cita.estado]}`)= cita.estado
-                                        span(class="text-slate-400 text-sm") Click para gestionar
+                        include components/appointmentsTable
 
                     div
                         h3(class="text-2xl font-bold mb-4") Acciones Rápidas
