@@ -1,19 +1,26 @@
 import app from "./app.js";
-import { sequelize } from "./models/index.js";
+import db from "./config/db.js";
+import asociarModelos from "./models/asociaciones.js";
 
-const PORT = 3000;
+// Registrar todas las asociaciones de Sequelize
+asociarModelos();
 
-sequelize
-  .sync()
-  .then(() => {
-    console.log("Base de datos sincronizada correctamente");
+try {
+
+    // Conectar con la base de datos
+    await db.authenticate();
+
+    console.log("✅ Base de datos conectada correctamente");
+
+    const PORT = process.env.PORT || 3000;
 
     app.listen(PORT, () => {
-      console.log(`Servidor corriendo en http://localhost:${PORT}`);
+        console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.error("Error al sincronizar la base de datos:", error);
-  });
 
-  
+} catch (error) {
+
+    console.error("❌ Error al conectar la base de datos");
+    console.error(error);
+
+}

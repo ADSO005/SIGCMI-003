@@ -1,0 +1,180 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title SIGCMI · Crear Cuenta
+    link(rel="stylesheet", href="/paciente/css/output.css")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
+
+  body
+    //-
+      mixin para un campo de texto/telefono/fecha estándar
+      name       -> atributo name del input (debe matchear express-validator)
+      label      -> texto de la etiqueta
+      type       -> tipo de input html
+      placeholder-> placeholder
+      icon       -> clase de icono fontawesome (sin "fa-solid")
+    mixin formInput(name, label, type, placeholder, icon)
+      .form-group
+        label.form-label(for=name)= label
+          span.form-label__required *
+        .input-wrapper
+          i.input-icon(class=icon)
+          input.form-input(
+            type=type
+            id=name
+            name=name
+            placeholder=placeholder
+            value=(typeof formData !== 'undefined' && formData ? formData[name] : '')
+          )
+        if typeof errors !== 'undefined' && errors && errors[name]
+          span.form-error= errors[name].msg
+
+    .auth-page
+      .auth-card
+        //- ===== HEADER =====
+        header.auth-header
+          h1.auth-header__title SIGCMI
+          p.auth-header__subtitle Sistema Integral de Gestión de Citas Médicas
+          .auth-header__wave
+            svg(viewBox="0 0 500 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg")
+              path(d="M0,20 C150,60 350,0 500,25 L500,60 L0,60 Z")
+
+        //- ===== BODY =====
+        .auth-body
+          .form-heading
+            h2.form-title Crear Cuenta
+            p.form-subtitle Regístrate para comenzar a usar SIGCMI
+
+          form.register-form(action="/auth/register" method="POST" novalidate=true)
+            .form-grid
+              //- ---------- COLUMNA IZQUIERDA ----------
+              .form-col
+                +formInput('nombres', 'Nombres', 'text', 'Tus nombres', 'fa-solid fa-user')
+                +formInput('apellidos', 'Apellidos', 'text', 'Tus apellidos', 'fa-solid fa-user')
+                +formInput('email', 'Correo Electrónico', 'email', 'Tu correo', 'fa-solid fa-envelope')
+                +formInput('telefono', 'Telefono', 'tel', 'Tu telefono', 'fa-solid fa-phone')
+                +formInput('fechaNacimiento', 'Fecha de Nacimiento', 'date', 'dd/mm/aaaa', 'fa-solid fa-calendar-days')
+
+              //- ---------- COLUMNA DERECHA ----------
+              .form-col
+                .form-group
+                  .form-row
+                    .form-group.form-group--small
+                      label.form-label(for="tipoDocumento") Tipo de Documento
+                        span.form-label__required *
+                      .input-wrapper
+                        select.form-select#tipoDocumento(name="tipoDocumento")
+                          option(value="CC" selected) CC
+                          option(value="CE") CE
+                          option(value="TI") TI
+                          option(value="PA") PA
+
+                    .form-group.form-group--grow
+                      label.form-label(for="numeroDocumento" style="height: 40px") Número
+                        span.form-label__required *
+                      .input-wrapper
+                        input.form-input(
+                          type="text"
+                          inputmode="numeric"
+                          id="numeroDocumento"
+                          name="numeroDocumento"
+                          placeholder="123456789"
+                        )
+                  if typeof errors !== 'undefined' && errors && (errors.tipoDocumento || errors.numeroDocumento)
+                    span.form-error= (errors.tipoDocumento || errors.numeroDocumento).msg
+
+                +formInput('departamento', 'Departamento de Residencia', 'text', 'Departamento de Residencia', 'fa-solid fa-location-dot')
+                +formInput('ciudad', 'Ciudad/Municipio de Residencia', 'text', 'Ciudad/Municipio', 'fa-solid fa-location-dot')
+
+
+                .form-group
+                  label.form-label(for="password")
+                    | Contraseña
+                    span.form-label__required *
+
+                  .input-wrapper
+                    i.input-icon.fa-solid.fa-lock
+
+                    input.form-input(
+                      type="password"
+                      id="password"
+                      name="password"
+                      placeholder="••••••••••••"
+                    )
+
+                    button.password-toggle(
+                      type="button"
+                      id="togglePassword"
+                    )
+                      i(class="fa-solid fa-eye")
+
+                  // Barra de seguridad
+                  .password-strength
+                    .password-strength-bar
+                      span#strengthBar
+
+                    p#strengthText.password-strength-text
+                      | Seguridad de la contraseña
+
+                  // Requisitos
+                  ul.password-rules
+
+                    li#ruleLength
+                      i.fa-solid.fa-circle-xmark
+                      | Mínimo 8 caracteres
+
+                    li#ruleUpper
+                      i.fa-solid.fa-circle-xmark
+                      | Una letra mayúscula
+
+                    li#ruleLower
+                      i.fa-solid.fa-circle-xmark
+                      | Una letra minúscula
+
+                    li#ruleNumber
+                      i.fa-solid.fa-circle-xmark
+                      | Un número
+
+                    li#ruleSpecial
+                      i.fa-solid.fa-circle-xmark
+                      | Un carácter especial
+
+                  if typeof errors !== 'undefined' && errors && errors.password
+                    span.form-error= errors.password.msg
+
+                .form-group
+                  label.form-label(for="confirmPassword")
+                    | Confirmar Contraseña
+                    span.form-label__required *
+
+                  .input-wrapper
+                    i.input-icon.fa-solid.fa-lock
+
+                    input.form-input(
+                      type="password"
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      placeholder="••••••••••••"
+                    )
+
+                    button.password-toggle(
+                      type="button"
+                      id="toggleConfirmPassword"
+                    )
+                      i(class="fa-solid fa-eye")
+
+                  if typeof errors !== 'undefined' && errors && errors.confirmPassword
+                    span.form-error= errors.confirmPassword.msg
+
+            .form-actions
+              button.btn-primary(type="submit") Crear cuenta
+              a.whatsapp-fab(href="https://wa.me/573112222222" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp")
+                i.fa-brands.fa-whatsapp
+
+            p.auth-footer
+              | ¿Ya tienes cuenta?
+              a.auth-footer__link(href="/auth/login")  Inicia Sesión
+
+    script(src="/paciente/js/register.js")

@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "server": "nodemon server.js",
+    "css": "npx @tailwindcss/cli -i ./public/paciente/css/input.css -o ./public/paciente/css/output.css --watch",
+    "dev": "concurrently \"npm run server\" \"npm run css\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -23,6 +25,7 @@
   },
   "homepage": "https://github.com/ADSO005/SIGCMI-003#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
@@ -34,8 +37,12 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@tailwindcss/cli": "^4.3.3",
+    "concurrently": "^10.0.4",
     "eslint": "^10.8.0",
     "globals": "^17.8.0",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "tailwind": "^4.0.0",
+    "tailwindcss": "^4.3.3"
   }
 }

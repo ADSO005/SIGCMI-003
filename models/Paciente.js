@@ -1,26 +1,60 @@
-import { DataTypes } from 'sequelize';
-import sequelize from '../config/db.js';
+import { DataTypes } from "sequelize";
+import db from "../config/db.js";
 
-const Paciente = sequelize.define('Paciente', {
-    id_paciente: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+const Paciente = db.define(
+    "Paciente",
+    {
+        id_paciente: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+
+        usuario_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            unique: true,
+        },
+
+        fecha_nacimiento: {
+            type: DataTypes.DATEONLY,
+            allowNull: true,
+        },
+
+        tipo_sangre: {
+            type: DataTypes.STRING(5),
+            allowNull: true,
+        },
+
+        alergias: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+
+        condiciones_medicas: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+
+        direccion: {
+            type: DataTypes.STRING(150),
+            allowNull: true,
+        },
+
+        departamento: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+        },
+
+        ciudad: {
+            type: DataTypes.STRING(100),
+            allowNull: true,
+        },
     },
-    usuario_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    },
-    fecha_nacimiento: DataTypes.DATEONLY,
-    tipo_sangre: DataTypes.STRING(5),
-    alergias: DataTypes.TEXT,
-    condiciones_medicas: DataTypes.TEXT,
-    direccion: DataTypes.STRING(150),
-    departamento: DataTypes.STRING(100),
-    ciudad: DataTypes.STRING(100)
-}, {
-    tableName: 'pacientes',
-    timestamps: false
-});
+    {
+        tableName: "pacientes",
+        timestamps: false,
+    }
+);
 
 export default Paciente;

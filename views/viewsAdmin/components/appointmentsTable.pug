@@ -1,0 +1,100 @@
+.appointments-card
+
+    .card-header
+
+        .card-title
+
+            h2
+                i.fa-solid.fa-calendar-day
+                |  Citas de Hoy
+
+            p Pacientes programados para la fecha actual
+
+        if citasHoy.length
+
+            span.badge-total= citasHoy.length + " citas"
+    
+    if citasHoy.length
+        
+        table.appointments-table
+
+            thead
+
+                tr
+
+                    th Hora
+
+                    th Paciente
+
+                    th Médico
+
+                    th Estado
+
+                    th.text-center Acción
+
+            tbody
+
+                each cita in citasHoy
+
+                    tr
+
+                        td
+                            strong= cita.hora
+
+                        td
+
+                            .table-user
+
+                                .table-avatar
+
+                                    i.fa-solid.fa-user
+
+                                .table-info
+
+                                    strong= cita.Paciente.Usuario.nombres + " " + cita.Paciente.Usuario.apellidos
+
+                        td
+
+                            .table-user
+
+                                .table-avatar.doctor
+
+                                    i.fa-solid.fa-user-doctor
+
+                                .table-info
+
+                                    strong= "Dr. " + cita.Medico.Usuario.nombres + " " + cita.Medico.Usuario.apellidos
+
+                        td
+
+                            if cita.Estado.nombre == "Pendiente"
+
+                                span.status.pending Pendiente
+
+                            else if cita.Estado.nombre == "Confirmada"
+
+                                span.status.completed Confirmada
+
+                            else if cita.Estado.nombre == "Cancelada"
+
+                                span.status.cancelled Cancelada
+
+                            else
+
+                                span.status= cita.Estado.nombre
+
+                        td.text-center
+
+                            button.table-btn(type="button")
+
+                                i.fa-solid.fa-eye
+
+    else
+
+        .empty-state
+
+            i.fa-regular.fa-calendar-xmark
+
+            h3 No hay citas programadas
+
+            p Cuando existan citas para hoy aparecerán aquí automáticamente.

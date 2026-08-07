@@ -1,20 +1,35 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import "dotenv/config";
 
-import pacienteRoutes from './routes/paciente/routes.js';
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
+import authRoutes from "./routes/paciente/authRoutes.js";
+import dashboardRoutes from "./routes/admin/dashboardRoutes.js";
 
 const app = express();
 
-// Reemplazo de __dirname en ES Modules
+// Equivalente a __dirname en ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.set('view engine', 'pug');
-app.set('views', path.join(__dirname, 'views'));
+// ---- Vistas (Pug) ----
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
 
-app.use(express.static(path.join(__dirname, 'public')));
+// ---- Middlewares ----
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use('/paciente', pacienteRoutes);
+// ---- Rutas ----
+app.use("/auth", authRoutes);
+
+app.use("/admin", dashboardRoutes);
+
+// Redirige la raíz al registro
+app.get("/", (req, res) => {
+    res.redirect("/auth/register");
+});
 
 export default app;
