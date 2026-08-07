@@ -1,0 +1,111 @@
+extends layout
+
+block content
+
+  header.top-bar
+    .brand
+      i.icon-user
+      div
+        strong Portal del Paciente
+        p Bienvenido, #{paciente.nombre}
+
+    a.btn-logout(href="/logout")
+      i.icon-logout
+      | Cerrar Sesión
+
+  .layout-grid
+
+    // =========================
+    // COLUMNA IZQUIERDA
+    // =========================
+    .col-principal
+
+      // ACCIONES
+      .acciones
+        a.btn-primario(href="/citas/nueva")
+          span +
+          | Nueva Cita Web
+
+        a.btn.btn-whatsapp(href="https://wa.me/3137458332" target="_blank")
+          i.icon-whatsapp
+          | Agendar por WhatsApp
+
+      // DIAGNÓSTICOS
+      a.btn.diag.btn-diagnosticos(href="/diagnosticos")
+        | Ver Diagnósticos
+
+      // MIS CITAS
+      section.card-citas
+        h2 Mis Citas
+
+        if citas.length === 0
+          p.sin-citas No tienes citas registradas.
+
+        else
+          each cita in citas
+
+            .cita-item
+
+              .cita-info
+                i.icon-calendar
+
+                div
+                  p.cita-fecha #{cita.fecha}
+                  p #{cita.hora} - #{cita.consultorio}
+                  p #{cita.doctor}
+
+              span.badge(class=`badge-${cita.estado.toLowerCase()}`)= cita.estado
+
+              .cita-acciones
+                a(href=`/citas/${cita.id}/reprogramar`)
+                  | Reprogramar
+
+                a.cancelar(href=`/citas/${cita.id}/cancelar`)
+                  | Cancelar
+
+
+    // =========================
+    // COLUMNA DERECHA
+    // =========================
+    aside.col-sidebar
+
+      // PERFIL
+      .card-perfil
+        i.icon-user-circle
+
+        p #{paciente.nombre}
+
+        a.btn.btn-primario(href="/perfil")
+          | Ver Mi Perfil
+
+
+      // NOTIFICACIONES
+      .card-notificaciones
+        h3
+          i.icon-bell
+          | Notificaciones
+
+        p
+          | Configura cómo deseas recibir notificaciones sobre tus citas.
+
+        a.btn.btn-primario(href="/notificaciones")
+          | Configurar Notificaciones
+
+
+      // AYUDA
+      .card-ayuda
+        h3 ¿Necesitas Ayuda?
+
+        p Nuestro equipo está disponible para asistirte.
+
+        p
+          i.icon-phone
+          | 3137458332
+
+        p
+          i.icon-email
+          | herrerayulieth254@gmail.com
+
+        p
+          i.icon-clock
+          | Lunes-Viernes 8:00-20:00
