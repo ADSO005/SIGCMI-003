@@ -1,17 +1,15 @@
 import { Sequelize } from 'sequelize';
 
-const db = new Sequelize(
-    'sigcmi',      // Aqui nombre de Base de datos
-    'root',        // Usuario de Base de datos
-    '',            // Contraseña de tu mySQL
+// Creamos la conexión
+const sequelize = new Sequelize(
+    'sigcmi',
+    'root',
+    'Karen1030140161',
     {
-        host: '127.0.0.1',
-        port: 3306,
+        host: 'localhost',
         dialect: 'mysql',
-        define: {
-            timestamps: false
-        }
+        logging: false
     }
 );
 
-export default db;
+export default sequelize;
