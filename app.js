@@ -34,5 +34,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/paciente", pacienteRoutes);
+app.use("/perfil", pacienteRoutes);
 
 export default app;

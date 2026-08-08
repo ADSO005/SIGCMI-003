@@ -1,0 +1,253 @@
+extends layout
+
+block content
+
+  // ==========================================
+  // ENCABEZADO DEL PERFIL
+  // ==========================================
+
+  header.profile-header
+
+    a.profile-back(href="/paciente/dashboard")
+      span ←
+      | Mi Perfil
+
+    a.profile-edit(href="/paciente/perfil/editar")
+      | Editar Perfil
+
+
+  // ==========================================
+  // CONTENEDOR PRINCIPAL
+  // ==========================================
+
+  main.profile-container
+
+    // ========================================
+    // COLUMNA IZQUIERDA
+    // ========================================
+
+    section.profile-left
+
+      // TARJETA PRINCIPAL
+      .profile-card.profile-user-card
+
+        .profile-avatar
+          span 👤
+
+        h1 #{paciente.nombre}
+
+        p.profile-user-role Paciente
+
+
+      // INFORMACIÓN PERSONAL
+      section.profile-card
+
+        .section-title
+          .section-icon 👤
+          div
+            h2 Información Personal
+            p Datos básicos del paciente
+
+        .profile-fields
+
+          .profile-field
+            span.field-icon 👤
+            .field-content
+              span.field-label Nombres
+              strong #{paciente.nombres || 'No registrado'}
+
+          .profile-field
+            span.field-icon 👤
+            .field-content
+              span.field-label Apellidos
+              strong #{paciente.apellidos || 'No registrado'}
+
+          .profile-field
+            span.field-icon ✉
+            .field-content
+              span.field-label Correo Electrónico
+              strong #{paciente.correo || 'No registrado'}
+
+          .profile-field
+            span.field-icon ☎
+            .field-content
+              span.field-label Teléfono
+              strong #{paciente.telefono || 'No registrado'}
+
+          .profile-field
+            span.field-icon 📅
+            .field-content
+              span.field-label Fecha de Nacimiento
+              strong #{paciente.fechaNacimiento || 'No registrada'}
+
+          .profile-field
+            span.field-icon ▣
+            .field-content
+              span.field-label Tipo de Documento
+              strong #{paciente.tipoDocumento || 'No registrado'}
+
+          .profile-field
+            span.field-icon ▣
+            .field-content
+              span.field-label Número de Documento
+              strong #{paciente.numeroDocumento || 'No registrado'}
+
+
+      // CAMBIO DE CONTRASEÑA
+      section.profile-card.password-card
+
+        .section-title
+          .section-icon 🔒
+          div
+            h2 Cambiar Contraseña
+            p La contraseña debe tener mínimo 6 caracteres.
+
+        form.password-form(action="/paciente/perfil/cambiar-password" method="POST")
+
+          .form-group
+            label(for="passwordActual") Contraseña actual
+            input(
+              type="password"
+              id="passwordActual"
+              name="passwordActual"
+              placeholder="Ingresa tu contraseña actual"
+            )
+
+          .form-group
+            label(for="passwordNueva") Contraseña nueva
+            input(
+              type="password"
+              id="passwordNueva"
+              name="passwordNueva"
+              placeholder="Ingresa tu nueva contraseña"
+            )
+
+          .form-group
+            label(for="confirmarPassword") Repetir contraseña nueva
+            input(
+              type="password"
+              id="confirmarPassword"
+              name="confirmarPassword"
+              placeholder="Repite tu nueva contraseña"
+            )
+
+          button.btn-password(type="submit")
+            | Cambiar Contraseña
+
+
+    // ========================================
+    // COLUMNA DERECHA
+    // ========================================
+
+    section.profile-right
+
+      // INFORMACIÓN MÉDICA
+      section.profile-card
+
+        .section-title
+          .section-icon.medical-icon ♥
+          div
+            h2 Información Médica
+            p Información importante para tu atención
+
+        .profile-fields
+
+          .profile-field
+            span.field-icon 🩸
+            .field-content
+              span.field-label Tipo de Sangre
+              strong #{paciente.tipoSangre || 'No registrado'}
+
+          .profile-field
+            span.field-icon ⚕
+            .field-content
+              span.field-label Alergias
+              strong #{paciente.alergias || 'Ninguna registrada'}
+
+          .profile-field
+            span.field-icon 🩺
+            .field-content
+              span.field-label Condiciones Médicas
+              strong #{paciente.condicionesMedicas || 'Ninguna registrada'}
+
+
+      // DIRECCIÓN
+      section.profile-card
+
+        .section-title
+          .section-icon 🏠
+          div
+            h2 Dirección de Residencia
+            p Lugar de residencia registrado
+
+        .profile-fields
+
+          .profile-field.field-full
+            span.field-icon 📍
+            .field-content
+              span.field-label Dirección
+              strong #{paciente.direccion || 'No registrada'}
+
+          .profile-field
+            span.field-icon 🌎
+            .field-content
+              span.field-label Departamento
+              strong #{paciente.departamento || 'No registrado'}
+
+          .profile-field
+            span.field-icon 🏙
+            .field-content
+              span.field-label Ciudad / Municipio
+              strong #{paciente.ciudad || 'No registrada'}
+
+
+      // CONTACTO DE EMERGENCIA
+      section.profile-card
+
+        .section-title
+          .section-icon.emergency-icon ☎
+          div
+            h2 Contacto de Emergencia
+            p Persona que podemos contactar en caso de emergencia
+
+        .profile-fields
+
+          .profile-field
+            span.field-icon 👤
+            .field-content
+              span.field-label Nombres
+              strong #{paciente.contactoEmergencia.nombres || 'No registrado'}
+
+          .profile-field
+            span.field-icon 👤
+            .field-content
+              span.field-label Apellidos
+              strong #{paciente.contactoEmergencia.apellidos || 'No registrado'}
+
+          .profile-field
+            span.field-icon ☎
+            .field-content
+              span.field-label Teléfono
+              strong #{paciente.contactoEmergencia.telefono || 'No registrado'}
+
+          .profile-field
+            span.field-icon ✉
+            .field-content
+              span.field-label Correo Electrónico
+              strong #{paciente.contactoEmergencia.correo || 'No registrado'}
+
+
+      // SEGURIDAD
+      section.security-card
+
+        .security-icon
+          | 🔒
+
+        .security-content
+          h2 Seguridad y Privacidad
+          p
+            | Tu información está protegida con los más altos estándares
+            | de seguridad. Cualquier modificación requiere confirmación.
+
+        a.security-button(href="/paciente/perfil/seguridad")
+          | Administrar Seguridad
