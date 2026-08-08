@@ -1,12 +1,3 @@
-console.log("Archivo cargado");
-
-setTimeout(() => {
-
-  console.log("5 segundos después");
-
-  console.log(document.getElementById("confirmPassword"));
-
-}, 5000);
 // ===============================
 // SIGCMI - Registro de Pacientes
 // ===============================
@@ -416,16 +407,53 @@ function validarNumeroDocumento() {
 // Validar Ciudad
 // ===============================
 
+
 function validarCiudad() {
+    const valor = ciudad.value.trim();
 
-  return validarCampoTexto(
-    ciudad,
-    "Ciudad",
-    2,
-    50
-  );
+    // Campo obligatorio
+    if (valor === "") {
+        mostrarError(ciudad, "La ciudad es obligatoria");
+        return false;
+    }
 
+    // Longitud mínima
+    if (valor.length < 2) {
+        mostrarError(ciudad, "La ciudad debe tener mínimo 2 caracteres");
+        return false;
+    }
+
+    // Longitud máxima
+    if (valor.length > 50) {
+        mostrarError(ciudad, "La ciudad debe tener máximo 50 caracteres");
+        return false;
+    }
+
+    // Solo letras, espacios y caracteres propios del español
+    const patron = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+
+    if (!patron.test(valor)) {
+        mostrarError(
+            ciudad,
+            "La ciudad solo puede contener letras y espacios"
+        );
+        return false;
+    }
+
+    // No permitir espacios al inicio o al final
+    if (valor !== ciudad.value) {
+        mostrarError(
+            ciudad,
+            "La ciudad no puede comenzar ni terminar con espacios"
+        );
+        return false;
+    }
+
+    // Todo correcto
+    limpiarError(ciudad);
+    return true;
 }
+
 
 
 // ===============================
@@ -605,38 +633,93 @@ function limpiarSoloNumeros(input, maximo) {
 
 function validarCampoTexto(input, nombreCampo, minimo, maximo) {
 
-  const valor = input.value.trim();
+  const valorOriginal = input.value;
+  const valor = valorOriginal.trim();
 
+  // Campo obligatorio
   if (valor === "") {
-    mostrarError(input, `El campo ${nombreCampo} es obligatorio.`);
+
+    mostrarError(
+      input,
+      `El campo ${nombreCampo} es obligatorio.`
+    );
+
     estadoFormulario[input.id] = false;
+
     return false;
   }
 
+  // Longitud mínima
   if (valor.length < minimo) {
-    mostrarError(input, `Debe tener mínimo ${minimo} caracteres.`);
+
+    mostrarError(
+      input,
+      `${nombreCampo} debe tener mínimo ${minimo} caracteres.`
+    );
+
     estadoFormulario[input.id] = false;
+
     return false;
   }
 
+  // Longitud máxima
   if (valor.length > maximo) {
-    mostrarError(input, `Máximo ${maximo} caracteres.`);
+
+    mostrarError(
+      input,
+      `${nombreCampo} debe tener máximo ${maximo} caracteres.`
+    );
+
     estadoFormulario[input.id] = false;
+
     return false;
   }
 
+  // Solo letras, espacios, tildes y ñ
   if (!soloLetras.test(valor)) {
-    mostrarError(input, `Solo se permiten letras.`);
+
+    mostrarError(
+      input,
+      `${nombreCampo} solo puede contener letras y espacios.`
+    );
+
     estadoFormulario[input.id] = false;
+
     return false;
   }
 
+  // No permitir espacios al inicio o al final
+  if (valorOriginal !== valor) {
+
+    mostrarError(
+      input,
+      `${nombreCampo} no puede comenzar ni terminar con espacios.`
+    );
+
+    estadoFormulario[input.id] = false;
+
+    return false;
+  }
+
+  // No permitir múltiples espacios seguidos
+  if (/\s{2,}/.test(valor)) {
+
+    mostrarError(
+      input,
+      `${nombreCampo} no puede contener espacios consecutivos.`
+    );
+
+    estadoFormulario[input.id] = false;
+
+    return false;
+  }
+
+  // Todo correcto
   mostrarExito(input);
 
   estadoFormulario[input.id] = true;
 
   return true;
-
 }
 
 // ===============================
@@ -802,14 +885,31 @@ numeroDocumento.addEventListener("blur", () => {
 // Departamento
 // ===============================
 
+// ===============================
+// Validar Departamento
+// ===============================
+
+function validarDepartamento() {
+
+    return validarCampoTexto(
+        departamento,
+        "Departamento",
+        2,
+        50
+    );
+
+}
+// ===============================
+// Departamento
+// ===============================
 
 departamento.addEventListener("keydown", permitirSoloLetras);
 
 departamento.addEventListener("input", () => {
 
-  limpiarSoloLetras(departamento);
+    limpiarSoloLetras(departamento);
 
-  validarDepartamento();
+    validarDepartamento();
 
 });
 
@@ -835,27 +935,10 @@ ciudad.addEventListener("blur", validarCiudad);
 
 
 // ===============================
-// Depaartamento
-// ===============================
-
-departamento.addEventListener("keydown", permitirSoloLetras);
-
-departamento.addEventListener("input", () => {
-
-  limpiarSoloLetras(departamento);
-
-  validarDepartamento();
-
-});
-
-ciudad.addEventListener("blur", validarDepartamento);
-
-// ===============================
 // Contraseña
 // ===============================
 
 password.addEventListener("input", () => {
-
   actualizarFortalezaPassword();
 
   validarPassword();
@@ -882,45 +965,56 @@ confirmPassword.addEventListener("blur", validarConfirmPassword);
 // ===============================
 // Envío del formulario
 // ===============================
-formulario.addEventListener("submit", (e) => {
+formulario.addEventListener("submit", async (e) => {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  validarNombres();
-  validarApellidos();
-  validarEmail();
-  validarTelefono();
-  validarFechaNacimiento();
-  validarTipoDocumento();
-  validarNumeroDocumento();
-  validarDepartamento();
-  validarCiudad();
-  validarPassword();
-  validarConfirmPassword();
+    validarNombres();
+    validarApellidos();
+    validarEmail();
+    validarTelefono();
+    validarFechaNacimiento();
+    validarTipoDocumento();
+    validarNumeroDocumento();
+    validarDepartamento();
+    validarCiudad();
+    validarPassword();
+    validarConfirmPassword();
 
-  const formularioValido = Object.values(estadoFormulario).every(valor => valor);
+    const formularioValido =
+        Object.values(estadoFormulario).every(valor => valor);
 
-  if (!formularioValido) {
+    if (!formularioValido) {
 
-    const primerError = document.querySelector(".input-error");
+        const primerError =
+            document.querySelector(".input-error");
 
-    if (primerError) {
+        if (primerError) {
 
-      primerError.focus();
+            primerError.focus();
 
-      primerError.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
+            primerError.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
 
+        }
+
+        return;
     }
 
-    return;
+    // Verificar datos en la base de datos
+    await verificarCorreo();
+    await verificarDocumento();
 
-  }
+    const formularioValidoBD =
+        Object.values(estadoFormulario).every(valor => valor);
 
-  formulario.submit();
+    if (!formularioValidoBD) {
+        return;
+    }
 
+    formulario.submit();
 });
 
 // ===============================
