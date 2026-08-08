@@ -408,49 +408,14 @@ function validarNumeroDocumento() {
 
 
 function validarCiudad() {
-    const valor = ciudad.value.trim();
 
-    // Campo obligatorio
-    if (valor === "") {
-        mostrarError(ciudad, "La ciudad es obligatoria");
-        return false;
-    }
+    return validarCampoTexto(
+        ciudad,
+        "Ciudad",
+        2,
+        50
+    );
 
-    // Longitud mínima
-    if (valor.length < 2) {
-        mostrarError(ciudad, "La ciudad debe tener mínimo 2 caracteres");
-        return false;
-    }
-
-    // Longitud máxima
-    if (valor.length > 50) {
-        mostrarError(ciudad, "La ciudad debe tener máximo 50 caracteres");
-        return false;
-    }
-
-    // Solo letras, espacios y caracteres propios del español
-    const patron = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
-
-    if (!patron.test(valor)) {
-        mostrarError(
-            ciudad,
-            "La ciudad solo puede contener letras y espacios"
-        );
-        return false;
-    }
-
-    // No permitir espacios al inicio o al final
-    if (valor !== ciudad.value) {
-        mostrarError(
-            ciudad,
-            "La ciudad no puede comenzar ni terminar con espacios"
-        );
-        return false;
-    }
-
-    // Todo correcto
-    limpiarError(ciudad);
-    return true;
 }
 
 
