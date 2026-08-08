@@ -347,7 +347,6 @@ function validarTipoDocumento() {
 
   }
 
-  mostrarExito(tipoDocumento);
 
   estadoFormulario.tipoDocumento = true;
 
@@ -881,9 +880,7 @@ numeroDocumento.addEventListener("blur", () => {
 });
 
 
-// ===============================
-// Departamento
-// ===============================
+
 
 // ===============================
 // Validar Departamento
