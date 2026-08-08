@@ -4,7 +4,7 @@ import { Sequelize } from 'sequelize';
 const sequelize = new Sequelize(
     'sigcmi',
     'root',
-    '',
+    'Karen1030140161',
     {
         host: 'localhost',
         dialect: 'mysql',
