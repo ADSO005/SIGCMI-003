@@ -1,5 +1,6 @@
 import User from "../../models/User.js";
 import bcrypt from "bcrypt";
+import generateJWT from "../../helpers/generateJWT.js";
 
 
 /* ruta de la vista principal inicio de sesion */
@@ -61,9 +62,33 @@ const login = async (req, res) => {
         });
     }
 
+    usuario.ultimo_login = new Date();
+
+    await usuario.save();
+
+    const token = generateJWT(usuario);
+
+    console.log("JWT:",token);
+
     console.log(passwordCorrecta);
 
     console.log(usuario);
+
+    res.cookie("_token", token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax"
+    });
+
+    return res.send({
+        mensaje: "Login exitoso",
+        token,
+        usuario: {
+            id: usuario.id_usuario,
+            rol: usuario.rol_id,
+            correo: usuario.correo
+        }
+    });
 
 };
 
