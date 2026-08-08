@@ -1,13 +1,15 @@
 import express from "express";
 import {
     formLogin,
+    login,
     formRecoverPassword
-} from "../../controllers/paciente/userController.js";
+} from "../../controllers/auth/userController.js";
 
 const router = express.Router();
 
 // Login
 router.get("/login", formLogin);
+router.post("/login",login);
 
 // Registro
 

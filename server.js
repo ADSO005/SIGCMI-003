@@ -1,7 +1,9 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 import app from './app.js'
 import db from './config/db.js'
-import dotenv from 'dotenv'
-import userRoutes from "./routes/paciente/userRoutes.js"
+import userRoutes from "./routes/auth/userRoutes.js"
 
 
 app.set('view engine', 'pug');
@@ -22,4 +24,3 @@ app.listen(PORT, () => {
     console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`)
 })
 
-dotenv.config()
