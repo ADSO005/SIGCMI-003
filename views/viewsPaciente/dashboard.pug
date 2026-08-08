@@ -2,110 +2,445 @@ extends layout
 
 block content
 
+  // ==========================================
+  // ENCABEZADO
+  // ==========================================
+
   header.top-bar
+
     .brand
+
       i.icon-user
+
       div
         strong Portal del Paciente
         p Bienvenido, #{paciente.nombre}
 
+
     a.btn-logout(href="/logout")
+
       i.icon-logout
       | Cerrar Sesión
 
+
+  // ==========================================
+  // CONTENIDO PRINCIPAL
+  // ==========================================
+
   .layout-grid
 
-    // =========================
+
+    // ========================================
     // COLUMNA IZQUIERDA
-    // =========================
+    // ========================================
+
     .col-principal
 
-      // ACCIONES
+
+      // ======================================
+      // BOTONES DE ACCIONES
+      // ======================================
+
       .acciones
-        a.btn-primario(href="/citas/nueva")
+
+        // NUEVA CITA WEB
+        button.btn-primario#btnNuevaCita(
+          type="button"
+          onclick="abrirNuevaCita()"
+        )
+
           span +
           | Nueva Cita Web
 
-        a.btn.btn-whatsapp(href="https://wa.me/3137458332" target="_blank")
+
+        // WHATSAPP
+        a.btn.btn-whatsapp(
+          href="https://wa.me/3137458332"
+          target="_blank"
+        )
+
           i.icon-whatsapp
           | Agendar por WhatsApp
 
+
+      // ======================================
       // DIAGNÓSTICOS
-      a.btn.diag.btn-diagnosticos(href="/diagnosticos")
+      // ======================================
+
+      a.btn.diag.btn-diagnosticos(
+        href="/diagnosticos"
+      )
         | Ver Diagnósticos
 
+
+      // ======================================
+      // FORMULARIO NUEVA CITA
+      // ======================================
+
+      section.card-nueva-cita#formNuevaCita(
+        style="display: none;"
+      )
+
+        h2 Agendar Nueva Cita
+
+
+        form(
+          action="/citas/nueva"
+          method="POST"
+        )
+
+
+          // ==================================
+          // ESPECIALIDAD
+          // ==================================
+
+          .campo
+
+            label(for="especialidad")
+              | Especialidad
+
+
+            select#especialidad(
+              name="especialidad"
+              required
+            )
+
+              option(value="")
+                | Seleccionar especialidad
+
+              option(value="medicina-general")
+                | Medicina General
+
+              option(value="odontologia")
+                | Odontología
+
+              option(value="pediatria")
+                | Pediatría
+
+              option(value="cardiologia")
+                | Cardiología
+
+              option(value="dermatologia")
+                | Dermatología
+
+
+          // ==================================
+          // MÉDICO
+          // ==================================
+
+          .campo
+
+            label(for="medico")
+              | Médico
+
+
+            select#medico(
+              name="medico"
+              required
+            )
+
+              option(value="")
+                | Seleccionar médico
+
+              option(value="1")
+                | Dr. Carlos Pérez
+
+              option(value="2")
+                | Dra. María Rodríguez
+
+              option(value="3")
+                | Dr. Andrés Gómez
+
+              option(value="4")
+                | Dra. Laura Martínez
+
+
+          // ==================================
+          // FECHA Y HORA
+          // ==================================
+
+          .fila-campos
+
+
+            .campo
+
+              label(for="fecha")
+                | Fecha
+
+
+              input#fecha(
+                type="date"
+                name="fecha"
+                required
+              )
+
+
+            .campo
+
+              label(for="hora")
+                | Hora
+
+
+              select#hora(
+                name="hora"
+                required
+              )
+
+                option(value="")
+                  | Seleccionar hora
+
+                option(value="08:00")
+                  | 08:00
+
+                option(value="09:00")
+                  | 09:00
+
+                option(value="10:00")
+                  | 10:00
+
+                option(value="11:00")
+                  | 11:00
+
+                option(value="14:00")
+                  | 14:00
+
+                option(value="15:00")
+                  | 15:00
+
+                option(value="16:00")
+                  | 16:00
+
+                option(value="17:00")
+                  | 17:00
+
+
+          // ==================================
+          // MOTIVO DE CONSULTA
+          // ==================================
+
+          .campo
+
+            label(for="motivo")
+              | Motivo de consulta
+
+
+            textarea#motivo(
+              name="motivo"
+              rows="3"
+              placeholder="Describe brevemente el motivo de tu consulta..."
+            )
+
+
+          // ==================================
+          // BOTONES
+          // ==================================
+
+          .acciones-formulario
+
+
+            button.btn-confirmar(
+              type="submit"
+            )
+              | Confirmar Cita
+
+
+            button.btn-cancelar(
+              type="button"
+              onclick="cerrarNuevaCita()"
+            )
+              | Cancelar
+
+
+      // ======================================
       // MIS CITAS
+      // ======================================
+
       section.card-citas
-        h2 Mis Citas
+
+        .titulo-citas
+
+          h2 Mis Citas
+
+          span.total-citas
+            | #{citas.length} citas
+
+
+        // ====================================
+        // VALIDACIÓN DE CITAS
+        // ====================================
 
         if citas.length === 0
-          p.sin-citas No tienes citas registradas.
+
+          .sin-citas
+
+            i.icon-calendar
+
+            p
+              | No tienes citas registradas.
+
 
         else
-          each cita in citas
 
-            .cita-item
+          .lista-citas
 
-              .cita-info
-                i.icon-calendar
+            each cita in citas
 
-                div
-                  p.cita-fecha #{cita.fecha}
-                  p #{cita.hora} - #{cita.consultorio}
-                  p #{cita.doctor}
-
-              span.badge(class=`badge-${cita.estado.toLowerCase()}`)= cita.estado
-
-              .cita-acciones
-                a(href=`/citas/${cita.id}/reprogramar`)
-                  | Reprogramar
-
-                a.cancelar(href=`/citas/${cita.id}/cancelar`)
-                  | Cancelar
+              .cita-item
 
 
-    // =========================
+                // ============================
+                // INFORMACIÓN
+                // ============================
+
+                .cita-info
+
+                  .cita-icono
+
+                    i.icon-calendar
+
+
+                  .cita-datos
+
+                    p.cita-fecha
+                      | #{cita.fecha}
+
+                    p.cita-hora
+                      | #{cita.hora} - #{cita.consultorio}
+
+                    p.cita-doctor
+                      | #{cita.doctor}
+
+
+                // ============================
+                // ESTADO
+                // ============================
+
+                .cita-estado
+
+                  span.badge(
+                    class=`badge-${cita.estado.toLowerCase()}`
+                  )
+                    | #{cita.estado}
+
+
+                // ============================
+                // ACCIONES DE LA CITA
+                // ============================
+
+                .cita-acciones
+
+                  a.reprogramar(
+                    href=`/citas/${cita.id}/reprogramar`
+                  )
+                    | Reprogramar
+
+                  a.cancelar(
+                    href=`/citas/${cita.id}/cancelar`
+                  )
+                    | Cancelar
+
+
+
+    // ========================================
     // COLUMNA DERECHA
-    // =========================
+    // ========================================
+
     aside.col-sidebar
 
+
+      // ======================================
       // PERFIL
+      // ======================================
+
       .card-perfil
+
         i.icon-user-circle
 
-        p #{paciente.nombre}
+        p
+          | #{paciente.nombre}
 
-        a.btn.btn-primario(href="/perfil")
+        a.btn.btn-primario(
+          href="/perfil"
+        )
           | Ver Mi Perfil
 
 
+      // ======================================
       // NOTIFICACIONES
+      // ======================================
+
       .card-notificaciones
+
         h3
+
           i.icon-bell
           | Notificaciones
 
         p
           | Configura cómo deseas recibir notificaciones sobre tus citas.
 
-        a.btn.btn-primario(href="/notificaciones")
+        a.btn.btn-primario(
+          href="/notificaciones"
+        )
           | Configurar Notificaciones
 
 
+      // ======================================
       // AYUDA
+      // ======================================
+
       .card-ayuda
+
         h3 ¿Necesitas Ayuda?
 
-        p Nuestro equipo está disponible para asistirte.
+        p
+          | Nuestro equipo está disponible para asistirte.
 
         p
+
           i.icon-phone
           | 3137458332
 
         p
+
           i.icon-email
           | herrerayulieth254@gmail.com
 
         p
+
           i.icon-clock
           | Lunes-Viernes 8:00-20:00
+
+
+
+  // ==========================================
+  // JAVASCRIPT
+  // ==========================================
+
+  script.
+
+    function abrirNuevaCita() {
+
+      const formulario = document.getElementById('formNuevaCita');
+
+      if (formulario) {
+        formulario.style.display = 'block';
+
+        formulario.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+
+    }
+
+
+    function cerrarNuevaCita() {
+
+      const formulario = document.getElementById('formNuevaCita');
+
+      if (formulario) {
+        formulario.style.display = 'none';
+      }
+
+    }
