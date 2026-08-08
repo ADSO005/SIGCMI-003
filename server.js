@@ -2,6 +2,7 @@ import app from "./app.js";
 import db from "./config/db.js";
 import asociarModelos from "./models/asociaciones.js";
 
+
 // Registrar todas las asociaciones de Sequelize
 asociarModelos();
 

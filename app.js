@@ -3,7 +3,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-
+import pacienteRoutes from "./routes/paciente/routes.js"
 import authRoutes from "./routes/paciente/authRoutes.js";
 import dashboardRoutes from "./routes/admin/dashboardRoutes.js";
 
@@ -19,6 +19,7 @@ app.set("views", path.join(__dirname, "views"));
 
 // ---- Middlewares ----
 app.use(express.urlencoded({ extended: true }));
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -31,5 +32,7 @@ app.use("/admin", dashboardRoutes);
 app.get("/", (req, res) => {
     res.redirect("/auth/register");
 });
+
+app.use("/paciente", pacienteRoutes);
 
 export default app;
