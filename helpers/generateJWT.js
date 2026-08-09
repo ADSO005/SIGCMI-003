@@ -4,8 +4,7 @@ const generateJWT = (usuario) => {
 
     return jwt.sign(
         {
-            id: usuario.id_usuario,
-            rol: usuario.rol_id
+            id: usuario.id_usuario
         },
         process.env.JWT_SECRET,
         {

@@ -80,15 +80,28 @@ const login = async (req, res) => {
         sameSite: "lax"
     });
 
-    return res.send({
-        mensaje: "Login exitoso",
-        token,
-        usuario: {
-            id: usuario.id_usuario,
-            rol: usuario.rol_id,
-            correo: usuario.correo
-        }
-    });
+    switch (usuario.rol_id) {
+
+        case 1:
+            return res.redirect("/admin/dashboard");
+
+        case 2:
+            return res.redirect("/medico/dashboard");
+
+        case 3:
+            return res.redirect("/paciente/dashboard");
+
+        default:
+            return res.redirect("/auth/login");
+    }
+
+};
+
+const logout = (req, res) => {
+
+    res.clearCookie("_token");
+
+    return res.redirect("/auth/login");
 
 };
 
@@ -96,6 +109,7 @@ const login = async (req, res) => {
 export {
     formLogin,
     login,
+    logout,
     formRecoverPassword
 };
 
