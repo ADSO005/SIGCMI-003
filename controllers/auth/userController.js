@@ -1,7 +1,8 @@
 import User from "../../models/User.js";
 import bcrypt from "bcrypt";
 import generateJWT from "../../helpers/generateJWT.js";
-
+import generateToken from "../../helpers/generateToken.js";
+import sendRecoveryEmail from "../../services/emailService.js";
 
 /* ruta de la vista principal inicio de sesion */
 const formLogin = (req, res) => {
@@ -11,13 +12,6 @@ const formLogin = (req, res) => {
     });
 };
 
-/* ruta de la vista recuperar contraseña */
-const formRecoverPassword = (req, res) => {
-
-    res.render("login/auth/recover-password", {
-        titulo: "Recuperar contraseña"
-    });
-};
 
 const login = async (req, res) => {
 
@@ -105,12 +99,129 @@ const logout = (req, res) => {
 
 };
 
+/* ruta vista olvide mi contraseña */
+const formRecoverPassword = (req, res) => {
+
+    res.render("login/auth/recover-password", {
+        titulo: "Recuperar contraseña"
+    });
+};
+
+/* funcion enlace recuperar contraseña */
+const recoverPassword = async (req, res) => {
+
+    const { correo } = req.body;
+
+    const usuario = await User.findOne({
+        where: {
+            correo
+        }
+    });
+
+    if (!usuario) {
+
+        return res.render("login/auth/recover-password", {
+            titulo: "Recuperar contraseña",
+            error: "No existe una cuenta con ese correo."
+        });
+
+    }
+
+    usuario.token = generateToken();
+
+    await usuario.save();
+
+    await sendRecoveryEmail(usuario);
+
+    return res.render("login/auth/recover-password",{
+        titulo: "Recuperar contraseña",
+        mensaje: "Hemos enviado un enlace de recuperación a tu correo. "
+    });
+
+};
+
+/* funcion correo para el cambio de contraseña */
+const formResetPassword = async (req, res) => {
+
+    const { token } = req.params;
+
+    const usuario = await User.findOne({
+        where: {
+            token
+        }
+    });
+
+    if (!usuario) {
+
+        return res.render("login/auth/recover-password", {
+            titulo: "Recuperar contraseña",
+            error: "El enlace de recuperación no es válido o ha expirado."
+        });
+
+    }
+
+    res.render("login/auth/reset-password", {
+        titulo: "Nueva contraseña",
+        token
+    });
+
+};
+
+// funcion cambiar contraseña
+const resetPassword = async (req, res) => {
+
+    const { token } = req.params;
+
+    const { password, password_confirmation } = req.body;
+
+    if (password !== password_confirmation) {
+
+        return res.render("login/auth/reset-password", {
+            titulo: "Nueva contraseña",
+            token,
+            error: "Las contraseñas no coinciden."
+        });
+
+    }
+
+    const usuario = await User.findOne({
+        where: {
+            token
+        }
+    });
+
+    if (!usuario) {
+
+        return res.render("login/auth/recover-password", {
+            titulo: "Recuperar contraseña",
+            error: "El enlace no es válido."
+        });
+
+    }
+
+    const salt = await bcrypt.genSalt(10);
+
+    usuario.password = await bcrypt.hash(password, salt);
+
+    usuario.token = null;
+
+    await usuario.save();
+
+    return res.render("login/auth/login", {
+        titulo: "Iniciar Sesión",
+        mensaje: "Tu contraseña fue actualizada correctamente."
+    });
+
+};
 
 export {
     formLogin,
     login,
     logout,
-    formRecoverPassword
+    formRecoverPassword,
+    recoverPassword,
+    formResetPassword,
+    resetPassword
 };
 
 
