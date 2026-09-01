@@ -1,8 +1,11 @@
 import User from "../../models/User.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import generateJWT from "../../helpers/generateJWT.js";
 import generateToken from "../../helpers/generateToken.js";
 import sendRecoveryEmail from "../../services/emailService.js";
+import generateOTP from "../../helpers/generateOTP.js";
+import generateResetToken from "../../helpers/generateResetToken.js";
 
 /* ruta de la vista principal inicio de sesion */
 const formLogin = (req, res) => {
@@ -127,15 +130,75 @@ const recoverPassword = async (req, res) => {
 
     }
 
-    usuario.token = generateToken();
+    const codigo = generateOTP();
+
+    const expiracion = new Date();
+    expiracion.setMinutes(expiracion.getMinutes() + 15);
+
+    usuario.codigo = codigo;
+    usuario.codigo_expira = expiracion;
 
     await usuario.save();
 
     await sendRecoveryEmail(usuario);
 
-    return res.render("login/auth/recover-password",{
-        titulo: "Recuperar contraseña",
-        mensaje: "Hemos enviado un enlace de recuperación a tu correo. "
+    return res.render("login/auth/verify-otp", {
+        titulo: "Verificar código",
+        correo
+    });
+
+};
+
+const verifyOTP = async (req, res) => {
+
+    const { codigo } = req.body;
+
+    const usuario = await User.findOne({
+        where: {
+            codigo
+        }
+    });
+
+    if (!usuario) {
+
+        return res.render("login/auth/verify-otp", {
+            titulo: "Verificar código",
+            error: "El código ingresado no es válido."
+        });
+
+    }
+
+    if (usuario.codigo_expira < new Date()) {
+
+        usuario.codigo = null;
+        usuario.codigo_expira = null;
+
+        await usuario.save();
+
+        return res.render("login/auth/verify-otp", {
+            titulo: "Verificar código",
+            error: "El código ha expirado. Solicita uno nuevo."
+        });
+
+    }
+
+    const resetToken = generateResetToken(usuario);
+
+    res.cookie("_reset_token", resetToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 10 * 60 * 1000
+    });
+
+    return res.redirect("/auth/reset-password");
+
+};
+
+const formVerifyOTP = (req, res) => {
+
+    res.render("login/auth/verify-otp", {
+        titulo: "Verificar código"
     });
 
 };
@@ -143,74 +206,111 @@ const recoverPassword = async (req, res) => {
 /* funcion correo para el cambio de contraseña */
 const formResetPassword = async (req, res) => {
 
-    const { token } = req.params;
+    const resetToken = req.cookies._reset_token;
 
-    const usuario = await User.findOne({
-        where: {
-            token
-        }
-    });
+    if (!resetToken) {
 
-    if (!usuario) {
-
-        return res.render("login/auth/recover-password", {
-            titulo: "Recuperar contraseña",
-            error: "El enlace de recuperación no es válido o ha expirado."
-        });
+        return res.redirect("/auth/recover-password");
 
     }
 
-    res.render("login/auth/reset-password", {
-        titulo: "Nueva contraseña",
-        token
-    });
+    try {
+
+        const decoded = jwt.verify(
+            resetToken,
+            process.env.JWT_SECRET
+        );
+
+        if (decoded.tipo !== "password-reset") {
+
+            return res.redirect("/auth/recover-password");
+
+        }
+
+        const usuario = await User.findByPk(decoded.id);
+
+        if (!usuario) {
+
+            return res.redirect("/auth/recover-password");
+
+        }
+
+        return res.render("login/auth/reset-password", {
+            titulo: "Nueva contraseña"
+        });
+
+    } catch (error) {
+
+        return res.redirect("/auth/recover-password");
+
+    }
 
 };
 
 // funcion cambiar contraseña
 const resetPassword = async (req, res) => {
 
-    const { token } = req.params;
+    const resetToken = req.cookies._reset_token;
 
-    const { password, password_confirmation } = req.body;
+    if (!resetToken) {
 
-    if (password !== password_confirmation) {
-
-        return res.render("login/auth/reset-password", {
-            titulo: "Nueva contraseña",
-            token,
-            error: "Las contraseñas no coinciden."
-        });
+        return res.redirect("/auth/recover-password");
 
     }
 
-    const usuario = await User.findOne({
-        where: {
-            token
+    try {
+
+        const decoded = jwt.verify(
+            resetToken,
+            process.env.JWT_SECRET
+        );
+
+        if (decoded.tipo !== "password-reset") {
+
+            return res.redirect("/auth/recover-password");
+
         }
-    });
 
-    if (!usuario) {
+        const usuario = await User.findByPk(decoded.id);
 
-        return res.render("login/auth/recover-password", {
-            titulo: "Recuperar contraseña",
-            error: "El enlace no es válido."
+        if (!usuario) {
+
+            return res.redirect("/auth/recover-password");
+
+        }
+
+        const { password, password_confirmation } = req.body;
+
+        if (password !== password_confirmation) {
+
+            return res.render("login/auth/reset-password", {
+                titulo: "Nueva contraseña",
+                error: "Las contraseñas no coinciden."
+            });
+
+        }
+
+        const salt = await bcrypt.genSalt(10);
+
+        usuario.password = await bcrypt.hash(password, salt);
+
+        usuario.codigo = null;
+        usuario.codigo_expira = null;
+
+        await usuario.save();
+
+        res.clearCookie("_reset_token");
+
+        return res.render("login/auth/login", {
+            titulo: "Iniciar Sesión",
+            mensaje: "Tu contraseña fue actualizada correctamente."
         });
 
+    } catch (error) {
+
+        return res.redirect("/auth/recover-password");
+
     }
-
-    const salt = await bcrypt.genSalt(10);
-
-    usuario.password = await bcrypt.hash(password, salt);
-
-    usuario.token = null;
-
-    await usuario.save();
-
-    return res.render("login/auth/login", {
-        titulo: "Iniciar Sesión",
-        mensaje: "Tu contraseña fue actualizada correctamente."
-    });
 
 };
 
@@ -220,6 +320,8 @@ export {
     logout,
     formRecoverPassword,
     recoverPassword,
+    formVerifyOTP,
+    verifyOTP,
     formResetPassword,
     resetPassword
 };

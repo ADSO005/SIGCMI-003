@@ -5,6 +5,8 @@ import {
     logout,
     formRecoverPassword,
     recoverPassword,
+    formVerifyOTP,
+    verifyOTP,
     formResetPassword,
     resetPassword
 } from "../../controllers/auth/userController.js";
@@ -18,17 +20,17 @@ router.post("/login",login);
 // Cerrar sesion
 router.get("/logout", logout);
 
-// Registro
-
 
 // Recuperar contraseña
 router.get("/recover-password", formRecoverPassword);
 router.post("/recover-password", recoverPassword);
 
-// Mostrar formulario de nueva contraseña
-router.get("/reset-password/:token", formResetPassword);
+// Verificar código OTP
+router.get("/verify-otp", formVerifyOTP);
+router.post("/verify-otp", verifyOTP);
 
-// Guardar nueva contraseña
-router.post("/reset-password/:token", resetPassword);
+// Cambiar contraseña
+router.get("/reset-password", formResetPassword);
+router.post("/reset-password", resetPassword);
 
 export default router;
