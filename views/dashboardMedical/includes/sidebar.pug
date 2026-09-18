@@ -1,0 +1,25 @@
+aside#sidebar.sidebar
+  .logo
+    span.logo-text SIGCMI
+    button#toggleBtn(onclick='toggleSidebar()' aria-label='Abrir o cerrar menú') ☰
+  hr.line-1
+  .user
+    .avatar
+      img.avatar-img(src='/medico/img/icono-medico-avatar.svg' alt='Avatar médico')
+    div
+      p.bienvenido-txt Bienvenido
+      h4 montoyajuanes11
+      span Médico General
+      button.btn-ver-perfil(onclick="alert('Ir a: Mi Perfil')") Ver Mi Perfil
+  hr.line-2
+  nav
+    a.nav-link.preActive(href='#' onclick="cambiarVista(event,'agendaView',this)")
+      img(src='/medico/img/icono-agenda.svg' alt='Agenda')
+      .nav-item Agenda
+    a.nav-link(href='#' onclick="cambiarVista(event,'pacientesView',this)")
+      img(src='/medico/img/icono-pacientes.svg' alt='Mis Pacientes')
+      .nav-item Mis Pacientes
+  hr.line-3
+  .logout(onclick='cerrarSesion()')
+    img.log-out(src='/medico/img/icono-salir.svg' alt='Cerrar sesión')
+    span.sesionlogout Cerrar Sesiónl
