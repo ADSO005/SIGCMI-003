@@ -1,0 +1,182 @@
+extends ../layout/main
+
+block append styles
+  link(rel="stylesheet" href="/medico/css/dashboardMedical.css")
+
+block content
+  main#mainContent.main
+    // VISTA: AGENDA
+    section#agendaView.view.active
+      header.header   
+        div
+          h1 Portal Médico
+          span.fecha-header 3 de Abril del 2026
+      section.cards
+        .card
+          p Citas Hoy
+          .card-body
+            .card-left
+              h2 48
+              span.card-sub 2 completadas
+            .card-icon.icono-azul
+              img(src='/medico/img/blueCalendar.png' alt='Citas')
+        .card
+          p Pacientes Activos
+          .card-body
+            .card-left
+              h2 48
+              span.card-sub +3 este mes
+            .card-icon.icono-verde
+              img(src='/medico/img/usderGreen.png' alt='Pacientes')
+        .card
+          p Consultas Esta Semana
+          .card-body
+            .card-left
+              h2 48
+              span.card-sub Promedio: 9/día
+            .card-icon.icono-morado
+              img(src='/medico/img/historyUser.png' alt='Consultas')
+        .card
+          p Tiempo Promedio
+          .card-body
+            .card-left
+              h2 48
+              span.card-sub Por consulta
+            .card-icon.icono-naranja
+              img(src='/medico/img/clockUserADMIN.png' alt='Tiempo')
+      section.content
+        // AGENDA DEL DÍA
+        .appointments
+          h3 Mi Agenda de hoy
+          // Cita 1: Completada
+          .appointment.estado-completada
+            .left
+              span.hour 09:00
+              div
+                h4 María González
+                p Consulta de rutina
+            .right
+              span.state.greenState Completado
+          // Cita 2: En curso
+          #cita2.appointment.estado-encurso
+            .left
+              span.hour.hour-encurso 10:25
+              div
+                h4 María González
+                p Consulta post-operatoria
+            .right
+              span.state.yellowState En curso
+            .btn-full-row
+              button.btn-consulta.btn-finalizar(onclick="finalizarConsulta('cita2')")
+                | Finalizar
+                | Consulta
+          // Cita 3: Pendiente
+          #cita3.appointment.estado-pendiente
+            .left
+              span.hour 10:00
+              div
+                h4 María González
+                p Consulta post-operatoria
+            .right
+              span.state.greyState Pendiente
+            .btn-full-row
+              button.btn-consulta.btn-iniciar(onclick="iniciarConsulta('cita3')") Iniciar Consulta
+        // ACCIONES RÁPIDAS
+        .actions
+          h3 Acciones Rápidas
+          button.btnActions.btnActionBlue(onclick='abrirModal()') Gestionar Citas
+          button.btnActions.btnActionGreen(onclick='abrirModalHorarios()') Configurar Horarios
+          .proxima-cita
+            .proxima-cita-header
+              img.proxima-icon(src='/medico/img/Icon.png' alt='Reloj')
+              span Próxima Cita
+            .proxima-hora 11:00 AM
+            .proxima-paciente Ana Rodríguez
+            .proxima-motivo Medicina interna
+    // fin agendaView
+
+    section#pacientesView.view
+      header.header
+        div
+          h1 Mis Pacientes
+          span.fecha-header 3 de Abril del 2026
+      .pacientes-layout
+        // COLUMNA IZQUIERDA: lista
+        .pacientes-lista
+          .pacientes-search-box
+            span.search-icon 🔍
+            input(type='text' placeholder='Buscar paciente...' oninput='filtrarPacientes(this.value)')
+          .paciente-item(onclick='seleccionarPaciente(this)')
+            img(src='/medico/img/Group 16.png' alt)
+            div
+              h4 María González Pérez
+              span
+                img.NegroCalen(src='/medico/img/CalendarNegro.png' alt='Imagen Calendario')
+                |  5 citas
+              span
+                img.NegroCalen(src='/medico/img/Google-Docs Negro.png' alt='Imagen archivo')
+                |  3 diagnósticos
+            span.paciente-arrow ›
+          .paciente-item(onclick='seleccionarPaciente(this)')
+            img(src='/medico/img/Group 16.png' alt)
+            div
+              h4 María González Pérez
+              span
+                img.NegroCalen(src='/medico/img/CalendarNegro.png' alt='Imagen Calendario')
+                |  5 citas
+              span
+                img.NegroCalen(src='/medico/img/Google-Docs Negro.png' alt)
+                |  3 diagnósticos
+            span.paciente-arrow ›
+        // COLUMNA DERECHA: detalle
+        .paciente-detalle
+          .detalle-header
+            img.detalle-avatar(src='/medico/img/Group 16.png' alt)
+            .detalle-info
+              h2 María González Pérez
+              p
+                | Email: 
+                a(href='mailto:sigcmi@gmail.com') sigcmi@gmail.com
+              p Teléfono: 3137482412
+            .detalle-meta
+              p Edad: 35 años
+              p Última Visita: 9/04/2026
+          .detalle-badges
+            span.badge.badge-blue
+              img(src='/medico/img/CalendarPaciente.png' alt='Imagen Calendario')
+              |  Citas: 5
+            span.badge.badge-purple
+              img(src='/medico/img/google-docs 2.png' alt='Imagen archivo')
+              |  Diagnósticos: 3
+          .historial
+            h3 Historial Médico
+            .historial-card
+              h4 Gripe común con síntomas de congestión nasal:
+              p.historial-fecha 9/abr/2026
+              p
+                strong Síntomas:
+              p Fiebre de 38C, congestion nasal, dolor de garganta.
+              p
+                strong Tratamiento:
+              p Reposo, hidratacion abundante y acetaminofen cada 6 horas.
+            .historial-card
+              h4 Gastritis aguda por estrés
+              p.historial-fecha 11 de marzo de 2026
+              p
+                strong Síntomas:
+              p Dolor epigástrico intenso, náuseas
+              p
+                strong Tratamiento:
+              p Omeprazol 20mg en ayunas por 14 días, dieta blanda
+            .historial-card
+              h4 Control general anual - Paciente sano
+              p.historial-fecha 19 de enero de 2026
+              p
+                strong Síntomas:
+              p Sin síntomas, control preventivo
+              p
+                strong Tratamiento:
+              p Vitamina D 1000 UI diaria como suplemento preventivo
+
+block scripts
+  script(src="/medico/js/dashboardMedical.js")

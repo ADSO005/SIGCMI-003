@@ -1,0 +1,159 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        title SIGCMI - Dashboard
+        script(src="https://cdn.tailwindcss.com")
+        link(rel="stylesheet" href="../admin/css/input.css")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css")
+        script(src="https://cdn.jsdelivr.net/npm/chart.js")
+    body(class="bg-white text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            //- ============ SIDEBAR ============
+            //- id="sidebar" para que el JS de abajo pueda encontrarlo y cambiarle el ancho
+            aside(
+    id="sidebar"
+    class="sticky top-0 h-screen w-64 bg-indigo-600 text-white flex flex-col"
+)
+
+                div
+
+                    //- --- Logo + botón hamburguesa ---
+                    div(class="flex items-center justify-between p-6")
+                        //- class="sidebar-text": el JS oculta TODO lo que tenga esta clase al colapsar
+                        h1(class="sidebar-text text-2xl font-bold") SIGCMI
+
+                        button(type="button" onclick="toggleSidebar()")
+                            svg(xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16")
+
+                    //- --- Bienvenida (se oculta al colapsar) ---
+                    div(class="sidebar-text px-6 pb-6")
+                        p(class="text-indigo-200 text-sm") Bienvenido
+                        p(class="font-bold")= usuarios.nombre
+                        p(class="text-indigo-200 text-sm") Admin
+
+                    //- --- Navegación ---
+                    //- Cada link tiene un ícono (siempre visible) y un span.sidebar-text (se oculta)
+                    //- --- Navegación ---
+                nav(class="px-3 space-y-1 ")
+
+                    // Dashboard
+                    a(href="/admin/dashboard" class="flex items-center gap-3 px-3 py-3 rounded-lg bg-indigo-500/60 hover:bg-indigo-500 transition")
+                        i(class="fa-solid fa-house w-6 text-center")
+                        span(class="sidebar-text") Dashboard
+
+                    // Usuarios
+                    a(href="/admin/usuarios" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-users w-6 text-center")
+                        span(class="sidebar-text") Usuarios
+
+                    // Pacientes
+                    a(href="/admin/pacientes" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-heart-pulse w-6 text-center")
+                        span(class="sidebar-text") Pacientes
+
+                    // Médicos
+                    a(href="/admin/medicos" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-user-doctor w-6 text-center")
+                        span(class="sidebar-text") Médicos
+
+                    // Especialidades
+                    a(href="/admin/especialidades" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-hospital w-6 text-center")
+                        span(class="sidebar-text") Especialidades
+
+                    // Citas
+                    a(href="/admin/citas" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-calendar-check w-6 text-center")
+                        span(class="sidebar-text") Citas
+
+                    // Calendario
+                    a(href="/admin/calendario" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-calendar-days w-6 text-center")
+                        span(class="sidebar-text") Calendario
+
+                    // Horarios
+                    a(href="/admin/horarios" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-clock w-6 text-center")
+                        span(class="sidebar-text") Horarios
+
+                    // Diagnósticos
+                    a(href="/admin/diagnosticos" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-stethoscope w-6 text-center")
+                        span(class="sidebar-text") Diagnósticos
+
+                    // Prescripciones
+                    a(href="/admin/prescripciones" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-pills w-6 text-center")
+                        span(class="sidebar-text") Prescripciones
+
+                    // WhatsApp
+                    a(href="/admin/whatsapp" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-brands fa-whatsapp w-6 text-center")
+                        span(class="sidebar-text") WhatsApp
+
+                    // Reportes
+                    a(href="/admin/reportes" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition")
+                        i(class="fa-solid fa-chart-column w-6 text-center")
+                        span(class="sidebar-text") Reportes
+
+                //- --- Cerrar sesión ---
+                div(class="fixed bottom-0 left-0 w-64 p-3")
+                    form(action="/auth/logout" method="POST")
+                        button(type="submit" class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 text-white")
+                            svg(xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
+                                path(stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1")
+                            span(class="sidebar-text") Cerrar Sesión
+
+            //- ============ CONTENIDO ============
+            main(class="flex-1 md:ml-0 px-4 md:px-8 xl:px-10 py-6")
+
+                div(class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-200")
+                    h2(class="text-3xl font-bold text-slate-900") Sistema Integral de Gestión de Citas Médicas
+                    span(class="text-slate-500")= fechaHoy
+
+                // Tarjetas
+                include components/statsCards
+
+                div(class="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-6")
+                    div(class="xl:col-span-2")
+                        include components/appointmentsTable
+
+
+                    div
+                        h3(class="text-2xl font-bold mb-4") Acciones Rápidas
+
+                        div(class="space-y-3")
+                            button(type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl") + Nueva Cita
+                            button(type="button" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl") + Registrar Paciente
+                            button(type="button" class="w-full bg-fuchsia-500 hover:bg-fuchsia-600 text-white font-bold py-4 rounded-xl") Gestionar Citas
+                            button(type="button" class="w-full bg-violet-800 hover:bg-violet-900 text-white font-bold py-4 rounded-xl") Ver Metricas
+                            button(type="button" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl") Ver Calendario
+                            button(type="button" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl") Enviar Recordatorios
+
+                            div(class="bg-slate-50 rounded-xl px-5 py-4 mt-2")
+                                p(class="font-bold")
+                                    | WhatsApp
+                                    span(class="text-emerald-600")  Activo
+                                p(class="text-slate-500 text-sm")= `${stats.notificacionesHoy} notificaciones enviadas hoy`
+
+                    // ===============================
+                    // Gráfico de Estados
+                    // ===============================
+
+                div(class="bg-white rounded-2xl  p-6 mt-6 w-1/2 mx-auto")
+
+                    h3(class="text-xl font-bold mb-5 flex items-center gap-2")
+                        i(class="fa-solid fa-chart-pie text-indigo-600")
+                        | Estado de las Citas
+                    canvas(id="graficoEstados" height="260")
+        //- ============ JAVASCRIPT: colapsar/expandir el sidebar ============
+        script(src="https://cdn.jsdelivr.net/npm/chart.js")
+
+        script(src="js/stadistics.js") 
+            
+        script(src="js/toggleSidebar.js") 
+            

@@ -1,0 +1,92 @@
+//- MODAL GESTIÓN DE CITAS
+#modalGestionCitas.modal-overlay(onclick='cerrarModalFuera(event)')
+  .modal-gc(onclick='event.stopPropagation()')
+    .modal-gc-header
+      .modal-gc-header-left
+        .modal-gc-icon
+          img(src='/medico/img/Calendar22.png' alt='Icono Citas')
+        div
+          h2 Gestión de Citas
+          p#modalSubtitulo Total de citas 3
+      button.modal-gc-close(onclick='cerrarModal()') ✕
+    .modal-gc-filtros
+      input.modal-gc-search(type='text' placeholder='Buscar por paciente.' oninput='filtrarCitas()')
+      select.modal-gc-select(onchange='filtrarCitas()')
+        option(value) Todos los estados
+        option(value='Pendiente') Pendiente
+        option(value='Completado') Completado
+        option(value='Cancelado') Cancelado
+    #listaCitas.modal-gc-body
+      .cita-card(data-estado='Pendiente')
+        .cita-card-top
+          .cita-fecha
+            img(src='/medico/img/Calendar22.png' alt)
+            |  14 abr 2026
+          span.pill.pill-pendiente Pendiente
+        .cita-info
+          img(src='/medico/img/Clock.png' alt)
+          |  09:00
+        .cita-info
+          img(src='/medico/img/person.png' alt)
+          |  Juan Martínez López
+        .cita-info
+          img(src='/medico/img/image 218.png' alt)
+          |  Dra. Ana López
+        .cita-motivo Control cardiológico
+        .cita-btns
+          button.btn-repro(onclick='event.stopPropagation(); abrirReprogramar(this)') Reprogramar
+          button.btn-cancel-cita Cancelar
+      .cita-card(data-estado='Pendiente')
+        .cita-card-top
+          .cita-fecha
+            img(src='/medico/img/Calendar22.png' alt)
+            |  18 abr 2026
+          span.pill.pill-pendiente Pendiente
+        .cita-info
+          img(src='/medico/img/Clock.png' alt)
+          |  10:00
+        .cita-info
+          img(src='/medico/img/person.png' alt)
+          |  María González Pérez
+        .cita-info
+          img(src='/medico/img/image 218.png' alt)
+          |  Dr. Carlos Pérez
+        .cita-motivo Consulta general - Control de rutina
+        .cita-btns
+          button.btn-repro(onclick='event.stopPropagation(); abrirReprogramar(this)') Reprogramar
+          button.btn-cancel-cita Cancelar
+      .cita-card(data-estado='Completado')
+        .cita-card-top
+          .cita-fecha
+            img(src='/medico/img/Calendar22.png' alt)
+            |  18 abr 2026
+          span.pill.pill-completado Completado
+        .cita-info
+          img(src='/medico/img/Clock.png' alt)
+          |  14:00
+        .cita-info
+          img(src='/medico/img/person.png' alt)
+          |  Ana Rodríguez Silva
+        .cita-info
+          img(src='/medico/img/image 218.png' alt)
+          |  Dr. Luis García
+        .cita-motivo Vacunación pediátrica
+
+//- MODAL REPROGRAMAR
+#modalReprogramar.modal-overlay(onclick='cerrarReprogramarFuera(event)')
+  .modal-gc(style='width:420px;' onclick='event.stopPropagation()')
+    .modal-gc-header
+      .modal-gc-header-left
+        div
+          h2 Reprogramar Cita
+          p#reprogramarNombre
+    div(style='padding: 24px; display:flex; flex-direction:column; gap:16px;')
+      div
+        label.repro-label Reprogramar Cita
+        input.repro-input(type='date')
+      div
+        label.repro-label Reprogramar Hora
+        input.repro-input(type='time')
+      div(style='display:flex; gap:12px; margin-top:8px;')
+        button.btn-cancel-cita(style='flex:1; padding:11px;' onclick='cerrarReprogramar()') Cancelar
+        button.btn-repro(style='flex:1; padding:11px;' onclick='guardarReprogramar()') Guardar

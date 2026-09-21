@@ -1,17 +1,18 @@
 import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
-const db = new Sequelize(
-    'sigcmi',      // Aqui nombre de Base de datos
-    'root',        // Usuario de Base de datos
-    '1089930248',            // Contraseña de tu mySQL
+dotenv.config();
+
+// Creamos la conexión
+const sequelize = new Sequelize(
+    'sigcmi',
+    'root',
+    '',
     {
-        host: '127.0.0.1',
-        port: 3306,
+        host: 'localhost',
         dialect: 'mysql',
-        define: {
-            timestamps: false
-        }
+        logging: false
     }
 );
 
-export default db;
+export default sequelize;

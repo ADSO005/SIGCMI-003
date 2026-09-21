@@ -1,0 +1,535 @@
+/* =========================================================
+   SIGCMI - Portal del Paciente
+   Archivo: public/css/style.css
+   ========================================================= */
+
+/* ---------- Variables ---------- */
+:root {
+    --fondo: #eef5ff;
+    --blanco: #ffffff;
+    --azul: #465de5;
+    --azul-oscuro: #354bc4;
+    --azul-suave: #d8e5fe;
+    --verde: #25d366;
+    --verde-oscuro: #18b957;
+    --texto: #20283d;
+    --texto-suave: #64708a;
+    --borde: #cbd5e6;
+    --rojo: #ff4d5e;
+    --sombra: 0 14px 32px rgba(49, 70, 110, 0.16);
+    --radio: 14px;
+}
+
+/* ---------- Reset ---------- */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    font-size: 14px;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- Barra superior ---------- */
+.top-bar {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 14.5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--blanco);
+    border-bottom: 1px solid #d6deeb;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.brand > div {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.brand strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: #26304a;
+}
+
+.brand p {
+    margin: 3px 0 0;
+    font-size: 9px;
+    color: var(--texto-suave);
+}
+
+.icon-user {
+    width: 25px;
+    height: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #a9c0ff;
+    color: #3d58c9;
+    font-size: 14px;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #3d4864;
+    font-size: 12px;
+    transition: color 0.2s ease;
+}
+
+.btn-logout:hover {
+    color: var(--azul);
+}
+
+.icon-logout {
+    font-size: 18px;
+}
+
+/* ---------- Contenedor principal ---------- */
+.layout-grid {
+    width: min(70%, 90%);
+    margin: 43px auto 70px;
+    display: grid;
+    grid-template-columns: 1.65fr 0.95fr;
+    gap: 21px;
+    align-items: start;
+}
+
+.col-principal {
+    min-width: 0;
+}
+
+/* ---------- Acciones ---------- */
+.acciones {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+    margin-bottom: 11px;
+}
+
+.btn,
+.btn-primario,
+.btn-whatsapp,
+.btn-diagnosticos {
+    border: 0;
+    border-radius: 5px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.diag{
+    grid-column: 1/-1;
+}
+.btn:hover,
+.btn-primario:hover,
+.btn-whatsapp:hover,
+.btn-diagnosticos:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.98);
+}
+
+.btn-primario {
+    background: var(--azul);
+    color: white;
+}
+
+.acciones .btn-primario {
+    min-height: 66px;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.acciones .btn-primario span {
+    font-size: 24px;
+    line-height: 22px;
+    font-weight: 300;
+}
+
+.btn-whatsapp {
+    min-height: 66px;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--verde);
+    color: white;
+}
+
+.btn-whatsapp .icon-whatsapp {
+    font-size: 19px;
+}
+
+.btn-whatsapp:hover {
+    background: var(--verde-oscuro);
+}
+
+.btn-diagnosticos {
+    width: 100%;
+    min-height: 40px;
+    margin-bottom: 31px;
+    background: var(--verde);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-diagnosticos:hover {
+    background: var(--verde-oscuro);
+}
+
+/* ---------- Tarjeta de perfil ---------- */
+.card-perfil {
+    min-height: 126px;
+    padding: 20px 16px;
+    background: #eaf2ff;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.card-perfil > .icon-user-circle {
+    width: 43px;
+    height: 43px;
+    margin-bottom: 4px;
+    border-radius: 50%;
+    background: #aabaf0;
+    color: #465dd1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+}
+
+.card-perfil p {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.card-perfil .btn {
+    width: 100%;
+    min-height: 28px;
+    font-size: 10px;
+}
+
+/* ---------- Tarjeta de citas ---------- */
+.card-citas {
+    border: 1px solid var(--borde);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 10px 18px 30px;
+}
+
+.card-citas h2 {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #27314c;
+}
+
+/* ---------- Cita individual ---------- */
+.cita-item {
+    min-height: 74px;
+    margin-bottom: 10px;
+    padding: 11px 13px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+        "info badge"
+        "info actions";
+    gap: 2px 10px;
+    border: 1px dashed #aebbd0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.cita-item:last-child {
+    margin-bottom: 0;
+}
+
+.cita-info {
+    grid-area: info;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.cita-info > .icon-calendar {
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: #c7dcff;
+    color: #3155b9;
+    font-size: 14px;
+}
+
+.cita-info > div {
+    min-width: 0;
+}
+
+.cita-info p {
+    margin: 0;
+    color: #29334c;
+    font-size: 9px;
+    line-height: 1.35;
+}
+
+.cita-info .cita-fecha {
+    font-size: 9px;
+    font-weight: 600;
+}
+
+.badge {
+    grid-area: badge;
+    align-self: start;
+    justify-self: end;
+    min-width: 67px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 8px;
+    font-weight: 500;
+}
+
+.badge-confirmada {
+    background: #c8f9d8;
+    color: #16a44b;
+}
+
+.badge-pendiente {
+    background: #f3ef8c;
+    color: #8d8b18;
+}
+
+.badge-completada {
+    background: #e4e4e4;
+    color: #4e4e4e;
+}
+
+.badge-cancelada {
+    background: #ffd8dd;
+    color: #c62e42;
+}
+
+.cita-acciones {
+    grid-area: actions;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cita-acciones a {
+    font-size: 8px;
+    color: #546ee0;
+}
+
+.cita-acciones a:hover {
+    text-decoration: underline;
+}
+
+.cita-acciones .cancelar {
+    color: var(--rojo);
+}
+
+/* ---------- Sidebar ---------- */
+.col-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.card-notificaciones {
+    padding: 14px 15px 18px;
+    border: 1px solid var(--borde);
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    width: 100%;
+}
+
+.card-notificaciones h3 {
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.card-notificaciones h3 .icon-bell {
+    color: #405dd3;
+}
+
+.card-notificaciones p {
+    margin: 0 0 12px;
+    color: #58647e;
+    font-size: 8px;
+    line-height: 1.4;
+}
+
+.card-notificaciones .btn {
+    width: 100%;
+    min-height: 28px;
+    font-size: 9px;
+}
+
+/* ---------- Ayuda ---------- */
+.card-ayuda {
+    padding: 14px 15px;
+    border-radius: 7px;
+    background: var(--azul-suave);
+    width: 100%;
+}
+
+.card-ayuda h3 {
+    margin: 0 0 5px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #33415f;
+}
+
+.card-ayuda p {
+    margin: 5px 0;
+    color: #56647e;
+    font-size: 8px;
+    line-height: 1.35;
+}
+
+.card-ayuda i {
+    display: inline-block;
+    width: 15px;
+    color: #7888a9;
+}
+
+/* ---------- Sin citas ---------- */
+.sin-citas {
+    padding: 20px;
+    margin: 0;
+    text-align: center;
+    color: var(--texto-suave);
+    font-size: 11px;
+}
+
+/* ---------- Iconos básicos ----------
+   Si tu proyecto utiliza una librería de iconos,
+   estas reglas no interfieren con ella. */
+i {
+    font-style: normal;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+    .top-bar {
+        padding: 0 5%;
+    }
+
+    .layout-grid {
+        width: 92%;
+        margin-top: 28px;
+        grid-template-columns: 1fr;
+    }
+
+    .col-sidebar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+    }
+
+    .card-perfil {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 520px) {
+    body {
+        font-size: 13px;
+    }
+
+    .top-bar {
+        min-height: 60px;
+        padding: 0 4%;
+    }
+
+    .brand strong {
+        font-size: 11px;
+    }
+
+    .brand p {
+        font-size: 8px;
+    }
+
+    .acciones {
+        grid-template-columns: 1fr;
+    }
+
+    .acciones .btn-primario,
+    .btn-whatsapp {
+        min-height: 55px;
+    }
+
+    .cita-item {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "info"
+            "badge"
+            "actions";
+        gap: 7px;
+    }
+
+    .badge {
+        justify-self: start;
+    }
+
+    .cita-acciones {
+        justify-content: flex-start;
+    }
+
+    .col-sidebar {
+        display: flex;
+    }
+
+    .card-citas {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}

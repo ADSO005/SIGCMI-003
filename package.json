@@ -1,13 +1,14 @@
 {
-  "name": "sigcmi-003",
+  "name": "medico",
   "version": "1.0.0",
-  "description": "> **Intelligent Medical Appointment Management System**",
-  "main": "app.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/app.css --watch",
-    "dev": "concurrently \"npm run server\" \"npm run css\"",
+    "css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/app.css./public/patient/css/output.css --watch",
+    "dev": "concurrently \"npm run server\" \"npm run css\" node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -19,10 +20,6 @@
   "author": "",
   "license": "ISC",
   "type": "module",
-  "bugs": {
-    "url": "https://github.com/ADSO005/SIGCMI-003/issues"
-  },
-  "homepage": "https://github.com/ADSO005/SIGCMI-003#readme",
   "dependencies": {
     "@tailwindcss/cli": "^4.3.3",
     "bcrypt": "^6.0.0",
@@ -32,7 +29,7 @@
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.23.2",
-    "nodemailer": "^9.0.3",
+    "nodemon": "^3.1.14",
     "pug": "^3.0.4",
     "sequelize": "^6.37.8",
     "tailwindcss": "^4.3.3",
@@ -40,9 +37,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/cli": "^4.3.3",
     "concurrently": "^10.0.4",
     "eslint": "^10.8.0",
     "globals": "^17.8.0",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "tailwind": "^4.0.0",
+    "tailwindcss": "^4.3.3"
   }
 }
