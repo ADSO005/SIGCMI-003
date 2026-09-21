@@ -1,0 +1,951 @@
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef5ff;
+    color: #172554;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.top-bar {
+    width: 100%;
+    height: 72px;
+    background: #ffffff;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 7%;
+
+    border-bottom: 1px solid #d9e2f0;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand i {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    background: #a9c1ff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #4058d9;
+}
+
+.brand strong {
+    display: block;
+    font-size: 16px;
+    color: #1e2a4a;
+}
+
+.brand p {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.btn-logout {
+    color: #344268;
+    font-size: 14px;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    transition: 0.2s;
+}
+
+.btn-logout:hover {
+    color: #4058d9;
+}
+
+
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+========================================================= */
+
+.layout-grid {
+    width: 100%;
+    max-width: 1120px;
+
+    margin: 35px auto;
+
+    padding: 0 25px;
+
+    display: grid;
+
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 0.9fr);
+
+    gap: 28px;
+
+    align-items: start;
+}
+
+
+/* =========================================================
+   COLUMNA IZQUIERDA
+========================================================= */
+
+.col-principal {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   BOTONES DE ACCIONES
+========================================================= */
+
+.acciones {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 14px;
+
+    margin-bottom: 14px;
+}
+
+
+/* Botones generales */
+
+.btn-primario,
+.btn-whatsapp,
+.btn-diagnosticos {
+    border: none;
+
+    min-height: 62px;
+
+    border-radius: 7px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    transition: 0.2s;
+}
+
+
+/* Nueva cita */
+
+.btn-primario {
+    background: #4b5ee8;
+    color: white;
+}
+
+.btn-primario:hover {
+    background: #394bd0;
+    transform: translateY(-1px);
+}
+
+.btn-primario span {
+    font-size: 24px;
+    margin-right: 9px;
+}
+
+
+/* WhatsApp */
+
+.btn-whatsapp {
+    background: #20ca67;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background: #16b859;
+    transform: translateY(-1px);
+}
+
+.btn-whatsapp i {
+    margin-right: 8px;
+}
+
+
+/* =========================================================
+   BOTÓN DIAGNÓSTICOS
+========================================================= */
+
+.btn-diagnosticos {
+    width: 100%;
+
+    min-height: 48px;
+
+    margin-bottom: 20px;
+
+    background: #20ca67;
+    color: white;
+
+    font-weight: 600;
+}
+
+.btn-diagnosticos:hover {
+    background: #16b859;
+}
+
+
+/* =========================================================
+   TARJETA NUEVA CITA
+========================================================= */
+
+.card-nueva-cita {
+    background: white;
+
+    border: 1px solid #d5dfed;
+
+    border-radius: 8px;
+
+    padding: 24px;
+
+    margin-bottom: 20px;
+
+    box-shadow: 0 3px 12px rgba(55, 79, 120, 0.05);
+
+    animation: aparecer 0.25s ease;
+}
+
+@keyframes aparecer {
+
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+.card-nueva-cita h2 {
+    font-size: 19px;
+
+    margin-bottom: 20px;
+
+    color: #1e2a4a;
+}
+
+
+/* =========================================================
+   CAMPOS
+========================================================= */
+
+.campo {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 16px;
+}
+
+.campo label {
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+
+    border: 1px solid #cbd7e8;
+
+    border-radius: 6px;
+
+    padding: 10px 12px;
+
+    background: #f8fbff;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    border-color: #4b5ee8;
+
+    background: white;
+
+    box-shadow: 0 0 0 2px rgba(75, 94, 232, 0.08);
+}
+
+.campo textarea {
+    resize: vertical;
+
+    min-height: 80px;
+}
+
+
+/* =========================================================
+   FECHA Y HORA
+========================================================= */
+
+.fila-campos {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+}
+
+
+/* =========================================================
+   BOTONES FORMULARIO
+========================================================= */
+
+.acciones-formulario {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 14px;
+
+    margin-top: 20px;
+}
+
+.btn-confirmar,
+.btn-cancelar {
+    border: none;
+
+    padding: 11px 28px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    transition: 0.2s;
+}
+
+.btn-confirmar {
+    background: #4058d9;
+
+    color: white;
+}
+
+.btn-confirmar:hover {
+    background: #3349c5;
+}
+
+.btn-cancelar {
+    background: #d6dce6;
+
+    color: #334155;
+}
+
+.btn-cancelar:hover {
+    background: #c5ccd8;
+}
+
+
+/* =========================================================
+   MIS CITAS
+========================================================= */
+
+.card-citas {
+    background: white;
+
+    border: 1px solid #d5dfed;
+
+    border-radius: 8px;
+
+    padding: 22px;
+
+    box-shadow: 0 3px 12px rgba(55, 79, 120, 0.04);
+}
+
+.titulo-citas {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+.titulo-citas h2 {
+    font-size: 18px;
+
+    font-weight: 500;
+
+    color: #1e2a4a;
+}
+
+.total-citas {
+    font-size: 12px;
+
+    color: #64748b;
+
+    background: #eef3ff;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+}
+
+
+/* =========================================================
+   LISTA DE CITAS
+========================================================= */
+
+.lista-citas {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+/* =========================================================
+   CITA INDIVIDUAL
+========================================================= */
+
+.cita-item {
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    grid-template-areas:
+        "info estado"
+        "info acciones";
+
+    gap: 5px 15px;
+
+    padding: 15px 16px;
+
+    border: 1px dashed #aebbd0;
+
+    border-radius: 10px;
+
+    background: #fafdff;
+
+    transition: 0.2s;
+}
+
+.cita-item:hover {
+    background: #f6f9ff;
+
+    border-color: #91a4c5;
+}
+
+
+/* =========================================================
+   INFORMACIÓN DE LA CITA
+========================================================= */
+
+.cita-info {
+    grid-area: info;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 12px;
+}
+
+.cita-icono {
+    width: 36px;
+    height: 36px;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background: #dbe6ff;
+
+    color: #4058d9;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+.cita-datos {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+.cita-fecha {
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #1e293b;
+}
+
+.cita-hora,
+.cita-doctor {
+    font-size: 11px;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   ESTADO DE LA CITA
+========================================================= */
+
+.cita-estado {
+    grid-area: estado;
+
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+.badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 5px 12px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    min-width: 76px;
+}
+
+
+/* Estados */
+
+.badge-confirmada {
+    background: #c9f7d9;
+
+    color: #159447;
+}
+
+.badge-pendiente {
+    background: #fff2a8;
+
+    color: #8a7800;
+}
+
+.badge-completada {
+    background: #e2e2e2;
+
+    color: #444;
+}
+
+.badge-cancelada {
+    background: #ffd4d4;
+
+    color: #c62828;
+}
+
+
+/* =========================================================
+   ACCIONES DE CITA
+========================================================= */
+
+.cita-acciones {
+    grid-area: acciones;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+}
+
+.cita-acciones a {
+    font-size: 11px;
+
+    color: #4b5ee8;
+}
+
+.cita-acciones .cancelar {
+    color: #ef4444;
+}
+
+.cita-acciones a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   SIN CITAS
+========================================================= */
+
+.sin-citas {
+    min-height: 130px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    color: #64748b;
+}
+
+.sin-citas i {
+    font-size: 28px;
+
+    color: #9aaed0;
+}
+
+
+/* =========================================================
+   COLUMNA DERECHA
+========================================================= */
+
+.col-sidebar {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+/* =========================================================
+   TARJETA PERFIL
+========================================================= */
+
+.card-perfil {
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 24px 18px;
+
+    min-height: 160px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border: 1px solid #d5dfed;
+
+    box-shadow: 0 8px 25px rgba(55, 79, 120, 0.08);
+}
+
+.card-perfil > i {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 50%;
+
+    background: #aebff5;
+
+    color: #4058d9;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 22px;
+
+    margin-bottom: 8px;
+}
+
+.card-perfil p {
+    font-size: 14px;
+
+    margin-bottom: 14px;
+
+    color: #263452;
+}
+
+.card-perfil .btn {
+    width: 100%;
+
+    min-height: 40px;
+
+    border-radius: 6px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   NOTIFICACIONES
+========================================================= */
+
+.card-notificaciones {
+    background: white;
+
+    border: 1px solid #d5dfed;
+
+    border-radius: 8px;
+
+    padding: 20px;
+}
+
+.card-notificaciones h3 {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 15px;
+
+    font-weight: 500;
+
+    margin-bottom: 10px;
+
+    color: #24345a;
+}
+
+.card-notificaciones h3 i {
+    color: #4058d9;
+}
+
+.card-notificaciones p {
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    color: #64748b;
+
+    margin-bottom: 15px;
+}
+
+.card-notificaciones .btn {
+    width: 100%;
+
+    min-height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   AYUDA
+========================================================= */
+
+.card-ayuda {
+    background: #d7e5ff;
+
+    border-radius: 9px;
+
+    padding: 20px;
+}
+
+.card-ayuda h3 {
+    font-size: 14px;
+
+    margin-bottom: 10px;
+
+    color: #263452;
+}
+
+.card-ayuda > p:first-of-type {
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    margin-bottom: 12px;
+
+    color: #52627e;
+}
+
+.card-ayuda p:not(:first-of-type) {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 10px;
+
+    color: #52627e;
+
+    margin-top: 8px;
+}
+
+.card-ayuda i {
+    width: 15px;
+
+    text-align: center;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .layout-grid {
+        grid-template-columns: 1fr;
+
+        max-width: 700px;
+    }
+
+    .col-sidebar {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .card-perfil {
+        grid-column: span 2;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - CELULAR
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .top-bar {
+        padding: 0 20px;
+
+        height: 65px;
+    }
+
+    .brand strong {
+        font-size: 13px;
+    }
+
+    .brand p {
+        font-size: 10px;
+    }
+
+    .layout-grid {
+        margin: 20px auto;
+
+        padding: 0 15px;
+
+        display: block;
+    }
+
+    .acciones {
+        grid-template-columns: 1fr;
+    }
+
+    .fila-campos {
+        grid-template-columns: 1fr;
+    }
+
+    .col-sidebar {
+        display: flex;
+
+        margin-top: 20px;
+    }
+
+    .card-citas {
+        padding: 15px;
+    }
+
+    .cita-item {
+        grid-template-columns: 1fr;
+
+        grid-template-areas:
+            "info"
+            "estado"
+            "acciones";
+    }
+
+    .cita-estado {
+        justify-content: flex-start;
+    }
+
+    .cita-acciones {
+        justify-content: flex-start;
+    }
+
+    .acciones-formulario {
+        flex-direction: column;
+    }
+
+    .btn-confirmar,
+    .btn-cancelar {
+        width: 100%;
+    }
+
+}

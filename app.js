@@ -2,6 +2,14 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import userRoutes from './routes/dashboardMedical/userRoutes.js';
+import "dotenv/config";
+
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import pacienteRoutes from "./routes/paciente/routes.js"
+import authRoutes from "./routes/paciente/authRoutes.js";
+import dashboardRoutes from "./routes/admin/dashboardRoutes.js";
 
 // Recrear __dirname para ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -49,5 +57,19 @@ app.post('/login', (req, res) => {
 
 // Usar el enrutador modularizado si manejas subrutas en userRoutes
 app.use('/users', userRoutes);
+
+
+// ---- Rutas ----
+app.use("/auth", authRoutes);
+
+app.use("/admin", dashboardRoutes);
+
+// Redirige la raíz al registro
+app.get("/", (req, res) => {
+    res.redirect("/auth/register");
+});
+
+app.use("/paciente", pacienteRoutes);
+app.use("/perfil", pacienteRoutes);
 
 export default app;

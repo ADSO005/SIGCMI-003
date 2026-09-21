@@ -1,0 +1,105 @@
+/*==========================================
+TABLA CITAS
+==========================================*/
+
+.table-user{
+
+    display:flex;
+    align-items:center;
+    gap:14px;
+
+}
+
+.table-avatar{
+
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#eff6ff;
+    color:#2563eb;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+}
+
+.table-avatar.doctor{
+
+    background:#ecfdf5;
+    color:#10b981;
+
+}
+
+.table-info{
+
+    display:flex;
+    flex-direction:column;
+
+}
+
+.table-info strong{
+
+    font-size:.95rem;
+
+}
+
+.badge-total{
+
+    background:#2563eb;
+    color:white;
+
+    padding:.45rem 1rem;
+
+    border-radius:999px;
+
+    font-size:.8rem;
+
+    font-weight:600;
+
+}
+
+.text-center{
+
+    text-align:center;
+
+}
+
+.empty-state{
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:4rem 2rem;
+
+    text-align:center;
+
+}
+
+.empty-state i{
+
+    font-size:4rem;
+
+    color:#9ca3af;
+
+    margin-bottom:1rem;
+
+}
+
+.empty-state h3{
+
+    font-size:1.3rem;
+
+    margin-bottom:.5rem;
+
+}
+
+.empty-state p{
+
+    color:#6b7280;
+
+}
