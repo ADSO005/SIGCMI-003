@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon server.js",
-    "css": "npx @tailwindcss/cli -i ./public/patient/css/input.css -o ./public/patient/css/output.css --watch",
+    "css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/app.css./public/patient/css/output.css --watch",
     "dev": "concurrently \"npm run server\" \"npm run css\" node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -21,15 +21,22 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@tailwindcss/cli": "^4.3.3",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.23.2",
     "nodemon": "^3.1.14",
     "pug": "^3.0.4",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "tailwindcss": "^4.3.3",
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/cli": "^4.3.3",
     "concurrently": "^10.0.4",

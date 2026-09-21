@@ -1,4 +1,8 @@
+
+
+
 import express from "express";
+import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -12,8 +16,12 @@ import dashboardRoutes from "./routes/admin/dashboardRoutes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
 // Inicializar Express
 const app = express();
+
+// Leer cookies
+app.use(cookieParser());
 
 // Configurar Pug como motor de vistas
 app.set("view engine", "pug");
