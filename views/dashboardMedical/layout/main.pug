@@ -1,0 +1,24 @@
+doctype html
+html(lang='es')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title SIGCMI - Portal Médico
+    link(rel="stylesheet", href="/medico/css/dashboardMedical.css")
+    block styles
+  body
+    .container
+      // Incluye la barra lateral
+      include ../includes/sidebar.pug
+
+      // Contenido dinámico de las vistas
+      block content
+
+    #sidebarOverlay.sidebar-overlay(onclick='cerrarSidebarMovil()')
+
+    // Incluye todos los modales
+    include ../includes/modalGestion.pug
+    include ../includes/modalHorarios.pug
+
+    script(src="/medico/js/dashboardMedical.js")
+    block scripts

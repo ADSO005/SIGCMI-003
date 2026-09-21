@@ -1,0 +1,81 @@
+#modalHorarios.modal-overlay(onclick='cerrarModalHorariosFuera(event)')
+  .modal-gc(style='width:520px;' onclick='event.stopPropagation()')
+    .modal-gc-header
+      .modal-gc-header-left
+        .modal-gc-icon
+          img(src='/medico/img/Calendar22.png' alt)
+        div
+          h2 Mi Horario de Atención
+          p Configura tus días y horarios disponibles
+    .horarios-body
+      #diaLunes.dia-row
+        .dia-top
+          .dia-left
+            label.switch
+              input(type='checkbox' onchange="toggleDia('diaLunes', this)")
+              span.slider
+            span.dia-nombre Lunes
+          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaLunes')") Agregar Horario
+        .dia-horas
+      #diaMartes.dia-row
+        .dia-top
+          .dia-left
+            label.switch
+              input(type='checkbox' onchange="toggleDia('diaMartes', this)")
+              span.slider
+            span.dia-nombre Martes
+          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaMartes')") Agregar Horario
+        .dia-horas
+      #diaMiercoles.dia-row
+        .dia-top
+          .dia-left
+            label.switch
+              input(type='checkbox' onchange="toggleDia('diaMiercoles', this)")
+              span.slider
+            span.dia-nombre Miércoles
+          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaMiercoles')") Agregar Horario
+        .dia-horas
+      #diaJueves.dia-row
+        .dia-top
+          .dia-left
+            label.switch
+              input(type='checkbox' onchange="toggleDia('diaJueves', this)")
+              span.slider
+            span.dia-nombre Jueves
+          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaJueves')") Agregar Horario
+        .dia-horas
+      #diaViernes.dia-row
+        .dia-top
+          .dia-left
+            label.switch
+              input(type='checkbox' onchange="toggleDia('diaViernes', this)")
+              span.slider
+            span.dia-nombre Viernes
+          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaViernes')") Agregar Horario
+        .dia-horas
+      #diaSabado.dia-row
+        .dia-top
+          .dia-left
+            label.switch
+              input(type='checkbox' onchange="toggleDia('diaSabado', this)")
+              span.slider
+            span.dia-nombre Sábado
+          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaSabado')") Agregar Horario
+        .dia-horas
+      #diaDomingo.dia-row
+        .dia-top
+          .dia-left
+            label.switch
+              input(type='checkbox' onchange="toggleDia('diaDomingo', this)")
+              span.slider
+            span.dia-nombre Domingo
+          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaDomingo')") Agregar Horario
+        .dia-horas
+      .info-box
+        span ⓘ
+        div
+          strong Información Importante
+          p Los pacientes solo podrán agendar citas en los horarios que configures aquí. Puedes tener múltiples horarios por día (por ejemplo, mañana y tarde).
+    .modal-gc-footer
+      button.btn-cancel-cita(style='flex:1; padding:11px;' onclick='cerrarModalHorarios()') Cancelar
+      button.btn-repro(style='flex:1; padding:11px;' onclick='guardarHorarios()') Guardar Horario
