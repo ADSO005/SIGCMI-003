@@ -29,6 +29,15 @@ block contenido
                     )
                         | #{error}
 
+                script.
+                    setTimeout(() => {
+                        const error = document.getElementById("mensajeError");
+
+                        if (error) {
+                            error.remove();
+                        }
+                    }, 4000);
+
                 form(
                     action="/auth/verify-otp"
                     method="POST"

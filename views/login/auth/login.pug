@@ -22,11 +22,40 @@ block contenido
                 h2.text-3xl.font-bold.text-center.text-slate-800.mb-2
                     | Iniciar Sesión
 
+                if error
+                    div(
+                        id="mensajeError"
+                        class="mb-5 rounded-lg bg-red-100 border border-red-300 px-4 py-3 text-red-700 text-sm text-center"
+                    )
+                        | #{error}
+
+                        if mostrarRegistro
+                            a(
+                                href="/registro"
+                                class="block mt-2 text-blue-600 font-semibold hover:underline"
+                            )
+                                | ¿Aún no tienes una cuenta? ¡Regístrate aquí!
+
                 if mensaje
                     div(
+                        id="mensajeError"
                         class="mb-5 rounded-lg bg-green-100 border border-green-300 px-4 py-3 text-green-700 text-sm text-center"
                     )
                         | #{mensaje}
+
+                script.
+                    setTimeout(() => {
+                        const error = document.getElementById("mensajeError");
+                        const exito = document.getElementById("mensajeExito");
+
+                        if (error) {
+                            error.remove();
+                        }
+
+                        if (exito) {
+                            exito.remove();
+                        }
+                    }, 4000);
 
                 p.text-center.text-gray-500.mb-6
                     | Ingresa a tu cuenta para continuar
@@ -63,7 +92,7 @@ block contenido
                             | Regístrate
 
                 a(
-                    href="https://wa.me/573001234567?text=Hola,%20necesito%20ayuda."
+                    href="https://wa.me/573105212658?text=Hola,%20necesito%20ayuda."
                     target="_blank"
                     rel="noopener noreferrer"
                     class="flex bottom-15 right-50 w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50 mr-0"

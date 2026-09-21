@@ -29,7 +29,9 @@ const login = async (req, res) => {
     if (!usuario) {
         return res.render("login/auth/login", {
             titulo: "Iniciar Sesión",
-            error: "Correo o contraseña incorrectos."
+            error: "No encontramos una cuenta asociada a este correo.",
+            mostrarRegistro: true,
+            correo
         });
     }
 
@@ -41,21 +43,24 @@ const login = async (req, res) => {
     if (!passwordCorrecta) {
         return res.render("login/auth/login", {
             titulo: "Iniciar Sesión",
-            error: "Correo o contraseña incorrectos."
+            error: "La contraseña o correo es incorrecto.",
+            correo
         });
     }
 
     if (!usuario.estado) {
         return res.render("login/auth/login", {
             titulo: "Iniciar Sesión",
-            error: "La cuenta se encuentra inactiva."
+            error: "La cuenta se encuentra inactiva.",
+            correo
         });
     }
 
     if (!usuario.confirmado) {
         return res.render("login/auth/login", {
             titulo: "Iniciar Sesión",
-            error: "Debes confirmar tu cuenta antes de iniciar sesión."
+            error: "Debes confirmar tu cuenta antes de iniciar sesión.",
+            correo
         });
     }
 
