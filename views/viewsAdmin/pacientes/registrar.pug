@@ -1,0 +1,591 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        title SIGCMI - Registrar Paciente
+
+        script(src="https://cdn.tailwindcss.com")
+        link(rel="stylesheet" href="/admin/css/input.css")
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-white text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            //- =========================================================
+            //- SIDEBAR
+            //- =========================================================
+
+            aside(
+                id="sidebar"
+                class="sticky top-0 h-screen w-64 bg-indigo-600 text-white flex flex-col"
+            )
+
+                div
+
+                    //- Logo + botón hamburguesa
+                    div(class="flex items-center justify-between p-6")
+
+                        h1(class="sidebar-text text-2xl font-bold")
+                            | SIGCMI
+
+                        button(
+                            type="button"
+                            onclick="toggleSidebar()"
+                        )
+                            svg(
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-7 h-7"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            )
+                                path(
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                )
+
+                    //- Bienvenida
+                    div(class="sidebar-text px-6 pb-6")
+                        p(class="text-indigo-200 text-sm") Bienvenido
+                        p(class="font-bold")= usuarios.nombres
+                        p(class="text-indigo-200 text-sm") Admin
+
+                    //- Navegación
+                    nav(class="px-3 space-y-1")
+
+                        // Dashboard
+                        a(
+                            href="/admin/dashboard"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-house w-6 text-center")
+                            span(class="sidebar-text") Dashboard
+
+                        // Usuarios
+                        a(
+                            href="/admin/usuarios"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-users w-6 text-center")
+                            span(class="sidebar-text") Usuarios
+
+                        // Pacientes
+                        a(
+                            href="/admin/pacientes"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg bg-indigo-500/60 transition"
+                        )
+                            i(class="fa-solid fa-heart-pulse w-6 text-center")
+                            span(class="sidebar-text") Pacientes
+
+                        // Médicos
+                        a(
+                            href="/admin/medicos"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-user-doctor w-6 text-center")
+                            span(class="sidebar-text") Médicos
+
+                        // Especialidades
+                        a(
+                            href="/admin/especialidades"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-hospital w-6 text-center")
+                            span(class="sidebar-text") Especialidades
+
+                        // Citas
+                        a(
+                            href="/admin/citas"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-calendar-check w-6 text-center")
+                            span(class="sidebar-text") Citas
+
+                        // Calendario
+                        a(
+                            href="/admin/calendario"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-calendar-days w-6 text-center")
+                            span(class="sidebar-text") Calendario
+
+                        // Horarios
+                        a(
+                            href="/admin/horarios"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-clock w-6 text-center")
+                            span(class="sidebar-text") Horarios
+
+                        // Diagnósticos
+                        a(
+                            href="/admin/diagnosticos"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-stethoscope w-6 text-center")
+                            span(class="sidebar-text") Diagnósticos
+
+                        // Prescripciones
+                        a(
+                            href="/admin/prescripciones"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-pills w-6 text-center")
+                            span(class="sidebar-text") Prescripciones
+
+                        // WhatsApp
+                        a(
+                            href="/admin/whatsapp"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-brands fa-whatsapp w-6 text-center")
+                            span(class="sidebar-text") WhatsApp
+
+                        // Reportes
+                        a(
+                            href="/admin/reportes"
+                            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+                        )
+                            i(class="fa-solid fa-chart-column w-6 text-center")
+                            span(class="sidebar-text") Reportes
+
+                //- Cerrar sesión
+                div(class="fixed bottom-0 left-0 w-64 p-3")
+                    form(
+                        action="/auth/logout"
+                        method="POST"
+                    )
+                        button(
+                            type="submit"
+                            class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 text-white"
+                        )
+                            svg(
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="w-6 h-6 shrink-0"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            )
+                                path(
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                                )
+
+                            span(class="sidebar-text") Cerrar Sesión
+
+
+            //- =========================================================
+            //- CONTENIDO PRINCIPAL
+            //- =========================================================
+
+            main(class="flex-1 px-4 md:px-8 xl:px-10 py-6")
+
+                //- Encabezado
+                div(
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-slate-200"
+                )
+
+                    div
+                        h2(class="text-3xl font-bold text-slate-900")
+                            | Registrar Paciente
+
+                        p(class="text-slate-500 mt-1")
+                            | Registra un nuevo paciente en el sistema SIGCMI.
+
+                    a(
+                        href="/admin/dashboard"
+                        class="inline-flex items-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                    )
+                        i(class="fa-solid fa-arrow-left")
+                        | Volver
+
+
+                //- =====================================================
+                //- FORMULARIO
+                //- =====================================================
+
+                div(class="max-w-6xl mx-auto mt-8")
+
+                    form(
+                        action="/admin/pacientes/nuevo"
+                        method="POST"
+                        id="formPaciente"
+                        class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8"
+                    )
+
+                        //- Información personal
+                        div(class="mb-10")
+
+                            div(class="flex items-center gap-3 mb-6")
+
+                                div(class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center")
+                                    i(class="fa-solid fa-user text-indigo-600")
+
+                                div
+                                    h3(class="text-xl font-bold text-slate-800")
+                                        | Información personal
+
+                                    p(class="text-sm text-slate-500")
+                                        | Datos básicos del paciente
+
+
+                            div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+
+                                // Nombres
+                                div
+                                    label(
+                                        for="nombres"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Nombres *
+
+                                    input(
+                                        type="text"
+                                        id="nombres"
+                                        name="nombres"
+                                        required
+                                        minlength="2"
+                                        maxlength="100"
+                                        placeholder="Ingrese los nombres"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                // Apellidos
+                                div
+                                    label(
+                                        for="apellidos"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Apellidos *
+
+                                    input(
+                                        type="text"
+                                        id="apellidos"
+                                        name="apellidos"
+                                        required
+                                        minlength="2"
+                                        maxlength="100"
+                                        placeholder="Ingrese los apellidos"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                // Tipo documento
+                                div
+                                    label(
+                                        for="tipo_documento"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Tipo de documento *
+
+                                    select(
+                                        id="tipo_documento"
+                                        name="tipo_documento"
+                                        required
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+                                    )
+                                        option(value="") Seleccione
+                                        option(value="CC") Cédula de ciudadanía
+                                        option(value="TI") Tarjeta de identidad
+                                        option(value="CE") Cédula de extranjería
+                                        option(value="PP") Pasaporte
+
+                                // Número documento
+                                div
+                                    label(
+                                        for="numero_documento"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Número de documento *
+
+                                    input(
+                                        type="text"
+                                        id="numero_documento"
+                                        name="numero_documento"
+                                        required
+                                        maxlength="30"
+                                        placeholder="Ingrese el número"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                // Fecha nacimiento
+                                div
+                                    label(
+                                        for="fecha_nacimiento"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Fecha de nacimiento
+
+                                    input(
+                                        type="date"
+                                        id="fecha_nacimiento"
+                                        name="fecha_nacimiento"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                // Tipo sangre
+                                div
+                                    label(
+                                        for="tipo_sangre"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Tipo de sangre
+
+                                    select(
+                                        id="tipo_sangre"
+                                        name="tipo_sangre"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white"
+                                    )
+                                        option(value="") Seleccione
+                                        option(value="O+") O+
+                                        option(value="O-") O-
+                                        option(value="A+") A+
+                                        option(value="A-") A-
+                                        option(value="B+") B+
+                                        option(value="B-") B-
+                                        option(value="AB+") AB+
+                                        option(value="AB-") AB-
+
+
+                        //- Contacto
+                        div(class="mb-10")
+
+                            div(class="flex items-center gap-3 mb-6")
+
+                                div(class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center")
+                                    i(class="fa-solid fa-address-book text-emerald-600")
+
+                                div
+                                    h3(class="text-xl font-bold text-slate-800")
+                                        | Información de contacto
+
+                                    p(class="text-sm text-slate-500")
+                                        | Datos de contacto y ubicación
+
+
+                            div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+
+                                div
+                                    label(
+                                        for="correo"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Correo electrónico *
+
+                                    input(
+                                        type="email"
+                                        id="correo"
+                                        name="correo"
+                                        required
+                                        maxlength="150"
+                                        placeholder="paciente@correo.com"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                div
+                                    label(
+                                        for="telefono"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Teléfono
+
+                                    input(
+                                        type="tel"
+                                        id="telefono"
+                                        name="telefono"
+                                        maxlength="20"
+                                        placeholder="3001234567"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                div
+                                    label(
+                                        for="departamento"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Departamento
+
+                                    input(
+                                        type="text"
+                                        id="departamento"
+                                        name="departamento"
+                                        maxlength="100"
+                                        placeholder="Ej: Caldas"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                div
+                                    label(
+                                        for="ciudad"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Ciudad
+
+                                    input(
+                                        type="text"
+                                        id="ciudad"
+                                        name="ciudad"
+                                        maxlength="100"
+                                        placeholder="Ej: Manizales"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                div(class="md:col-span-2")
+
+                                    label(
+                                        for="direccion"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Dirección
+
+                                    input(
+                                        type="text"
+                                        id="direccion"
+                                        name="direccion"
+                                        maxlength="150"
+                                        placeholder="Dirección de residencia"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+
+                        //- Información médica
+                        div(class="mb-10")
+
+                            div(class="flex items-center gap-3 mb-6")
+
+                                div(class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center")
+                                    i(class="fa-solid fa-heart-pulse text-red-600")
+
+                                div
+                                    h3(class="text-xl font-bold text-slate-800")
+                                        | Información médica
+
+                                    p(class="text-sm text-slate-500")
+                                        | Información médica relevante
+
+
+                            div(class="grid grid-cols-1 gap-6")
+
+                                div
+                                    label(
+                                        for="alergias"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Alergias
+
+                                    textarea(
+                                        id="alergias"
+                                        name="alergias"
+                                        rows="3"
+                                        placeholder="Indique las alergias conocidas"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
+                                    )
+
+                                div
+                                    label(
+                                        for="condiciones_medicas"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Condiciones médicas
+
+                                    textarea(
+                                        id="condiciones_medicas"
+                                        name="condiciones_medicas"
+                                        rows="3"
+                                        placeholder="Indique enfermedades o condiciones médicas relevantes"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
+                                    )
+
+
+                        //- Seguridad
+                        div(class="mb-8")
+
+                            div(class="flex items-center gap-3 mb-6")
+
+                                div(class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center")
+                                    i(class="fa-solid fa-lock text-amber-600")
+
+                                div
+                                    h3(class="text-xl font-bold text-slate-800")
+                                        | Seguridad
+
+                                    p(class="text-sm text-slate-500")
+                                        | Credenciales iniciales del paciente
+
+
+                            div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+
+                                div
+                                    label(
+                                        for="password"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Contraseña *
+
+                                    input(
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        required
+                                        minlength="8"
+                                        maxlength="255"
+                                        placeholder="Mínimo 8 caracteres"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                div
+                                    label(
+                                        for="confirmPassword"
+                                        class="block text-sm font-semibold text-slate-700 mb-2"
+                                    ) Confirmar contraseña *
+
+                                    input(
+                                        type="password"
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        required
+                                        minlength="8"
+                                        maxlength="255"
+                                        placeholder="Repita la contraseña"
+                                        class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+
+                        //- Botones
+                        div(class="border-t border-slate-200 pt-6 flex flex-col sm:flex-row justify-end gap-3")
+
+                            a(
+                                href="/admin/dashboard"
+                                class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-center transition"
+                            )
+                                | Cancelar
+
+                            button(
+                                type="submit"
+                                class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-semibold transition"
+                            )
+                                i(class="fa-solid fa-user-plus mr-2")
+                                | Registrar paciente
+
+
+        //- =============================================================
+        //- VALIDACIÓN FRONTEND
+        //- =============================================================
+
+        script.
+            const form = document.getElementById("formPaciente");
+            const password = document.getElementById("password");
+            const confirmPassword = document.getElementById("confirmPassword");
+
+            form.addEventListener("submit", function(event) {
+
+                if (password.value !== confirmPassword.value) {
+                    event.preventDefault();
+
+                    alert("Las contraseñas no coinciden.");
+
+                    confirmPassword.focus();
+                }
+
+            });
+
+
+        //- =============================================================
+        //- SIDEBAR JS
+        //- =============================================================
+
+        script(src="/admin/js/toggleSidebar.js")
