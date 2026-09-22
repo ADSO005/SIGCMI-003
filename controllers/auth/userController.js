@@ -1,4 +1,6 @@
 import Usuario from "../../models/Usuario.js";
+import Paciente from "../../models/Paciente.js";
+import db from "../../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import generateJWT from "../../helpers/generateJWT.js";
@@ -70,7 +72,7 @@ const login = async (req, res) => {
 
     const token = generateJWT(usuario);
 
-    console.log("JWT:",token);
+    console.log("JWT:", token);
 
     console.log(passwordCorrecta);
 
@@ -215,33 +217,41 @@ const register = async (req, res) => {
         );
 
 
-        // ===============================
-        // CREAR USUARIO
-        // ===============================
+        const transaction = await db.transaction();
 
-        await Usuario.create({
+        try {
+            const usuario = await Usuario.create(
+                {
+                    rol_id: 3,
+                    nombres,
+                    apellidos,
+                    correo: email,
+                    telefono,
+                    tipo_documento: tipoDocumento,
+                    numero_documento: numeroDocumento,
+                    password: passwordHash,
+                    confirmado: true,
+                    estado: true
+                },
+                { transaction }
+            );
 
-            rol_id: 3,
+            await Paciente.create(
+                {
+                    usuario_id: usuario.id_usuario,
+                    fecha_nacimiento: fechaNacimiento || null,
+                    departamento: departamento || null,
+                    ciudad: ciudad || null
+                },
+                { transaction }
+            );
 
-            nombres,
+            await transaction.commit();
 
-            apellidos,
-
-            correo: email,
-
-            telefono,
-
-            tipo_documento: tipoDocumento,
-
-            numero_documento: numeroDocumento,
-
-            password: passwordHash,
-
-            confirmado: true,
-
-            estado: true
-
-        });
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
 
         // ===============================
