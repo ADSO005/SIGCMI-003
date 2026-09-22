@@ -1,4 +1,4 @@
-import User from "../models/user.js";
+import Usuario from "../models/Usuario.js";
 import jwt from "jsonwebtoken";
 
 const auth = async (req, res, next) => {
@@ -16,7 +16,7 @@ const auth = async (req, res, next) => {
             process.env.JWT_SECRET
         );
 
-        const usuario = await User.findByPk(decoded.id);
+        const usuario = await Usuario.findByPk(decoded.id);
 
         if (!usuario) {
 

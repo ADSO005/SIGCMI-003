@@ -52,7 +52,7 @@ export const verDashboard = async (req, res) => {
         citasHoy.forEach((cita) => {
             cita.hora = cita.hora.substring(0, 5);
         });
-        
+
         const notificacionesHoy = await SolicitudWhatsApp.count();
 
         //=========================================
@@ -100,7 +100,9 @@ export const verDashboard = async (req, res) => {
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Error al cargar dashboard administrativo:", error);
+
+        res.status(500).send("Error al cargar el dashboard administrativo");
 
     }
 

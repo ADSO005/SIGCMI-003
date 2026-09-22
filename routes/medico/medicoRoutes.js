@@ -9,9 +9,7 @@ router.get(
     auth,
     role(2),
     (req, res) => {
-
-        res.send("Dashboard Médico");
-
+        res.render("dashboardMedical/viewsMedico/dashboardMedical");
     }
 );
 

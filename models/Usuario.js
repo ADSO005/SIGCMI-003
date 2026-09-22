@@ -69,10 +69,21 @@ const Usuario = db.define(
 
         fecha_registro: {
             type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
         },
 
         token: {
             type: DataTypes.STRING(150),
+            allowNull: true,
+        },
+
+        codigo: {
+            type: DataTypes.STRING(6),
+            allowNull: true,
+        },
+
+        codigo_expira: {
+            type: DataTypes.DATE,
             allowNull: true,
         },
     },

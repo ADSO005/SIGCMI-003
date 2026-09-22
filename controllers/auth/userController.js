@@ -1,4 +1,4 @@
-import User from "../../models/User.js";
+import Usuario from "../../models/Usuario.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import generateJWT from "../../helpers/generateJWT.js";
@@ -20,7 +20,7 @@ const login = async (req, res) => {
 
     const { correo, password } = req.body;
 
-    const usuario = await User.findOne({
+    const usuario = await Usuario.findOne({
         where: {
             correo
         }
@@ -107,6 +107,175 @@ const logout = (req, res) => {
 
 };
 
+
+/* ===============================
+   FORMULARIO DE REGISTRO
+================================ */
+
+const formRegister = (req, res) => {
+
+    res.render("login/auth/register", {
+        titulo: "Crear Cuenta"
+    });
+
+};
+
+
+/* ===============================
+   REGISTRAR USUARIO
+================================ */
+
+const register = async (req, res) => {
+
+    try {
+
+        const {
+            nombres,
+            apellidos,
+            email,
+            telefono,
+            fechaNacimiento,
+            tipoDocumento,
+            numeroDocumento,
+            departamento,
+            ciudad,
+            password,
+            confirmPassword
+        } = req.body;
+
+
+        // ===============================
+        // VALIDAR CONTRASEÑAS
+        // ===============================
+
+        if (password !== confirmPassword) {
+
+            return res.render("login/auth/register", {
+                titulo: "Crear Cuenta",
+                error: "Las contraseñas no coinciden.",
+                formData: req.body
+            });
+
+        }
+
+
+        // ===============================
+        // BUSCAR CORREO EXISTENTE
+        // ===============================
+
+        const usuarioExistente = await Usuario.findOne({
+            where: {
+                correo: email
+            }
+        });
+
+
+        if (usuarioExistente) {
+
+            return res.render("login/auth/register", {
+                titulo: "Crear Cuenta",
+                error: "Ya existe una cuenta con ese correo.",
+                formData: req.body
+            });
+
+        }
+
+
+        // ===============================
+        // BUSCAR DOCUMENTO EXISTENTE
+        // ===============================
+
+        const documentoExistente = await Usuario.findOne({
+            where: {
+                numero_documento: numeroDocumento
+            }
+        });
+
+
+        if (documentoExistente) {
+
+            return res.render("login/auth/register", {
+                titulo: "Crear Cuenta",
+                error: "Ya existe una cuenta con ese número de documento.",
+                formData: req.body
+            });
+
+        }
+
+
+        // ===============================
+        // ENCRIPTAR CONTRASEÑA
+        // ===============================
+
+        const salt = await bcrypt.genSalt(10);
+
+        const passwordHash = await bcrypt.hash(
+            password,
+            salt
+        );
+
+
+        // ===============================
+        // CREAR USUARIO
+        // ===============================
+
+        await Usuario.create({
+
+            rol_id: 3,
+
+            nombres,
+
+            apellidos,
+
+            correo: email,
+
+            telefono,
+
+            tipo_documento: tipoDocumento,
+
+            numero_documento: numeroDocumento,
+
+            password: passwordHash,
+
+            confirmado: true,
+
+            estado: true
+
+        });
+
+
+        // ===============================
+        // REGRESAR AL LOGIN
+        // ===============================
+
+        return res.render("login/auth/login", {
+
+            titulo: "Iniciar Sesión",
+
+            mensaje: "Cuenta creada correctamente. Ahora puedes iniciar sesión."
+
+        });
+
+
+    } catch (error) {
+
+        console.error("❌ Error al registrar usuario:");
+        console.error(error);
+
+        return res.render("login/auth/register", {
+
+            titulo: "Crear Cuenta",
+
+            error: "Ocurrió un error al crear la cuenta.",
+
+            formData: req.body
+
+        });
+
+    }
+
+};
+
 /* ruta vista olvide mi contraseña */
 const formRecoverPassword = (req, res) => {
 
@@ -120,7 +289,7 @@ const recoverPassword = async (req, res) => {
 
     const { correo } = req.body;
 
-    const usuario = await User.findOne({
+    const usuario = await Usuario.findOne({
         where: {
             correo
         }
@@ -158,7 +327,7 @@ const verifyOTP = async (req, res) => {
 
     const { codigo } = req.body;
 
-    const usuario = await User.findOne({
+    const usuario = await Usuario.findOne({
         where: {
             codigo
         }
@@ -232,7 +401,7 @@ const formResetPassword = async (req, res) => {
 
         }
 
-        const usuario = await User.findByPk(decoded.id);
+        const usuario = await Usuario.findByPk(decoded.id);
 
         if (!usuario) {
 
@@ -276,7 +445,7 @@ const resetPassword = async (req, res) => {
 
         }
 
-        const usuario = await User.findByPk(decoded.id);
+        const usuario = await Usuario.findByPk(decoded.id);
 
         if (!usuario) {
 
@@ -323,6 +492,8 @@ export {
     formLogin,
     login,
     logout,
+    formRegister,
+    register,
     formRecoverPassword,
     recoverPassword,
     formVerifyOTP,

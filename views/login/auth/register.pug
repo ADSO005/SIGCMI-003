@@ -4,17 +4,11 @@ html(lang="es")
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title SIGCMI · Crear Cuenta
-    link(rel="stylesheet", href="medico/css/output.css")
+    link(rel="stylesheet", href="/medico/css/output.css")
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
 
   body
-    //-
-      mixin para un campo de texto/telefono/fecha estándar
-      name       -> atributo name del input (debe matchear express-validator)
-      label      -> texto de la etiqueta
-      type       -> tipo de input html
-      placeholder-> placeholder
-      icon       -> clase de icono fontawesome (sin "fa-solid")
+
     mixin formInput(name, label, type, placeholder, icon)
       .form-group
         label.form-label(for=name)= label
@@ -115,4 +109,4 @@ html(lang="es")
               | ¿Ya tienes cuenta?
               a.auth-footer__link(href="/login")  Inicia Sesión
 
-    script(src="js/register.js")
+    script(src="/js/register.js")
