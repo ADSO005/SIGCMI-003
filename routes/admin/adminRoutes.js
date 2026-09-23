@@ -1,4 +1,5 @@
 import express from "express";
+
 import auth from "../../middleware/auth.js";
 import role from "../../middleware/role.js";
 
@@ -9,6 +10,11 @@ import {
     obtenerHorasDisponibles,
     crearNuevaCita
 } from "../../controllers/admin/citasController.js";
+
+import {
+    mostrarFormularioPaciente,
+    registrarPaciente
+} from "../../controllers/admin/pacientesController.js";
 
 const router = express.Router();
 
@@ -39,6 +45,8 @@ router.post(
     auth,
     role(1),
     registrarPaciente
+);
+
 router.get(
     "/citas/nueva",
     auth,
