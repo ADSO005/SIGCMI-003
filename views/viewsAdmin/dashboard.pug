@@ -150,6 +150,11 @@ html(lang="es")
                         i(class="fa-solid fa-chart-pie text-indigo-600")
                         | Estado de las Citas
                     canvas(id="graficoEstados" height="260")
+        
+        // COMPONENTES
+        include components/modals/nuevaCita.pug
+
+        script(src="/admin/js/modals/nuevaCita.js")
         //- ============ JAVASCRIPT: colapsar/expandir el sidebar ============
         script(src="https://cdn.jsdelivr.net/npm/chart.js")
 

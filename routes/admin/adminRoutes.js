@@ -5,9 +5,10 @@ import role from "../../middleware/role.js";
 import { verDashboard } from "../../controllers/admin/dashboardController.js";
 
 import {
-    mostrarFormularioPaciente,
-    registrarPaciente
-} from "../../controllers/admin/pacientesController.js";
+    mostrarFormularioNuevaCita,
+    obtenerHorasDisponibles,
+    crearNuevaCita
+} from "../../controllers/admin/citasController.js";
 
 const router = express.Router();
 
@@ -38,6 +39,25 @@ router.post(
     auth,
     role(1),
     registrarPaciente
+router.get(
+    "/citas/nueva",
+    auth,
+    role(1),
+    mostrarFormularioNuevaCita
+);
+
+router.get(
+    "/citas/disponibilidad",
+    auth,
+    role(1),
+    obtenerHorasDisponibles
+);
+
+router.post(
+    "/citas/nueva",
+    auth,
+    role(1),
+    crearNuevaCita
 );
 
 export default router;
