@@ -2,6 +2,7 @@ import {
     Usuario,
     Paciente,
     Medico,
+    Especialidad,
     EstadoCita,
     Cita,
     SolicitudWhatsApp
@@ -81,21 +82,71 @@ export const verDashboard = async (req, res) => {
 
         };
 
+        const pacientes = await Paciente.findAll({
+            include: [
+                {
+                    model: Usuario,
+                    attributes: [
+                        "id_usuario",
+                        "nombres",
+                        "apellidos",
+                        "numero_documento"
+                    ]
+                }
+            ],
+            order: [
+                [Usuario, "nombres", "ASC"]
+            ]
+        });
+
+        const especialidades = await Especialidad.findAll({
+            order: [
+                ["nombre", "ASC"]
+            ]
+        });
+
+        const medicos = await Medico.findAll({
+            include: [
+                {
+                    model: Usuario,
+                    attributes: [
+                        "id_usuario",
+                        "nombres",
+                        "apellidos"
+                    ]
+                },
+                {
+                    model: Especialidad,
+                    attributes: [
+                        "id_especialidad",
+                        "nombre"
+                    ]
+                }
+            ],
+            order: [
+                [Usuario, "nombres", "ASC"]
+            ]
+        });
+
+        const estados = await EstadoCita.findAll({
+            order: [
+                ["nombre", "ASC"]
+            ]
+        });
 
         //=========================================
         // RENDER
         //=========================================
 
         res.render("viewsAdmin/dashboard", {
-
-            usuarios,
-
+            usuarios: req.usuario,
             fechaHoy: new Date().toLocaleDateString("es-CO"),
-
             stats,
-
-            citasHoy
-
+            citasHoy,
+            pacientes,
+            especialidades,
+            medicos,
+            estados
         });
 
     } catch (error) {
