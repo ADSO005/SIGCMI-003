@@ -8,7 +8,9 @@ import {
     Horario
 } from "../../models/index.js";
 
-
+import {
+    contieneLenguajeInapropiado
+} from "../../utils/filtroLenguaje.js";
 // =====================================================
 // FUNCIONES AUXILIARES
 // =====================================================
@@ -600,36 +602,10 @@ export const crearNuevaCita = async (req, res) => {
         }
 
 
-        // -----------------------------------------
-        // Validar palabras no permitidas
-        // -----------------------------------------
-
-        const palabrasNoPermitidas = [
-            "puta",
-            "puto",
-            "mierda",
-            "marica",
-            "gonorrea"
-        ];
-
-
         const motivo =
-            String(motivo_consulta || "")
-                .trim();
+            String(motivo_consulta || "").trim();
 
-
-        const motivoMinuscula =
-            motivo.toLowerCase();
-
-
-        const contienePalabraNoPermitida =
-            palabrasNoPermitidas.some(
-                palabra =>
-                    motivoMinuscula.includes(palabra)
-            );
-
-
-        if (contienePalabraNoPermitida) {
+        if (contieneLenguajeInapropiado(motivo)) {
 
             return res.status(400).json({
                 ok: false,
@@ -638,7 +614,6 @@ export const crearNuevaCita = async (req, res) => {
             });
 
         }
-
 
         // -----------------------------------------
         // Obtener administrador autenticado
