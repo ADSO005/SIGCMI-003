@@ -429,23 +429,87 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const motivoValido = () => {
 
-        const palabrasNoPermitidas = [
+        let texto =
+            motivoInput.value
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+
+
+        const sustituciones = {
+            "0": "o",
+            "1": "i",
+            "3": "e",
+            "4": "a",
+            "5": "s",
+            "7": "t",
+            "@": "a",
+            "$": "s"
+        };
+
+
+        texto = texto
+            .split("")
+            .map(caracter =>
+                sustituciones[caracter] ?? caracter
+            )
+            .join("");
+
+
+        const limpio =
+            texto.replace(/[^a-z]/g, "");
+
+
+        const reducido =
+            limpio.replace(
+                /(.)\1{2,}/g,
+                "$1$1"
+            );
+
+
+        const palabrasBloqueadas = [
             "puta",
             "puto",
             "mierda",
             "marica",
-            "gonorrea"
+            "maricon",
+            "gonorrea",
+            "hijueputa",
+            "malparido",
+            "carechimba",
+            "caremonda",
+            "careverga",
+            "chimba",
+            "monda",
+            "verga",
+            "polla",
+            "coño",
+            "culo",
+            "joder",
+            "jodete",
+            "chingar",
+            "chingada"
         ];
 
 
-        const texto =
-            motivoInput.value
-                .toLowerCase();
+        return !palabrasBloqueadas.some(
+            palabra => {
 
+                const palabraLimpia =
+                    palabra
+                        .normalize("NFD")
+                        .replace(
+                            /[\u0300-\u036f]/g,
+                            ""
+                        );
 
-        return !palabrasNoPermitidas.some(
-            palabra =>
-                texto.includes(palabra)
+                return (
+                    texto.includes(palabraLimpia) ||
+                    limpio.includes(palabraLimpia) ||
+                    reducido.includes(palabraLimpia)
+                );
+
+            }
         );
 
     };
