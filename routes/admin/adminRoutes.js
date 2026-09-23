@@ -12,6 +12,10 @@ import {
 
 const router = express.Router();
 
+// ===============================
+// DASHBOARD
+// ===============================
+
 router.get(
     "/dashboard",
     auth,
@@ -19,6 +23,22 @@ router.get(
     verDashboard
 );
 
+// ===============================
+// PACIENTES
+// ===============================
+
+router.get(
+    "/pacientes/nuevo",
+    auth,
+    role(1),
+    mostrarFormularioPaciente
+);
+
+router.post(
+    "/pacientes/nuevo",
+    auth,
+    role(1),
+    registrarPaciente
 router.get(
     "/citas/nueva",
     auth,
