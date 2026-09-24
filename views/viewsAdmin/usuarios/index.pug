@@ -278,8 +278,9 @@ html(lang="es")
 
                                                     button(
                                                         type="button"
-                                                        class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                                        class="btnEditarUsuario w-9 h-9 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
                                                         title="Editar usuario"
+                                                        data-id=usuario.id
                                                     )
                                                         i(class="fa-solid fa-pen")
 
@@ -289,7 +290,9 @@ html(lang="es")
                                                         title="Cambiar estado"
                                                     )
                                                         i(class="fa-solid fa-power-off")
-
+        
+        //- MODAL EDITAR USUARIO
+        include ../components/modals/editarUsuario.pug
 
         //- ==========================================
         //- JAVASCRIPT

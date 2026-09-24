@@ -6,7 +6,9 @@ import role from "../../middleware/role.js";
 import { verDashboard } from "../../controllers/admin/dashboardController.js";
 
 import {
-    listarUsuarios
+    listarUsuarios,
+    obtenerUsuario,
+    actualizarUsuario
 } from "../../controllers/admin/usuariosController.js";
 
 import {
@@ -44,6 +46,19 @@ router.get(
     listarUsuarios
 );
 
+router.get(
+    "/usuarios/:id",
+    auth,
+    role(1),
+    obtenerUsuario
+);
+
+router.put(
+    "/usuarios/:id",
+    auth,
+    role(1),
+    actualizarUsuario
+);
 // ===============================
 // PACIENTES
 // ===============================
