@@ -17,10 +17,15 @@ block content
         p Bienvenido, #{paciente.nombre}
 
 
-    a.btn-logout(href="/logout")
+    form(
+        action="/auth/logout"
+        method="POST"
+    )
 
-      i.icon-logout
-      | Cerrar Sesión
+        button.btn-logout(type="submit")
+
+            i.icon-logout
+            | Cerrar Sesión
 
 
   // ==========================================
