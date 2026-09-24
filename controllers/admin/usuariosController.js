@@ -391,3 +391,48 @@ export const actualizarUsuario = async (req, res) => {
         });
     }
 };
+
+export const cambiarEstadoUsuario = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validar ID
+        if (!/^\d+$/.test(String(id))) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El ID del usuario no es válido."
+            });
+        }
+
+        // Buscar usuario
+        const usuario = await Usuario.findByPk(id);
+
+        if (!usuario) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: "Usuario no encontrado."
+            });
+        }
+
+        // Cambiar estado
+        usuario.estado = !usuario.estado;
+
+        await usuario.save();
+
+        return res.json({
+            ok: true,
+            mensaje: usuario.estado
+                ? "Usuario activado correctamente."
+                : "Usuario desactivado correctamente.",
+            estado: usuario.estado
+        });
+
+    } catch (error) {
+        console.error("Error al cambiar estado del usuario:", error);
+
+        return res.status(500).json({
+            ok: false,
+            mensaje: "Error al cambiar el estado del usuario."
+        });
+    }
+};

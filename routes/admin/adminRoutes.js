@@ -8,7 +8,8 @@ import { verDashboard } from "../../controllers/admin/dashboardController.js";
 import {
     listarUsuarios,
     obtenerUsuario,
-    actualizarUsuario
+    actualizarUsuario,
+    cambiarEstadoUsuario
 } from "../../controllers/admin/usuariosController.js";
 
 import {
@@ -59,6 +60,14 @@ router.put(
     role(1),
     actualizarUsuario
 );
+
+router.patch(
+    "/usuarios/:id/estado",
+    auth,
+    role(1),
+    cambiarEstadoUsuario
+);
+
 // ===============================
 // PACIENTES
 // ===============================
