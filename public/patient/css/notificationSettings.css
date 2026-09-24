@@ -1,0 +1,622 @@
+/* =========================================================
+   SIGCMI
+   Modal - Configuración de Notificaciones
+   ========================================================= */
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.notification-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(20, 29, 52, 0.55);
+
+    overflow-y: auto;
+}
+
+
+/* Se muestra cuando tiene la clase active */
+
+.notification-modal.active {
+    display: flex;
+}
+
+
+/* =========================================================
+   CONTENEDOR
+   ========================================================= */
+
+.notification-container {
+    width: min(790px, 100%);
+
+    max-height: 95vh;
+
+    background: #eef5ff;
+
+    border-radius: 0 0 12px 12px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 20px 60px rgba(20, 35, 70, 0.30);
+
+    animation: notificationOpen 0.2s ease;
+}
+
+
+@keyframes notificationOpen {
+
+    from {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.notification-header {
+
+    min-height: 76px;
+
+    padding: 10px 24px;
+
+    background: #465de5;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+
+.notification-header-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.notification-header-icon {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    color: #465de5;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+}
+
+
+.notification-header h2 {
+
+    margin: 0;
+
+    font-size: 22px;
+
+    font-weight: 700;
+}
+
+
+.notification-header p {
+
+    margin: 3px 0 0;
+
+    font-size: 13px;
+
+    opacity: 0.85;
+}
+
+
+.notification-close {
+
+    border: 0;
+
+    background: transparent;
+
+    color: white;
+
+    font-size: 32px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    padding: 0 5px;
+
+    transition: transform 0.2s ease;
+}
+
+
+.notification-close:hover {
+
+    transform: scale(1.15);
+
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.notification-body {
+
+    padding: 12px 24px 20px;
+
+    max-height: calc(95vh - 150px);
+
+    overflow-y: auto;
+}
+
+
+/* =========================================================
+   SECCIONES
+   ========================================================= */
+
+.notification-section {
+
+    margin-bottom: 20px;
+}
+
+
+.notification-section-title {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-bottom: 8px;
+}
+
+
+.notification-section-title h3 {
+
+    margin: 0;
+
+    color: #1e2a55;
+
+    font-size: 19px;
+
+    font-weight: 700;
+}
+
+
+.section-icon {
+
+    width: 23px;
+    height: 23px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #465de5;
+
+    font-size: 19px;
+
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   OPCIONES
+   ========================================================= */
+
+.notification-option {
+
+    min-height: 55px;
+
+    margin-bottom: 8px;
+
+    padding: 8px 14px;
+
+    border: 2px solid #c4cee2;
+
+    border-radius: 10px;
+
+    background: #e4ebf8;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.notification-option:hover {
+
+    border-color: #9eadd0;
+
+    background: #e0e9f8;
+}
+
+
+.option-info {
+
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+    gap: 15px;
+}
+
+
+.option-icon {
+
+    width: 35px;
+    min-width: 35px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    color: #3f59db;
+
+    font-size: 25px;
+}
+
+
+.option-icon img {
+
+    width: 31px;
+    height: 31px;
+
+    object-fit: contain;
+}
+
+
+.option-text {
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+
+.option-text strong {
+
+    color: #182452;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    line-height: 1.1;
+}
+
+
+.option-text small {
+
+    margin-top: 2px;
+
+    color: #26345d;
+
+    font-size: 13px;
+
+    line-height: 1.1;
+}
+
+
+.option-text-no-icon {
+
+    margin-left: 66px;
+}
+
+
+/* =========================================================
+   SWITCH
+   ========================================================= */
+
+.switch {
+
+    position: relative;
+
+    width: 53px;
+    min-width: 53px;
+
+    height: 29px;
+
+    cursor: pointer;
+}
+
+
+.switch input {
+
+    opacity: 0;
+
+    width: 0;
+    height: 0;
+}
+
+
+.slider {
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 30px;
+
+    background: #dedce2;
+
+    border: 2px solid #87818d;
+
+    transition: 0.25s;
+}
+
+
+.slider::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 19px;
+    height: 19px;
+
+    left: 3px;
+    top: 3px;
+
+    border-radius: 50%;
+
+    background: #827b87;
+
+    transition: 0.25s;
+}
+
+
+.switch input:checked + .slider {
+
+    background: #4055d4;
+
+    border-color: #4055d4;
+}
+
+
+.switch input:checked + .slider::before {
+
+    background: white;
+
+    transform: translateX(24px);
+}
+
+
+/* =========================================================
+   INFORMACIÓN
+   ========================================================= */
+
+.notification-info-box {
+
+    margin-top: 15px;
+
+    padding: 18px 22px;
+
+    border: 2px solid #6076a8;
+
+    border-radius: 9px;
+
+    background: #b8ccf9;
+}
+
+
+.notification-info-box h4 {
+
+    margin: 0 0 4px;
+
+    color: #384d78;
+
+    font-size: 18px;
+
+    font-weight: 500;
+}
+
+
+.notification-info-box p {
+
+    margin: 0;
+
+    color: #33466e;
+
+    font-size: 13px;
+
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.notification-footer {
+
+    padding: 20px 24px 24px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1.2fr;
+
+    gap: 24px;
+
+    background: #eef5ff;
+}
+
+
+.notification-btn {
+
+    min-height: 47px;
+
+    border: 0;
+
+    border-radius: 25px;
+
+    font-family: inherit;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        filter 0.15s ease;
+}
+
+
+.notification-btn:hover {
+
+    transform: translateY(-1px);
+
+    filter: brightness(0.97);
+}
+
+
+.notification-btn.cancel {
+
+    background: #d1d1d1;
+
+    color: #111;
+}
+
+
+.notification-btn.save {
+
+    background: #4055d4;
+
+    color: white;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .notification-modal {
+
+        padding: 0;
+    }
+
+
+    .notification-container {
+
+        width: 100%;
+
+        max-height: 100vh;
+
+        border-radius: 0;
+    }
+
+
+    .notification-header {
+
+        padding: 12px 16px;
+    }
+
+
+    .notification-header h2 {
+
+        font-size: 18px;
+    }
+
+
+    .notification-header p {
+
+        font-size: 11px;
+    }
+
+
+    .notification-body {
+
+        padding: 10px 14px;
+    }
+
+
+    .notification-option {
+
+        padding: 8px 10px;
+    }
+
+
+    .option-info {
+
+        gap: 8px;
+    }
+
+
+    .option-text strong {
+
+        font-size: 15px;
+    }
+
+
+    .option-text small {
+
+        font-size: 11px;
+    }
+
+
+    .option-text-no-icon {
+
+        margin-left: 0;
+    }
+
+
+    .notification-footer {
+
+        padding: 15px;
+
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+    }
+
+}

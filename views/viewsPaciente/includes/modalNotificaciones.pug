@@ -1,0 +1,334 @@
+// ==========================================
+// MODAL CONFIGURACIÓN DE NOTIFICACIONES
+// ==========================================
+
+div#modalNotificaciones.notification-modal
+
+  .notification-container
+
+    // ========================================
+    // ENCABEZADO
+    // ========================================
+
+    header.notification-header
+
+      .notification-header-info
+
+        .notification-header-icon
+          span 🔔
+
+        div
+          h2 Configuración de Notificaciones
+          p Personaliza cómo recibes notificaciones
+
+
+      button#cerrarNotificaciones.notification-close(
+        type="button"
+        aria-label="Cerrar"
+      )
+        | ×
+
+
+    // ========================================
+    // CONTENIDO
+    // ========================================
+
+    .notification-body
+
+
+      // ======================================
+      // CANALES DE NOTIFICACIÓN
+      // ======================================
+
+      section.notification-section
+
+        .notification-section-title
+
+          span.section-icon 💬
+
+          h3 Canales de Notificación
+
+
+        // CORREO ELECTRÓNICO
+
+        .notification-option
+
+          .option-info
+
+            .option-icon.email-icon
+              span ✉
+
+            .option-text
+              strong Correo Electrónico
+              small Recibe notificaciones por email
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="notificacionCorreo"
+              name="correo"
+              checked
+            )
+            span.slider
+
+
+        // SMS
+
+        .notification-option
+
+          .option-info
+
+            .option-icon.sms-icon
+              span ▱
+
+            .option-text
+              strong SMS
+              small Recibe mensajes de texto
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="notificacionSms"
+              name="sms"
+              checked
+            )
+            span.slider
+
+
+        // WHATSAPP
+
+        .notification-option
+
+          .option-info
+
+            .option-icon.whatsapp-icon
+              img(
+                src="/medico/img/WhatsApp.svg.png"
+                alt="WhatsApp"
+              )
+
+            .option-text
+              strong WhatsApp
+              small Recibe mensajes por WhatsApp
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="notificacionWhatsapp"
+              name="whatsapp"
+              checked
+            )
+            span.slider
+
+
+
+      // ======================================
+      // RECORDATORIOS DE CITAS
+      // ======================================
+
+      section.notification-section
+
+        .notification-section-title
+
+          span.section-icon 🕐
+
+          h3 Recordatorios de citas
+
+
+        // 24 HORAS
+
+        .notification-option
+
+          .option-info
+
+            .option-icon.calendar-icon
+              span ▣
+
+            .option-text
+              strong Recordatorio 24 horas antes
+              small Un día antes de tu Cita
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="recordatorio24h"
+              name="recordatorio_24h"
+            )
+            span.slider
+
+
+        // 1 HORA
+
+        .notification-option
+
+          .option-info
+
+            .option-icon.clock-icon
+              span ◷
+
+            .option-text
+              strong Recordatorio 1 hora antes
+              small Un hora antes de tu Cita
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="recordatorio1h"
+              name="recordatorio_1h"
+            )
+            span.slider
+
+
+
+      // ======================================
+      // NOTIFICACIONES DE EVENTOS
+      // ======================================
+
+      section.notification-section
+
+        .notification-section-title
+
+          span.section-icon !
+
+          h3 Notificaciones de Eventos
+
+
+        // CONFIRMACIÓN
+
+        .notification-option
+
+          .option-info
+
+            .option-text.option-text-no-icon
+              strong Confirmación de citas
+              small Cuando se confirme una cita
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="confirmacionCita"
+              name="confirmacion_cita"
+            )
+            span.slider
+
+
+        // CANCELACIÓN
+
+        .notification-option
+
+          .option-info
+
+            .option-text.option-text-no-icon
+              strong Cancelación de citas
+              small Cuando se cancele una cita
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="cancelacionCita"
+              name="cancelacion_cita"
+            )
+            span.slider
+
+
+        // REPROGRAMACIÓN
+
+        .notification-option
+
+          .option-info
+
+            .option-text.option-text-no-icon
+              strong Reprogramación de citas
+              small Cuando se reprograme una cita
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="reprogramacion"
+              name="reprogramacion"
+              checked
+            )
+            span.slider
+
+
+        // NUEVO DIAGNÓSTICO
+
+        .notification-option
+
+          .option-info
+
+            .option-text.option-text-no-icon
+              strong Nuevos diagnósticos
+              small Cuando haya un nuevo diagnóstico
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="nuevoDiagnostico"
+              name="nuevo_diagnostico"
+              checked
+            )
+            span.slider
+
+
+        // ACTUALIZACIONES
+
+        .notification-option
+
+          .option-info
+
+            .option-text.option-text-no-icon
+              strong Actualizaciones generales
+              small Noticias y actualizaciones del sistema
+
+
+          label.switch
+            input(
+              type="checkbox"
+              id="actualizaciones"
+              name="actualizaciones"
+              checked
+            )
+            span.slider
+
+
+
+      // ======================================
+      // INFORMACIÓN IMPORTANTE
+      // ======================================
+
+      .notification-info-box
+
+        h4 Información importante
+
+        p
+          | Las notificaciones te ayudan a estar informado sobre tus citas
+          | y diagnósticos. Puedes cambiar estas preferencias en cualquier momento.
+
+
+
+    // ========================================
+    // BOTONES
+    // ========================================
+
+    footer.notification-footer
+
+      button#cancelarNotificaciones.notification-btn.cancel(
+        type="button"
+      )
+        | Cancelar
+
+
+      button#guardarNotificaciones.notification-btn.save(
+        type="button"
+      )
+        | Guardar Cambios

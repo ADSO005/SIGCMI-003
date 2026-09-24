@@ -7,7 +7,7 @@ dotenv.config();
 const sequelize = new Sequelize(
     'sigcmi',
     'root',
-    '',
+    'kdaniela0731.',
     {
         host: 'localhost',
         dialect: 'mysql',
