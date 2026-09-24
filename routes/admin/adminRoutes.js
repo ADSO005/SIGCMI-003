@@ -6,6 +6,10 @@ import role from "../../middleware/role.js";
 import { verDashboard } from "../../controllers/admin/dashboardController.js";
 
 import {
+    listarUsuarios
+} from "../../controllers/admin/usuariosController.js";
+
+import {
     mostrarFormularioNuevaCita,
     obtenerHorasDisponibles,
     crearNuevaCita
@@ -27,6 +31,17 @@ router.get(
     auth,
     role(1),
     verDashboard
+);
+
+// ===============================
+// USUARIOS
+// ===============================
+
+router.get(
+    "/usuarios",
+    auth,
+    role(1),
+    listarUsuarios
 );
 
 // ===============================

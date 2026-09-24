@@ -1,0 +1,299 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        title SIGCMI - Usuarios
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-white text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            include ../components/sidebar.pug
+            //- ==========================================
+            //- CONTENIDO PRINCIPAL
+            //- ==========================================
+
+            main(
+                id="mainContent"
+                class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6"
+            )
+
+                //- HEADER
+
+                div(
+                    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200"
+                )
+
+                    div
+
+                        h2(class="text-2xl sm:text-3xl font-bold text-slate-900")
+                            | Gestión de Usuarios
+
+                        p(class="text-slate-500 mt-1")
+                            | Administra los usuarios registrados en SIGCMI
+
+                    div(class="text-slate-500")
+
+                        i(class="fa-solid fa-calendar-days mr-2")
+
+                        = new Date().toLocaleDateString("es-CO")
+
+
+                //- ==========================================
+                //- RESUMEN
+                //- ==========================================
+
+                div(class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-6")
+
+                    div(class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5")
+
+                        div(class="flex items-center justify-between")
+
+                            div
+
+                                p(class="text-slate-500 text-sm")
+                                    | Total usuarios
+
+                                p(class="text-3xl font-bold text-slate-900 mt-1")
+                                    | #{usuariosLista.length}
+
+                            div(class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center")
+                                i(class="fa-solid fa-users text-xl")
+
+
+                    div(class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5")
+
+                        div(class="flex items-center justify-between")
+
+                            div
+
+                                p(class="text-slate-500 text-sm")
+                                    | Usuarios activos
+
+                                p(class="text-3xl font-bold text-slate-900 mt-1")
+                                    | #{usuariosLista.filter(usuario => usuario.estado).length}
+
+                            div(class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center")
+                                i(class="fa-solid fa-user-check text-xl")
+
+
+                    div(class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5")
+
+                        div(class="flex items-center justify-between")
+
+                            div
+
+                                p(class="text-slate-500 text-sm")
+                                    | Usuarios inactivos
+
+                                p(class="text-3xl font-bold text-slate-900 mt-1")
+                                    | #{usuariosLista.filter(usuario => !usuario.estado).length}
+
+                            div(class="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center")
+                                i(class="fa-solid fa-user-xmark text-xl")
+
+
+                    div(class="bg-white border border-slate-100 rounded-2xl shadow-sm p-5")
+
+                        div(class="flex items-center justify-between")
+
+                            div
+
+                                p(class="text-slate-500 text-sm")
+                                    | Registrados
+
+                                p(class="text-3xl font-bold text-slate-900 mt-1")
+                                    | #{usuariosLista.length}
+
+                            div(class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center")
+                                i(class="fa-solid fa-user-plus text-xl")
+
+
+                //- ==========================================
+                //- TABLA
+                //- ==========================================
+
+                div(class="bg-white rounded-2xl shadow-sm border border-slate-100 mt-6 overflow-hidden")
+
+                    div(class="p-5 sm:p-6 border-b border-slate-100")
+
+                        div(class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4")
+
+                            div
+
+                                h3(class="text-xl font-bold text-slate-900")
+                                    | Usuarios registrados
+
+                                p(class="text-sm text-slate-500 mt-1")
+                                    | Consulta y administra los usuarios del sistema.
+
+                            div(class="flex flex-col sm:flex-row gap-3")
+
+                                input(
+                                    type="text"
+                                    id="buscarUsuario"
+                                    placeholder="Buscar usuario..."
+                                    class="border border-slate-300 rounded-lg px-4 py-3 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                )
+
+                                select(
+                                    id="filtroRol"
+                                    class="border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                )
+
+                                    option(value="")
+                                        | Todos los roles
+
+                                    - const rolesUnicos = [...new Set(usuariosLista.map(usuario => usuario.rol).filter(Boolean))]
+
+                                    each rol in rolesUnicos
+                                        option(value=rol)
+                                            | #{rol}
+
+                    div(class="overflow-x-auto")
+
+                        table(class="w-full min-w-[900px]")
+
+                            thead(class="bg-slate-50")
+
+                                tr
+
+                                    th(class="text-left px-6 py-4 text-sm font-semibold text-slate-600")
+                                        | Usuario
+
+                                    th(class="text-left px-6 py-4 text-sm font-semibold text-slate-600")
+                                        | Documento
+
+                                    th(class="text-left px-6 py-4 text-sm font-semibold text-slate-600")
+                                        | Correo
+
+                                    th(class="text-left px-6 py-4 text-sm font-semibold text-slate-600")
+                                        | Rol
+
+                                    th(class="text-left px-6 py-4 text-sm font-semibold text-slate-600")
+                                        | Estado
+
+                                    th(class="text-left px-6 py-4 text-sm font-semibold text-slate-600")
+                                        | Registro
+
+                                    th(class="text-center px-6 py-4 text-sm font-semibold text-slate-600")
+                                        | Acciones
+
+
+                            tbody(id="tablaUsuarios")
+
+                                if usuariosLista.length === 0
+
+                                    tr
+
+                                        td(
+                                            colspan="7"
+                                            class="px-6 py-12 text-center text-slate-500"
+                                        )
+
+                                            i(class="fa-solid fa-users text-4xl mb-3")
+
+                                            p
+                                                | No hay usuarios registrados.
+
+                                else
+
+                                    each usuario in usuariosLista
+
+                                        tr(
+                                            class="usuario-fila border-t border-slate-100 hover:bg-slate-50 transition"
+                                            data-nombre=usuario.nombre
+                                            data-correo=usuario.correo
+                                            data-documento=usuario.documento
+                                            data-rol=usuario.rol
+                                        )
+
+                                            td(class="px-6 py-4")
+
+                                                div(class="flex items-center gap-3")
+
+                                                    div(class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0")
+                                                        i(class="fa-solid fa-user")
+
+                                                    div
+
+                                                        p(class="font-semibold text-slate-900")
+                                                            | #{usuario.nombre}
+
+                                                        p(class="text-xs text-slate-500")
+                                                            | ID: #{usuario.id}
+
+
+                                            td(class="px-6 py-4")
+
+                                                p(class="text-sm text-slate-500")
+                                                    | #{usuario.tipoDocumento || "N/A"}
+
+                                                p(class="font-medium text-slate-800")
+                                                    | #{usuario.documento}
+
+
+                                            td(class="px-6 py-4 text-sm")
+                                                | #{usuario.correo}
+
+
+                                            td(class="px-6 py-4")
+
+                                                span(class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold")
+                                                    | #{usuario.rol}
+
+
+                                            td(class="px-6 py-4")
+
+                                                if usuario.estado
+
+                                                    span(class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold")
+                                                        | Activo
+
+                                                else
+
+                                                    span(class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold")
+                                                        | Inactivo
+
+
+                                            td(class="px-6 py-4 text-sm text-slate-500")
+
+                                                if usuario.fechaRegistro
+                                                    = new Date(usuario.fechaRegistro).toLocaleDateString("es-CO")
+                                                else
+                                                    | N/A
+
+
+                                            td(class="px-6 py-4")
+
+                                                div(class="flex justify-center gap-2")
+
+                                                    button(
+                                                        type="button"
+                                                        class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                                        title="Editar usuario"
+                                                    )
+                                                        i(class="fa-solid fa-pen")
+
+                                                    button(
+                                                        type="button"
+                                                        class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                                                        title="Cambiar estado"
+                                                    )
+                                                        i(class="fa-solid fa-power-off")
+
+
+        //- ==========================================
+        //- JAVASCRIPT
+        //- ==========================================
+
+        script(src="/admin/js/toggleSidebar.js")
+        script(src="/admin/js/usuarios.js")
