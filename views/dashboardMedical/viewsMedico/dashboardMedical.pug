@@ -106,28 +106,20 @@ block content
           .pacientes-search-box
             span.search-icon 🔍
             input(type='text' placeholder='Buscar paciente...' oninput='filtrarPacientes(this.value)')
-          .paciente-item(onclick='seleccionarPaciente(this)')
-            img(src='/medico/img/Group 16.png' alt)
-            div
-              h4 María González Pérez
-              span
-                img.NegroCalen(src='/medico/img/CalendarNegro.png' alt='Imagen Calendario')
-                |  5 citas
-              span
-                img.NegroCalen(src='/medico/img/Google-Docs Negro.png' alt='Imagen archivo')
-                |  3 diagnósticos
-            span.paciente-arrow ›
-          .paciente-item(onclick='seleccionarPaciente(this)')
-            img(src='/medico/img/Group 16.png' alt)
-            div
-              h4 María González Pérez
-              span
-                img.NegroCalen(src='/medico/img/CalendarNegro.png' alt='Imagen Calendario')
-                |  5 citas
-              span
-                img.NegroCalen(src='/medico/img/Google-Docs Negro.png' alt)
-                |  3 diagnósticos
-            span.paciente-arrow ›
+
+          if pacientes && pacientes.length > 0
+            each item in pacientes
+              .paciente-item(onclick='seleccionarPaciente(this)')
+                img(src='/medico/img/Group 16.png' alt='Paciente')
+                div
+                  h4= `${item.paciente.Usuario.nombres} ${item.paciente.Usuario.apellidos}`
+                  span
+                    img.NegroCalen(src='/medico/img/CalendarNegro.png' alt='Imagen Calendario')
+                    |  #{item.cantidadCitas} citas
+                span.paciente-arrow ›
+
+          else
+            p No hay pacientes registrados.
         // COLUMNA DERECHA: detalle
         .paciente-detalle
           .detalle-header
