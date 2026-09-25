@@ -538,10 +538,134 @@ document.addEventListener("DOMContentLoaded", () => {
     // =====================================================
     // GUARDAR CAMBIOS DEL PACIENTE
     // =====================================================
+    function validarFormularioPaciente() {
+
+        const nombres = document.getElementById("editar_nombres").value.trim();
+        const apellidos = document.getElementById("editar_apellidos").value.trim();
+        const tipoDocumento = document.getElementById("editar_tipo_documento").value;
+        const numeroDocumento = document.getElementById("editar_numero_documento").value.trim();
+        const correo = document.getElementById("editar_correo").value.trim();
+        const telefono = document.getElementById("editar_telefono").value.trim();
+        const fechaNacimiento = document.getElementById("editar_fecha_nacimiento").value;
+        const tipoSangre = document.getElementById("editar_tipo_sangre").value;
+
+        const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/;
+        const soloNumeros = /^\d+$/;
+        const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        // Nombres
+        if (!nombres) {
+            alert("El nombre es obligatorio.");
+            return false;
+        }
+
+        if (!soloLetras.test(nombres)) {
+            alert("El nombre solo puede contener letras y espacios.");
+            return false;
+        }
+
+        // Apellidos
+        if (!apellidos) {
+            alert("Los apellidos son obligatorios.");
+            return false;
+        }
+
+        if (!soloLetras.test(apellidos)) {
+            alert("Los apellidos solo pueden contener letras y espacios.");
+            return false;
+        }
+
+        // Tipo documento
+        if (!tipoDocumento) {
+            alert("Seleccione un tipo de documento.");
+            return false;
+        }
+
+        // Número documento
+        if (!numeroDocumento) {
+            alert("El número de documento es obligatorio.");
+            return false;
+        }
+
+        if (!soloNumeros.test(numeroDocumento)) {
+            alert("El número de documento solo puede contener números.");
+            return false;
+        }
+
+        if (numeroDocumento.length < 5 || numeroDocumento.length > 15) {
+            alert("El número de documento debe tener entre 5 y 15 dígitos.");
+            return false;
+        }
+
+        // Correo
+        if (!correo) {
+            alert("El correo electrónico es obligatorio.");
+            return false;
+        }
+
+        if (!correoValido.test(correo)) {
+            alert("Ingrese un correo electrónico válido.");
+            return false;
+        }
+
+        // Teléfono
+        if (!telefono) {
+            alert("El teléfono es obligatorio.");
+            return false;
+        }
+
+        if (!soloNumeros.test(telefono)) {
+            alert("El teléfono solo puede contener números.");
+            return false;
+        }
+
+        if (telefono.length < 7 || telefono.length > 10) {
+            alert("El teléfono debe tener entre 7 y 10 dígitos.");
+            return false;
+        }
+
+        // Fecha de nacimiento
+        if (fechaNacimiento) {
+
+            const fecha = new Date(fechaNacimiento + "T00:00:00");
+            const hoy = new Date();
+
+            hoy.setHours(0, 0, 0, 0);
+
+            if (fecha > hoy) {
+                alert("La fecha de nacimiento no puede ser futura.");
+                return false;
+            }
+        }
+
+        // Tipo de sangre
+        const tiposSangreValidos = [
+            "",
+            "A+",
+            "A-",
+            "B+",
+            "B-",
+            "AB+",
+            "AB-",
+            "O+",
+            "O-"
+        ];
+
+        if (!tiposSangreValidos.includes(tipoSangre)) {
+            alert("Seleccione un tipo de sangre válido.");
+            return false;
+        }
+
+        return true;
+    }
 
     formEditarPaciente.addEventListener("submit", async (event) => {
 
         event.preventDefault();
+
+        if (!validarFormularioPaciente()) {
+            return;
+        }
 
         const id = document.getElementById(
             "editar_id_paciente"
