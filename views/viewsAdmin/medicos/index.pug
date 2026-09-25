@@ -1,0 +1,532 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        title SIGCMI - Medicos
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-white text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            include ../components/sidebar.pug
+            //- ==========================================
+            //- CONTENIDO PRINCIPAL
+            //- ==========================================
+
+
+            main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
+
+                // AQUÍ VA TODO EL CONTENIDO QUE YA TIENES
+
+                // =================================================
+                // HEADER
+                // =================================================
+
+                div(
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
+                )
+
+                    div
+
+                        h1(
+                            class="text-2xl md:text-3xl font-bold text-slate-800"
+                        )
+                            | Gestión de médicos
+
+                        p(
+                            class="text-sm text-slate-500 mt-1"
+                        )
+                            | Administra y consulta los médicos registrados.
+
+                    // Botón menú móvil
+
+                    button#btnMenuMobile(
+                        type="button"
+                        class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-sm text-slate-600 hover:bg-slate-50 transition"
+                    )
+
+                        i(class="fa-solid fa-bars")
+
+                // =================================================
+                // ESTADÍSTICAS
+                // =================================================
+
+                div(
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+                )
+
+                    // =============================================
+                    // TOTAL MÉDICOS
+                    // =============================================
+
+                    div(
+                        class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200"
+                    )
+
+                        div(
+                            class="flex items-center justify-between"
+                        )
+
+                            div
+
+                                p(
+                                    class="text-sm text-slate-500"
+                                )
+                                    | Total médicos
+
+                                p(
+                                    class="text-3xl font-bold text-slate-800 mt-1"
+                                )
+                                    | #{totalMedicos}
+
+                            div(
+                                class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center"
+                            )
+
+                                i(
+                                    class="fa-solid fa-user-doctor text-blue-600 text-xl"
+                                )
+
+                    // =============================================
+                    // MÉDICOS ACTIVOS
+                    // =============================================
+
+                    div(
+                        class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200"
+                    )
+
+                        div(
+                            class="flex items-center justify-between"
+                        )
+
+                            div
+
+                                p(
+                                    class="text-sm text-slate-500"
+                                )
+                                    | Médicos activos
+
+                                p(
+                                    class="text-3xl font-bold text-emerald-600 mt-1"
+                                )
+                                    | #{medicosActivos}
+
+                            div(
+                                class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center"
+                            )
+
+                                i(
+                                    class="fa-solid fa-circle-check text-emerald-600 text-xl"
+                                )
+
+                    // =============================================
+                    // MÉDICOS INACTIVOS
+                    // =============================================
+
+                    div(
+                        class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200"
+                    )
+
+                        div(
+                            class="flex items-center justify-between"
+                        )
+
+                            div
+
+                                p(
+                                    class="text-sm text-slate-500"
+                                )
+                                    | Médicos inactivos
+
+                                p(
+                                    class="text-3xl font-bold text-red-600 mt-1"
+                                )
+                                    | #{medicosInactivos}
+
+                            div(
+                                class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center"
+                            )
+
+                                i(
+                                    class="fa-solid fa-circle-xmark text-red-600 text-xl"
+                                )
+
+                // =================================================
+                // FILTROS
+                // =================================================
+
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6"
+                )
+
+                    div(
+                        class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                    )
+
+                        // =========================================
+                        // BUSCAR MÉDICO
+                        // =========================================
+
+                        div(
+                            class="relative"
+                        )
+
+                            i(
+                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                            )
+
+                            input#buscarMedico(
+                                type="text"
+                                placeholder="Buscar por nombre, correo o documento..."
+                                class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                            )
+
+                        // =========================================
+                        // FILTRO ESTADO
+                        // =========================================
+
+                        div
+
+                            select#filtroEstadoMedico(
+                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                            )
+
+                                option(
+                                    value=""
+                                )
+                                    | Todos los estados
+
+                                option(
+                                    value="activo"
+                                )
+                                    | Activos
+
+                                option(
+                                    value="inactivo"
+                                )
+                                    | Inactivos
+
+                // =================================================
+                // TABLA DE MÉDICOS
+                // =================================================
+
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+                )
+
+                    div(
+                        class="overflow-x-auto"
+                    )
+
+                        table(
+                            class="w-full min-w-[1000px]"
+                        )
+
+                            // =====================================
+                            // CABECERA
+                            // =====================================
+
+                            thead(
+                                class="bg-slate-50 border-b border-slate-200"
+                            )
+
+                                tr
+
+                                    th(
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase"
+                                    )
+                                        | Médico
+
+                                    th(
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase"
+                                    )
+                                        | Documento
+
+                                    th(
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase"
+                                    )
+                                        | Especialidad
+
+                                    th(
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase"
+                                    )
+                                        | Cédula profesional
+
+                                    th(
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase"
+                                    )
+                                        | Experiencia
+
+                                    th(
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase"
+                                    )
+                                        | Estado
+
+                                    th(
+                                        class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase"
+                                    )
+                                        | Acciones
+
+                            // =====================================
+                            // CUERPO
+                            // =====================================
+
+                            tbody#tablaMedicos
+
+                                if medicosLista && medicosLista.length
+
+                                    each medico in medicosLista
+
+                                        tr.medico-fila(
+                                            class="border-b border-slate-100 hover:bg-slate-50 transition"
+                                            data-nombre=medico.nombre.toLowerCase()
+                                            data-correo=medico.correo.toLowerCase()
+                                            data-documento=medico.documento.toLowerCase()
+                                            data-estado=medico.estado ? "activo" : "inactivo"
+                                        )
+
+                                            // =================================
+                                            // MÉDICO
+                                            // =================================
+
+                                            td(
+                                                class="px-6 py-4"
+                                            )
+
+                                                div(
+                                                    class="flex items-center gap-3"
+                                                )
+
+                                                    div(
+                                                        class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0"
+                                                    )
+
+                                                        i(
+                                                            class="fa-solid fa-user-doctor"
+                                                        )
+
+                                                    div(
+                                                        class="min-w-0"
+                                                    )
+
+                                                        p(
+                                                            class="font-semibold text-slate-800 truncate"
+                                                        )
+                                                            | #{medico.nombre}
+
+                                                        p(
+                                                            class="text-sm text-slate-500 truncate"
+                                                        )
+                                                            | #{medico.correo}
+
+                                            // =================================
+                                            // DOCUMENTO
+                                            // =================================
+
+                                            td(
+                                                class="px-6 py-4"
+                                            )
+
+                                                p(
+                                                    class="text-sm font-medium text-slate-700"
+                                                )
+                                                    | #{medico.tipoDocumento}
+
+                                                p(
+                                                    class="text-xs text-slate-500"
+                                                )
+                                                    | #{medico.documento}
+
+                                            // =================================
+                                            // ESPECIALIDAD
+                                            // =================================
+
+                                            td(
+                                                class="px-6 py-4"
+                                            )
+
+                                                span(
+                                                    class="inline-flex px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium"
+                                                )
+                                                    | #{medico.especialidad}
+
+                                            // =================================
+                                            // CÉDULA PROFESIONAL
+                                            // =================================
+
+                                            td(
+                                                class="px-6 py-4 text-sm text-slate-700"
+                                            )
+                                                | #{medico.cedulaProfesional}
+
+                                            // =================================
+                                            // EXPERIENCIA
+                                            // =================================
+
+                                            td(
+                                                class="px-6 py-4 text-sm text-slate-700"
+                                            )
+
+                                                if medico.aniosExperiencia !== null && medico.aniosExperiencia !== ""
+
+                                                    | #{medico.aniosExperiencia} años
+
+                                                else
+
+                                                    | Sin especificar
+
+                                            // =================================
+                                            // ESTADO
+                                            // =================================
+
+                                            td(
+                                                class="px-6 py-4"
+                                            )
+
+                                                if medico.estado
+
+                                                    span(
+                                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium"
+                                                    )
+
+                                                        i(
+                                                            class="fa-solid fa-circle text-[7px]"
+                                                        )
+
+                                                        | Activo
+
+                                                else
+
+                                                    span(
+                                                        class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-medium"
+                                                    )
+
+                                                        i(
+                                                            class="fa-solid fa-circle text-[7px]"
+                                                        )
+
+                                                        | Inactivo
+
+                                            // =================================
+                                            // ACCIONES
+                                            // =================================
+
+                                            td(
+                                                class="px-6 py-4"
+                                            )
+
+                                                div(
+                                                    class="flex justify-end gap-2"
+                                                )
+
+                                                    // Ver
+
+                                                    button.btnVerMedico(
+                                                        type="button"
+                                                        data-id=medico.id
+                                                        title="Ver médico"
+                                                        class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition flex items-center justify-center"
+                                                    )
+
+                                                        i(
+                                                            class="fa-solid fa-eye"
+                                                        )
+
+                                                    // Editar
+
+                                                    button.btnEditarMedico(
+                                                        type="button"
+                                                        data-id=medico.id
+                                                        title="Editar médico"
+                                                        class="w-9 h-9 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition flex items-center justify-center"
+                                                    )
+
+                                                        i(
+                                                            class="fa-solid fa-pen"
+                                                        )
+
+                                else
+
+                                    tr
+
+                                        td(
+                                            colspan="7"
+                                            class="px-6 py-16 text-center"
+                                        )
+
+                                            div(
+                                                class="flex flex-col items-center"
+                                            )
+
+                                                div(
+                                                    class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4"
+                                                )
+
+                                                    i(
+                                                        class="fa-solid fa-user-doctor text-2xl text-slate-300"
+                                                    )
+
+                                                p(
+                                                    class="font-semibold text-slate-700"
+                                                )
+                                                    | No hay médicos registrados.
+
+                                                p(
+                                                    class="text-sm text-slate-500 mt-1"
+                                                )
+                                                    | Cuando se registren médicos aparecerán aquí.
+
+                            // =====================================
+                            // SIN RESULTADOS
+                            // =====================================
+
+                            tr#sinResultadosMedicos.hidden
+
+                                td(
+                                    colspan="7"
+                                    class="px-6 py-16 text-center"
+                                )
+
+                                    div(
+                                        class="flex flex-col items-center"
+                                    )
+
+                                        div(
+                                            class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4"
+                                        )
+
+                                            i(
+                                                class="fa-solid fa-magnifying-glass text-2xl text-slate-300"
+                                            )
+
+                                        p(
+                                            class="font-semibold text-slate-700"
+                                        )
+                                            | No se encontraron médicos.
+
+                                        p(
+                                            class="text-sm text-slate-500 mt-1"
+                                        )
+                                            | Intenta cambiar los filtros de búsqueda.
+
+                // =================================================
+                // MODAL VER MÉDICO
+                // =================================================
+
+                include ../components/modals/verMedico.pug
+                include ../components/modals/editarMedico.pug
+
+            // =================================================
+            // SCRIPTS
+            // =================================================
+
+            script(src="/admin/js/toggleSidebar.js")
+            script(src="/admin/js/medicos.js")

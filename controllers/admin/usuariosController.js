@@ -1,4 +1,9 @@
-import { Usuario, Rol } from "../../models/index.js";
+import {
+    Usuario,
+    Rol,
+    Medico,
+    Especialidad
+} from "../../models/index.js";
 
 export const listarUsuarios = async (req, res) => {
     try {
@@ -363,8 +368,10 @@ export const actualizarUsuario = async (req, res) => {
         }
 
         // ========================================
-        // ACTUALIZAR
+        // ACTUALIZAR USUARIO
         // ========================================
+
+        const rolAnterior = usuario.rol_id;
 
         await usuario.update({
             nombres: nombresLimpios,
@@ -375,6 +382,55 @@ export const actualizarUsuario = async (req, res) => {
             numero_documento: numeroDocumentoLimpio,
             rol_id: rolId
         });
+
+        // ========================================
+        // SI EL NUEVO ROL ES MÉDICO
+        // ========================================
+
+        if (rolId === 2) {
+
+            const medicoExistente = await Medico.findOne({
+                where: {
+                    usuario_id: usuario.id_usuario
+                }
+            });
+
+            // Solo crear si todavía no existe
+            if (!medicoExistente) {
+
+                // Buscar una especialidad disponible
+                const especialidad = await Especialidad.findOne({
+                    order: [
+                        ["id_especialidad", "ASC"]
+                    ]
+                });
+
+                if (!especialidad) {
+
+                    // Revertir el cambio de rol
+                    await usuario.update({
+                        rol_id: rolAnterior
+                    });
+
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje:
+                            "No hay especialidades registradas para crear el médico."
+                    });
+                }
+
+                await Medico.create({
+                    usuario_id: usuario.id_usuario,
+                    especialidad_id: especialidad.id_especialidad,
+                    cedula_profesional: numeroDocumentoLimpio,
+                    anios_experiencia: 0
+                });
+            }
+        }
+
+        // ========================================
+        // RESPUESTA
+        // ========================================
 
         return res.json({
             ok: true,
