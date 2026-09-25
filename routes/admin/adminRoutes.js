@@ -20,7 +20,10 @@ import {
 
 import {
     mostrarFormularioPaciente,
-    registrarPaciente
+    registrarPaciente,
+    listarPacientes,
+    obtenerPaciente,
+    actualizarPaciente
 } from "../../controllers/admin/pacientesController.js";
 
 const router = express.Router();
@@ -72,6 +75,11 @@ router.patch(
 // PACIENTES
 // ===============================
 
+// ========================================
+// PACIENTES
+// ========================================
+
+// Registrar paciente
 router.get(
     "/pacientes/nuevo",
     auth,
@@ -84,6 +92,30 @@ router.post(
     auth,
     role(1),
     registrarPaciente
+);
+
+// Listar pacientes
+router.get(
+    "/pacientes",
+    auth,
+    role(1),
+    listarPacientes
+);
+
+// Obtener paciente
+router.get(
+    "/pacientes/:id",
+    auth,
+    role(1),
+    obtenerPaciente
+);
+
+// Actualizar paciente
+router.put(
+    "/pacientes/:id",
+    auth,
+    role(1),
+    actualizarPaciente
 );
 
 router.get(

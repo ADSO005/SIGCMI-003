@@ -1,4 +1,7 @@
+console.log("PACIENTES.JS CARGADO");
+
 document.addEventListener("DOMContentLoaded", () => {
+
 
     const buscarPaciente =
         document.getElementById("buscarPaciente");
@@ -351,6 +354,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formEditarPaciente =
         document.getElementById("formEditarPaciente");
+    const btnGuardarEditarPaciente =
+        document.getElementById("btnGuardarEditarPaciente");
 
     const botonesEditarPaciente =
         document.querySelectorAll(".btnEditarPaciente");
@@ -529,5 +534,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
     );
+
+    // =====================================================
+    // GUARDAR CAMBIOS DEL PACIENTE
+    // =====================================================
+
+    formEditarPaciente.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        const id = document.getElementById(
+            "editar_id_paciente"
+        ).value;
+
+        const datos = {
+            nombres: document.getElementById("editar_nombres").value.trim(),
+            apellidos: document.getElementById("editar_apellidos").value.trim(),
+            tipo_documento: document.getElementById("editar_tipo_documento").value,
+            numero_documento: document.getElementById("editar_numero_documento").value.trim(),
+            correo: document.getElementById("editar_correo").value.trim(),
+            telefono: document.getElementById("editar_telefono").value.trim(),
+            fecha_nacimiento: document.getElementById("editar_fecha_nacimiento").value,
+            tipo_sangre: document.getElementById("editar_tipo_sangre").value,
+            alergias: document.getElementById("editar_alergias").value.trim(),
+            condiciones_medicas: document.getElementById("editar_condiciones_medicas").value.trim(),
+            departamento: document.getElementById("editar_departamento").value.trim(),
+            ciudad: document.getElementById("editar_ciudad").value.trim(),
+            direccion: document.getElementById("editar_direccion").value.trim()
+        };
+
+        try {
+
+            const respuesta = await fetch(`/admin/pacientes/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datos)
+            });
+
+            const data = await respuesta.json();
+
+            if (!respuesta.ok || !data.ok) {
+                throw new Error(
+                    data.mensaje || "No se pudo actualizar el paciente."
+                );
+            }
+
+            alert(data.mensaje);
+
+            cerrarModalEditarPaciente();
+
+            window.location.reload();
+
+        } catch (error) {
+
+            console.error(
+                "❌ ERROR AL ACTUALIZAR PACIENTE:",
+                error
+            );
+
+            alert(error.message);
+        }
+
+    });
 
 });

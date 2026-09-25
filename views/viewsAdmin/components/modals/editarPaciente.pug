@@ -365,9 +365,10 @@ div#modalEditarPaciente(
                 i(class="fa-solid fa-xmark mr-2")
                 | Cancelar
 
-            button(
+            button#btnGuardarEditarPaciente(
                 type="submit"
-                class="w-full rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 sm:w-auto"
+                form="formEditarPaciente"
+                class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             )
                 i(class="fa-solid fa-floppy-disk mr-2")
                 | Guardar cambios
