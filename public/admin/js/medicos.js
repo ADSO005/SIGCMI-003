@@ -258,203 +258,271 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    async function verMedico(id) {
+async function verMedico(id) {
+    try {
+        const respuesta = await fetch(`/admin/medicos/${id}`);
+        const data = await respuesta.json();
 
-        try {
-
-            const respuesta = await fetch(
-                `/admin/medicos/${id}`
+        if (!respuesta.ok || !data.ok) {
+            throw new Error(
+                data.mensaje || "No se pudo obtener el médico."
             );
-
-            const data = await respuesta.json();
-
-            if (!respuesta.ok || !data.ok) {
-
-                throw new Error(
-                    data.mensaje ||
-                    "No se pudo obtener el médico."
-                );
-            }
-
-            const medico = data.medico;
-
-            const usuario = medico.Usuario;
-
-            const especialidad = medico.Especialidad;
-
-            const horarios = medico.Horarios || [];
-
-            const contenedorHorarios = document.getElementById("ver_medico_horarios");
-
-            if (horarios.length === 0) {
-                contenedorHorarios.innerHTML = `
-        <div class="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-            <i class="fa-solid fa-calendar-xmark text-slate-400 text-lg"></i>
-            <p class="text-sm text-slate-500">
-                Este médico no tiene horarios registrados.
-            </p>
-        </div>
-    `;
-            } else {
-                contenedorHorarios.innerHTML = horarios.map((horario) => {
-                    const horaInicio = horario.hora_inicio?.slice(0, 5) || "";
-                    const horaFin = horario.hora_fin?.slice(0, 5) || "";
-
-                    let estadoClase = "";
-                    let iconoEstado = "";
-
-                    if (horario.estado === "Aprobado") {
-                        estadoClase = "bg-emerald-100 text-emerald-700";
-                        iconoEstado = "fa-circle-check";
-                    } else if (horario.estado === "Rechazado") {
-                        estadoClase = "bg-red-100 text-red-700";
-                        iconoEstado = "fa-circle-xmark";
-                    } else {
-                        estadoClase = "bg-amber-100 text-amber-700";
-                        iconoEstado = "fa-clock";
-                    }
-
-                    return `
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <i class="fa-solid fa-calendar-day text-blue-600"></i>
-                    </div>
-
-                    <div>
-                        <p class="text-sm font-semibold text-slate-800">
-                            ${horario.dia_semana}
-                        </p>
-
-                        <p class="text-sm text-slate-500">
-                            ${horaInicio} - ${horaFin}
-                        </p>
-                    </div>
-                </div>
-
-                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${estadoClase}">
-                    <i class="fa-solid ${iconoEstado}"></i>
-                    ${horario.estado}
-                </span>
-
-            </div>
-        `;
-                }).join("");
-            }
-            // ========================================
-            // DATOS PERSONALES
-            // ========================================
-
-            document.getElementById(
-                "ver_medico_nombre"
-            ).textContent =
-                `${usuario.nombres} ${usuario.apellidos}`;
-
-
-            document.getElementById(
-                "ver_medico_nombre_completo"
-            ).textContent =
-                `${usuario.nombres} ${usuario.apellidos}`;
-
-
-            document.getElementById(
-                "ver_medico_documento"
-            ).textContent =
-                `${usuario.tipo_documento || "N/A"} ${usuario.numero_documento || ""}`;
-
-
-            document.getElementById(
-                "ver_medico_correo"
-            ).textContent =
-                usuario.correo || "N/A";
-
-
-            document.getElementById(
-                "ver_medico_telefono"
-            ).textContent =
-                usuario.telefono || "N/A";
-
-
-            // ========================================
-            // DATOS PROFESIONALES
-            // ========================================
-
-            document.getElementById(
-                "ver_medico_especialidad"
-            ).textContent =
-                especialidad?.nombre || "Sin especialidad";
-
-
-            document.getElementById(
-                "ver_medico_cedula"
-            ).textContent =
-                medico.cedula_profesional || "N/A";
-
-
-            document.getElementById(
-                "ver_medico_experiencia"
-            ).textContent =
-                medico.anios_experiencia !== null
-                    ? `${medico.anios_experiencia} años`
-                    : "N/A";
-
-
-            // ========================================
-            // ESTADO
-            // ========================================
-
-            const estado =
-                document.getElementById(
-                    "ver_medico_estado"
-                );
-
-
-            estado.textContent =
-                usuario.estado
-                    ? "Activo"
-                    : "Inactivo";
-
-
-            estado.className =
-                usuario.estado
-                    ? "inline-flex px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700"
-                    : "inline-flex px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700";
-
-
-            // ========================================
-            // FECHA DE REGISTRO
-            // ========================================
-
-            document.getElementById(
-                "ver_medico_fecha_registro"
-            ).textContent =
-                usuario.fecha_registro
-                    ? new Date(
-                        usuario.fecha_registro
-                    ).toLocaleDateString("es-CO")
-                    : "N/A";
-
-
-            // ========================================
-            // MOSTRAR MODAL
-            // ========================================
-
-            modalVerMedico.classList.remove("hidden");
-
-            modalVerMedico.classList.add("flex");
-
-
-        } catch (error) {
-
-            console.error(
-                "Error al obtener médico:",
-                error
-            );
-
-            alert(error.message);
         }
+
+        const medico = data.medico;
+        const usuario = medico.Usuario;
+        const especialidad = medico.Especialidad;
+        const horarios = medico.Horarios || [];
+
+        // ============================================
+        // DATOS DEL MÉDICO
+        // ============================================
+
+        document.getElementById("ver_medico_nombre").textContent =
+            `${usuario.nombres} ${usuario.apellidos}`;
+
+        document.getElementById("ver_medico_nombre_completo").textContent =
+            `${usuario.nombres} ${usuario.apellidos}`;
+
+        document.getElementById("ver_medico_documento").textContent =
+            `${usuario.tipo_documento} ${usuario.numero_documento}`;
+
+        document.getElementById("ver_medico_correo").textContent =
+            usuario.correo || "No registrado";
+
+        document.getElementById("ver_medico_telefono").textContent =
+            usuario.telefono || "No registrado";
+
+        document.getElementById("ver_medico_especialidad").textContent =
+            especialidad?.nombre || "Sin especialidad";
+
+        document.getElementById("ver_medico_cedula").textContent =
+            medico.cedula_profesional || "No registrada";
+
+        document.getElementById("ver_medico_experiencia").textContent =
+            medico.anios_experiencia != null
+                ? `${medico.anios_experiencia} años`
+                : "No registrada";
+
+        document.getElementById("ver_medico_estado").textContent =
+            usuario.estado ? "Activo" : "Inactivo";
+
+        document.getElementById("ver_medico_fecha_registro").textContent =
+            usuario.fecha_registro
+                ? new Date(usuario.fecha_registro).toLocaleDateString("es-CO")
+                : "No registrada";
+
+        // ============================================
+        // HORARIOS
+        // ============================================
+
+        const contenedorHorarios = document.getElementById(
+            "ver_medico_horarios"
+        );
+
+        contenedorHorarios.innerHTML = "";
+
+        if (horarios.length === 0) {
+            contenedorHorarios.innerHTML = `
+                <div class="text-center py-8 text-slate-500">
+                    <i class="fa-solid fa-calendar-xmark text-3xl mb-3"></i>
+                    <p>Este médico no tiene horarios registrados.</p>
+                </div>
+            `;
+        } else {
+
+            // ========================================
+            // AGRUPAR POR PERÍODO
+            // ========================================
+
+            const periodos = {};
+
+            horarios.forEach((horario) => {
+
+                const fechaInicio = horario.fecha_inicio;
+                const fechaFin = horario.fecha_fin;
+
+                const clave = `${fechaInicio}_${fechaFin}`;
+
+                if (!periodos[clave]) {
+                    periodos[clave] = {
+                        fechaInicio,
+                        fechaFin,
+                        horarios: []
+                    };
+                }
+
+                periodos[clave].horarios.push(horario);
+            });
+
+            // ========================================
+            // ORDEN DE LOS DÍAS
+            // ========================================
+
+            const ordenDias = {
+                Lunes: 1,
+                Martes: 2,
+                Miercoles: 3,
+                Jueves: 4,
+                Viernes: 5,
+                Sabado: 6,
+                Domingo: 7
+            };
+
+            // ========================================
+            // FORMATEAR FECHA
+            // ========================================
+
+            const formatearFecha = (fecha) => {
+
+                if (!fecha) {
+                    return "Fecha no definida";
+                }
+
+                const partes = fecha.split("-");
+
+                if (partes.length !== 3) {
+                    return fecha;
+                }
+
+                const [anio, mes, dia] = partes;
+
+                return `${dia}/${mes}/${anio}`;
+            };
+
+            // ========================================
+            // MOSTRAR CADA PERÍODO
+            // ========================================
+
+            Object.values(periodos).forEach((periodo) => {
+
+                periodo.horarios.sort((a, b) => {
+                    return (
+                        (ordenDias[a.dia_semana] || 99) -
+                        (ordenDias[b.dia_semana] || 99)
+                    );
+                });
+
+                const periodoHTML = document.createElement("div");
+
+                periodoHTML.className =
+                    "border border-slate-200 rounded-2xl p-5 bg-white shadow-sm";
+
+                periodoHTML.innerHTML = `
+                    <div class="flex items-center gap-3 mb-5">
+
+                        <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center">
+                            <i class="fa-solid fa-calendar-days text-blue-600 text-lg"></i>
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-slate-500">
+                                Vigencia del horario
+                            </p>
+
+                            <p class="font-semibold text-slate-800">
+                                ${formatearFecha(periodo.fechaInicio)}
+                                hasta
+                                ${formatearFecha(periodo.fechaFin)}
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="space-y-3">
+
+                        ${periodo.horarios.map((horario) => {
+
+                            const horaInicio =
+                                horario.hora_inicio
+                                    ? horario.hora_inicio.substring(0, 5)
+                                    : "--:--";
+
+                            const horaFin =
+                                horario.hora_fin
+                                    ? horario.hora_fin.substring(0, 5)
+                                    : "--:--";
+
+                            let estadoHTML = "";
+
+                            if (horario.estado === "Aprobado") {
+
+                                estadoHTML = `
+                                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Aprobado
+                                    </span>
+                                `;
+
+                            } else if (horario.estado === "Pendiente") {
+
+                                estadoHTML = `
+                                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 text-xs font-medium">
+                                        <i class="fa-solid fa-clock"></i>
+                                        Pendiente
+                                    </span>
+                                `;
+
+                            } else {
+
+                                estadoHTML = `
+                                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">
+                                        <i class="fa-solid fa-circle-xmark"></i>
+                                        ${horario.estado || "Sin estado"}
+                                    </span>
+                                `;
+                            }
+
+                            return `
+                                <div class="flex items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
+
+                                    <div class="flex items-center gap-3">
+
+                                        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                            <i class="fa-solid fa-clock text-blue-600"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <p class="font-semibold text-slate-800">
+                                                ${horario.dia_semana}
+                                            </p>
+
+                                            <p class="text-sm text-slate-500">
+                                                ${horaInicio} - ${horaFin}
+                                            </p>
+
+                                        </div>
+
+                                    </div>
+
+                                    ${estadoHTML}
+
+                                </div>
+                            `;
+                        }).join("")}
+
+                    </div>
+                `;
+
+                contenedorHorarios.appendChild(periodoHTML);
+            });
+        }
+
+        // ============================================
+        // ABRIR MODAL
+        // ============================================
+
+        modalVerMedico.classList.remove("hidden");
+        modalVerMedico.classList.add("flex");
+
+    } catch (error) {
+
+        console.error("Error al obtener médico:", error);
+
+        alert(error.message);
     }
+}
 
 
     // =====================================================
@@ -695,5 +763,5 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
     });
-    
+
 }); 

@@ -38,6 +38,16 @@ const Horario = db.define(
             allowNull: false,
         },
 
+        fecha_inicio: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+        },
+
+        fecha_fin: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+        },
+
         estado: {
             type: DataTypes.ENUM(
                 "Pendiente",

@@ -169,6 +169,8 @@ export const obtenerMedico = async (req, res) => {
                     attributes: [
                         "id_horario",
                         "dia_semana",
+                        "fecha_inicio",
+                        "fecha_fin",
                         "hora_inicio",
                         "hora_fin",
                         "estado",
