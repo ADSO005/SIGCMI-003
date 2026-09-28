@@ -26,6 +26,14 @@ import {
     actualizarPaciente
 } from "../../controllers/admin/pacientesController.js";
 
+
+import {
+    listarMedicos,
+    obtenerMedico,
+    actualizarMedico,
+    crearHorariosMedico
+} from "../../controllers/admin/medicosController.js";
+
 const router = express.Router();
 
 // ===============================
@@ -75,9 +83,6 @@ router.patch(
 // PACIENTES
 // ===============================
 
-// ========================================
-// PACIENTES
-// ========================================
 
 // Registrar paciente
 router.get(
@@ -117,6 +122,44 @@ router.put(
     role(1),
     actualizarPaciente
 );
+
+
+// ===============================
+// MÉDICOS
+// ===============================
+
+router.get(
+    "/medicos",
+    auth,
+    role(1),
+    listarMedicos
+);
+
+router.get(
+    "/medicos/:id",
+    auth,
+    role(1),
+    obtenerMedico
+);
+
+router.put(
+    "/medicos/:id",
+    auth,
+    role(1),
+    actualizarMedico
+);
+
+
+router.post(
+    "/medicos/:id/horarios",
+    auth,
+    role(1),
+    crearHorariosMedico
+);
+
+// ===============================
+// CITAS
+// ===============================
 
 router.get(
     "/citas/nueva",
