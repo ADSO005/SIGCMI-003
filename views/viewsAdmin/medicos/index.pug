@@ -452,6 +452,14 @@ html(lang="es")
                                                         i(
                                                             class="fa-solid fa-pen"
                                                         )
+                                                    
+                                                    button.btnHorariosMedico(
+                                                        type="button"
+                                                        data-id=medico.id
+                                                        title="Gestionar horarios"
+                                                        class="..."
+                                                    )
+                                                        i(class="fa-solid fa-clock")
 
                                 else
 
@@ -523,7 +531,7 @@ html(lang="es")
 
                 include ../components/modals/verMedico.pug
                 include ../components/modals/editarMedico.pug
-
+                include ../components/modals/horariosMedico.pug
             // =================================================
             // SCRIPTS
             // =================================================

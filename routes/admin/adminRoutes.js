@@ -30,7 +30,8 @@ import {
 import {
     listarMedicos,
     obtenerMedico,
-    actualizarMedico
+    actualizarMedico,
+    crearHorariosMedico
 } from "../../controllers/admin/medicosController.js";
 
 const router = express.Router();
@@ -146,6 +147,14 @@ router.put(
     auth,
     role(1),
     actualizarMedico
+);
+
+
+router.post(
+    "/medicos/:id/horarios",
+    auth,
+    role(1),
+    crearHorariosMedico
 );
 
 // ===============================
