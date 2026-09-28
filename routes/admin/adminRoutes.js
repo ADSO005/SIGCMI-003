@@ -5,6 +5,7 @@ import role from "../../middleware/role.js";
 
 import { verDashboard } from "../../controllers/admin/dashboardController.js";
 
+//APARTADO USUARIOS
 import {
     listarUsuarios,
     obtenerUsuario,
@@ -12,12 +13,14 @@ import {
     cambiarEstadoUsuario
 } from "../../controllers/admin/usuariosController.js";
 
+//APARTADO CREAR CITA
 import {
     mostrarFormularioNuevaCita,
     obtenerHorasDisponibles,
     crearNuevaCita
 } from "../../controllers/admin/citasController.js";
 
+//APARTADO CREAR UN PACIENTE
 import {
     mostrarFormularioPaciente,
     registrarPaciente,
@@ -26,13 +29,22 @@ import {
     actualizarPaciente
 } from "../../controllers/admin/pacientesController.js";
 
-
+//APARTADO MEDICOS
 import {
     listarMedicos,
     obtenerMedico,
     actualizarMedico,
     crearHorariosMedico
 } from "../../controllers/admin/medicosController.js";
+
+//APARTADO ESPECIALIDADES
+import {
+    listarEspecialidades,
+    crearEspecialidad,
+    obtenerEspecialidad,
+    actualizarEspecialidad,
+    eliminarEspecialidad
+} from "../../controllers/admin/especialidadesController.js";
 
 const router = express.Router();
 
@@ -156,6 +168,45 @@ router.post(
     role(1),
     crearHorariosMedico
 );
+
+// ===============================
+// ESPECIALIDADES
+// ===============================
+
+router.get(
+    "/especialidades",
+    auth,
+    role(1),
+    listarEspecialidades
+);
+
+router.post(
+    "/especialidades",
+    auth,
+    role(1),
+    crearEspecialidad
+);
+
+router.get(
+    "/especialidades/:id",
+    auth,
+    role(1),
+    obtenerEspecialidad
+)
+
+router.put(
+    "/especialidades/:id",
+    auth,
+    role(1),
+    actualizarEspecialidad
+);
+
+router.delete(
+    "/especialidades/:id",
+    auth,
+    role(1),
+    eliminarEspecialidad
+)
 
 // ===============================
 // CITAS
