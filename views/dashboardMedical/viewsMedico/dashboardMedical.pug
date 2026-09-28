@@ -126,52 +126,52 @@ block content
         // COLUMNA DERECHA: detalle
         .paciente-detalle
           .detalle-header
-            img.detalle-avatar(src='/medico/img/Group 16.png' alt)
+            img.detalle-avatar(
+              src='/medico/img/Group 16.png'
+              alt='Paciente'
+            )
+
             .detalle-info
-              h2 María González Pérez
+              h2#detalleNombre Selecciona un paciente
+
               p
                 | Email: 
-                a(href='mailto:sigcmi@gmail.com') sigcmi@gmail.com
-              p Teléfono: 3137482412
+                a#detalleCorreo(href='#') -
+
+              p
+                | Teléfono: 
+                span#detalleTelefono -
+
             .detalle-meta
-              p Edad: 35 años
-              p Última Visita: 9/04/2026
+              p
+                | Edad: 
+                span#detalleEdad -
+
+              p
+                | Última Visita: 
+                span#detalleUltimaVisita -
+
           .detalle-badges
             span.badge.badge-blue
-              img(src='/medico/img/CalendarPaciente.png' alt='Imagen Calendario')
-              |  Citas: 5
+              img(
+                src='/medico/img/CalendarPaciente.png'
+                alt='Calendario'
+              )
+              |  Citas: 
+              span#detalleCitas 0
+
             span.badge.badge-purple
-              img(src='/medico/img/google-docs 2.png' alt='Imagen archivo')
-              |  Diagnósticos: 3
+              img(
+                src='/medico/img/google-docs 2.png'
+                alt='Diagnósticos'
+              )
+              |  Diagnósticos: 
+              span#detalleDiagnosticos 0
+
           .historial
             h3 Historial Médico
-            .historial-card
-              h4 Gripe común con síntomas de congestión nasal:
-              p.historial-fecha 9/abr/2026
-              p
-                strong Síntomas:
-              p Fiebre de 38C, congestion nasal, dolor de garganta.
-              p
-                strong Tratamiento:
-              p Reposo, hidratacion abundante y acetaminofen cada 6 horas.
-            .historial-card
-              h4 Gastritis aguda por estrés
-              p.historial-fecha 11 de marzo de 2026
-              p
-                strong Síntomas:
-              p Dolor epigástrico intenso, náuseas
-              p
-                strong Tratamiento:
-              p Omeprazol 20mg en ayunas por 14 días, dieta blanda
-            .historial-card
-              h4 Control general anual - Paciente sano
-              p.historial-fecha 19 de enero de 2026
-              p
-                strong Síntomas:
-              p Sin síntomas, control preventivo
-              p
-                strong Tratamiento:
-              p Vitamina D 1000 UI diaria como suplemento preventivo
 
+            #historialPaciente
+              p Selecciona un paciente para consultar su historial.
 block scripts
   script(src="/medico/js/dashboardMedical.js")

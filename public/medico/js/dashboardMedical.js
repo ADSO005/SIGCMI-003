@@ -218,15 +218,12 @@ function guardarHorarios() {
 // SELECCIONAR PACIENTE DE LA LISTA
 async function seleccionarPaciente(element) {
 
-  // Quitar selección anterior
   document.querySelectorAll(".paciente-item").forEach(item => {
     item.classList.remove("activo");
   });
 
-  // Marcar paciente seleccionado
   element.classList.add("activo");
 
-  // Obtener ID guardado en data-id
   const idPaciente = element.dataset.id;
 
   if (!idPaciente) {
@@ -246,7 +243,65 @@ async function seleccionarPaciente(element) {
 
     const datos = await respuesta.json();
 
-    console.log("Paciente recibido:", datos);
+    const paciente = datos.paciente;
+    const citas = datos.citas;
+    const usuario = paciente.Usuario;
+
+    // -----------------------------
+    // DATOS PERSONALES
+    // -----------------------------
+
+    document.getElementById("detalleNombre").textContent =
+      `${usuario.nombres} ${usuario.apellidos}`;
+
+    const correo = document.getElementById("detalleCorreo");
+
+    correo.textContent = usuario.correo || "No registrado";
+
+    correo.href = usuario.correo
+      ? `mailto:${usuario.correo}`
+      : "#";
+
+    document.getElementById("detalleTelefono").textContent =
+      usuario.telefono || "No registrado";
+
+    // -----------------------------
+    // EDAD
+    // -----------------------------
+
+    document.getElementById("detalleEdad").textContent =
+      calcularEdad(paciente.fecha_nacimiento);
+
+    // -----------------------------
+    // CANTIDAD DE CITAS
+    // -----------------------------
+
+    document.getElementById("detalleCitas").textContent =
+      citas.length;
+
+    // -----------------------------
+    // ÚLTIMA VISITA
+    // -----------------------------
+
+    document.getElementById("detalleUltimaVisita").textContent =
+      obtenerUltimaVisita(citas);
+
+    // -----------------------------
+    // DIAGNÓSTICOS
+    // -----------------------------
+
+    const citasConDiagnostico = citas.filter(
+      cita => cita.Diagnostico
+    );
+
+    document.getElementById("detalleDiagnosticos").textContent =
+      citasConDiagnostico.length;
+
+    // -----------------------------
+    // HISTORIAL
+    // -----------------------------
+
+    mostrarHistorial(citas);
 
   } catch (error) {
 
@@ -258,6 +313,111 @@ async function seleccionarPaciente(element) {
   }
 }
 
+function calcularEdad(fechaNacimiento) {
+
+  if (!fechaNacimiento) {
+    return "No registrada";
+  }
+
+  const nacimiento = new Date(
+    `${fechaNacimiento}T00:00:00`
+  );
+
+  const hoy = new Date();
+
+  let edad =
+    hoy.getFullYear() - nacimiento.getFullYear();
+
+  const mes =
+    hoy.getMonth() - nacimiento.getMonth();
+
+  if (
+    mes < 0 ||
+    (mes === 0 && hoy.getDate() < nacimiento.getDate())
+  ) {
+    edad--;
+  }
+
+  return `${edad} años`;
+}
+
+function obtenerUltimaVisita(citas) {
+
+  if (!citas || citas.length === 0) {
+    return "Sin visitas";
+  }
+
+  const fecha = citas[0].fecha;
+
+  if (!fecha) {
+    return "Sin visitas";
+  }
+
+  return new Date(
+    `${fecha}T00:00:00`
+  ).toLocaleDateString("es-CO");
+}
+
+function mostrarHistorial(citas) {
+
+  const contenedor =
+    document.getElementById("historialPaciente");
+
+  contenedor.innerHTML = "";
+
+  const citasConDiagnostico = citas.filter(
+    cita => cita.Diagnostico
+  );
+
+  if (citasConDiagnostico.length === 0) {
+
+    contenedor.innerHTML = `
+      <p>Este paciente no tiene diagnósticos registrados.</p>
+    `;
+
+    return;
+  }
+
+  citasConDiagnostico.forEach(cita => {
+
+    const diagnostico = cita.Diagnostico;
+
+    const card = document.createElement("div");
+
+    card.className = "historial-card";
+
+    const fecha = new Date(
+      `${cita.fecha}T00:00:00`
+    ).toLocaleDateString("es-CO");
+
+    card.innerHTML = `
+      <h4>${diagnostico.diagnostico || "Sin diagnóstico"}</h4>
+
+      <p class="historial-fecha">
+        ${fecha}
+      </p>
+
+      <p>
+        <strong>Síntomas:</strong>
+      </p>
+
+      <p>
+        ${diagnostico.sintomas || "No registrados"}
+      </p>
+
+      <p>
+        <strong>Tratamiento:</strong>
+      </p>
+
+      <p>
+        ${diagnostico.tratamiento || "No registrado"}
+      </p>
+    `;
+
+    contenedor.appendChild(card);
+
+  });
+}
 // FILTRAR PACIENTES EN TIEMPO REAL
 function filtrarPacientes(query) {
   const texto = query.toLowerCase().trim();
