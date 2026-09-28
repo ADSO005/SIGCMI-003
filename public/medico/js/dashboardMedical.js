@@ -216,20 +216,46 @@ function guardarHorarios() {
 }
 
 // SELECCIONAR PACIENTE DE LA LISTA
-function seleccionarPaciente(element) {
-  // 1. Quitar la clase "activo" de todos los ítems de la lista
-  document.querySelectorAll('.paciente-item').forEach(item => {
-    item.classList.remove('activo');
+async function seleccionarPaciente(element) {
+
+  // Quitar selección anterior
+  document.querySelectorAll(".paciente-item").forEach(item => {
+    item.classList.remove("activo");
   });
 
-  // 2. Agregar la clase "activo" al elemento presionado
-  if (element && element.classList) {
-    element.classList.add('activo');
+  // Marcar paciente seleccionado
+  element.classList.add("activo");
+
+  // Obtener ID guardado en data-id
+  const idPaciente = element.dataset.id;
+
+  if (!idPaciente) {
+    console.error("No se encontró el ID del paciente");
+    return;
   }
 
-  // 3. (Opcional) Obtener el nombre del paciente cliqueado
-  const nombrePaciente = element.querySelector('h4')?.textContent;
-  console.log("Paciente seleccionado:", nombrePaciente);
+  try {
+
+    const respuesta = await fetch(
+      `/medico/pacientes/${idPaciente}`
+    );
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudo obtener el paciente");
+    }
+
+    const datos = await respuesta.json();
+
+    console.log("Paciente recibido:", datos);
+
+  } catch (error) {
+
+    console.error(
+      "Error al cargar el paciente:",
+      error
+    );
+
+  }
 }
 
 // FILTRAR PACIENTES EN TIEMPO REAL

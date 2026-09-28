@@ -109,7 +109,10 @@ block content
 
           if pacientes && pacientes.length > 0
             each item in pacientes
-              .paciente-item(onclick='seleccionarPaciente(this)')
+              .paciente-item(
+                data-id=item.paciente.id_paciente
+                onclick='seleccionarPaciente(this)'
+              )
                 img(src='/medico/img/Group 16.png' alt='Paciente')
                 div
                   h4= `${item.paciente.Usuario.nombres} ${item.paciente.Usuario.apellidos}`

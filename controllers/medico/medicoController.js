@@ -2,6 +2,8 @@ import Medico from "../../models/Medico.js";
 import Cita from "../../models/Cita.js";
 import Paciente from "../../models/Paciente.js";
 import Usuario from "../../models/Usuario.js";
+import Diagnostico from "../../models/Diagnostico.js";
+import Prescripcion from "../../models/Prescripcion.js";
 
 const dashboard = async (req, res) => {
 
@@ -100,6 +102,96 @@ const dashboard = async (req, res) => {
 
 };
 
+const detallePaciente = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        // Buscar el médico que inició sesión
+        const medico = await Medico.findOne({
+            where: {
+                usuario_id: req.usuario.id_usuario
+            }
+        });
+
+        if (!medico) {
+            return res.status(404).json({
+                mensaje: "No se encontró el perfil del médico"
+            });
+        }
+
+        // Buscar el paciente
+        const paciente = await Paciente.findByPk(id, {
+            include: [
+                {
+                    model: Usuario,
+                    attributes: [
+                        "nombres",
+                        "apellidos",
+                        "correo",
+                        "telefono"
+                    ]
+                }
+            ]
+        });
+
+        if (!paciente) {
+            return res.status(404).json({
+                mensaje: "Paciente no encontrado"
+            });
+        }
+
+        // Buscar únicamente las citas de este paciente
+        // que pertenecen al médico autenticado
+        const citas = await Cita.findAll({
+            where: {
+                paciente_id: paciente.id_paciente,
+                medico_id: medico.id_medico
+            },
+            include: [
+                {
+                    model: Diagnostico,
+                    include: [
+                        {
+                            model: Prescripcion
+                        }
+                    ]
+                }
+            ],
+            order: [
+                ["fecha", "DESC"]
+            ]
+        });
+
+        // Seguridad:
+        // el médico no puede consultar un paciente
+        // que nunca ha tenido una cita con él.
+        if (citas.length === 0) {
+            return res.status(403).json({
+                mensaje: "No tienes acceso a este paciente"
+            });
+        }
+
+        return res.json({
+            paciente,
+            citas
+        });
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error al obtener paciente:",
+            error
+        );
+
+        return res.status(500).json({
+            mensaje: "Error al obtener el paciente"
+        });
+    }
+};
+
 export {
-    dashboard
+    dashboard,
+    detallePaciente
 };
