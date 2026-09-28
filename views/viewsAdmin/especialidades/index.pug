@@ -1,0 +1,225 @@
+doctype html
+html(lang="es")
+
+    head
+
+        meta(charset="UTF-8")
+
+        meta(
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        )
+
+        title SIGCMI - Especialidades
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-slate-100 text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            include ../components/sidebar.pug
+
+            main(
+                class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6"
+            )
+
+                //- ==========================================
+                //- ENCABEZADO
+                //- ==========================================
+
+                div(
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
+                )
+
+                    div
+
+                        h1(class="text-2xl font-bold text-slate-800")
+                            | Especialidades médicas
+
+                        p(class="text-sm text-slate-500 mt-1")
+                            | Administra las especialidades disponibles en el sistema.
+
+                    button(
+                        type="button"
+                        id="btnNuevaEspecialidad"
+                        class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
+                    )
+
+                        i(class="fa-solid fa-plus")
+
+                        | Nueva especialidad
+
+
+                //- ==========================================
+                //- BUSCADOR
+                //- ==========================================
+
+                div(
+                    class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6"
+                )
+
+                    div(class="relative max-w-md")
+
+                        i(
+                            class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        )
+
+                        input(
+                            type="text"
+                            id="buscarEspecialidad"
+                            placeholder="Buscar especialidad..."
+                            class="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        )
+
+
+                //- ==========================================
+                //- TABLA
+                //- ==========================================
+
+                div(
+                    class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
+                )
+
+                    div(class="overflow-x-auto")
+
+                        table(class="w-full")
+
+                            thead(
+                                class="bg-slate-50 border-b border-slate-200"
+                            )
+
+                                tr
+
+                                    th(
+                                        class="text-left px-6 py-4 text-sm font-semibold text-slate-600"
+                                    )
+                                        | Especialidad
+
+                                    th(
+                                        class="text-left px-6 py-4 text-sm font-semibold text-slate-600"
+                                    )
+                                        | Descripción
+
+                                    th(
+                                        class="text-center px-6 py-4 text-sm font-semibold text-slate-600"
+                                    )
+                                        | Médicos
+
+                                    th(
+                                        class="text-center px-6 py-4 text-sm font-semibold text-slate-600"
+                                    )
+                                        | Acciones
+
+
+                            tbody#tablaEspecialidades
+
+                                if especialidades && especialidades.length
+
+                                    each especialidad in especialidades
+
+                                        tr(
+                                            class="border-b border-slate-100 hover:bg-slate-50 transition"
+                                            data-nombre=especialidad.nombre
+                                        )
+
+                                            td(class="px-6 py-4")
+
+                                                div(class="flex items-center gap-3")
+
+                                                    div(
+                                                        class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center"
+                                                    )
+
+                                                        i(
+                                                            class="fa-solid fa-stethoscope text-blue-600"
+                                                        )
+
+                                                    div
+
+                                                        p(
+                                                            class="font-semibold text-slate-800"
+                                                        )
+                                                            = especialidad.nombre
+
+                                                        p(
+                                                            class="text-xs text-slate-400"
+                                                        )
+                                                            | ID:
+                                                            = " " + especialidad.id_especialidad
+
+
+                                            td(
+                                                class="px-6 py-4 text-sm text-slate-600"
+                                            )
+                                                = especialidad.descripcion || "Sin descripción"
+
+
+                                            td(
+                                                class="px-6 py-4 text-center"
+                                            )
+
+                                                span(
+                                                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium"
+                                                )
+
+                                                    i(
+                                                        class="fa-solid fa-user-doctor"
+                                                    )
+
+                                                    = especialidad.cantidad_medicos
+
+
+                                            td(class="px-6 py-4")
+
+                                                div(
+                                                    class="flex items-center justify-center gap-2"
+                                                )
+
+                                                    button(
+                                                        type="button"
+                                                        class="btnEditarEspecialidad p-2 rounded-lg text-blue-600 hover:bg-blue-50"
+                                                        data-id=especialidad.id_especialidad
+                                                        title="Editar"
+                                                    )
+
+                                                        i(class="fa-solid fa-pen")
+
+
+                                                    button(
+                                                        type="button"
+                                                        class="btnEliminarEspecialidad p-2 rounded-lg text-red-600 hover:bg-red-50"
+                                                        data-id=especialidad.id_especialidad
+                                                        title="Eliminar"
+                                                    )
+
+                                                        i(class="fa-solid fa-trash")
+
+
+                                else
+
+                                    tr
+
+                                        td(
+                                            colspan="4"
+                                            class="px-6 py-12 text-center text-slate-500"
+                                        )
+
+                                            i(
+                                                class="fa-solid fa-stethoscope text-4xl mb-3"
+                                            )
+
+                                            p(class="font-medium")
+                                                | No hay especialidades registradas.
+            
+
+            include ../components/modals/crearEspecialidad.pug
+            include ../components/modals/editarEspecialidad.pug
+            
+            script(src="/admin/js/especialidades.js")
+            script(src="/admin/js/toggleSidebar.js")
