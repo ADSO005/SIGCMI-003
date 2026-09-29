@@ -242,11 +242,10 @@ html(lang="es")
 
                                                 button(
                                                     type="button"
-                                                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                                    class="btnVerPrescripcion w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
                                                     title="Ver prescripción"
                                                     data-id=prescripcion.id_prescripcion
                                                 )
-
                                                     i(class="fa-solid fa-eye")
 
 
@@ -269,5 +268,8 @@ html(lang="es")
 
                                                 p(class="text-sm text-slate-400 mt-1")
                                                     | Las prescripciones aparecerán aquí cuando sean registradas.
+
+            include ../components/modals/modalPrescripcion.pug
+
 
             script(src="/admin/js/prescripciones.js")
