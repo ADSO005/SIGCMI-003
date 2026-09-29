@@ -1,0 +1,360 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+        title SIGCMI - Calendario
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-slate-100 text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            // =====================================================
+            // SIDEBAR
+            // =====================================================
+
+            include ../components/sidebar.pug
+            include ../components/sidebarOverlay.pug
+
+
+            // =====================================================
+            // CONTENIDO PRINCIPAL
+            // =====================================================
+
+            main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
+
+
+                // =================================================
+                // ENCABEZADO
+                // =================================================
+
+                div(class="mb-6")
+
+                    div(class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4")
+
+                        div
+                            div(class="flex items-center gap-3")
+
+                                div(
+                                    class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center"
+                                )
+                                    i(class="fa-solid fa-calendar-days text-xl")
+
+                                div
+                                    h1(class="text-2xl md:text-3xl font-bold text-slate-800")
+                                        | Calendario de citas
+
+                                    p(class="text-sm text-slate-500 mt-1")
+                                        | Consulta y organiza las citas médicas programadas.
+
+
+                        // Fecha actual
+                        div(
+                            class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm"
+                        )
+
+                            div(
+                                class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center"
+                            )
+                                i(class="fa-regular fa-calendar")
+
+                            div
+                                p(class="text-xs text-slate-400")
+                                    | Fecha actual
+
+                                p(
+                                    id="fechaActualTexto"
+                                    class="font-semibold text-slate-700"
+                                )
+                                    | --
+
+
+                // =================================================
+                // ESTADÍSTICAS
+                // =================================================
+
+                div(class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6")
+
+
+                    // Total
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
+                    )
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Total de citas
+
+                                p(
+                                    id="totalCitas"
+                                    class="text-2xl font-bold text-slate-800 mt-1"
+                                )
+                                    = estadisticas.total
+
+                            div(
+                                class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"
+                            )
+                                i(class="fa-solid fa-calendar-check")
+
+
+                    // Pendientes
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
+                    )
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Pendientes
+
+                                p(
+                                    id="totalPendientes"
+                                    class="text-2xl font-bold text-amber-600 mt-1"
+                                )
+                                    = estadisticas.pendientes
+
+                            div(
+                                class="w-11 h-11 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center"
+                            )
+                                i(class="fa-regular fa-clock")
+
+
+                    // En curso
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
+                    )
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | En curso
+
+                                p(
+                                    id="totalEnCurso"
+                                    class="text-2xl font-bold text-blue-600 mt-1"
+                                )
+                                    = estadisticas.enCurso
+
+                            div(
+                                class="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center"
+                            )
+                                i(class="fa-solid fa-user-doctor")
+
+
+                    // Completadas
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
+                    )
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Completadas
+
+                                p(
+                                    id="totalCompletadas"
+                                    class="text-2xl font-bold text-emerald-600 mt-1"
+                                )
+                                    = estadisticas.completadas
+
+                            div(
+                                class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center"
+                            )
+                                i(class="fa-solid fa-circle-check")
+
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
+                    )
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Canceladas
+
+                                p(
+                                    id="totalCanceladas"
+                                    class="text-2xl font-bold text-red-600 mt-1"
+                                )
+                                    = estadisticas.canceladas
+
+                            div(
+                                class="w-11 h-11 rounded-xl bg-red-100 text-red-600 flex items-center justify-center"
+                            )
+                                i(class="fa-solid fa-calendar-xmark")
+                // =================================================
+                // CONTROLES
+                // =================================================
+
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-5"
+                )
+
+                    div(
+                        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+                    )
+
+                        // Navegación
+                        div(class="flex items-center gap-2")
+
+                            button(
+                                type="button"
+                                id="btnMesAnterior"
+                                class="w-10 h-10 rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-600 transition"
+                                title="Mes anterior"
+                            )
+                                i(class="fa-solid fa-chevron-left")
+
+
+                            button(
+                                type="button"
+                                id="btnHoy"
+                                class="px-4 h-10 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition shadow-sm"
+                            )
+                                i(class="fa-solid fa-calendar-day mr-2")
+                                | Hoy
+
+
+                            button(
+                                type="button"
+                                id="btnMesSiguiente"
+                                class="w-10 h-10 rounded-xl border border-slate-200 hover:bg-slate-100 hover:border-slate-300 text-slate-600 transition"
+                                title="Mes siguiente"
+                            )
+                                i(class="fa-solid fa-chevron-right")
+
+
+                        // Mes
+                        div(class="text-center")
+
+                            h2(
+                                id="tituloMes"
+                                class="text-xl md:text-2xl font-bold text-slate-800"
+                            )
+                                | Septiembre 2026
+
+
+                            p(
+                                id="subtituloMes"
+                                class="text-xs text-slate-400 mt-1"
+                            )
+                                | Vista mensual
+
+
+                        // Filtro
+                        div(class="flex items-center gap-2")
+
+                            div(
+                                class="relative"
+                            )
+
+                                i(
+                                    class="fa-solid fa-filter absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"
+                                )
+
+                                select(
+                                    id="filtroEstado"
+                                    class="pl-9 pr-8 h-10 rounded-xl border border-slate-200 bg-white text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                )
+                                    option(value="Todos")
+                                        | Todos los estados
+
+                                    option(value="Pendiente")
+                                        | Pendientes
+
+                                    option(value="En curso")
+                                        | En curso
+
+                                    option(value="Completada")
+                                        | Completadas
+
+                                    option(value="Cancelada")
+                                        | Canceladas
+
+
+                // =================================================
+                // CALENDARIO
+                // =================================================
+
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+                )
+
+                    // Cabecera
+                    div(
+                        class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 min-w-[850px]"
+                    )
+
+                        each dia in ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+
+                            div(
+                                class="py-3 md:py-4 text-center text-xs md:text-sm font-bold text-slate-500 uppercase tracking-wide"
+                            )
+                                | #{dia}
+
+
+                    // Contenedor responsive
+                    div(class="overflow-x-auto")
+
+                        div(
+                            id="calendarioGrid"
+                            class="grid grid-cols-7 min-w-[850px]"
+                        )
+
+
+                // =================================================
+                // LEYENDA
+                // =================================================
+
+                div(
+                    class="flex flex-wrap items-center gap-x-6 gap-y-3 mt-5 px-1"
+                )
+
+                    div(class="flex items-center gap-2 text-xs md:text-sm text-slate-500")
+                        span(class="w-3 h-3 rounded-full bg-amber-400")
+                        | Pendiente
+
+                    div(class="flex items-center gap-2 text-xs md:text-sm text-slate-500")
+                        span(class="w-3 h-3 rounded-full bg-blue-500")
+                        | En curso
+
+                    div(class="flex items-center gap-2 text-xs md:text-sm text-slate-500")
+                        span(class="w-3 h-3 rounded-full bg-emerald-500")
+                        | Completada
+
+                    div(class="flex items-center gap-2 text-xs md:text-sm text-slate-500")
+                        span(class="w-3 h-3 rounded-full bg-red-500")
+                        | Cancelada
+
+
+
+        // =========================================================
+        // DATOS
+        // =========================================================
+
+        script.
+            window.citasCalendario = !{JSON.stringify(citas)};
+
+        
+        include ../components/modals/verCita.pug
+
+        // =========================================================
+        // SCRIPTS
+        // =========================================================
+
+        script(src="/admin/js/toggleSidebar.js")
+        script(src="/admin/js/citas.js")
+        script(src="/admin/js/calendario.js")
