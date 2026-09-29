@@ -71,6 +71,11 @@ import {
     obtenerDiagnostico
 } from "../../controllers/admin/diagnosticosController.js";
 
+//APARTADO DE PRESCRIPCIONES
+import {
+    listarPrescripciones,
+    obtenerPrescripcion
+} from "../../controllers/admin/prescripcionesController.js";
 
 // ===============================
 // DASHBOARD
@@ -347,4 +352,21 @@ router.get(
     obtenerDiagnostico
 );
 
+// =====================================================
+// PRESCRIPCIONES
+// =====================================================
+
+router.get(
+    "/prescripciones",
+    auth,
+    role(1),
+    listarPrescripciones
+);
+
+router.get(
+    "/prescripciones/:id",
+    auth,
+    role(1),
+    obtenerPrescripcion
+);
 export default router;

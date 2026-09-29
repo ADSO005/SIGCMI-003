@@ -1,0 +1,275 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Gestión de Prescripciones
+
+        script(src="https://cdn.tailwindcss.com")
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        )
+
+    body(class="bg-slate-50 min-h-screen")
+
+        div(class="flex min-h-screen")
+
+            //- =====================================================
+            //- SIDEBAR
+            //- =====================================================
+
+            include ../components/sidebar.pug
+
+
+            //- =====================================================
+            //- CONTENIDO PRINCIPAL
+            //- =====================================================
+
+            main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
+
+                //- HEADER
+                div(class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8")
+
+                    div
+                        p(class="text-sm text-slate-500 mb-1")
+                            | Administración
+
+                        h1(class="text-3xl font-bold text-slate-800")
+                            | Gestión de Prescripciones
+
+                        p(class="text-slate-500 mt-1")
+                            | Consulta y gestión de las prescripciones médicas.
+
+                    div(class="flex items-center gap-3")
+
+                        div(class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center")
+                            i(class="fa-solid fa-prescription-bottle-medical text-blue-600")
+
+
+                //- =====================================================
+                //- TARJETAS DE RESUMEN
+                //- =====================================================
+
+                div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8")
+
+                    div(class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm")
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Total prescripciones
+
+                                p(class="text-3xl font-bold text-slate-800 mt-2")
+                                    = prescripciones.length
+
+                            div(class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center")
+                                i(class="fa-solid fa-prescription-bottle-medical text-blue-600 text-xl")
+
+
+                    div(class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm")
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Medicamentos
+
+                                p(class="text-3xl font-bold text-slate-800 mt-2")
+                                    = prescripciones.length
+
+                            div(class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center")
+                                i(class="fa-solid fa-pills text-emerald-600 text-xl")
+
+
+                    div(class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm")
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Registros
+
+                                p(class="text-3xl font-bold text-slate-800 mt-2")
+                                    = prescripciones.length
+
+                            div(class="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center")
+                                i(class="fa-solid fa-file-medical text-violet-600 text-xl")
+
+
+                //- =====================================================
+                //- TABLA
+                //- =====================================================
+
+                div(class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden")
+
+                    //- CABECERA DE TABLA
+                    div(class="p-5 border-b border-slate-200")
+
+                        div(class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4")
+
+                            div
+                                h2(class="text-lg font-semibold text-slate-800")
+                                    | Prescripciones registradas
+
+                                p(class="text-sm text-slate-500 mt-1")
+                                    | Medicamentos prescritos en los diagnósticos registrados.
+
+                            div(class="relative w-full lg:w-80")
+
+                                i(
+                                    class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                                )
+
+                                input(
+                                    type="text"
+                                    id="buscarPrescripcion"
+                                    placeholder="Buscar prescripción..."
+                                    class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                )
+
+
+                    //- CONTENEDOR RESPONSIVE
+                    div(class="overflow-x-auto")
+
+                        table(class="w-full text-sm")
+
+                            thead(class="bg-slate-50 border-b border-slate-200")
+
+                                tr
+
+                                    th(class="text-left px-6 py-4 font-semibold text-slate-600")
+                                        | Medicamento
+
+                                    th(class="text-left px-6 py-4 font-semibold text-slate-600")
+                                        | Dosis
+
+                                    th(class="text-left px-6 py-4 font-semibold text-slate-600")
+                                        | Frecuencia
+
+                                    th(class="text-left px-6 py-4 font-semibold text-slate-600")
+                                        | Duración
+
+                                    th(class="text-left px-6 py-4 font-semibold text-slate-600")
+                                        | Paciente
+
+                                    th(class="text-left px-6 py-4 font-semibold text-slate-600")
+                                        | Médico
+
+                                    th(class="text-center px-6 py-4 font-semibold text-slate-600")
+                                        | Acción
+
+
+                            tbody(id="tablaPrescripciones")
+
+                                if prescripciones.length
+                                    each prescripcion in prescripciones
+
+                                        - const diagnostico = prescripcion.Diagnostico
+                                        - const cita = diagnostico ? diagnostico.Cita : null
+                                        - const paciente = cita ? cita.Paciente : null
+                                        - const pacienteUsuario = paciente ? paciente.Usuario : null
+                                        - const medico = cita ? cita.Medico : null
+                                        - const medicoUsuario = medico ? medico.Usuario : null
+                                        - const textoBusqueda = (prescripcion.nombre_medicamento || "") + " " + (prescripcion.dosis || "") + " " + (prescripcion.frecuencia || "") + " " + (prescripcion.duracion || "") + " " + (pacienteUsuario ? pacienteUsuario.nombres : "") + " " + (pacienteUsuario ? pacienteUsuario.apellidos : "") + " " + (medicoUsuario ? medicoUsuario.nombres : "") + " " + (medicoUsuario ? medicoUsuario.apellidos : "")
+                                        - const textoBusquedaNormalizado = textoBusqueda.toLowerCase()
+
+                                        tr(
+                                            class="border-b border-slate-100 hover:bg-slate-50 transition"
+                                            data-search=textoBusquedaNormalizado
+                                        )
+
+                                            td(class="px-6 py-4")
+
+                                                div(class="flex items-center gap-3")
+
+                                                    div(class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center")
+                                                        i(class="fa-solid fa-pills text-blue-600")
+
+                                                    div
+                                                        p(class="font-semibold text-slate-800")
+                                                            = prescripcion.nombre_medicamento
+
+                                                        p(class="text-xs text-slate-400")
+                                                            | Prescripción médica
+
+
+                                            td(class="px-6 py-4 text-slate-600")
+                                                = prescripcion.dosis
+
+
+                                            td(class="px-6 py-4 text-slate-600")
+                                                = prescripcion.frecuencia
+
+
+                                            td(class="px-6 py-4 text-slate-600")
+                                                = prescripcion.duracion
+
+
+                                            td(class="px-6 py-4")
+
+                                                if pacienteUsuario
+
+                                                    p(class="font-medium text-slate-700")
+                                                        = pacienteUsuario.nombres + " " + pacienteUsuario.apellidos
+
+                                                    p(class="text-xs text-slate-400")
+                                                        = pacienteUsuario.numero_documento
+
+                                                else
+
+                                                    span(class="text-slate-400")
+                                                        | Sin paciente
+
+
+                                            td(class="px-6 py-4")
+
+                                                if medicoUsuario
+
+                                                    p(class="font-medium text-slate-700")
+                                                        = medicoUsuario.nombres + " " + medicoUsuario.apellidos
+
+                                                    if medico && medico.Especialidad
+
+                                                        p(class="text-xs text-slate-400")
+                                                            = medico.Especialidad.nombre
+
+                                                else
+
+                                                    span(class="text-slate-400")
+                                                        | Sin médico
+
+
+                                            td(class="px-6 py-4 text-center")
+
+                                                button(
+                                                    type="button"
+                                                    class="btnVerPrescripcion w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                                    title="Ver prescripción"
+                                                    data-id=prescripcion.id_prescripcion
+                                                )
+                                                    i(class="fa-solid fa-eye")
+
+
+                                else
+
+                                    tr
+
+                                        td(
+                                            colspan="7"
+                                            class="px-6 py-12 text-center"
+                                        )
+
+                                            div(class="flex flex-col items-center justify-center")
+
+                                                div(class="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mb-4")
+                                                    i(class="fa-solid fa-prescription-bottle-medical text-slate-400 text-xl")
+
+                                                p(class="font-semibold text-slate-600")
+                                                    | No hay prescripciones registradas.
+
+                                                p(class="text-sm text-slate-400 mt-1")
+                                                    | Las prescripciones aparecerán aquí cuando sean registradas.
+
+            include ../components/modals/modalPrescripcion.pug
+
+
+            script(src="/admin/js/prescripciones.js")
