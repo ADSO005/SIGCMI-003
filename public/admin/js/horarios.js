@@ -463,6 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
         eliminarHorario(horariosIds);
     });
 
+
     document.addEventListener("click", (event) => {
 
         const botonEditar =
@@ -504,6 +505,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==================================================
 
     function abrirGestionHorarios(medicoId) {
+
+        // Siempre comenzar en estado limpio
+        resetearFormularioHorario();
+
 
         const medico = medicosHorarios.find((item) => {
             return String(item.id_medico) === String(medicoId);
@@ -996,6 +1001,63 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         });
+
+
+
+    function resetearFormularioHorario() {
+
+        if (!formularioNuevoHorario) {
+            return;
+        }
+
+        // Salir del modo edición
+        delete formNuevoHorario.dataset.editarIds;
+
+        // Restaurar título
+        const titulo =
+            document.getElementById("tituloFormularioHorario");
+
+        if (titulo) {
+            titulo.textContent = "Nuevo horario";
+        }
+
+        // Ocultar formulario
+        formularioNuevoHorario.classList.add("hidden");
+
+        // Limpiar campos
+        if (formNuevoHorario) {
+            formNuevoHorario.reset();
+        }
+
+        // Desmarcar días
+        document
+            .querySelectorAll(".diaHorario")
+            .forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+
+        // Ocultar y limpiar horas
+        document
+            .querySelectorAll(".horasDia")
+            .forEach((contenedor) => {
+
+                contenedor.classList.add("hidden");
+
+                const horaInicio =
+                    contenedor.querySelector(".horaInicioDia");
+
+                const horaFin =
+                    contenedor.querySelector(".horaFinDia");
+
+                if (horaInicio) {
+                    horaInicio.value = "";
+                }
+
+                if (horaFin) {
+                    horaFin.value = "";
+                }
+            });
+    }
     // ==================================================
     // CERRAR MODAL
     // ==================================================
@@ -1004,12 +1066,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!modal) return;
 
+        // Limpiar cualquier estado de edición
+        resetearFormularioHorario();
+
+        // Cerrar modal
         modal.classList.add("hidden");
 
         document.body.classList.remove(
             "overflow-hidden"
         );
-
     }
 
 
@@ -1562,30 +1627,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnAgregarHorarioModal.addEventListener("click", () => {
 
-        // Salir del modo edición
-        delete formNuevoHorario.dataset.editarIds;
+        // Limpiar cualquier estado anterior
+        resetearFormularioHorario();
 
-        // Limpiar formulario
-        formNuevoHorario.reset();
-
-        // Limpiar días
-        document
-            .querySelectorAll(".diaHorario")
-            .forEach((checkbox) => {
-                checkbox.checked = false;
-            });
-
-        // Título
-        const titulo =
-            document.getElementById(
-                "tituloFormularioHorario"
-            );
-
-        if (titulo) {
-            titulo.textContent = "Nuevo horario";
-        }
-
+        // Mostrar formulario como nuevo horario
         formularioNuevoHorario.classList.remove("hidden");
+
+        // Enfocar fecha de inicio
+        document
+            .getElementById("horario_fecha_inicio")
+            ?.focus();
     });
 
 });
