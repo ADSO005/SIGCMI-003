@@ -1,0 +1,454 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        )
+
+        title SIGCMI - Diagnósticos
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-slate-100 text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            // =====================================================
+            // SIDEBAR
+            // =====================================================
+
+            include ../components/sidebar.pug
+
+
+            // =====================================================
+            // CONTENIDO PRINCIPAL
+            // =====================================================
+
+            main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
+
+                // =================================================
+                // ENCABEZADO
+                // =================================================
+
+                div(class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-7")
+
+                    div
+                        div(class="flex items-center gap-3 mb-2")
+                            div(class="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center")
+                                i(class="fa-solid fa-file-medical text-lg")
+
+                            div
+                                h1(class="text-2xl md:text-3xl font-bold text-slate-800")
+                                    | Gestión de Diagnósticos
+
+                        p(class="text-slate-500")
+                            | Consulta y revisa los diagnósticos médicos registrados en el sistema.
+
+
+                // =================================================
+                // TARJETAS DE RESUMEN
+                // =================================================
+
+                div(class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 mb-7")
+
+                    // TOTAL
+                    div(class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5")
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm font-medium text-slate-500")
+                                    | Total diagnósticos
+
+                                p(class="text-2xl font-bold text-slate-800 mt-1")
+                                    = diagnosticos ? diagnosticos.length : 0
+
+                            div(class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center")
+                                i(class="fa-solid fa-file-medical text-lg")
+
+
+                    // RECIENTES
+                    div(class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5")
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm font-medium text-slate-500")
+                                    | Diagnósticos registrados
+
+                                p(class="text-2xl font-bold text-slate-800 mt-1")
+                                    = diagnosticos ? diagnosticos.length : 0
+
+                            div(class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center")
+                                i(class="fa-solid fa-notes-medical text-lg")
+
+
+                    // HISTORIAS
+                    div(class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5")
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm font-medium text-slate-500")
+                                    | Historias clínicas
+
+                                p(class="text-2xl font-bold text-slate-800 mt-1")
+                                    = diagnosticos ? diagnosticos.length : 0
+
+                            div(class="w-12 h-12 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center")
+                                i(class="fa-solid fa-heart-pulse text-lg")
+
+
+                // =================================================
+                // FILTROS
+                // =================================================
+
+                div(class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-6")
+
+                    div(class="flex flex-col lg:flex-row lg:items-end gap-4")
+
+                        // BUSCAR
+                        div(class="flex-1")
+
+                            label(
+                                for="buscarDiagnostico"
+                                class="block text-sm font-medium text-slate-600 mb-2"
+                            )
+                                | Buscar diagnóstico
+
+                            div(class="relative")
+
+                                i(class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400")
+
+                                input(
+                                    id="buscarDiagnostico"
+                                    type="text"
+                                    placeholder="Buscar paciente, médico o diagnóstico..."
+                                    class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                                )
+
+
+                        // ESTADO
+                        div(class="w-full lg:w-56")
+
+                            label(
+                                for="filtroEstado"
+                                class="block text-sm font-medium text-slate-600 mb-2"
+                            )
+                                | Estado
+
+                            select(
+                                id="filtroEstado"
+                                class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                            )
+                                option(value="") Todos los estados
+                                option(value="Pendiente") Pendiente
+                                option(value="En curso") En curso
+                                option(value="Completada") Completada
+                                option(value="Cancelada") Cancelada
+
+
+                        // BOTÓN
+                        div
+
+                            button(
+                                id="btnLimpiarFiltros"
+                                type="button"
+                                class="w-full lg:w-auto px-5 py-3 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 transition font-medium"
+                            )
+                                i(class="fa-solid fa-filter-circle-xmark mr-2")
+                                | Limpiar
+
+
+                // =================================================
+                // TABLA
+                // =================================================
+
+                div(class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden")
+
+                    // CABECERA TABLA
+                    div(class="px-5 py-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3")
+
+                        div
+                            h2(class="text-lg font-bold text-slate-800")
+                                | Diagnósticos registrados
+
+                            p(class="text-sm text-slate-500 mt-1")
+                                | Información clínica asociada a las citas médicas.
+
+                        div(class="flex items-center gap-2 text-sm text-slate-500")
+                            i(class="fa-solid fa-database")
+                            span(id="contadorDiagnosticos")
+                                = diagnosticos ? diagnosticos.length : 0
+                            |  registros
+
+
+                    // TABLA RESPONSIVE
+                    div(class="overflow-x-auto")
+
+                        table(
+                            class="w-full text-sm"
+                            id="tablaDiagnosticos"
+                        )
+
+                            thead(class="bg-slate-50 border-b border-slate-200")
+
+                                tr
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600 whitespace-nowrap")
+                                        | Diagnóstico
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600 whitespace-nowrap")
+                                        | Paciente
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600 whitespace-nowrap")
+                                        | Médico
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600 whitespace-nowrap")
+                                        | Fecha
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600 whitespace-nowrap")
+                                        | Estado
+
+                                    th(class="px-5 py-4 text-center font-semibold text-slate-600 whitespace-nowrap")
+                                        | Acciones
+
+
+                            tbody(class="divide-y divide-slate-100")
+
+                                if diagnosticos && diagnosticos.length > 0
+
+                                    each diagnostico in diagnosticos
+
+                                        - const cita = diagnostico.Cita || null
+                                        - const paciente = cita ? cita.Paciente : null
+                                        - const pacienteUsuario = paciente ? paciente.Usuario : null
+                                        - const medico = cita ? cita.Medico : null
+                                        - const medicoUsuario = medico ? medico.Usuario : null
+                                        - const especialidad = medico ? medico.Especialidad : null
+                                        - const estadoCita = cita ? cita.Estado : null
+
+                                        - const nombrePaciente = pacienteUsuario ? `${pacienteUsuario.nombres} ${pacienteUsuario.apellidos}` : "Sin paciente"
+                                        - const documentoPaciente = pacienteUsuario ? pacienteUsuario.numero_documento : "Sin documento"
+                                        - const nombreMedico = medicoUsuario ? `${medicoUsuario.nombres} ${medicoUsuario.apellidos}` : "Sin médico"
+                                        - const nombreEspecialidad = especialidad ? especialidad.nombre : "Sin especialidad"
+                                        - const nombreEstado = estadoCita ? estadoCita.nombre : "Sin estado"
+
+
+                                        tr(
+                                            class="diagnostico-row hover:bg-slate-50 transition"
+                                            data-search=`${nombrePaciente} ${nombreMedico} ${diagnostico.diagnostico || ""} ${nombreEspecialidad}`.toLowerCase()
+                                            data-estado=nombreEstado
+                                        )
+
+                                            // DIAGNÓSTICO
+                                            td(class="px-5 py-5 min-w-[260px]")
+
+                                                div(class="flex items-start gap-3")
+
+                                                    div(class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0")
+                                                        i(class="fa-solid fa-stethoscope")
+
+                                                    div
+
+                                                        p(class="font-semibold text-slate-800")
+                                                            = diagnostico.diagnostico || "Sin diagnóstico"
+
+                                                        if diagnostico.sintomas
+                                                            p(
+                                                                class="text-xs text-slate-500 mt-1 max-w-xs truncate"
+                                                                title=diagnostico.sintomas
+                                                            )
+                                                                = diagnostico.sintomas
+                                                        else
+                                                            p(class="text-xs text-slate-400 mt-1")
+                                                                | Sin síntomas registrados
+
+
+                                            // PACIENTE
+                                            td(class="px-5 py-5 min-w-[220px]")
+
+                                                div(class="flex items-center gap-3")
+
+                                                    div(class="w-9 h-9 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0")
+                                                        i(class="fa-solid fa-user")
+
+                                                    div
+
+                                                        p(class="font-semibold text-slate-800")
+                                                            = nombrePaciente
+
+                                                        p(class="text-xs text-slate-500 mt-1")
+                                                            | CC: #{documentoPaciente}
+
+
+                                            // MÉDICO
+                                            td(class="px-5 py-5 min-w-[220px]")
+
+                                                div(class="flex items-center gap-3")
+
+                                                    div(class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0")
+                                                        i(class="fa-solid fa-user-doctor")
+
+                                                    div
+
+                                                        p(class="font-semibold text-slate-800")
+                                                            = nombreMedico
+
+                                                        p(class="text-xs text-slate-500 mt-1")
+                                                            = nombreEspecialidad
+
+                                            // FECHA
+                                            td(class="px-5 py-5 whitespace-nowrap")
+
+                                                - const fechaDiagnostico = diagnostico.fecha_diagnostico ? new Date(diagnostico.fecha_diagnostico) : null
+                                                - const fechaFormateada = fechaDiagnostico ? fechaDiagnostico.toLocaleDateString("es-CO") : "Sin fecha"
+
+                                                div(class="flex items-center gap-2 text-slate-600")
+
+                                                    i(class="fa-regular fa-calendar text-slate-400")
+
+                                                    span
+                                                        = fechaFormateada
+
+
+                                            // ESTADO
+                                            td(class="px-5 py-5 whitespace-nowrap")
+
+                                                if nombreEstado === "Pendiente"
+
+                                                    span(class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700")
+                                                        span(class="w-1.5 h-1.5 rounded-full bg-amber-500")
+                                                        = nombreEstado
+
+                                                else if nombreEstado === "En curso"
+
+                                                    span(class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700")
+                                                        span(class="w-1.5 h-1.5 rounded-full bg-blue-500")
+                                                        = nombreEstado
+
+                                                else if nombreEstado === "Completada"
+
+                                                    span(class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700")
+                                                        span(class="w-1.5 h-1.5 rounded-full bg-emerald-500")
+                                                        = nombreEstado
+
+                                                else if nombreEstado === "Cancelada"
+
+                                                    span(class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-red-100 text-red-700")
+                                                        span(class="w-1.5 h-1.5 rounded-full bg-red-500")
+                                                        = nombreEstado
+
+                                                else
+
+                                                    span(class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600")
+                                                        span(class="w-1.5 h-1.5 rounded-full bg-slate-400")
+                                                        = nombreEstado
+
+
+                                            // ACCIONES
+                                            td(class="px-5 py-5")
+
+                                                div(class="flex items-center justify-center gap-2")
+
+                                                    button(
+                                                        type="button"
+                                                        class="btnVerDiagnostico w-10 h-10 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                                        data-id=diagnostico.id_diagnostico
+                                                        title="Ver diagnóstico"
+                                                    )
+                                                        i(class="fa-solid fa-eye")
+
+
+                                else
+
+                                    tr
+
+                                        td(
+                                            colspan="6"
+                                            class="px-5 py-16 text-center"
+                                        )
+
+                                            div(class="flex flex-col items-center justify-center")
+
+                                                div(class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-4")
+                                                    i(class="fa-solid fa-file-medical text-2xl")
+
+                                                p(class="font-semibold text-lg text-slate-700")
+                                                    | No hay diagnósticos registrados
+
+                                                p(class="text-sm text-slate-400 mt-1")
+                                                    | Cuando se registren diagnósticos aparecerán aquí.
+
+
+                // =================================================
+                // JAVASCRIPT
+                // =================================================
+
+                script.
+                    document.addEventListener("DOMContentLoaded", () => {
+
+                        const buscador = document.getElementById("buscarDiagnostico");
+                        const filtroEstado = document.getElementById("filtroEstado");
+                        const btnLimpiar = document.getElementById("btnLimpiarFiltros");
+                        const filas = document.querySelectorAll(".diagnostico-row");
+                        const contador = document.getElementById("contadorDiagnosticos");
+
+                        function filtrarDiagnosticos() {
+
+                            const texto = buscador.value.toLowerCase().trim();
+                            const estado = filtroEstado.value;
+
+                            let visibles = 0;
+
+                            filas.forEach(fila => {
+
+                                const contenido = fila.dataset.search || "";
+                                const estadoFila = fila.dataset.estado || "";
+
+                                const coincideTexto =
+                                    !texto || contenido.includes(texto);
+
+                                const coincideEstado =
+                                    !estado || estadoFila === estado;
+
+                                if (coincideTexto && coincideEstado) {
+                                    fila.style.display = "";
+                                    visibles++;
+                                } else {
+                                    fila.style.display = "none";
+                                }
+
+                            });
+
+                            if (contador) {
+                                contador.textContent = visibles;
+                            }
+                        }
+
+                        if (buscador) {
+                            buscador.addEventListener("input", filtrarDiagnosticos);
+                        }
+
+                        if (filtroEstado) {
+                            filtroEstado.addEventListener("change", filtrarDiagnosticos);
+                        }
+
+                        if (btnLimpiar) {
+
+                            btnLimpiar.addEventListener("click", () => {
+
+                                buscador.value = "";
+                                filtroEstado.value = "";
+
+                                filtrarDiagnosticos();
+
+                            });
+
+                        }
+
+                    });

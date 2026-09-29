@@ -106,13 +106,10 @@ export const listarDiagnosticos = async (req, res) => {
         // ==========================================
         // RESPUESTA
         // ==========================================
-
-        return res.json({
-
-            ok: true,
-
-            diagnosticos
-
+        
+        return res.render("viewsAdmin/diagnosticos/index", {
+            diagnosticos,
+            usuarios: req.usuario
         });
 
     } catch (error) {
