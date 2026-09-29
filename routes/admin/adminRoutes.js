@@ -56,6 +56,13 @@ import {
 } from "../../controllers/admin/calendarioController.js";
 const router = express.Router();
 
+//APARTADO DE HORARIOS
+import {
+    listarHorarios,
+    actualizarHorario,
+    actualizarPeriodoHorario,
+    eliminarHorario
+} from "../../controllers/admin/horariosController.js";
 // ===============================
 // DASHBOARD
 // ===============================
@@ -278,5 +285,37 @@ router.get(
     auth,
     role(1),
     mostrarCalendario
+);
+
+// ===============================
+// HORARIOS
+// ===============================
+
+router.get(
+    "/horarios",
+    auth,
+    role(1),
+    listarHorarios
+);
+
+router.put(
+    "/horarios/:id",
+    auth,
+    role(1),
+    actualizarHorario
+);
+
+router.delete(
+    "/horarios",
+    auth,
+    role(1),
+    eliminarHorario
+);
+
+router.put(
+    "/horarios",
+    auth,
+    role(1),
+    actualizarPeriodoHorario
 );
 export default router;

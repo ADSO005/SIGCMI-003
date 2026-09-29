@@ -1,0 +1,312 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+
+        title SIGCMI - Horarios
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-slate-100 min-h-screen")
+
+        div(class="flex min-h-screen")
+
+            // SIDEBAR
+            include ../components/sidebar.pug
+
+            // OVERLAY
+            include ../components/sidebarOverlay.pug
+
+            // CONTENIDO
+            main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
+
+                // HEADER
+                div(class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8")
+
+                    div
+                        div(class="flex items-center gap-3")
+
+                            div(class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-sm")
+                                i(class="fa-solid fa-clock text-xl")
+
+                            div
+                                h1(class="text-2xl font-bold text-slate-800")
+                                    | Horarios de atención
+
+                                p(class="text-sm text-slate-500 mt-1")
+                                    | Administra la disponibilidad de los médicos.
+                    button(
+                        type="button"
+                        class="btnNuevoHorario inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-sm transition"
+                    )
+                        i(class="fa-solid fa-plus")
+                        | Nuevo horario
+
+                // RESUMEN
+                div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-7")
+
+                    // MÉDICOS
+                    div(class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm")
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Médicos
+
+                                p(class="text-3xl font-bold text-slate-800 mt-1")
+                                    = medicos.length
+
+                            div(class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center")
+                                i(class="fa-solid fa-user-doctor text-lg")
+
+                    // HORARIOS
+                    div(class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm")
+
+                        - let totalHorarios = 0
+                        each medico in medicos
+                            - totalHorarios += medico.horarios.length
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Horarios registrados
+
+                                p(class="text-3xl font-bold text-slate-800 mt-1")
+                                    = totalHorarios
+
+                            div(class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center")
+                                i(class="fa-solid fa-calendar-days text-lg")
+
+                    // MÉDICOS ACTIVOS
+                    div(class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm")
+
+                        - let medicosActivos = medicos.filter(m => m.estado === true).length
+
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(class="text-sm text-slate-500")
+                                    | Médicos activos
+
+                                p(class="text-3xl font-bold text-green-600 mt-1")
+                                    = medicosActivos
+
+                            div(class="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center")
+                                i(class="fa-solid fa-user-check text-lg")
+
+                // BARRA DE BÚSQUEDA
+                div(class="bg-white border border-slate-200 rounded-2xl p-4 mb-7 shadow-sm")
+
+                    div(class="relative max-w-md")
+
+                        i(class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400")
+
+                        input(
+                            id="buscarMedicoHorario"
+                            type="text"
+                            placeholder="Buscar médico o especialidad..."
+                            class="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        )
+
+                // CONTENEDOR DE MÉDICOS
+                div(
+                    id="contenedorMedicosHorarios"
+                    class="grid grid-cols-1 xl:grid-cols-2 gap-6"
+                )
+
+                    if medicos.length
+
+                        each medico in medicos
+
+                            div(
+                                class="tarjetaMedicoHorario bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden"
+                                data-nombre=medico.nombre
+                                data-especialidad=medico.especialidad
+                            )
+
+                                // CABECERA MÉDICO
+                                div(class="p-5 border-b border-slate-200")
+
+                                    div(class="flex items-start justify-between gap-4")
+
+                                        div(class="flex items-center gap-4")
+
+                                            div(class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0")
+                                                i(class="fa-solid fa-user-doctor text-xl")
+
+                                            div
+
+                                                h2(class="text-lg font-bold text-slate-800")
+                                                    = medico.nombre
+
+                                                p(class="text-sm text-slate-500 mt-1")
+                                                    = medico.especialidad
+
+                                        if medico.estado
+
+                                            span(class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 text-green-700 text-xs font-semibold")
+                                                span(class="w-2 h-2 rounded-full bg-green-500")
+                                                | Activo
+
+                                        else
+
+                                            span(class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-100 text-red-700 text-xs font-semibold")
+                                                span(class="w-2 h-2 rounded-full bg-red-500")
+                                                | Inactivo
+
+                                // HORARIOS
+                                div(class="p-5")
+
+                                    div(class="flex items-center justify-between mb-4")
+
+                                        div
+
+                                            h3(class="font-semibold text-slate-800")
+                                                | Horario de atención
+
+                                            p(class="text-xs text-slate-400 mt-1")
+                                                | Disponibilidad configurada
+
+                                        span(class="text-xs font-medium text-slate-500")
+                                            = medico.horarios.length
+                                            |  horario(s)
+
+
+                                    if medico.horarios.length
+
+                                        div(class="space-y-3")
+
+                                            each horario in medico.horarios.slice(0, 5)
+
+                                                div(class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200")
+
+                                                    div(class="flex items-center gap-3")
+
+                                                        div(class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0")
+                                                            i(class="fa-regular fa-calendar")
+
+                                                        div
+
+                                                            p(class="font-semibold text-slate-800")
+                                                                = horario.dia_semana
+
+                                                            p(class="text-xs text-slate-500 mt-1")
+                                                                = horario.fecha_inicio
+                                                                |  → 
+                                                                = horario.fecha_fin
+
+                                                    div(class="flex items-center gap-2")
+
+                                                        span(class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm font-medium text-slate-700")
+
+                                                            i(class="fa-regular fa-clock text-blue-500")
+
+                                                            = horario.hora_inicio ? horario.hora_inicio.substring(0, 5) : ""
+                                                            |  -
+                                                            = horario.hora_fin ? horario.hora_fin.substring(0, 5) : ""
+
+                                                        if horario.estado === "Aprobado"
+
+                                                            span(
+                                                                class="w-2.5 h-2.5 rounded-full bg-green-500"
+                                                                title="Aprobado"
+                                                            )
+
+                                                        else if horario.estado === "Pendiente"
+
+                                                            span(
+                                                                class="w-2.5 h-2.5 rounded-full bg-amber-500"
+                                                                title="Pendiente"
+                                                            )
+
+                                                        else
+
+                                                            span(
+                                                                class="w-2.5 h-2.5 rounded-full bg-red-500"
+                                                                title="Rechazado"
+                                                            )
+
+                                        // AVISO SI HAY MÁS DE 5
+                                        if medico.horarios.length > 5
+
+                                            div(class="mt-4 flex items-center justify-between px-3 py-2 rounded-lg bg-blue-50 border border-blue-100")
+
+                                                p(class="text-sm text-blue-700")
+
+                                                    i(class="fa-solid fa-circle-info mr-1")
+
+                                                    | Mostrando 5 de #{medico.horarios.length} horarios
+
+                                                button(
+                                                    type="button"
+                                                    class="btnGestionarHorario text-sm font-semibold text-blue-700 hover:text-blue-900"
+                                                    data-medico-id=medico.id_medico
+                                                    data-medico-nombre=medico.nombre
+                                                )
+                                                    | Ver todos
+                                                    i(class="fa-solid fa-arrow-right ml-1")
+
+                                // ACCIONES
+                                div(class="px-5 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row gap-3")
+
+                                    button(
+                                        type="button"
+                                        class="btnGestionarHorario flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition"
+                                        data-medico-id=medico.id_medico
+                                        data-medico-nombre=medico.nombre
+                                    )
+                                        i(class="fa-solid fa-sliders")
+                                        | Gestionar horarios
+
+                                    button(
+                                        type="button"
+                                        class="btnNuevoHorarioMedico inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-semibold text-sm transition"
+                                        data-medico-id=medico.id_medico
+                                        data-medico-nombre=medico.nombre
+                                    )
+                                        i(class="fa-solid fa-plus")
+                                        | Agregar
+
+                    else
+
+                        div(class="xl:col-span-2 bg-white border border-slate-200 rounded-2xl p-12 text-center")
+
+                            div(class="w-16 h-16 mx-auto rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4")
+                                i(class="fa-solid fa-user-doctor text-2xl")
+
+                            h2(class="text-lg font-bold text-slate-800")
+                                | No hay médicos disponibles
+
+                            p(class="text-sm text-slate-500 mt-2")
+                                | Los médicos registrados aparecerán aquí para gestionar sus horarios.
+
+                // SIN RESULTADOS
+                div(
+                    id="sinResultadosMedicos"
+                    class="hidden bg-white border border-slate-200 rounded-2xl p-10 text-center"
+                )
+
+                    div(class="w-14 h-14 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-4")
+                        i(class="fa-solid fa-magnifying-glass text-xl")
+
+                    h2(class="font-bold text-slate-800")
+                        | No se encontraron médicos
+
+                    p(class="text-sm text-slate-500 mt-1")
+                        | Intenta con otro nombre o especialidad.
+
+        include ../components/modals/gestionarHorarios.pug
+        
+        script.
+            window.medicosHorarios = !{JSON.stringify(medicos).replace(/</g, '\\u003c')}
+        
+        script(src="/admin/js/toggleSidebar.js")
+        script(src="/admin/js/horarios.js")

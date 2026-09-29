@@ -406,9 +406,7 @@ export const crearHorariosMedico = async (req, res) => {
         const {
             fecha_inicio,
             fecha_fin,
-            dias_semana,
-            hora_inicio,
-            hora_fin
+            horarios
         } = req.body;
 
         // ============================================
@@ -423,18 +421,20 @@ export const crearHorariosMedico = async (req, res) => {
         }
 
         // ============================================
-        // VALIDAR CAMPOS
+        // VALIDAR CAMPOS PRINCIPALES
         // ============================================
 
-        if (
-            !fecha_inicio ||
-            !fecha_fin ||
-            !hora_inicio ||
-            !hora_fin
-        ) {
+        if (!fecha_inicio || !fecha_fin) {
             return res.status(400).json({
                 ok: false,
-                mensaje: "Completa todos los campos obligatorios."
+                mensaje: "Las fechas son obligatorias."
+            });
+        }
+
+        if (!Array.isArray(horarios) || horarios.length === 0) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "Selecciona al menos un día de atención."
             });
         }
 
@@ -445,12 +445,18 @@ export const crearHorariosMedico = async (req, res) => {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
 
-        const fechaInicioObj = new Date(`${fecha_inicio}T00:00:00`);
-        const fechaFinObj = new Date(`${fecha_fin}T00:00:00`);
+        const fechaInicioObj = new Date(
+            `${fecha_inicio}T00:00:00`
+        );
 
-        if (Number.isNaN(fechaInicioObj.getTime()) ||
-            Number.isNaN(fechaFinObj.getTime())) {
+        const fechaFinObj = new Date(
+            `${fecha_fin}T00:00:00`
+        );
 
+        if (
+            Number.isNaN(fechaInicioObj.getTime()) ||
+            Number.isNaN(fechaFinObj.getTime())
+        ) {
             return res.status(400).json({
                 ok: false,
                 mensaje: "Las fechas proporcionadas no son válidas."
@@ -460,24 +466,53 @@ export const crearHorariosMedico = async (req, res) => {
         if (fechaInicioObj <= hoy) {
             return res.status(400).json({
                 ok: false,
-                mensaje: "La fecha de inicio debe ser posterior a la fecha actual."
+                mensaje:
+                    "La fecha de inicio debe ser posterior a la fecha actual."
             });
         }
 
         if (fechaFinObj < fechaInicioObj) {
             return res.status(400).json({
                 ok: false,
-                mensaje: "La fecha final no puede ser anterior a la fecha inicial."
+                mensaje:
+                    "La fecha final no puede ser anterior a la fecha inicial."
             });
         }
 
-        if (
-            !Array.isArray(dias_semana) ||
-            dias_semana.length === 0
-        ) {
+        // ============================================
+        // VALIDAR QUE SEA LUNES A DOMINGO
+        // ============================================
+
+        const diaInicio = fechaInicioObj.getDay();
+        const diaFin = fechaFinObj.getDay();
+
+        const diferenciaDias =
+            Math.round(
+                (fechaFinObj - fechaInicioObj) /
+                (1000 * 60 * 60 * 24)
+            );
+
+        if (diaInicio !== 1) {
             return res.status(400).json({
                 ok: false,
-                mensaje: "Selecciona al menos un día de atención."
+                mensaje:
+                    "La fecha de inicio debe ser un lunes."
+            });
+        }
+
+        if (diaFin !== 0) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "La fecha de finalización debe ser un domingo."
+            });
+        }
+
+        if (diferenciaDias !== 6) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "El período debe tener exactamente 7 días, de lunes a domingo."
             });
         }
 
@@ -494,82 +529,99 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-
         // ============================================
-        // VALIDAR RANGO DE HORARIO
-        // ============================================
-
-        if (
-            hora_inicio < "07:00" ||
-            hora_inicio > "19:00"
-        ) {
-            return res.status(400).json({
-                ok: false,
-                mensaje:
-                    "La hora de inicio debe estar entre las 07:00 AM y las 07:00 PM."
-            });
-        }
-
-        if (
-            hora_fin < "07:00" ||
-            hora_fin > "19:00"
-        ) {
-            return res.status(400).json({
-                ok: false,
-                mensaje:
-                    "La hora de finalización debe estar entre las 07:00 AM y las 07:00 PM."
-            });
-        }
-
-        if (hora_fin <= hora_inicio) {
-            return res.status(400).json({
-                ok: false,
-                mensaje:
-                    "La hora de finalización debe ser posterior a la hora de inicio."
-            });
-        }
-
-        // ============================================
-        // DÍAS PERMITIDOS
+        // DÍAS VÁLIDOS
         // ============================================
 
-        const diasSemanaNumeros = {
-            Domingo: 0,
-            Lunes: 1,
-            Martes: 2,
-            Miercoles: 3,
-            Jueves: 4,
-            Viernes: 5,
-            Sabado: 6
-        };
+        const diasValidos = [
+            "Lunes",
+            "Martes",
+            "Miercoles",
+            "Jueves",
+            "Viernes",
+            "Sabado",
+            "Domingo"
+        ];
 
-        const diasDisponibles = new Set();
+        // ============================================
+        // VALIDAR CADA HORARIO
+        // ============================================
 
-        const fechaActual = new Date(`${fecha_inicio}T00:00:00`);
-        const fechaFinal = new Date(`${fecha_fin}T00:00:00`);
+        for (const horario of horarios) {
 
-        while (fechaActual <= fechaFinal) {
-            const numeroDia = fechaActual.getDay();
+            const {
+                dia_semana,
+                hora_inicio,
+                hora_fin
+            } = horario;
 
-            const nombreDia = Object.keys(diasSemanaNumeros).find(
-                (dia) => diasSemanaNumeros[dia] === numeroDia
-            );
-
-            if (nombreDia) {
-                diasDisponibles.add(nombreDia);
+            // Validar día
+            if (!diasValidos.includes(dia_semana)) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje:
+                        `El día "${dia_semana}" no es válido.`
+                });
             }
 
-            fechaActual.setDate(fechaActual.getDate() + 1);
+            // Validar horas
+            if (!hora_inicio || !hora_fin) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje:
+                        `Debes indicar la hora de inicio y finalización para ${dia_semana}.`
+                });
+            }
+
+            // Hora inicio
+            if (
+                hora_inicio < "07:00" ||
+                hora_inicio > "19:00"
+            ) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje:
+                        `La hora de inicio del ${dia_semana} debe estar entre las 07:00 y las 19:00.`
+                });
+            }
+
+            // Hora fin
+            if (
+                hora_fin < "07:00" ||
+                hora_fin > "19:00"
+            ) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje:
+                        `La hora de finalización del ${dia_semana} debe estar entre las 07:00 y las 19:00.`
+                });
+            }
+
+            // Hora final > hora inicial
+            if (hora_fin <= hora_inicio) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje:
+                        `La hora de finalización debe ser posterior a la hora de inicio para ${dia_semana}.`
+                });
+            }
         }
 
-        const diasFueraDelPeriodo = dias_semana.filter(
-            (dia) => !diasDisponibles.has(dia)
+        // ============================================
+        // EVITAR DÍAS REPETIDOS
+        // ============================================
+
+        const diasSeleccionados = horarios.map(
+            (horario) => horario.dia_semana
         );
 
-        if (diasFueraDelPeriodo.length > 0) {
+        const diasUnicos = new Set(diasSeleccionados);
+
+        if (diasUnicos.size !== diasSeleccionados.length) {
             return res.status(400).json({
                 ok: false,
-                mensaje: `Los siguientes días no existen dentro del período seleccionado: ${diasFueraDelPeriodo.join(", ")}.`
+                mensaje:
+                    "No puedes registrar el mismo día más de una vez."
             });
         }
 
@@ -581,24 +633,27 @@ export const crearHorariosMedico = async (req, res) => {
             where: {
                 medico_id: medico.id_medico,
                 fecha_inicio,
-                fecha_fin,
-                hora_inicio,
-                hora_fin
+                fecha_fin
             }
         });
 
+        // Revisar si alguno de los días ya existe
         const diasExistentes = horariosExistentes.map(
             (horario) => horario.dia_semana
         );
 
-        const diasNuevos = dias_semana.filter(
-            (dia) => !diasExistentes.includes(dia)
+        const diasDuplicados = horarios.filter(
+            (horario) =>
+                diasExistentes.includes(horario.dia_semana)
         );
 
-        if (diasNuevos.length === 0) {
+        if (diasDuplicados.length > 0) {
             return res.status(409).json({
                 ok: false,
-                mensaje: "Estos horarios ya están registrados para este período."
+                mensaje:
+                    `Ya existe un horario registrado para: ${diasDuplicados
+                        .map((h) => h.dia_semana)
+                        .join(", ")}.`
             });
         }
 
@@ -608,21 +663,25 @@ export const crearHorariosMedico = async (req, res) => {
 
         const horariosCreados = [];
 
-        for (const dia of diasNuevos) {
+        for (const horarioData of horarios) {
 
             const horario = await Horario.create({
                 medico_id: medico.id_medico,
-                dia_semana: dia,
+                dia_semana: horarioData.dia_semana,
                 fecha_inicio,
                 fecha_fin,
-                hora_inicio,
-                hora_fin,
+                hora_inicio: horarioData.hora_inicio,
+                hora_fin: horarioData.hora_fin,
                 estado: "Aprobado",
                 aprobado_por: req.usuario.id_usuario
             });
 
             horariosCreados.push(horario);
         }
+
+        // ============================================
+        // RESPUESTA
+        // ============================================
 
         return res.status(201).json({
             ok: true,
