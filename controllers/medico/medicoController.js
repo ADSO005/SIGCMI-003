@@ -4,6 +4,7 @@ import Paciente from "../../models/Paciente.js";
 import Usuario from "../../models/Usuario.js";
 import Diagnostico from "../../models/Diagnostico.js";
 import Prescripcion from "../../models/Prescripcion.js";
+import EstadoCita from "../../models/EstadoCita.js";
 
 const dashboard = async (req, res) => {
 
@@ -45,6 +46,42 @@ const dashboard = async (req, res) => {
             ]
         });
 
+
+        // Obtener la fecha actual en formato YYYY-MM-DD
+const hoy = new Date().toLocaleDateString("en-CA");
+
+    // Buscar las citas de hoy del médico
+    const citasHoy = await Cita.findAll({
+        where: {
+            medico_id: medico.id_medico,
+            fecha: hoy
+        },
+        include: [
+            {
+                model: Paciente,
+                include: [
+                    {
+                        model: Usuario,
+                        attributes: [
+                            "nombres",
+                            "apellidos"
+                        ]
+                    }
+                ]
+            },
+            {
+                model: EstadoCita,
+                as: "Estado",
+                attributes: [
+                    "id_estado",
+                    "nombre"
+                ]
+            }
+        ],
+        order: [
+            ["hora", "ASC"]
+        ]
+    });
         // Evitar repetir pacientes que tienen varias citas
         const pacientesMap = new Map();
 
@@ -77,13 +114,15 @@ const dashboard = async (req, res) => {
 
         console.log("Médico:", medico.id_medico);
         console.log("Pacientes encontrados:", pacientes.length);
+        console.log("Citas de hoy:", citasHoy.length);
 
         res.render(
             "dashboardMedical/viewsMedico/dashboardMedical",
             {
                 usuario: req.usuario,
                 medico,
-                pacientes
+                pacientes,
+                citasHoy
             }
         );
 

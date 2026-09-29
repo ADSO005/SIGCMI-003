@@ -48,39 +48,55 @@ block content
         // AGENDA DEL DÍA
         .appointments
           h3 Mi Agenda de hoy
-          // Cita 1: Completada
-          .appointment.estado-completada
-            .left
-              span.hour 09:00
-              div
-                h4 María González
-                p Consulta de rutina
-            .right
-              span.state.greenState Completado
-          // Cita 2: En curso
-          #cita2.appointment.estado-encurso
-            .left
-              span.hour.hour-encurso 10:25
-              div
-                h4 María González
-                p Consulta post-operatoria
-            .right
-              span.state.yellowState En curso
-            .btn-full-row
-              button.btn-consulta.btn-finalizar(onclick="finalizarConsulta('cita2')")
-                | Finalizar
-                | Consulta
-          // Cita 3: Pendiente
-          #cita3.appointment.estado-pendiente
-            .left
-              span.hour 10:00
-              div
-                h4 María González
-                p Consulta post-operatoria
-            .right
-              span.state.greyState Pendiente
-            .btn-full-row
-              button.btn-consulta.btn-iniciar(onclick="iniciarConsulta('cita3')") Iniciar Consulta
+
+          if citasHoy && citasHoy.length > 0
+            each cita in citasHoy
+
+              - const estado = cita.Estado ? cita.Estado.nombre : "Sin estado"
+              - const usuarioPaciente = cita.Paciente ? cita.Paciente.Usuario : null
+
+              .appointment(
+                class=`estado-${estado.toLowerCase().replace(" ", "")}`
+                id=`cita${cita.id_cita}`
+              )
+                .left
+                  span.hour= cita.hora.substring(0, 5)
+
+                  div
+                    if usuarioPaciente
+                      h4= `${usuarioPaciente.nombres} ${usuarioPaciente.apellidos}`
+                    else
+                      h4 Paciente no disponible
+
+                    p= cita.motivo_consulta || "Sin motivo de consulta"
+
+                .right
+                  if estado === "Completada"
+                    span.state.greenState= estado
+
+                  else if estado === "En Curso"
+                    span.state.yellowState= estado
+
+                  else if estado === "Pendiente"
+                    span.state.greyState= estado
+
+                  else
+                    span.state= estado
+
+                if estado === "Pendiente"
+                  .btn-full-row
+                    button.btn-consulta.btn-iniciar(
+                      onclick=`iniciarConsulta('cita${cita.id_cita}')`
+                    ) Iniciar Consulta
+
+                else if estado === "En Curso"
+                  .btn-full-row
+                    button.btn-consulta.btn-finalizar(
+                      onclick=`finalizarConsulta('cita${cita.id_cita}')`
+                    ) Finalizar Consulta
+
+          else
+            p No tienes citas programadas para hoy.
         // ACCIONES RÁPIDAS
         .actions
           h3 Acciones Rápidas

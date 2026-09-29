@@ -43,7 +43,7 @@ try {
     // Conectar con la base de datos
     await db.authenticate();
 
-    console.log("✅ Base de datos conectada correctamente");
+    console.log("Base de datos conectada correctamente");
 
     app.listen(PORT, () => {
         console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
@@ -51,7 +51,7 @@ try {
 
 } catch (error) {
 
-    console.error("❌ Error al conectar la base de datos");
+    console.error("Error al conectar la base de datos");
     console.error(error);
 
 }
