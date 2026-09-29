@@ -50,6 +50,10 @@ import {
     eliminarEspecialidad
 } from "../../controllers/admin/especialidadesController.js";
 
+//APARTADO DE CALENDARIO
+import {
+    mostrarCalendario
+} from "../../controllers/admin/calendarioController.js";
 const router = express.Router();
 
 // ===============================
@@ -263,5 +267,16 @@ router.put(
     auth,
     role(1),
     cancelarCita
+);
+
+//===================
+//CALENDARIO
+//===================
+
+router.get(
+    "/calendario",
+    auth,
+    role(1),
+    mostrarCalendario
 );
 export default router;
