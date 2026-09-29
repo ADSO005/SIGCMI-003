@@ -63,6 +63,15 @@ import {
     actualizarPeriodoHorario,
     eliminarHorario
 } from "../../controllers/admin/horariosController.js";
+
+//APARTADO DE DIAGNOSTICOS
+
+import {
+    listarDiagnosticos,
+    obtenerDiagnostico
+} from "../../controllers/admin/diagnosticosController.js";
+
+
 // ===============================
 // DASHBOARD
 // ===============================
@@ -318,4 +327,24 @@ router.put(
     role(1),
     actualizarPeriodoHorario
 );
+
+// =====================================================
+// DIAGNÓSTICOS
+// =====================================================
+
+router.get(
+    "/diagnosticos",
+    auth,
+    role(1),
+    listarDiagnosticos
+);
+
+
+router.get(
+    "/diagnosticos/:id",
+    auth,
+    role(1),
+    obtenerDiagnostico
+);
+
 export default router;

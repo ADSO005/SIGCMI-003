@@ -140,15 +140,15 @@ export default function asociarModelos() {
 
     // Un estado puede pertenecer a muchas citas
 
-EstadoCita.hasMany(Cita, {
-    foreignKey: "estado_id",
-    as: "Citas"
-});
+    EstadoCita.hasMany(Cita, {
+        foreignKey: "estado_id",
+        as: "Citas"
+    });
 
-Cita.belongsTo(EstadoCita, {
-    foreignKey: "estado_id",
-    as: "Estado"
-});
+    Cita.belongsTo(EstadoCita, {
+        foreignKey: "estado_id",
+        as: "Estado"
+    });
 
 
 
@@ -200,10 +200,12 @@ Cita.belongsTo(EstadoCita, {
 
     Cita.hasOne(Diagnostico, {
         foreignKey: "cita_id",
+        as: "Diagnostico"
     });
 
     Diagnostico.belongsTo(Cita, {
         foreignKey: "cita_id",
+        as: "Cita"
     });
 
 
