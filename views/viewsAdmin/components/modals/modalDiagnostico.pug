@@ -1,0 +1,303 @@
+// =====================================================
+// MODAL - DETALLE DEL DIAGNÓSTICO
+// =====================================================
+
+div(
+    id="modalDiagnostico"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+)
+
+    div(
+        class="bg-white w-full max-w-4xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden"
+    )
+
+        // ================================================
+        // HEADER
+        // ================================================
+
+        div(class="flex items-center justify-between px-6 py-5 border-b border-slate-200")
+
+            div(class="flex items-center gap-3")
+
+                div(class="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center")
+                    i(class="fa-solid fa-file-medical")
+
+                div
+                    h2(class="text-xl font-bold text-slate-800")
+                        | Detalle del diagnóstico
+
+                    p(class="text-sm text-slate-500 mt-1")
+                        | Información clínica de la consulta
+
+
+            button(
+                type="button"
+                id="btnCerrarModal"
+                class="w-10 h-10 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+                title="Cerrar"
+            )
+                i(class="fa-solid fa-xmark text-lg")
+
+
+        // ================================================
+        // CONTENIDO
+        // ================================================
+
+        div(class="p-6 overflow-y-auto max-h-[calc(90vh-150px)]")
+
+            // ============================================
+            // INFORMACIÓN DE LA CITA
+            // ============================================
+
+            div(class="mb-6")
+
+                div(class="flex items-center gap-2 mb-4")
+
+                    div(class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center")
+                        i(class="fa-solid fa-calendar-check text-sm")
+
+                    h3(class="font-bold text-slate-800")
+                        | Información de la cita
+
+
+                div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+
+                    // PACIENTE
+                    div(class="bg-slate-50 rounded-xl p-4")
+
+                        p(class="text-xs font-semibold text-slate-400 uppercase tracking-wide")
+                            | Paciente
+
+                        div(class="flex items-center gap-3 mt-2")
+
+                            div(class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center")
+                                i(class="fa-solid fa-user")
+
+                            div
+
+                                p(
+                                    id="modalPaciente"
+                                    class="font-semibold text-slate-800"
+                                )
+                                    | -
+
+                                p(
+                                    id="modalDocumento"
+                                    class="text-xs text-slate-500 mt-1"
+                                )
+                                    | Documento: -
+
+
+                    // MÉDICO
+                    div(class="bg-slate-50 rounded-xl p-4")
+
+                        p(class="text-xs font-semibold text-slate-400 uppercase tracking-wide")
+                            | Médico
+
+                        div(class="flex items-center gap-3 mt-2")
+
+                            div(class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center")
+                                i(class="fa-solid fa-user-doctor")
+
+                            div
+
+                                p(
+                                    id="modalMedico"
+                                    class="font-semibold text-slate-800"
+                                )
+                                    | -
+
+                                p(
+                                    id="modalEspecialidad"
+                                    class="text-xs text-slate-500 mt-1"
+                                )
+                                    | -
+
+
+                    // FECHA
+                    div(class="bg-slate-50 rounded-xl p-4")
+
+                        p(class="text-xs font-semibold text-slate-400 uppercase tracking-wide")
+                            | Fecha
+
+                        div(class="flex items-center gap-3 mt-2")
+
+                            div(class="w-10 h-10 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center")
+                                i(class="fa-regular fa-calendar")
+
+                            p(
+                                id="modalFecha"
+                                class="font-semibold text-slate-800"
+                            )
+                                | -
+
+
+                    // ESTADO
+                    div(class="bg-slate-50 rounded-xl p-4")
+
+                        p(class="text-xs font-semibold text-slate-400 uppercase tracking-wide")
+                            | Estado
+
+                        div(class="mt-2")
+
+                            span(
+                                id="modalEstado"
+                                class="inline-flex px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600"
+                            )
+                                | -
+
+
+            // ============================================
+            // SIGNOS VITALES
+            // ============================================
+
+            div(class="mb-6")
+
+                div(class="flex items-center gap-2 mb-4")
+
+                    div(class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center")
+                        i(class="fa-solid fa-heart-pulse text-sm")
+
+                    h3(class="font-bold text-slate-800")
+                        | Signos vitales
+
+
+                div(class="grid grid-cols-2 md:grid-cols-4 gap-4")
+
+                    // TEMPERATURA
+                    div(class="border border-slate-200 rounded-xl p-4")
+
+                        p(class="text-xs text-slate-500")
+                            | Temperatura
+
+                        p(
+                            id="modalTemperatura"
+                            class="text-lg font-bold text-slate-800 mt-1"
+                        )
+                            | -
+
+
+                    // PRESIÓN
+                    div(class="border border-slate-200 rounded-xl p-4")
+
+                        p(class="text-xs text-slate-500")
+                            | Presión arterial
+
+                        p(
+                            id="modalPresion"
+                            class="text-lg font-bold text-slate-800 mt-1"
+                        )
+                            | -
+
+
+                    // ALTURA
+                    div(class="border border-slate-200 rounded-xl p-4")
+
+                        p(class="text-xs text-slate-500")
+                            | Altura
+
+                        p(
+                            id="modalAltura"
+                            class="text-lg font-bold text-slate-800 mt-1"
+                        )
+                            | -
+
+
+                    // PESO
+                    div(class="border border-slate-200 rounded-xl p-4")
+
+                        p(class="text-xs text-slate-500")
+                            | Peso
+
+                        p(
+                            id="modalPeso"
+                            class="text-lg font-bold text-slate-800 mt-1"
+                        )
+                            | -
+
+
+                    // FRECUENCIA
+                    div(class="border border-slate-200 rounded-xl p-4")
+
+                        p(class="text-xs text-slate-500")
+                            | Frecuencia cardíaca
+
+                        p(
+                            id="modalFrecuencia"
+                            class="text-lg font-bold text-slate-800 mt-1"
+                        )
+                            | -
+
+
+            // ============================================
+            // INFORMACIÓN CLÍNICA
+            // ============================================
+
+            div(class="space-y-4")
+
+                // SÍNTOMAS
+                div(class="border border-slate-200 rounded-xl p-5")
+
+                    div(class="flex items-center gap-2 mb-3")
+
+                        i(class="fa-solid fa-notes-medical text-blue-500")
+
+                        h3(class="font-semibold text-slate-800")
+                            | Síntomas
+
+                    p(
+                        id="modalSintomas"
+                        class="text-sm text-slate-600 leading-relaxed"
+                    )
+                        | -
+
+
+                // DIAGNÓSTICO
+                div(class="border border-slate-200 rounded-xl p-5")
+
+                    div(class="flex items-center gap-2 mb-3")
+
+                        i(class="fa-solid fa-stethoscope text-blue-500")
+
+                        h3(class="font-semibold text-slate-800")
+                            | Diagnóstico
+
+                    p(
+                        id="modalDiagnosticoTexto"
+                        class="text-sm text-slate-600 leading-relaxed"
+                    )
+                        | -
+
+
+                // TRATAMIENTO
+                div(class="border border-slate-200 rounded-xl p-5")
+
+                    div(class="flex items-center gap-2 mb-3")
+
+                        i(class="fa-solid fa-prescription-bottle-medical text-emerald-500")
+
+                        h3(class="font-semibold text-slate-800")
+                            | Tratamiento recomendado
+
+                    p(
+                        id="modalTratamiento"
+                        class="text-sm text-slate-600 leading-relaxed"
+                    )
+                        | -
+
+
+                // NOTAS
+                div(class="border border-slate-200 rounded-xl p-5")
+
+                    div(class="flex items-center gap-2 mb-3")
+
+                        i(class="fa-solid fa-note-sticky text-amber-500")
+
+                        h3(class="font-semibold text-slate-800")
+                            | Notas adicionales
+
+                    p(
+                        id="modalNotas"
+                        class="text-sm text-slate-600 leading-relaxed"
+                    )
+                        | -

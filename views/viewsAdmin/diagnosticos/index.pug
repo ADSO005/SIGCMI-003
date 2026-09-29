@@ -23,7 +23,6 @@ html(lang="es")
             // =====================================================
             // SIDEBAR
             // =====================================================
-
             include ../components/sidebar.pug
 
 
@@ -385,70 +384,12 @@ html(lang="es")
                                                     | Cuando se registren diagnósticos aparecerán aquí.
 
 
-                // =================================================
-                // JAVASCRIPT
-                // =================================================
 
-                script.
-                    document.addEventListener("DOMContentLoaded", () => {
+                include ../components/modals/modalDiagnostico.pug
+                                
+        // =================================================
+        // JAVASCRIPT
+        // =================================================
 
-                        const buscador = document.getElementById("buscarDiagnostico");
-                        const filtroEstado = document.getElementById("filtroEstado");
-                        const btnLimpiar = document.getElementById("btnLimpiarFiltros");
-                        const filas = document.querySelectorAll(".diagnostico-row");
-                        const contador = document.getElementById("contadorDiagnosticos");
 
-                        function filtrarDiagnosticos() {
-
-                            const texto = buscador.value.toLowerCase().trim();
-                            const estado = filtroEstado.value;
-
-                            let visibles = 0;
-
-                            filas.forEach(fila => {
-
-                                const contenido = fila.dataset.search || "";
-                                const estadoFila = fila.dataset.estado || "";
-
-                                const coincideTexto =
-                                    !texto || contenido.includes(texto);
-
-                                const coincideEstado =
-                                    !estado || estadoFila === estado;
-
-                                if (coincideTexto && coincideEstado) {
-                                    fila.style.display = "";
-                                    visibles++;
-                                } else {
-                                    fila.style.display = "none";
-                                }
-
-                            });
-
-                            if (contador) {
-                                contador.textContent = visibles;
-                            }
-                        }
-
-                        if (buscador) {
-                            buscador.addEventListener("input", filtrarDiagnosticos);
-                        }
-
-                        if (filtroEstado) {
-                            filtroEstado.addEventListener("change", filtrarDiagnosticos);
-                        }
-
-                        if (btnLimpiar) {
-
-                            btnLimpiar.addEventListener("click", () => {
-
-                                buscador.value = "";
-                                filtroEstado.value = "";
-
-                                filtrarDiagnosticos();
-
-                            });
-
-                        }
-
-                    });
+        script(src="/admin/js/diagnosticos.js")

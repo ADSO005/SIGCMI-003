@@ -67,7 +67,8 @@ import {
 //APARTADO DE DIAGNOSTICOS
 
 import {
-    listarDiagnosticos
+    listarDiagnosticos,
+    obtenerDiagnostico
 } from "../../controllers/admin/diagnosticosController.js";
 
 
@@ -337,4 +338,13 @@ router.get(
     role(1),
     listarDiagnosticos
 );
+
+
+router.get(
+    "/diagnosticos/:id",
+    auth,
+    role(1),
+    obtenerDiagnostico
+);
+
 export default router;
