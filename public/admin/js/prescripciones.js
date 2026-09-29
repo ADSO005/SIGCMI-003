@@ -4,8 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const filas = document.querySelectorAll("#tablaPrescripciones tr");
 
     const modal = document.getElementById("modalPrescripcion");
-    const btnCerrar = document.getElementById("btnCerrarModalPrescripcion");
 
+    const botonesCerrar = document.querySelectorAll(
+        ".btnCerrarModalPrescripcion"
+    );
 
     // =====================================================
     // BUSCAR PRESCRIPCIONES
@@ -215,16 +217,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // CERRAR MODAL
     // =====================================================
 
-    if (btnCerrar) {
+    botonesCerrar.forEach((boton) => {
 
-        btnCerrar.addEventListener("click", () => {
+        boton.addEventListener("click", () => {
 
             modal.classList.add("hidden");
             modal.classList.remove("flex");
 
         });
 
-    }
+    });
 
 
     // =====================================================
