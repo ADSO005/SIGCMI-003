@@ -509,7 +509,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // Siempre comenzar en estado limpio
         resetearFormularioHorario();
 
-
         const medico = medicosHorarios.find((item) => {
             return String(item.id_medico) === String(medicoId);
         });
@@ -721,14 +720,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // CAMBIAR TÍTULO
         // ============================================
 
-        const titulo =
-            document.getElementById(
-                "tituloFormularioHorario"
-            );
-
-        if (titulo) {
-            titulo.textContent = "Editar horario";
-        }
+        establecerModoEditarHorario();
 
         // ============================================
         // HORARIO BASE
@@ -1003,6 +995,159 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
+    function establecerModoNuevoHorario() {
+
+        const titulo =
+            document.getElementById("tituloFormularioHorario");
+
+        const descripcion =
+            document.getElementById("descripcionFormularioHorario");
+
+        const icono =
+            document.getElementById("iconoEstadoFormularioHorario");
+
+        const boton =
+            document.getElementById("btnGuardarHorario");
+
+        const iconoBoton =
+            document.getElementById("iconoBotonHorario");
+
+        const textoBoton =
+            document.getElementById("textoBotonHorario");
+
+
+        // Título
+        if (titulo) {
+            titulo.textContent = "Nuevo horario";
+        }
+
+        // Descripción
+        if (descripcion) {
+            descripcion.textContent =
+                "Configura el período y los días de atención.";
+        }
+
+        // Icono del encabezado
+        if (icono) {
+
+            icono.classList.remove(
+                "bg-blue-100",
+                "text-blue-600"
+            );
+
+            icono.classList.add(
+                "bg-green-100",
+                "text-green-600"
+            );
+
+            icono.innerHTML =
+                '<i class="fa-solid fa-plus"></i>';
+        }
+
+        // Botón
+        if (boton) {
+
+            boton.classList.remove(
+                "bg-blue-600",
+                "hover:bg-blue-700"
+            );
+
+            boton.classList.add(
+                "bg-green-600",
+                "hover:bg-green-700"
+            );
+        }
+
+        // Icono del botón
+        if (iconoBoton) {
+            iconoBoton.className =
+                "fa-solid fa-floppy-disk mr-2";
+        }
+
+        // Texto del botón
+        if (textoBoton) {
+            textoBoton.textContent =
+                "Guardar horario";
+        }
+    }
+
+
+    function establecerModoEditarHorario() {
+
+        const titulo =
+            document.getElementById("tituloFormularioHorario");
+
+        const descripcion =
+            document.getElementById("descripcionFormularioHorario");
+
+        const icono =
+            document.getElementById("iconoEstadoFormularioHorario");
+
+        const boton =
+            document.getElementById("btnGuardarHorario");
+
+        const iconoBoton =
+            document.getElementById("iconoBotonHorario");
+
+        const textoBoton =
+            document.getElementById("textoBotonHorario");
+
+
+        // Título
+        if (titulo) {
+            titulo.textContent = "Editar horario";
+        }
+
+        // Descripción
+        if (descripcion) {
+            descripcion.textContent =
+                "Modifica el período y los días de atención.";
+        }
+
+        // Icono del encabezado
+        if (icono) {
+
+            icono.classList.remove(
+                "bg-green-100",
+                "text-green-600"
+            );
+
+            icono.classList.add(
+                "bg-blue-100",
+                "text-blue-600"
+            );
+
+            icono.innerHTML =
+                '<i class="fa-solid fa-pen"></i>';
+        }
+
+        // Botón
+        if (boton) {
+
+            boton.classList.remove(
+                "bg-green-600",
+                "hover:bg-green-700"
+            );
+
+            boton.classList.add(
+                "bg-blue-600",
+                "hover:bg-blue-700"
+            );
+        }
+
+        // Icono del botón
+        if (iconoBoton) {
+            iconoBoton.className =
+                "fa-solid fa-pen-to-square mr-2";
+        }
+
+        // Texto del botón
+        if (textoBoton) {
+            textoBoton.textContent =
+                "Actualizar horario";
+        }
+    }
+
 
     function resetearFormularioHorario() {
 
@@ -1013,13 +1158,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Salir del modo edición
         delete formNuevoHorario.dataset.editarIds;
 
-        // Restaurar título
-        const titulo =
-            document.getElementById("tituloFormularioHorario");
-
-        if (titulo) {
-            titulo.textContent = "Nuevo horario";
-        }
+        establecerModoNuevoHorario();
 
         // Ocultar formulario
         formularioNuevoHorario.classList.add("hidden");
