@@ -8,6 +8,8 @@ import {
     Horario
 } from "../../models/index.js";
 
+import { Op } from "sequelize";
+
 import {
     contieneLenguajeInapropiado
 } from "../../utils/filtroLenguaje.js";
@@ -102,12 +104,24 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
         where: {
             medico_id,
             dia_semana: diaSemana,
-            estado: "Aprobado"
+            estado: "Aprobado",
+
+            // La fecha seleccionada debe estar
+            // dentro del período aprobado
+            fecha_inicio: {
+                [Op.lte]: fecha
+            },
+
+            fecha_fin: {
+                [Op.gte]: fecha
+            }
         },
 
         attributes: [
             "hora_inicio",
-            "hora_fin"
+            "hora_fin",
+            "fecha_inicio",
+            "fecha_fin"
         ]
 
     });
@@ -705,4 +719,829 @@ export const crearNuevaCita = async (req, res) => {
 
     }
 
+};
+
+export const listarCitas = async (req, res) => {
+    try {
+
+        // ==========================================
+        // CITAS
+        // ==========================================
+
+        const citas = await Cita.findAll({
+            include: [
+                {
+                    model: Paciente,
+                    include: [
+                        {
+                            model: Usuario,
+                            attributes: [
+                                "id_usuario",
+                                "nombres",
+                                "apellidos",
+                                "numero_documento"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: Medico,
+                    include: [
+                        {
+                            model: Usuario,
+                            attributes: [
+                                "id_usuario",
+                                "nombres",
+                                "apellidos"
+                            ]
+                        },
+                        {
+                            model: Especialidad,
+                            attributes: [
+                                "id_especialidad",
+                                "nombre"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    model: EstadoCita,
+                    as: "Estado",
+                    attributes: [
+                        "id_estado",
+                        "nombre"
+                    ]
+                }
+            ],
+
+            order: [
+                ["fecha", "DESC"],
+                ["hora", "DESC"]
+            ]
+        });
+
+
+        // ==========================================
+        // PACIENTES PARA NUEVA CITA
+        // ==========================================
+
+        const pacientes = await Paciente.findAll({
+            include: [
+                {
+                    model: Usuario,
+                    attributes: [
+                        "id_usuario",
+                        "nombres",
+                        "apellidos",
+                        "numero_documento"
+                    ]
+                }
+            ],
+            order: [
+                [
+                    Usuario,
+                    "nombres",
+                    "ASC"
+                ]
+            ]
+        });
+
+
+        // ==========================================
+        // ESPECIALIDADES PARA NUEVA CITA
+        // ==========================================
+
+        const especialidades = await Especialidad.findAll({
+            order: [
+                ["nombre", "ASC"]
+            ]
+        });
+
+
+        // ==========================================
+        // MÉDICOS PARA NUEVA CITA
+        // ==========================================
+
+        const medicos = await Medico.findAll({
+            include: [
+                {
+                    model: Usuario,
+                    attributes: [
+                        "id_usuario",
+                        "nombres",
+                        "apellidos"
+                    ]
+                },
+                {
+                    model: Especialidad,
+                    attributes: [
+                        "id_especialidad",
+                        "nombre"
+                    ]
+                }
+            ],
+            order: [
+                [
+                    Usuario,
+                    "nombres",
+                    "ASC"
+                ]
+            ]
+        });
+
+
+        // ==========================================
+        // RENDER
+        // ==========================================
+
+        res.render("viewsAdmin/citas/index", {
+            citas,
+            pacientes,
+            especialidades,
+            medicos,
+            usuarios: req.usuario
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al listar citas:",
+            error
+        );
+
+        res.status(500).send(
+            "Error al cargar las citas."
+        );
+    }
+};
+
+// =====================================================
+// OBTENER DETALLE DE UNA CITA
+// =====================================================
+
+export const obtenerCita = async (req, res) => {
+
+    try {
+
+        const { id } = req.params;
+
+        // Validar ID
+        if (!/^\d+$/.test(String(id))) {
+
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El ID de la cita no es válido."
+            });
+
+        }
+
+
+        const cita = await Cita.findByPk(id, {
+
+            include: [
+
+                // PACIENTE
+                {
+                    model: Paciente,
+
+                    include: [
+                        {
+                            model: Usuario,
+
+                            attributes: [
+                                "id_usuario",
+                                "nombres",
+                                "apellidos",
+                                "numero_documento",
+                                "correo",
+                                "telefono"
+                            ]
+                        }
+                    ]
+                },
+
+
+                // MÉDICO
+                {
+                    model: Medico,
+
+                    include: [
+
+                        {
+                            model: Usuario,
+
+                            attributes: [
+                                "id_usuario",
+                                "nombres",
+                                "apellidos",
+                                "correo",
+                                "telefono"
+                            ]
+                        },
+
+                        {
+                            model: Especialidad,
+
+                            attributes: [
+                                "id_especialidad",
+                                "nombre"
+                            ]
+                        }
+
+                    ]
+
+                },
+
+
+                // ESTADO
+                {
+                    model: EstadoCita,
+                    as: "Estado",
+
+                    attributes: [
+                        "id_estado",
+                        "nombre"
+                    ]
+                }
+
+            ]
+
+        });
+
+
+        if (!cita) {
+
+            return res.status(404).json({
+                ok: false,
+                mensaje: "Cita no encontrada."
+            });
+
+        }
+
+
+        return res.status(200).json({
+            ok: true,
+            cita
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al obtener detalle de la cita:",
+            error
+        );
+
+
+        return res.status(500).json({
+            ok: false,
+            mensaje: "Error al obtener el detalle de la cita."
+        });
+
+    }
+
+};
+
+// =====================================================
+// REPROGRAMAR CITA
+// =====================================================
+
+export const reprogramarCita = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+
+        const {
+            fecha,
+            hora,
+            motivo_reprogramacion
+        } = req.body;
+
+
+        // =========================================
+        // VALIDAR ID
+        // =========================================
+
+        if (!/^\d+$/.test(String(id))) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El ID de la cita no es válido."
+            });
+        }
+
+
+        // =========================================
+        // VALIDAR CAMPOS
+        // =========================================
+
+        if (
+            !fecha ||
+            !hora ||
+            !motivo_reprogramacion ||
+            !motivo_reprogramacion.trim()
+        ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "La fecha, hora y motivo de reprogramación son obligatorios."
+            });
+        }
+
+
+        // =========================================
+        // VALIDAR LENGUAJE
+        // =========================================
+
+        if (
+            contieneLenguajeInapropiado(
+                motivo_reprogramacion.trim()
+            )
+        ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El motivo de reprogramación contiene lenguaje no permitido."
+            });
+        }
+
+
+        // =========================================
+        // BUSCAR CITA
+        // =========================================
+
+        const cita = await Cita.findByPk(id);
+
+        if (!cita) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: "La cita no existe."
+            });
+        }
+
+
+        // =========================================
+        // VALIDAR FECHA
+        // =========================================
+
+        const fechaSeleccionada =
+            new Date(`${fecha}T00:00:00`);
+
+        if (Number.isNaN(fechaSeleccionada.getTime())) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "La fecha seleccionada no es válida."
+            });
+        }
+
+
+        const ahora = new Date();
+
+        const fechaActual =
+            obtenerFechaLocal(ahora);
+
+        if (fecha <= fechaActual) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "La nueva fecha debe ser posterior a la fecha actual."
+            });
+        }
+
+
+        // =========================================
+        // VALIDAR HORA
+        // =========================================
+
+        if (!/^\d{2}:\d{2}$/.test(hora)) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El formato de la hora no es válido."
+            });
+        }
+
+
+        const [horas, minutos] =
+            hora.split(":").map(Number);
+
+        const minutosTotales =
+            horas * 60 + minutos;
+
+
+        if (
+            horas < 0 ||
+            horas > 23 ||
+            minutos < 0 ||
+            minutos > 59
+        ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "La hora seleccionada no es válida."
+            });
+        }
+
+
+        // =========================================
+        // HORARIO GLOBAL DEL SISTEMA
+        // 07:00 - 19:00
+        // =========================================
+
+        if (
+            minutosTotales < 420 ||
+            minutosTotales > 1140 ||
+            minutos % 30 !== 0
+        ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "La hora debe estar entre las 07:00 y las 19:00 y utilizar intervalos de 30 minutos."
+            });
+        }
+
+
+        // =========================================
+        // OBTENER HORARIOS APROBADOS
+        // DEL MÉDICO PARA ESA FECHA
+        // =========================================
+
+        const diaSemana =
+            diasSemana[fechaSeleccionada.getDay()];
+
+
+        const horariosMedico =
+            await Horario.findAll({
+
+                where: {
+                    medico_id: cita.medico_id,
+                    dia_semana: diaSemana,
+                    estado: "Aprobado",
+
+                    fecha_inicio: {
+                        [Op.lte]: fecha
+                    },
+
+                    fecha_fin: {
+                        [Op.gte]: fecha
+                    }
+                },
+
+                attributes: [
+                    "hora_inicio",
+                    "hora_fin"
+                ]
+
+            });
+
+
+        // =========================================
+        // EL MÉDICO NO TRABAJA ESE DÍA
+        // =========================================
+
+        if (horariosMedico.length === 0) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "El médico no tiene un horario aprobado para la fecha seleccionada."
+            });
+        }
+
+
+        // =========================================
+        // VALIDAR QUE LA HORA ESTÉ DENTRO
+        // DE UNO DE LOS HORARIOS APROBADOS
+        // =========================================
+
+        const horaValidaEnHorario =
+            horariosMedico.some((horario) => {
+
+                const inicio =
+                    horaAMinutos(horario.hora_inicio);
+
+                const fin =
+                    horaAMinutos(horario.hora_fin);
+
+                return (
+                    minutosTotales >= inicio &&
+                    minutosTotales <= fin
+                );
+            });
+
+
+        if (!horaValidaEnHorario) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "La hora seleccionada no pertenece al horario aprobado del médico."
+            });
+        }
+
+
+        // =========================================
+        // VALIDAR ANTICIPACIÓN MÍNIMA
+        // =========================================
+
+        const fechaHoraCita =
+            new Date(`${fecha}T${hora}:00`);
+
+        const minimoPermitido =
+            new Date(
+                ahora.getTime() +
+                (5 * 60 * 60 * 1000)
+            );
+
+
+        if (fechaHoraCita < minimoPermitido) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "La cita debe programarse con mínimo 5 horas de anticipación."
+            });
+        }
+
+
+        // =========================================
+        // BUSCAR OTRA CITA DEL MÉDICO
+        // EN ESA FECHA Y HORA
+        // =========================================
+
+        const citaExistente =
+            await Cita.findOne({
+
+                where: {
+                    medico_id: cita.medico_id,
+                    fecha,
+                    hora,
+
+                    // Excluir la cita que estamos
+                    // reprogramando
+                    id_cita: {
+                        [Op.ne]: cita.id_cita
+                    }
+                }
+
+            });
+
+
+        if (citaExistente) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "La hora seleccionada ya está ocupada por otra cita."
+            });
+        }
+
+
+        // =========================================
+        // VALIDAR QUE EL PACIENTE NO TENGA
+        // OTRA CITA ESE MISMO DÍA
+        // =========================================
+
+        const citaPaciente =
+            await Cita.findOne({
+
+                where: {
+                    paciente_id: cita.paciente_id,
+                    fecha,
+
+                    id_cita: {
+                        [Op.ne]: cita.id_cita
+                    }
+                }
+
+            });
+
+
+        if (citaPaciente) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "El paciente ya tiene otra cita programada para ese día."
+            });
+        }
+
+
+        // =========================================
+        // GUARDAR DATOS ANTERIORES
+        // =========================================
+
+        const fechaAnterior = cita.fecha;
+        const horaAnterior = cita.hora;
+
+
+        // =========================================
+        // ACTUALIZAR CITA
+        // =========================================
+
+        await cita.update({
+
+            fecha,
+
+            hora,
+
+            reprogramado_por:
+                req.usuario.id_usuario,
+
+            fecha_reprogramacion:
+                new Date(),
+
+            motivo_reprogramacion:
+                motivo_reprogramacion.trim()
+
+        });
+
+
+        // =========================================
+        // RESPUESTA
+        // =========================================
+
+        return res.status(200).json({
+
+            ok: true,
+
+            mensaje:
+                "La cita fue reprogramada correctamente.",
+
+            cita: {
+
+                id_cita:
+                    cita.id_cita,
+
+                fecha_anterior:
+                    fechaAnterior,
+
+                hora_anterior:
+                    horaAnterior,
+
+                nueva_fecha:
+                    cita.fecha,
+
+                nueva_hora:
+                    cita.hora
+
+            }
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al reprogramar cita:",
+            error
+        );
+
+        return res.status(500).json({
+            ok: false,
+            mensaje:
+                "Error interno al reprogramar la cita."
+        });
+
+    }
+};
+
+// =====================================================
+// CANCELAR CITA
+// =====================================================
+
+export const cancelarCita = async (req, res) => {
+    try {
+
+        const { id } = req.params;
+        const { motivo_cancelacion } = req.body;
+
+
+        // ==========================================
+        // VALIDAR ID
+        // ==========================================
+
+        if (!/^\d+$/.test(String(id))) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "El ID de la cita no es válido."
+            });
+        }
+
+
+        // ==========================================
+        // VALIDAR MOTIVO
+        // ==========================================
+
+        if (
+            !motivo_cancelacion ||
+            !motivo_cancelacion.trim()
+        ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "Debe indicar el motivo de la cancelación."
+            });
+        }
+
+
+        // ==========================================
+        // VALIDAR LENGUAJE
+        // ==========================================
+
+        if (
+            contieneLenguajeInapropiado(
+                motivo_cancelacion
+            )
+        ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje:
+                    "El motivo de cancelación contiene lenguaje no permitido."
+            });
+        }
+
+
+        // ==========================================
+        // BUSCAR CITA
+        // ==========================================
+
+        const cita = await Cita.findByPk(id);
+
+        if (!cita) {
+            return res.status(404).json({
+                ok: false,
+                mensaje: "Cita no encontrada."
+            });
+        }
+
+
+        // ==========================================
+        // BUSCAR ESTADO CANCELADA
+        // ==========================================
+
+        const estadoCancelada =
+            await EstadoCita.findOne({
+                where: {
+                    nombre: "Cancelada"
+                }
+            });
+
+
+        if (!estadoCancelada) {
+            return res.status(500).json({
+                ok: false,
+                mensaje:
+                    "No existe el estado 'Cancelada' en la base de datos."
+            });
+        }
+
+
+        // ==========================================
+        // VERIFICAR SI YA ESTÁ CANCELADA
+        // ==========================================
+
+        if (
+            Number(cita.estado_id) ===
+            Number(estadoCancelada.id_estado)
+        ) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: "La cita ya se encuentra cancelada."
+            });
+        }
+
+
+        // ==========================================
+        // ACTUALIZAR CITA
+        // ==========================================
+
+        cita.estado_id =
+            estadoCancelada.id_estado;
+
+        cita.motivo_cancelacion =
+            motivo_cancelacion.trim();
+
+        cita.cancelado_por =
+            req.usuario.id_usuario;
+
+        cita.fecha_cancelacion =
+            new Date();
+
+
+        await cita.save();
+
+
+        // ==========================================
+        // RESPUESTA
+        // ==========================================
+
+        return res.status(200).json({
+            ok: true,
+            mensaje: "La cita fue cancelada correctamente."
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Error al cancelar cita:",
+            error
+        );
+
+        return res.status(500).json({
+            ok: false,
+            mensaje:
+                "Ocurrió un error al cancelar la cita."
+        });
+    }
 };

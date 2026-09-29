@@ -1,0 +1,237 @@
+// =====================================================
+// MODAL REPROGRAMAR CITA
+// =====================================================
+
+div(
+    id="modalReprogramarCita"
+    class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm items-center justify-center z-[100] p-4"
+)
+
+    div(
+        class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden"
+    )
+
+        // =================================================
+        // ENCABEZADO
+        // =================================================
+
+        div(
+            class="bg-blue-600 text-white px-6 py-5 flex items-center justify-between"
+        )
+
+            div
+                h2(class="text-xl font-bold")
+                    i(class="fa-solid fa-calendar-days mr-2")
+                    | Reprogramar Cita
+
+                p(
+                    id="reprogramarCitaNumero"
+                    class="text-blue-100 text-sm mt-1"
+                ) Cita #-
+
+            button(
+                type="button"
+                id="btnCerrarReprogramarCita"
+                class="text-white hover:text-blue-200 text-2xl transition"
+                title="Cerrar"
+            )
+                i(class="fa-solid fa-xmark")
+
+
+        // =================================================
+        // CONTENIDO
+        // =================================================
+
+        div(class="p-6")
+
+            // Información actual
+            div(
+                class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5"
+            )
+
+                div(
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                )
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Paciente
+
+                        p(
+                            id="reprogramarPaciente"
+                            class="font-semibold text-slate-800"
+                        ) -
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Médico
+
+                        p(
+                            id="reprogramarMedico"
+                            class="font-semibold text-slate-800"
+                        ) -
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Especialidad
+
+                        p(
+                            id="reprogramarEspecialidad"
+                            class="text-slate-700"
+                        ) -
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Cita actual
+
+                        p(
+                            id="reprogramarCitaActual"
+                            class="text-slate-700"
+                        ) -
+
+
+            form(
+                id="formReprogramarCita"
+            )
+
+                input(
+                    type="hidden"
+                    id="reprogramarCitaId"
+                )
+
+                input(
+                    type="hidden"
+                    id="reprogramarMedicoId"
+                )
+
+
+                // =========================================
+                // NUEVA FECHA Y HORA
+                // =========================================
+
+                div(
+                    class="grid grid-cols-1 md:grid-cols-2 gap-5"
+                )
+
+                    // Nueva fecha
+                    div
+                        label(
+                            for="reprogramarFecha"
+                            class="block text-sm font-semibold text-slate-700 mb-2"
+                        )
+                            | Nueva fecha
+
+                        input(
+                            type="date"
+                            id="reprogramarFecha"
+                            required
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        )
+
+                    // Nueva hora
+                    div
+                        label(
+                            for="reprogramarHora"
+                            class="block text-sm font-semibold text-slate-700 mb-2"
+                        )
+                            | Nueva hora
+
+                        select(
+                            id="reprogramarHora"
+                            required
+                            disabled
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100 disabled:text-slate-400"
+                        )
+
+                            option(value="")
+                                | Seleccione una fecha
+
+
+                // =========================================
+                // MOTIVO
+                // =========================================
+
+                div(class="mt-5")
+
+                    label(
+                        for="reprogramarMotivo"
+                        class="block text-sm font-semibold text-slate-700 mb-2"
+                    )
+                        | Motivo de reprogramación
+
+                    textarea(
+                        id="reprogramarMotivo"
+                        rows="3"
+                        required
+                        maxlength="500"
+                        placeholder="Ingrese el motivo de la reprogramación..."
+                        class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    )
+
+
+                // =========================================
+                // ERROR
+                // =========================================
+
+                div(
+                    id="errorReprogramarCita"
+                    class="hidden mt-5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3"
+                )
+
+                    div(class="flex items-start gap-3")
+
+                        i(class="fa-solid fa-circle-exclamation mt-1")
+
+                        div
+
+                            p(class="font-semibold")
+                                | No se puede reprogramar la cita
+
+                            p(
+                                id="mensajeErrorReprogramarCita"
+                                class="text-sm mt-1"
+                            )
+
+
+                // =========================================
+                // ÉXITO
+                // =========================================
+
+                div(
+                    id="exitoReprogramarCita"
+                    class="hidden mt-5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3"
+                )
+
+                    i(class="fa-solid fa-circle-check mr-2")
+
+                    | La cita puede ser reprogramada.
+
+
+                // =========================================
+                // BOTONES
+                // =========================================
+
+                div(
+                    class="flex justify-end gap-3 mt-6"
+                )
+
+                    button(
+                        type="button"
+                        id="btnCancelarReprogramarCita"
+                        class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition"
+                    )
+                        | Cancelar
+
+                    button(
+                        type="submit"
+                        id="btnGuardarReprogramarCita"
+                        class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition"
+                    )
+
+                        i(class="fa-solid fa-calendar-check mr-2")
+
+                        | Reprogramar Cita

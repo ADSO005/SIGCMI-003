@@ -17,7 +17,11 @@ import {
 import {
     mostrarFormularioNuevaCita,
     obtenerHorasDisponibles,
-    crearNuevaCita
+    crearNuevaCita,
+    listarCitas,
+    obtenerCita,
+    reprogramarCita,
+    cancelarCita
 } from "../../controllers/admin/citasController.js";
 
 //APARTADO CREAR UN PACIENTE
@@ -211,6 +215,13 @@ router.delete(
 // ===============================
 // CITAS
 // ===============================
+router.get(
+    "/citas",
+    auth,
+    role(1),
+    listarCitas
+);
+
 
 router.get(
     "/citas/nueva",
@@ -233,4 +244,24 @@ router.post(
     crearNuevaCita
 );
 
+router.get(
+    "/citas/:id",
+    auth,
+    role(1),
+    obtenerCita
+);
+
+router.put(
+    "/citas/:id/reprogramar",
+    auth,
+    role(1),
+    reprogramarCita
+);
+
+router.put(
+    "/citas/:id/cancelar",
+    auth,
+    role(1),
+    cancelarCita
+);
 export default router;
