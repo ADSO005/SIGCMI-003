@@ -1,0 +1,310 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
+        title SIGCMI - Gestión de Citas
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-slate-100 text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            // SIDEBAR
+            include ../components/sidebar.pug
+
+            // CONTENIDO PRINCIPAL
+            main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
+
+                // ENCABEZADO
+                div(class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6")
+
+                    div
+                        h1(class="text-2xl md:text-3xl font-bold text-slate-800")
+                            | Gestión de Citas
+
+                        p(class="text-slate-500 mt-1")
+                            | Administra y consulta las citas médicas registradas.
+
+                    button(
+                        type="button"
+                        class="btnNuevaCita inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+                    )
+                        i(class="fa-solid fa-plus")
+                        | Nueva cita
+
+                // FILTROS
+                div(class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6")
+
+                    div(class="flex flex-col lg:flex-row gap-4")
+
+                        // BUSCAR
+                        div(class="flex-1")
+
+                            label(
+                                for="buscarCita"
+                                class="block text-sm font-medium text-slate-700 mb-2"
+                            )
+                                | Buscar
+
+                            div(class="relative")
+
+                                i(
+                                    class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                                )
+
+                                input(
+                                    type="text"
+                                    id="buscarCita"
+                                    placeholder="Paciente, médico o documento..."
+                                    class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                )
+
+                        // ESTADO
+                        div(class="w-full lg:w-56")
+
+                            label(
+                                for="filtroEstado"
+                                class="block text-sm font-medium text-slate-700 mb-2"
+                            )
+                                | Estado
+
+                            select(
+                                id="filtroEstado"
+                                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            )
+
+                                option(value="")
+                                    | Todos
+
+                                each estado in ["Pendiente", "En curso", "Completada", "Cancelada"]
+                                    option(value=estado)
+                                        = estado
+
+                        // FECHA
+                        div(class="w-full lg:w-56")
+
+                            label(
+                                for="filtroFecha"
+                                class="block text-sm font-medium text-slate-700 mb-2"
+                            )
+                                | Fecha
+
+                            input(
+                                type="date"
+                                id="filtroFecha"
+                                class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            )
+
+                // TABLA
+                div(class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden")
+
+                    div(class="overflow-x-auto")
+
+                        table(
+                            class="w-full text-sm"
+                            id="tablaCitas"
+                        )
+
+                            thead(class="bg-slate-50 border-b border-slate-200")
+
+                                tr
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600")
+                                        | Cita
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600")
+                                        | Paciente
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600")
+                                        | Médico
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600")
+                                        | Especialidad
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600")
+                                        | Fecha
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600")
+                                        | Hora
+
+                                    th(class="px-5 py-4 text-left font-semibold text-slate-600")
+                                        | Estado
+
+                                    th(class="px-5 py-4 text-center font-semibold text-slate-600")
+                                        | Acciones
+
+                            tbody(class="divide-y divide-slate-100")
+
+                                if citas && citas.length > 0
+
+                                    each cita in citas
+
+                                        - const paciente = cita.Paciente || null
+                                        - const pacienteUsuario = paciente ? paciente.Usuario : null
+                                        - const medico = cita.Medico || null
+                                        - const medicoUsuario = medico ? medico.Usuario : null
+                                        - const especialidad = medico ? medico.Especialidad : null
+                                        - const estadoCita = cita.Estado || null
+
+                                        - const nombrePaciente = pacienteUsuario ? pacienteUsuario.nombres : ""
+                                        - const apellidoPaciente = pacienteUsuario ? pacienteUsuario.apellidos : ""
+                                        - const documentoPaciente = pacienteUsuario ? pacienteUsuario.numero_documento : ""
+                                        - const nombreMedico = medicoUsuario ? medicoUsuario.nombres : ""
+                                        - const apellidoMedico = medicoUsuario ? medicoUsuario.apellidos : ""
+                                        - const nombreEspecialidad = especialidad ? especialidad.nombre : "Sin especialidad"
+                                        - const nombreEstado = estadoCita ? estadoCita.nombre : "Sin estado"
+
+                                        tr(
+                                            class="hover:bg-slate-50 transition"
+                                            data-paciente=`${nombrePaciente} ${apellidoPaciente}`
+                                            data-medico=`${nombreMedico} ${apellidoMedico}`
+                                            data-documento=documentoPaciente
+                                            data-estado=nombreEstado
+                                            data-fecha=cita.fecha
+                                        )
+
+                                            // ID
+                                            td(class="px-5 py-4 font-semibold text-slate-700")
+                                                | #
+                                                = cita.id_cita
+
+                                            // PACIENTE
+                                            td(class="px-5 py-4")
+
+                                                p(class="font-semibold text-slate-800")
+                                                    = `${nombrePaciente} ${apellidoPaciente}`
+
+                                                p(class="text-xs text-slate-500 mt-1")
+                                                    | CC: 
+                                                    = documentoPaciente || "Sin documento"
+
+                                            // MÉDICO
+                                            td(class="px-5 py-4")
+
+                                                p(class="font-semibold text-slate-800")
+                                                    = `${nombrePaciente} ${apellidoPaciente}`
+
+                                            // ESPECIALIDAD
+                                            td(class="px-5 py-4")
+                                                span(class="text-slate-600")
+                                                    = nombreEspecialidad
+
+                                            // FECHA
+                                            td(class="px-5 py-4 text-slate-600")
+                                                = cita.fecha
+
+                                            // HORA
+                                            td(class="px-5 py-4 text-slate-600")
+                                                = String(cita.hora).substring(0, 5)
+
+                                            // ESTADO
+                                            td(class="px-5 py-4")
+
+                                                - const estado = cita.Estado?.nombre || "Sin estado"
+
+                                                if estado === "Pendiente"
+                                                    span(class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700")
+                                                        = estado
+
+                                                else if estado === "En curso"
+                                                    span(class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700")
+                                                        = estado
+
+                                                else if estado === "Completada"
+                                                    span(class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700")
+                                                        = estado
+
+                                                else if estado === "Cancelada"
+                                                    span(class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700")
+                                                        = estado
+
+                                                else
+                                                    span(class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600")
+                                                        = estado
+
+                                            // ACCIONES
+                                            td(class="px-4 py-4")
+                                                div(class="flex items-center gap-2")
+
+                                                    // =========================================
+                                                    // VER CITA
+                                                    // =========================================
+
+                                                    button(
+                                                        type="button"
+                                                        class="btnVerCita w-9 h-9 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+                                                        data-id=cita.id_cita
+                                                        title="Ver cita"
+                                                    )
+                                                        i(class="fa-solid fa-eye")
+
+
+                                                    // =========================================
+                                                    // REPROGRAMAR
+                                                    // Solo citas Pendientes
+                                                    // =========================================
+
+                                                    if nombreEstado === "Pendiente"
+
+                                                        button(
+                                                            type="button"
+                                                            class="btnReprogramarCita w-9 h-9 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                                            data-id=cita.id_cita
+                                                            title="Reprogramar cita"
+                                                        )
+                                                            i(class="fa-solid fa-calendar-days")
+
+
+                                                    // =========================================
+                                                    // CANCELAR
+                                                    // Solo citas Pendientes
+                                                    // =========================================
+
+                                                    if nombreEstado === "Pendiente"
+
+                                                        button(
+                                                            type="button"
+                                                            class="btnCancelarCita w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition"
+                                                            data-id=cita.id_cita
+                                                            title="Cancelar cita"
+                                                        )
+                                                            i(class="fa-solid fa-calendar-xmark")
+                                                    
+
+
+                                else
+
+                                    tr
+
+                                        td(
+                                            colspan="8"
+                                            class="px-5 py-12 text-center"
+                                        )
+
+                                            div(class="text-slate-400")
+
+                                                i(class="fa-regular fa-calendar-xmark text-4xl mb-3")
+
+                                                p(class="font-semibold text-lg")
+                                                    | No hay citas registradas
+
+                                                p(class="text-sm mt-1")
+                                                    | Cuando se registren citas aparecerán aquí.
+
+            include ../components/modals/nuevaCita.pug
+            include ../components/modals/verCita.pug
+            include ../components/modals/reprogramarCita.pug
+            include ../components/modals/cancelarCita.pug
+
+            script(src="/admin/js/toggleSidebar.js")
+            script(src="/admin/js/citas.js")
+            script(src="/admin/js/modals/nuevaCita.js")
+            

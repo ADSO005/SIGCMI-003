@@ -1,0 +1,354 @@
+// ==========================================
+// MODAL - VER CITA
+// ==========================================
+
+div(
+    id="modalVerCita"
+    class="hidden fixed inset-0 z-[100] items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4"
+)
+
+    div(
+        class="relative w-full max-w-3xl max-h-[88vh] overflow-hidden bg-white rounded-3xl shadow-2xl"
+    )
+
+        // ======================================
+        // HEADER
+        // ======================================
+
+        div(
+            class="relative overflow-hidden bg-blue-600 px-6 md:px-7 py-5 text-white"
+        )
+
+            // Decoración
+            div(
+                class="absolute -top-16 -right-16 w-44 h-44 bg-white/10 rounded-full"
+            )
+
+            div(
+                class="absolute -bottom-20 -left-12 w-40 h-40 bg-white/5 rounded-full"
+            )
+
+            div(
+                class="relative flex items-start justify-between gap-4"
+            )
+
+                div(
+                    class="flex items-center gap-4"
+                )
+
+                    // Icono
+                    div(
+                        class="w-14 h-14 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center shrink-0"
+                    )
+                        i(
+                            class="fa-solid fa-calendar-check text-2xl text-white"
+                        )
+
+                    div
+
+                        p(
+                            class="text-blue-100 text-xs font-semibold uppercase tracking-wider"
+                        ) Detalle de la cita
+
+                        h2(
+                            id="detalleCitaId"
+                            class="text-xl md:text-2xl font-bold tracking-tight"
+                        ) Cita #-
+
+                        p(
+                            class="text-blue-100 text-sm mt-1"
+                        ) Información completa de la cita médica
+
+                // Botón cerrar
+                button(
+                    type="button"
+                    id="btnCerrarVerCita"
+                    class="relative w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition"
+                    title="Cerrar"
+                )
+                    i(class="fa-solid fa-xmark text-lg")
+
+
+        // ======================================
+        // CONTENIDO
+        // ======================================
+
+        div(
+            class="overflow-y-auto max-h-[calc(88vh-145px)] p-5 md:p-6 bg-slate-50"
+        )
+
+            // ==================================
+            // ESTADO + FECHA + HORA
+            // ==================================
+
+            div(
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5"
+            )
+
+                // Estado
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"
+                )
+
+                    div(
+                        class="flex items-center gap-3 mb-2"
+                    )
+
+                        div(
+                            class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-circle-info")
+
+                        p(
+                            class="text-xs text-slate-400 uppercase tracking-wide font-semibold"
+                        ) Estado
+
+                    p(
+                        id="detalleEstado"
+                        class="text-base font-bold text-slate-900"
+                    ) -
+
+                // Fecha
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"
+                )
+
+                    div(
+                        class="flex items-center gap-3 mb-2"
+                    )
+
+                        div(
+                            class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-calendar-days")
+
+                        p(
+                            class="text-xs text-slate-400 uppercase tracking-wide font-semibold"
+                        ) Fecha
+
+                    p(
+                        id="detalleFecha"
+                        class="text-base font-bold text-slate-900"
+                    ) -
+
+                // Hora
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm"
+                )
+
+                    div(
+                        class="flex items-center gap-3 mb-2"
+                    )
+
+                        div(
+                            class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-clock")
+
+                        p(
+                            class="text-xs text-slate-400 uppercase tracking-wide font-semibold"
+                        ) Hora
+
+                    p(
+                        id="detalleHora"
+                        class="text-base font-bold text-slate-900"
+                    ) -
+
+
+            // ==================================
+            // PACIENTE
+            // ==================================
+
+            div(
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-5 overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 border-b border-slate-100 flex items-center gap-3"
+                )
+
+                    div(
+                        class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                    )
+                        i(class="fa-solid fa-user")
+
+                    div
+                        h3(
+                            class="font-bold text-slate-900"
+                        ) Información del paciente
+
+                        p(
+                            class="text-xs text-slate-500 mt-0.5"
+                        ) Datos de identificación y contacto
+
+                div(
+                    class="p-5"
+                )
+
+                    // Nombre y documento
+                    div(
+                        class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5"
+                    )
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Paciente
+
+                            p(
+                                id="detallePaciente"
+                                class="text-base font-bold text-slate-900"
+                            ) -
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Documento
+
+                            p(
+                                id="detalleDocumento"
+                                class="text-sm font-medium text-slate-800"
+                            ) -
+
+                    // Contacto
+                    div(
+                        class="grid grid-cols-1 md:grid-cols-2 gap-5"
+                    )
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Teléfono
+
+                            p(
+                                id="detalleTelefonoPaciente"
+                                class="text-sm font-medium text-slate-800"
+                            ) -
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Correo electrónico
+
+                            p(
+                                id="detalleCorreoPaciente"
+                                class="text-sm font-medium text-slate-800 break-words"
+                            ) -
+
+
+            // ==================================
+            // MÉDICO
+            // ==================================
+
+            div(
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-5 overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 border-b border-slate-100 flex items-center gap-3"
+                )
+
+                    div(
+                        class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                    )
+                        i(class="fa-solid fa-user-doctor")
+
+                    div
+                        h3(
+                            class="font-bold text-slate-900"
+                        ) Información del médico
+
+                        p(
+                            class="text-xs text-slate-500 mt-0.5"
+                        ) Profesional asignado a la cita
+
+                div(
+                    class="p-5"
+                )
+
+                    // Médico y especialidad
+                    div(
+                        class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5"
+                    )
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Médico
+
+                            p(
+                                id="detalleMedico"
+                                class="text-base font-bold text-slate-900"
+                            ) -
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Especialidad
+
+                            p(
+                                id="detalleEspecialidad"
+                                class="text-sm font-medium text-slate-800"
+                            ) -
+
+                    // Contacto
+                    div(
+                        class="grid grid-cols-1 md:grid-cols-2 gap-5"
+                    )
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Teléfono
+
+                            p(
+                                id="detalleTelefonoMedico"
+                                class="text-sm font-medium text-slate-800"
+                            ) -
+
+                        div
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                            ) Correo electrónico
+
+                            p(
+                                id="detalleCorreoMedico"
+                                class="text-sm font-medium text-slate-800 break-words"
+                            ) -
+
+
+            // ==================================
+            // MOTIVO DE CONSULTA
+            // ==================================
+
+            div(
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 border-b border-slate-100 flex items-center gap-3"
+                )
+
+                    div(
+                        class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                    )
+                        i(class="fa-solid fa-notes-medical")
+
+                    div
+                        h3(
+                            class="font-bold text-slate-900"
+                        ) Motivo de consulta
+
+                        p(
+                            class="text-xs text-slate-500 mt-0.5"
+                        ) Motivo registrado para la atención
+
+                div(
+                    class="p-5"
+                )
+
+                    p(
+                        id="detalleMotivo"
+                        class="text-sm text-slate-700 leading-relaxed whitespace-pre-line"
+                    ) Sin información
+

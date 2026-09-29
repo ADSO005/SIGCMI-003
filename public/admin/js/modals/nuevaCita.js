@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal =
         document.getElementById("modalNuevaCita");
 
-    const btnAbrir =
-        document.getElementById("btnNuevaCita");
+    const botonesNuevaCita =
+        document.querySelectorAll(".btnNuevaCita");
 
     const btnCerrar =
         document.getElementById("btnCerrarNuevaCita");
@@ -131,6 +131,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================================
+    // EVENTOS
+    // =====================================================
+
+    botonesNuevaCita.forEach((boton) => {
+        boton.addEventListener(
+            "click",
+            abrirModal
+        );
+    });
+
+
+    // =====================================================
     // CERRAR MODAL
     // =====================================================
 
@@ -148,11 +160,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     };
 
+    botonesNuevaCita.forEach((boton) => {
+        boton.addEventListener(
+            "click",
+            abrirModal
+        );
+    });
 
-    btnAbrir?.addEventListener(
-        "click",
-        abrirModal
-    );
+
 
 
     btnCerrar?.addEventListener(
