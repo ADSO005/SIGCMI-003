@@ -2,6 +2,8 @@ import Usuario from "../../models/Usuario.js";
 import Paciente from "../../models/Paciente.js";
 import Especialidad from "../../models/Especialidad.js";
 import Medico from "../../models/Medico.js";
+import Horario from "../../models/Horario.js";
+import Cita from "../../models/Cita.js";
 
 const sesiones = new Map();
 
@@ -384,6 +386,335 @@ Escribe el número del médico.`
             };
         }
     }
+
+
+
+    // ==========================================
+    // SELECCION MEDICO
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_MEDICO") {
+
+        const opcion = parseInt(mensajeNormalizado);
+
+        if (
+            isNaN(opcion) ||
+            opcion < 1 ||
+            opcion > sesion.medicos.length
+        ) {
+            return {
+                mensaje: `⚠️ Opción no válida.
+
+Por favor, selecciona uno de los médicos disponibles.`
+            };
+        }
+
+        const medicoSeleccionado = sesion.medicos[opcion - 1];
+
+        sesion.medicoId = medicoSeleccionado.id_medico;
+
+        sesion.medicoNombre =
+            `${medicoSeleccionado.Usuario.nombres} ${medicoSeleccionado.Usuario.apellidos}`;
+
+        sesion.estado = "ESPERANDO_FECHA";
+
+        return {
+            mensaje: `✅ Médico seleccionado:
+
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+
+Ahora ingresa la fecha en la que deseas tu cita.
+
+📅 Formato:
+
+DD/MM/AAAA
+
+Ejemplo:
+30/09/2026`
+        };
+    }
+
+
+    // ==========================================
+    // ESPERANDO FECHA
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_MEDICO") {
+
+        const opcion = parseInt(mensajeNormalizado);
+
+        if (
+            isNaN(opcion) ||
+            opcion < 1 ||
+            opcion > sesion.medicos.length
+        ) {
+            return {
+                mensaje: `⚠️ Opción no válida.
+
+Por favor, selecciona uno de los médicos disponibles.`
+            };
+        }
+
+        const medicoSeleccionado = sesion.medicos[opcion - 1];
+
+        sesion.medicoId = medicoSeleccionado.id_medico;
+
+        sesion.medicoNombre =
+            `${medicoSeleccionado.Usuario.nombres} ${medicoSeleccionado.Usuario.apellidos}`;
+
+        sesion.estado = "ESPERANDO_FECHA";
+
+        return {
+            mensaje: `✅ Médico seleccionado:
+
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+
+Ahora ingresa la fecha en la que deseas tu cita.
+
+📅 Formato:
+
+DD/MM/AAAA
+
+Ejemplo:
+30/09/2026`
+        };
+    }
+
+
+    // ==========================================
+    // ESPERANDO FECHA
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_FECHA") {
+
+        const fechaIngresada = mensaje.trim();
+
+        const formatoFecha = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const resultado = fechaIngresada.match(formatoFecha);
+
+        if (!resultado) {
+            return {
+                mensaje: `⚠️ El formato de fecha no es válido.
+
+Por favor utiliza:
+
+DD/MM/AAAA
+
+Ejemplo:
+30/09/2026`
+            };
+        }
+
+        const dia = parseInt(resultado[1]);
+        const mes = parseInt(resultado[2]);
+        const anio = parseInt(resultado[3]);
+
+        const fecha = new Date(anio, mes - 1, dia);
+
+        if (
+            fecha.getFullYear() !== anio ||
+            fecha.getMonth() !== mes - 1 ||
+            fecha.getDate() !== dia
+        ) {
+            return {
+                mensaje: `⚠️ La fecha ingresada no existe.
+
+Por favor ingresa una fecha válida.`
+            };
+        }
+
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        if (fecha < hoy) {
+            return {
+                mensaje: `⚠️ No puedes seleccionar una fecha anterior a hoy.
+
+Por favor ingresa una fecha futura.`
+            };
+        }
+
+        const fechaSQL =
+            `${anio}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+
+        sesion.fecha = fechaSQL;
+
+        try {
+
+            const fechaConsulta =
+                new Date(`${sesion.fecha}T00:00:00`);
+
+            const diasSemana = [
+                "Domingo",
+                "Lunes",
+                "Martes",
+                "Miercoles",
+                "Jueves",
+                "Viernes",
+                "Sabado"
+            ];
+
+            const diaSemana = diasSemana[fechaConsulta.getDay()];
+
+            // ==========================================
+            // BUSCAR HORARIO DEL MÉDICO
+            // ==========================================
+
+            const horario = await Horario.findOne({
+                where: {
+                    medico_id: sesion.medicoId,
+                    dia_semana: diaSemana,
+                    estado: "Aprobado"
+                }
+            });
+
+            if (!horario) {
+
+                sesion.estado = "ESPERANDO_FECHA";
+
+                return {
+                    mensaje: `❌ El Dr. ${sesion.medicoNombre} no tiene horario de atención para el ${diaSemana}.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            // ==========================================
+            // VALIDAR VIGENCIA DEL HORARIO
+            // ==========================================
+
+            if (
+                horario.fecha_inicio &&
+                sesion.fecha < horario.fecha_inicio
+            ) {
+                sesion.estado = "ESPERANDO_FECHA";
+
+                return {
+                    mensaje: `❌ El horario del médico todavía no está vigente para esa fecha.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            if (
+                horario.fecha_fin &&
+                sesion.fecha > horario.fecha_fin
+            ) {
+                sesion.estado = "ESPERANDO_FECHA";
+
+                return {
+                    mensaje: `❌ El horario del médico ya no está vigente para esa fecha.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            // ==========================================
+            // BUSCAR CITAS OCUPADAS
+            // ==========================================
+
+            const citasExistentes = await Cita.findAll({
+                where: {
+                    medico_id: sesion.medicoId,
+                    fecha: sesion.fecha
+                }
+            });
+
+            const horasOcupadas = citasExistentes.map(
+                cita => cita.hora.substring(0, 5)
+            );
+
+            // ==========================================
+            // GENERAR HORARIOS DE 30 MINUTOS
+            // ==========================================
+
+            const horariosDisponibles = [];
+
+            let horaActual = horario.hora_inicio;
+            const horaFin = horario.hora_fin;
+
+            while (horaActual < horaFin) {
+
+                const horaFormateada =
+                    horaActual.substring(0, 5);
+
+                if (!horasOcupadas.includes(horaFormateada)) {
+                    horariosDisponibles.push(horaFormateada);
+                }
+
+                const [horas, minutos] = horaActual
+                    .split(":")
+                    .map(Number);
+
+                const minutosTotales =
+                    horas * 60 + minutos + 30;
+
+                const nuevaHora =
+                    Math.floor(minutosTotales / 60);
+
+                const nuevosMinutos =
+                    minutosTotales % 60;
+
+                horaActual =
+                    `${String(nuevaHora).padStart(2, "0")}:${String(nuevosMinutos).padStart(2, "0")}:00`;
+            }
+
+            // ==========================================
+            // NO HAY HORARIOS
+            // ==========================================
+
+            if (horariosDisponibles.length === 0) {
+
+                sesion.estado = "ESPERANDO_FECHA";
+
+                return {
+                    mensaje: `❌ No hay horarios disponibles para el ${fechaIngresada}.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            // ==========================================
+            // MOSTRAR HORARIOS
+            // ==========================================
+
+            const listaHorarios = horariosDisponibles
+                .map((hora) => {
+                    return `🕐 ${hora}`;
+                })
+                .join("\n");
+
+            sesion.horariosDisponibles = horariosDisponibles;
+            sesion.estado = "ESPERANDO_HORA";
+
+            return {
+                mensaje: `📅 Fecha: ${fechaIngresada}
+
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+
+Horarios disponibles:
+
+${listaHorarios}
+
+Escribe la hora que prefieres.
+
+Ejemplo: 08:30`
+            };
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error consultando horarios:",
+                error
+            );
+
+            return {
+                mensaje: "❌ Ocurrió un error consultando los horarios disponibles."
+            };
+        }
+    }
+
+
     // ==========================================
     // MENSAJE NO RECONOCIDO
     // ==========================================
