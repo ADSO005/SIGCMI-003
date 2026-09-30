@@ -1,20 +1,13 @@
 import Usuario from "../../models/Usuario.js";
 import Paciente from "../../models/Paciente.js";
-import RegistroPendiente from "../../models/RegistroPendiente.js";
-
 import db from "../../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
 import generateJWT from "../../helpers/generateJWT.js";
 import generateToken from "../../helpers/generateToken.js";
+import sendRecoveryEmail from "../../services/emailService.js";
 import generateOTP from "../../helpers/generateOTP.js";
 import generateResetToken from "../../helpers/generateResetToken.js";
-
-import {
-    sendRecoveryEmail,
-    sendConfirmationEmail
-} from "../../services/emailService.js";
 
 /* ruta de la vista principal inicio de sesion */
 const formLogin = (req, res) => {
@@ -224,85 +217,54 @@ const register = async (req, res) => {
         );
 
 
+        const transaction = await db.transaction();
+
+        try {
+            const usuario = await Usuario.create(
+                {
+                    rol_id: 3,
+                    nombres,
+                    apellidos,
+                    correo: email,
+                    telefono,
+                    tipo_documento: tipoDocumento,
+                    numero_documento: numeroDocumento,
+                    password: passwordHash,
+                    confirmado: true,
+                    estado: true
+                },
+                { transaction }
+            );
+
+            await Paciente.create(
+                {
+                    usuario_id: usuario.id_usuario,
+                    fecha_nacimiento: fechaNacimiento || null,
+                    departamento: departamento || null,
+                    ciudad: ciudad || null
+                },
+                { transaction }
+            );
+
+            await transaction.commit();
+
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+
+
         // ===============================
-        // GENERAR TOKEN
+        // REGRESAR AL LOGIN
         // ===============================
 
-        const token = generateToken();
+        return res.render("login/auth/login", {
 
+            titulo: "Iniciar Sesión",
 
-        // ===============================
-        // EXPIRACIÓN DEL TOKEN
-        // ===============================
-
-        const expiracion = new Date();
-
-        expiracion.setMinutes(
-            expiracion.getMinutes() + 15
-        );
-
-
-        // ===============================
-        // CREAR REGISTRO PENDIENTE
-        // ===============================
-
-        const registro = await RegistroPendiente.create({
-
-            nombres,
-
-            apellidos,
-
-            correo: email,
-
-            telefono,
-
-            fecha_nacimiento:
-                fechaNacimiento || null,
-
-            tipo_documento:
-                tipoDocumento,
-
-            numero_documento:
-                numeroDocumento,
-
-            departamento:
-                departamento || null,
-
-            ciudad:
-                ciudad || null,
-
-            password:
-                passwordHash,
-
-            token,
-
-            token_expira:
-                expiracion
+            mensaje: "Cuenta creada correctamente. Ahora puedes iniciar sesión."
 
         });
-
-
-        // ===============================
-        // ENVIAR CORREO
-        // ===============================
-
-        await sendConfirmationEmail(registro);
-
-
-        // ===============================
-        // INFORMAR AL USUARIO
-        // ===============================
-
-        return res.render(
-            "login/auth/register",
-            {
-                titulo: "Crear Cuenta",
-
-                mensaje:
-                    "Hemos enviado un correo de confirmación. Revisa tu bandeja de entrada para activar tu cuenta."
-            }
-        );
-
 
 
     } catch (error) {
@@ -322,85 +284,6 @@ const register = async (req, res) => {
 
     }
 
-};
-
-/* confirmer register */
-const confirmRegister = async (req, res) => {
-    try {
-        const { token } = req.params;
-
-        const registro = await RegistroPendiente.findOne({
-            where: { token }
-        });
-
-        if (!registro) {
-            return res.render("login/auth/confirmation", {
-                titulo: "Confirmación de cuenta",
-                error: "El enlace de confirmación no es válido."
-            });
-        }
-
-        if (registro.token_expira < new Date()) {
-            await registro.destroy();
-
-            return res.render("login/auth/confirmation", {
-                titulo: "Confirmación de cuenta",
-                error: "El enlace de confirmación ha expirado. Debes realizar el registro nuevamente."
-            });
-        }
-
-        const transaction = await db.transaction();
-
-        try {
-            const usuario = await Usuario.create(
-                {
-                    rol_id: 3,
-                    nombres: registro.nombres,
-                    apellidos: registro.apellidos,
-                    correo: registro.correo,
-                    telefono: registro.telefono,
-                    tipo_documento: registro.tipo_documento,
-                    numero_documento: registro.numero_documento,
-                    password: registro.password,
-                    confirmado: true,
-                    estado: true
-                },
-                { transaction }
-            );
-
-            await Paciente.create(
-                {
-                    usuario_id: usuario.id_usuario,
-                    fecha_nacimiento: registro.fecha_nacimiento,
-                    departamento: registro.departamento,
-                    ciudad: registro.ciudad
-                },
-                { transaction }
-            );
-
-            await registro.destroy({ transaction });
-
-            await transaction.commit();
-
-        } catch (error) {
-            await transaction.rollback();
-            throw error;
-        }
-
-        return res.render("login/auth/login", {
-            titulo: "Iniciar Sesión",
-            mensaje: "¡Cuenta confirmada correctamente! Ya puedes iniciar sesión."
-        });
-
-    } catch (error) {
-        console.error("❌ Error al confirmar registro:");
-        console.error(error);
-
-        return res.render("login/auth/confirmation", {
-            titulo: "Confirmación de cuenta",
-            error: "No fue posible confirmar la cuenta."
-        });
-    }
 };
 
 /* ruta vista olvide mi contraseña */
@@ -621,7 +504,6 @@ export {
     logout,
     formRegister,
     register,
-    confirmRegister,
     formRecoverPassword,
     recoverPassword,
     formVerifyOTP,
