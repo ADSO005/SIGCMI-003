@@ -6,6 +6,7 @@ import {
     logout,
     formRegister,
     register,
+    confirmRegister,
     formRecoverPassword,
     recoverPassword,
     formVerifyOTP,
@@ -29,6 +30,7 @@ router.post("/login", login);
 
 router.get("/register", formRegister);
 router.post("/register", register);
+router.get("/confirm-register/:token", confirmRegister);
 
 // ===============================
 // Cerrar sesión
