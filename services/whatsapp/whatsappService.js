@@ -4,6 +4,7 @@ import Especialidad from "../../models/Especialidad.js";
 import Medico from "../../models/Medico.js";
 import Horario from "../../models/Horario.js";
 import Cita from "../../models/Cita.js";
+import EstadoCita from "../../models/EstadoCita.js";
 
 const sesiones = new Map();
 
@@ -40,6 +41,9 @@ export const procesarMensaje = async (telefono, mensaje) => {
             mensajeNormalizado.includes("buenas noches")
         )
     ) {
+
+        sesion.estado = "ESPERANDO_OPCION";
+
         return {
             mensaje: `¡Hola! 👋 Bienvenido al asistente virtual de SIGCMI.
 
@@ -53,8 +57,80 @@ export const procesarMensaje = async (telefono, mensaje) => {
     }
 
     // ==========================================
+    // ESPERANDO OPCIÓN DEL MENÚ
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_OPCION") {
+
+        // Solicitar cita
+        if (mensajeNormalizado === "1") {
+
+            sesion.estado = "ESPERANDO_DOCUMENTO";
+
+            return {
+                mensaje: `Claro que sí. 📅
+
+Para solicitar una cita necesito validar tu identidad.
+
+Por favor, ingresa tu número de documento.`
+            };
+        }
+
+        // Consultar citas
+        if (mensajeNormalizado === "2") {
+
+            sesion.estado = "ESPERANDO_DOCUMENTO";
+            sesion.accionPendiente = "CONSULTAR_CITAS";
+
+            return {
+                mensaje: `Para consultar tus citas necesito validar tu identidad.
+
+Por favor, ingresa tu número de documento.`
+            };
+        }
+
+        // Cancelar cita
+        if (mensajeNormalizado === "3") {
+
+            sesion.estado = "ESPERANDO_DOCUMENTO";
+            sesion.accionPendiente = "CANCELAR_CITA";
+
+            return {
+                mensaje: `Para cancelar una cita necesito validar tu identidad.
+
+Por favor, ingresa tu número de documento.`
+            };
+        }
+
+        // Reprogramar cita
+        if (mensajeNormalizado === "4") {
+
+            sesion.estado = "ESPERANDO_DOCUMENTO";
+            sesion.accionPendiente = "REPROGRAMAR_CITA";
+
+            return {
+                mensaje: `Para reprogramar una cita necesito validar tu identidad.
+
+Por favor, ingresa tu número de documento.`
+            };
+        }
+
+        return {
+            mensaje: `⚠️ Opción no válida.
+
+Por favor selecciona una opción:
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+        };
+    }
+    // ==========================================
     // SOLICITAR CITA
     // ==========================================
+
+
 
     if (
         sesion.estado === "INICIO" &&
@@ -169,6 +245,10 @@ No necesitas ingresar al portal web para solicitar tu cita.
 
     if (sesion.estado === "PACIENTE_VALIDADO") {
 
+        // ==========================================
+        // PEDIR MI CITA
+        // ==========================================
+
         if (mensajeNormalizado === "1") {
 
             try {
@@ -215,19 +295,187 @@ Escribe el número de la especialidad.`
             }
         }
 
-        if (mensajeNormalizado === "2") {
-            return {
-                mensaje: `📋 Consulta de citas.
 
-Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
+        // ==========================================
+        // CONSULTAR MIS CITAS PENDIENTES
+        // ==========================================
+
+        if (mensajeNormalizado === "2") {
+
+            const citas = await Cita.findAll({
+                where: {
+                    paciente_id: sesion.pacienteId,
+                    estado_id: 1
+                },
+                include: [
+                    {
+                        model: Medico,
+                        required: true,
+                        include: [
+                            {
+                                model: Usuario,
+                                attributes: ["nombres", "apellidos"],
+                                required: true
+                            },
+                            {
+                                model: Especialidad,
+                                attributes: ["nombre"],
+                                required: true
+                            }
+                        ]
+                    },
+                    {
+                        model: EstadoCita,
+                        as: "Estado",
+                        attributes: ["nombre"],
+                        required: true
+                    }
+                ],
+                order: [
+                    ["fecha", "ASC"],
+                    ["hora", "ASC"]
+                ]
+            });
+
+            if (citas.length === 0) {
+
+                return {
+                    mensaje: `📋 No tienes citas pendientes actualmente.
+
+¿Qué deseas hacer?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+                };
+            }
+
+            const listaCitas = citas.map((cita) => {
+
+                const nombreMedico =
+                    `${cita.Medico.Usuario.nombres} ${cita.Medico.Usuario.apellidos}`;
+
+                const especialidad =
+                    cita.Medico.Especialidad.nombre;
+
+                const fecha = String(cita.fecha)
+                    .split("-")
+                    .reverse()
+                    .join("/");
+
+                const hora =
+                    String(cita.hora).substring(0, 5)
+
+                return `📌 Cita #${cita.id_cita}
+
+🏥 ${especialidad}
+👨‍⚕️ Dr. ${nombreMedico}
+📅 ${fecha}
+🕐 ${hora}
+📊 Estado: ${cita.Estado.nombre}`;
+            }).join("\n\n");
+
+            return {
+                mensaje: `📋 Tus citas pendientes
+
+${listaCitas}
+
+¿Qué deseas hacer ahora?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
             };
         }
 
-        if (mensajeNormalizado === "3") {
-            return {
-                mensaje: `❌ Cancelación de citas.
+        // ==========================================
+        // CANCELAR UNA CITA
+        // ==========================================
 
-Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
+        if (mensajeNormalizado === "3") {
+
+            const citas = await Cita.findAll({
+                where: {
+                    paciente_id: sesion.pacienteId,
+                    estado_id: 1
+                },
+                include: [
+                    {
+                        model: Medico,
+                        required: true,
+                        include: [
+                            {
+                                model: Usuario,
+                                attributes: ["nombres", "apellidos"],
+                                required: true
+                            },
+                            {
+                                model: Especialidad,
+                                attributes: ["nombre"],
+                                required: true
+                            }
+                        ]
+                    }
+                ],
+                order: [
+                    ["fecha", "ASC"],
+                    ["hora", "ASC"]
+                ]
+            });
+
+            if (citas.length === 0) {
+
+                return {
+                    mensaje: `❌ No tienes citas pendientes para cancelar.
+
+¿Qué deseas hacer?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+                };
+            }
+
+            const listaCitas = citas.map((cita, index) => {
+
+                const nombreMedico =
+                    `${cita.Medico.Usuario.nombres} ${cita.Medico.Usuario.apellidos}`;
+
+                const especialidad =
+                    cita.Medico.Especialidad.nombre;
+
+                const fecha = String(cita.fecha)
+                    .split("-")
+                    .reverse()
+                    .join("/");
+
+                const hora = String(cita.hora).substring(0, 5);
+
+                return `${index + 1}️⃣ Cita #${cita.id_cita}
+
+🏥 ${especialidad}
+👨‍⚕️ Dr. ${nombreMedico}
+📅 ${fecha}
+🕐 ${hora}`;
+            }).join("\n\n");
+
+            sesion.citasPendientes = citas;
+            sesion.estado = "ESPERANDO_CITA_CANCELAR";
+
+            return {
+                mensaje: `❌ Cancelar cita
+
+Estas son tus citas pendientes:
+
+${listaCitas}
+
+Escribe el número de la cita que deseas cancelar.
+
+Ejemplo:
+1`
             };
         }
 
@@ -238,6 +486,9 @@ Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
 Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
             };
         }
+
+
+
 
         return {
             mensaje: `Por favor, selecciona una opción:
@@ -299,6 +550,170 @@ Escribe el número de la especialidad.`
         }
     }
 
+
+    // ==========================================
+    // SELECCIONAR CITA PARA CANCELAR
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_CITA_CANCELAR") {
+
+        const opcion = parseInt(mensajeNormalizado);
+
+        if (
+            isNaN(opcion) ||
+            opcion < 1 ||
+            opcion > sesion.citasPendientes.length
+        ) {
+            return {
+                mensaje: `⚠️ Opción no válida.
+
+Por favor selecciona una de las citas mostradas anteriormente.
+
+Ejemplo:
+1`
+            };
+        }
+
+        const citaSeleccionada =
+            sesion.citasPendientes[opcion - 1];
+
+        sesion.citaCancelarId = citaSeleccionada.id_cita;
+
+        const nombreMedico =
+            `${citaSeleccionada.Medico.Usuario.nombres} ${citaSeleccionada.Medico.Usuario.apellidos}`;
+
+        const especialidad =
+            citaSeleccionada.Medico.Especialidad.nombre;
+
+        const fecha = String(citaSeleccionada.fecha)
+            .split("-")
+            .reverse()
+            .join("/");
+
+        const hora =
+            String(citaSeleccionada.hora).substring(0, 5);
+
+        sesion.estado = "CONFIRMANDO_CANCELACION";
+
+        return {
+            mensaje: `⚠️ Confirmar cancelación
+
+📋 Datos de la cita:
+
+🆔 Cita #${citaSeleccionada.id_cita}
+🏥 ${especialidad}
+👨‍⚕️ Dr. ${nombreMedico}
+📅 ${fecha}
+🕐 ${hora}
+
+¿Estás seguro de que deseas cancelar esta cita?
+
+1️⃣ Sí, cancelar
+2️⃣ No, conservar cita`
+        };
+    }
+
+    // ==========================================
+    // CONFIRMANDO CANCELACIÓN
+    // ==========================================
+
+    if (sesion.estado === "CONFIRMANDO_CANCELACION") {
+
+        // ==========================================
+        // CONFIRMAR CANCELACIÓN
+        // ==========================================
+
+        if (mensajeNormalizado === "1") {
+
+            const cita = await Cita.findOne({
+                where: {
+                    id_cita: sesion.citaCancelarId,
+                    paciente_id: sesion.pacienteId,
+                    estado_id: 1
+                }
+            });
+
+            // Verificar que la cita todavía exista y esté pendiente
+            if (!cita) {
+
+                sesion.estado = "PACIENTE_VALIDADO";
+
+                return {
+                    mensaje: `❌ La cita ya no está disponible para cancelar.
+
+Puede que haya sido cancelada o modificada anteriormente.
+
+¿Qué deseas hacer ahora?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+                };
+            }
+
+            // Actualizar la cita
+            await cita.update({
+                estado_id: 4,
+                cancelado_por: sesion.usuarioId,
+                fecha_cancelacion: new Date()
+            });
+
+            sesion.estado = "PACIENTE_VALIDADO";
+
+            return {
+                mensaje: `✅ Cita cancelada correctamente.
+
+🆔 Cita #${cita.id_cita}
+
+La cita ha sido marcada como:
+
+📌 Estado: Cancelada
+
+¿Qué deseas hacer ahora?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+            };
+        }
+
+        // ==========================================
+        // NO CANCELAR
+        // ==========================================
+
+        if (mensajeNormalizado === "2") {
+
+            sesion.estado = "PACIENTE_VALIDADO";
+
+            return {
+                mensaje: `👍 La cita se conservará.
+
+No se realizó ningún cambio.
+
+¿Qué deseas hacer ahora?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+            };
+        }
+
+        // ==========================================
+        // OPCIÓN NO VÁLIDA
+        // ==========================================
+
+        return {
+            mensaje: `⚠️ Opción no válida.
+
+Por favor responde:
+
+1️⃣ Sí, cancelar
+2️⃣ No, conservar cita`
+        };
+    }
 
     // ==========================================
     // SELECCION ESPECIALIDAD
@@ -885,6 +1300,8 @@ Por favor responde:
 2️⃣ No, cancelar`
         };
     }
+
+
 
     // ==========================================
     // MENSAJE NO RECONOCIDO
