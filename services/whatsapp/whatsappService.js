@@ -1,3 +1,6 @@
+import Usuario from "../../models/Usuario.js";
+import Paciente from "../../models/Paciente.js";
+
 const sesiones = new Map();
 
 export const procesarMensaje = async (telefono, mensaje) => {
@@ -12,6 +15,7 @@ export const procesarMensaje = async (telefono, mensaje) => {
         sesion = {
             estado: "INICIO",
             pacienteId: null,
+            usuarioId: null,
             documento: null
         };
 
@@ -56,7 +60,6 @@ export const procesarMensaje = async (telefono, mensaje) => {
             mensajeNormalizado.includes("solicitar una cita")
         )
     ) {
-
         sesion.estado = "ESPERANDO_DOCUMENTO";
 
         return {
@@ -69,7 +72,7 @@ Por favor, ingresa tu número de documento.`
     }
 
     // ==========================================
-    // DOCUMENTO
+    // VALIDAR DOCUMENTO
     // ==========================================
 
     if (sesion.estado === "ESPERANDO_DOCUMENTO") {
@@ -84,32 +87,142 @@ Por favor, ingresa nuevamente tu documento.`
             };
         }
 
-        sesion.documento = documento;
+        try {
 
-        // Por ahora solamente guardamos el documento.
-        // En el siguiente paso consultaremos la base de datos.
+            const usuario = await Usuario.findOne({
+                where: {
+                    numero_documento: documento,
+                    rol_id: 3,
+                    estado: true
+                },
+                include: [
+                    {
+                        model: Paciente,
+                        required: true
+                    }
+                ]
+            });
 
-        sesion.estado = "DOCUMENTO_RECIBIDO";
+            // ==========================================
+            // PACIENTE NO ENCONTRADO
+            // ==========================================
+
+            if (!usuario) {
+
+                sesion.estado = "INICIO";
+
+                return {
+                    mensaje: `❌ No encontramos un paciente activo asociado al documento ingresado.
+
+Verifica que el número sea correcto.
+
+Si consideras que tus datos deberían estar registrados en SIGCMI, comunícate con la institución.`
+                };
+            }
+
+            // ==========================================
+            // PACIENTE ENCONTRADO
+            // ==========================================
+
+            sesion.documento = documento;
+            sesion.usuarioId = usuario.id_usuario;
+            sesion.pacienteId = usuario.Paciente.id_paciente;
+            sesion.estado = "PACIENTE_VALIDADO";
+
+            return {
+                mensaje: `✅ Identidad encontrada correctamente.
+
+Hola ${usuario.nombres} ${usuario.apellidos} 👋
+
+Tu información ya se encuentra registrada en SIGCMI.
+
+No necesitas ingresar al portal web para solicitar tu cita.
+
+¿Qué deseas hacer?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+            };
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error validando paciente:",
+                error
+            );
+
+            return {
+                mensaje: "Ocurrió un error al validar tu información. Inténtalo nuevamente."
+            };
+        }
+    }
+
+    // ==========================================
+    // PACIENTE VALIDADO
+    // ==========================================
+
+    if (sesion.estado === "PACIENTE_VALIDADO") {
+
+        if (mensajeNormalizado === "1") {
+
+            sesion.estado = "SOLICITANDO_CITA";
+
+            return {
+                mensaje: `Perfecto. 📅
+
+Vamos a solicitar tu cita.
+
+Primero selecciona la especialidad que necesitas.`
+            };
+        }
+
+        if (mensajeNormalizado === "2") {
+
+            return {
+                mensaje: `📋 Consulta de citas.
+
+Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
+            };
+        }
+
+        if (mensajeNormalizado === "3") {
+
+            return {
+                mensaje: `❌ Cancelación de citas.
+
+Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
+            };
+        }
+
+        if (mensajeNormalizado === "4") {
+
+            return {
+                mensaje: `🔄 Reprogramación de citas.
+
+Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
+            };
+        }
 
         return {
-            mensaje: `Perfecto. ✅
+            mensaje: `Por favor, selecciona una opción:
 
-Recibí el documento:
-
-${documento}
-
-Ahora voy a validar tu información en SIGCMI.`
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
         };
     }
 
     // ==========================================
-    // DOCUMENTO RECIBIDO
+    // SOLICITANDO CITA
     // ==========================================
 
-    if (sesion.estado === "DOCUMENTO_RECIBIDO") {
+    if (sesion.estado === "SOLICITANDO_CITA") {
 
         return {
-            mensaje: `Estoy procesando tu solicitud. ⏳`
+            mensaje: `Aquí mostraremos las especialidades disponibles en SIGCMI.`
         };
     }
 
@@ -120,9 +233,6 @@ Ahora voy a validar tu información en SIGCMI.`
     return {
         mensaje: `No estoy seguro de haber entendido tu solicitud. 🤖
 
-Puedes escribir:
-
-• "Hola"
-• "Quiero una cita"`
+Escribe "Hola" para comenzar.`
     };
 };
