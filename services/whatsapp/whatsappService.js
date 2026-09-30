@@ -1,5 +1,7 @@
 import Usuario from "../../models/Usuario.js";
 import Paciente from "../../models/Paciente.js";
+import Especialidad from "../../models/Especialidad.js";
+import Medico from "../../models/Medico.js";
 
 const sesiones = new Map();
 
@@ -167,19 +169,51 @@ No necesitas ingresar al portal web para solicitar tu cita.
 
         if (mensajeNormalizado === "1") {
 
-            sesion.estado = "SOLICITANDO_CITA";
+            try {
 
-            return {
-                mensaje: `Perfecto. 📅
+                const especialidades = await Especialidad.findAll({
+                    order: [["nombre", "ASC"]]
+                });
 
-Vamos a solicitar tu cita.
+                if (especialidades.length === 0) {
+                    return {
+                        mensaje: `❌ En este momento no hay especialidades disponibles.`
+                    };
+                }
 
-Primero selecciona la especialidad que necesitas.`
-            };
+                const listaEspecialidades = especialidades
+                    .map((especialidad, index) => {
+                        return `${index + 1}️⃣ ${especialidad.nombre}`;
+                    })
+                    .join("\n");
+
+                sesion.estado = "ESPERANDO_ESPECIALIDAD";
+                sesion.especialidades = especialidades;
+
+                return {
+                    mensaje: `Perfecto. 📅
+
+Selecciona la especialidad que necesitas:
+
+${listaEspecialidades}
+
+Escribe el número de la especialidad.`
+                };
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Error obteniendo especialidades:",
+                    error
+                );
+
+                return {
+                    mensaje: "❌ Ocurrió un error consultando las especialidades."
+                };
+            }
         }
 
         if (mensajeNormalizado === "2") {
-
             return {
                 mensaje: `📋 Consulta de citas.
 
@@ -188,7 +222,6 @@ Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
         }
 
         if (mensajeNormalizado === "3") {
-
             return {
                 mensaje: `❌ Cancelación de citas.
 
@@ -197,7 +230,6 @@ Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
         }
 
         if (mensajeNormalizado === "4") {
-
             return {
                 mensaje: `🔄 Reprogramación de citas.
 
@@ -216,16 +248,142 @@ Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
     }
 
     // ==========================================
-    // SOLICITANDO CITA
+    // SOLICITANDO CITA 
     // ==========================================
 
     if (sesion.estado === "SOLICITANDO_CITA") {
 
-        return {
-            mensaje: `Aquí mostraremos las especialidades disponibles en SIGCMI.`
-        };
+        try {
+
+            const especialidades = await Especialidad.findAll({
+                order: [["nombre", "ASC"]]
+            });
+
+            if (especialidades.length === 0) {
+                return {
+                    mensaje: "❌ En este momento no hay especialidades disponibles."
+                };
+            }
+
+            const listaEspecialidades = especialidades
+                .map((especialidad, index) => {
+                    return `${index + 1}️⃣ ${especialidad.nombre}`;
+                })
+                .join("\n");
+
+            sesion.estado = "ESPERANDO_ESPECIALIDAD";
+            sesion.especialidades = especialidades;
+
+            return {
+                mensaje: `Perfecto. 📅
+
+Selecciona la especialidad que necesitas:
+
+${listaEspecialidades}
+
+Escribe el número de la especialidad.`
+            };
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error obteniendo especialidades:",
+                error
+            );
+
+            return {
+                mensaje: "❌ Ocurrió un error consultando las especialidades."
+            };
+        }
     }
 
+
+    // ==========================================
+    // SELECCION ESPECIALIDAD
+    // ==========================================
+
+
+    if (sesion.estado === "ESPERANDO_ESPECIALIDAD") {
+
+        const opcion = parseInt(mensajeNormalizado);
+
+        if (
+            isNaN(opcion) ||
+            opcion < 1 ||
+            opcion > sesion.especialidades.length
+        ) {
+            return {
+                mensaje: `⚠️ Opción no válida.
+
+Selecciona una de las especialidades disponibles.`
+            };
+        }
+
+        const especialidadSeleccionada =
+            sesion.especialidades[opcion - 1];
+
+        sesion.especialidadId =
+            especialidadSeleccionada.id_especialidad;
+
+        sesion.especialidadNombre =
+            especialidadSeleccionada.nombre;
+
+        try {
+
+            const medicos = await Medico.findAll({
+                where: {
+                    especialidad_id: sesion.especialidadId
+                },
+                include: [
+                    {
+                        model: Usuario,
+                        attributes: ["nombres", "apellidos"],
+                        required: true
+                    }
+                ]
+            });
+
+            if (medicos.length === 0) {
+                return {
+                    mensaje: `❌ No hay médicos disponibles para ${sesion.especialidadNombre} en este momento.
+
+Puedes seleccionar otra especialidad.`
+                };
+            }
+
+            const listaMedicos = medicos
+                .map((medico, index) => {
+                    return `${index + 1}️⃣ Dr. ${medico.Usuario.nombres} ${medico.Usuario.apellidos}`;
+                })
+                .join("\n");
+
+            sesion.medicos = medicos;
+            sesion.estado = "ESPERANDO_MEDICO";
+
+            return {
+                mensaje: `✅ Especialidad seleccionada:
+
+🏥 ${sesion.especialidadNombre}
+
+Ahora selecciona el médico:
+
+${listaMedicos}
+
+Escribe el número del médico.`
+            };
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error obteniendo médicos:",
+                error
+            );
+
+            return {
+                mensaje: "❌ Ocurrió un error consultando los médicos."
+            };
+        }
+    }
     // ==========================================
     // MENSAJE NO RECONOCIDO
     // ==========================================
