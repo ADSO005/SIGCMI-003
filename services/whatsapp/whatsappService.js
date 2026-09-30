@@ -714,6 +714,177 @@ Ejemplo: 08:30`
         }
     }
 
+    // ==========================================
+    // ESPERANDO HORA
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_HORA") {
+
+        const horaIngresada = mensaje.trim();
+
+        // ==========================================
+        // VALIDAR FORMATO
+        // ==========================================
+
+        const formatoHora = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+        if (!formatoHora.test(horaIngresada)) {
+
+            return {
+                mensaje: `⚠️ El formato de hora no es válido.
+
+Por favor utiliza:
+
+HH:MM
+
+Ejemplo:
+08:30`
+            };
+        }
+
+        // ==========================================
+        // VERIFICAR QUE LA HORA ESTÉ DISPONIBLE
+        // ==========================================
+
+        if (!sesion.horariosDisponibles.includes(horaIngresada)) {
+
+            return {
+                mensaje: `❌ La hora ${horaIngresada} no está disponible.
+
+Por favor selecciona una de las horas disponibles que te mostré anteriormente.`
+            };
+        }
+
+        // ==========================================
+        // GUARDAR HORA
+        // ==========================================
+
+        sesion.hora = horaIngresada;
+
+        sesion.estado = "CONFIRMANDO_CITA";
+
+        // ==========================================
+        // MOSTRAR RESUMEN
+        // ==========================================
+
+        return {
+            mensaje: `📋 Resumen de tu cita
+
+🏥 ${sesion.especialidadNombre}
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+📅 ${sesion.fecha.split("-").reverse().join("/")}
+🕐 ${sesion.hora}
+
+¿Deseas confirmar esta cita?
+
+1️⃣ Sí, confirmar
+2️⃣ No, cancelar`
+        };
+    }
+
+
+    // ==========================================
+    // CONFIRMANDO CITA
+    // ==========================================
+
+    if (sesion.estado === "CONFIRMANDO_CITA") {
+
+        // ==========================================
+        // CONFIRMAR
+        // ==========================================
+
+        if (mensajeNormalizado === "1") {
+
+            // Verificar nuevamente que la hora siga disponible
+            const citaExistente = await Cita.findOne({
+                where: {
+                    medico_id: sesion.medicoId,
+                    fecha: sesion.fecha,
+                    hora: sesion.hora
+                }
+            });
+
+            // La hora fue ocupada mientras el paciente confirmaba
+            if (citaExistente) {
+
+                sesion.estado = "ESPERANDO_FECHA";
+
+                return {
+                    mensaje: `❌ Lo sentimos.
+
+La hora ${sesion.hora} acaba de ser ocupada por otro paciente.
+
+Por favor selecciona nuevamente una fecha para consultar los horarios disponibles.`
+                };
+            }
+
+            // Crear la cita
+            const nuevaCita = await Cita.create({
+                paciente_id: sesion.pacienteId,
+                medico_id: sesion.medicoId,
+                estado_id: 1,
+                creado_por: sesion.usuarioId,
+                fecha: sesion.fecha,
+                hora: sesion.hora
+            });
+
+            // Guardar el ID de la cita
+            sesion.citaId = nuevaCita.id_cita;
+
+            // Reiniciar estado
+            sesion.estado = "PACIENTE_VALIDADO";
+
+            return {
+                mensaje: `✅ ¡Cita creada correctamente!
+
+📋 Datos de tu cita:
+
+🆔 Cita #${nuevaCita.id_cita}
+🏥 ${sesion.especialidadNombre}
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+📅 ${sesion.fecha.split("-").reverse().join("/")}
+🕐 ${sesion.hora}
+📌 Estado: Pendiente
+
+Tu cita ha sido registrada exitosamente.`
+            };
+        }
+
+        // ==========================================
+        // CANCELAR SOLICITUD
+        // ==========================================
+
+        if (mensajeNormalizado === "2") {
+
+            sesion.estado = "PACIENTE_VALIDADO";
+
+            return {
+                mensaje: `❌ Solicitud de cita cancelada.
+
+No se ha creado ninguna cita.
+
+¿Qué deseas hacer ahora?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+            };
+        }
+
+        // ==========================================
+        // OPCIÓN NO VÁLIDA
+        // ==========================================
+
+        return {
+            mensaje: `⚠️ Opción no válida.
+
+Por favor responde:
+
+1️⃣ Sí, confirmar
+2️⃣ No, cancelar`
+        };
+    }
 
     // ==========================================
     // MENSAJE NO RECONOCIDO
