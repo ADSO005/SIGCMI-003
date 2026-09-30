@@ -479,11 +479,96 @@ Ejemplo:
             };
         }
 
-        if (mensajeNormalizado === "4") {
-            return {
-                mensaje: `🔄 Reprogramación de citas.
 
-Esta funcionalidad la conectaremos con tus citas registradas en SIGCMI.`
+
+
+        // ==========================================
+        // REPROGRAMAR UNA CITA
+        // ==========================================
+
+        if (mensajeNormalizado === "4") {
+
+            const citas = await Cita.findAll({
+                where: {
+                    paciente_id: sesion.pacienteId,
+                    estado_id: 1
+                },
+                include: [
+                    {
+                        model: Medico,
+                        required: true,
+                        include: [
+                            {
+                                model: Usuario,
+                                attributes: ["nombres", "apellidos"],
+                                required: true
+                            },
+                            {
+                                model: Especialidad,
+                                attributes: ["nombre"],
+                                required: true
+                            }
+                        ]
+                    }
+                ],
+                order: [
+                    ["fecha", "ASC"],
+                    ["hora", "ASC"]
+                ]
+            });
+
+            if (citas.length === 0) {
+
+                return {
+                    mensaje: `🔄 No tienes citas pendientes para reprogramar.
+
+¿Qué deseas hacer?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+                };
+            }
+
+            const listaCitas = citas.map((cita, index) => {
+
+                const nombreMedico =
+                    `${cita.Medico.Usuario.nombres} ${cita.Medico.Usuario.apellidos}`;
+
+                const especialidad =
+                    cita.Medico.Especialidad.nombre;
+
+                const fecha = String(cita.fecha)
+                    .split("-")
+                    .reverse()
+                    .join("/");
+
+                const hora =
+                    String(cita.hora).substring(0, 5);
+
+                return `${index + 1}️⃣ Cita #${cita.id_cita}
+
+🏥 ${especialidad}
+👨‍⚕️ Dr. ${nombreMedico}
+📅 ${fecha}
+🕐 ${hora}`;
+            }).join("\n\n");
+
+            sesion.citasPendientes = citas;
+            sesion.estado = "ESPERANDO_CITA_REPROGRAMAR";
+
+            return {
+                mensaje: `🔄 Reprogramar cita
+
+Estas son tus citas pendientes:
+
+${listaCitas}
+
+Escribe el número de la cita que deseas reprogramar.
+
+Ejemplo:
+1`
             };
         }
 
@@ -715,6 +800,537 @@ Por favor responde:
         };
     }
 
+
+
+    // ==========================================
+    // SELECCIONAR CITA PARA REPROGRAMAR
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_CITA_REPROGRAMAR") {
+
+        const opcion = parseInt(mensajeNormalizado);
+
+        if (
+            isNaN(opcion) ||
+            opcion < 1 ||
+            opcion > sesion.citasPendientes.length
+        ) {
+            return {
+                mensaje: `⚠️ Opción no válida.
+
+Por favor selecciona una de las citas mostradas anteriormente.
+
+Ejemplo:
+1`
+            };
+        }
+
+        const citaSeleccionada =
+            sesion.citasPendientes[opcion - 1];
+
+        sesion.citaReprogramarId =
+            citaSeleccionada.id_cita;
+
+        sesion.citaFechaAnterior =
+            String(citaSeleccionada.fecha);
+
+        sesion.citaHoraAnterior =
+            String(citaSeleccionada.hora).substring(0, 5);
+
+        sesion.medicoId =
+            citaSeleccionada.medico_id;
+
+        sesion.medicoNombre =
+            `${citaSeleccionada.Medico.Usuario.nombres} ${citaSeleccionada.Medico.Usuario.apellidos}`;
+
+        sesion.especialidadNombre =
+            citaSeleccionada.Medico.Especialidad.nombre;
+
+        sesion.estado = "ESPERANDO_NUEVA_FECHA";
+
+        return {
+            mensaje: `🔄 Cita seleccionada correctamente.
+
+📋 Cita actual:
+
+🆔 Cita #${citaSeleccionada.id_cita}
+🏥 ${sesion.especialidadNombre}
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+📅 ${String(citaSeleccionada.fecha).split("-").reverse().join("/")}
+🕐 ${String(citaSeleccionada.hora).substring(0, 5)}
+
+Ahora ingresa la nueva fecha.
+
+📅 Formato:
+
+DD/MM/AAAA
+
+Ejemplo:
+10/10/2026`
+        };
+    }
+
+
+
+    // ==========================================
+    // ESPERANDO NUEVA FECHA
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_NUEVA_FECHA") {
+
+        const fechaIngresada = mensaje.trim();
+
+        const formatoFecha = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+        const resultado = fechaIngresada.match(formatoFecha);
+
+        if (!resultado) {
+            return {
+                mensaje: `⚠️ El formato de fecha no es válido.
+
+Por favor utiliza:
+
+DD/MM/AAAA
+
+Ejemplo:
+10/10/2026`
+            };
+        }
+
+        const dia = parseInt(resultado[1]);
+        const mes = parseInt(resultado[2]);
+        const anio = parseInt(resultado[3]);
+
+        const fecha = new Date(anio, mes - 1, dia);
+
+        // Validar que la fecha realmente exista
+        if (
+            fecha.getFullYear() !== anio ||
+            fecha.getMonth() !== mes - 1 ||
+            fecha.getDate() !== dia
+        ) {
+            return {
+                mensaje: `⚠️ La fecha ingresada no existe.
+
+Por favor ingresa una fecha válida.`
+            };
+        }
+
+        // No permitir fechas anteriores a hoy
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        if (fecha < hoy) {
+            return {
+                mensaje: `⚠️ No puedes seleccionar una fecha anterior a hoy.
+
+Por favor ingresa una fecha futura.`
+            };
+        }
+
+        const fechaSQL =
+            `${anio}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+
+        sesion.nuevaFecha = fechaSQL;
+
+        try {
+
+            // ==========================================
+            // DETERMINAR DÍA DE LA SEMANA
+            // ==========================================
+
+            const fechaConsulta =
+                new Date(`${sesion.nuevaFecha}T00:00:00`);
+
+            const diasSemana = [
+                "Domingo",
+                "Lunes",
+                "Martes",
+                "Miercoles",
+                "Jueves",
+                "Viernes",
+                "Sabado"
+            ];
+
+            const diaSemana =
+                diasSemana[fechaConsulta.getDay()];
+
+            // ==========================================
+            // BUSCAR HORARIO DEL MÉDICO
+            // ==========================================
+
+            const horario = await Horario.findOne({
+                where: {
+                    medico_id: sesion.medicoId,
+                    dia_semana: diaSemana,
+                    estado: "Aprobado"
+                }
+            });
+
+            if (!horario) {
+
+                sesion.estado = "ESPERANDO_NUEVA_FECHA";
+
+                return {
+                    mensaje: `❌ El Dr. ${sesion.medicoNombre} no tiene horario de atención para el ${diaSemana}.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            // ==========================================
+            // VALIDAR VIGENCIA DEL HORARIO
+            // ==========================================
+
+            if (
+                horario.fecha_inicio &&
+                sesion.nuevaFecha < horario.fecha_inicio
+            ) {
+
+                sesion.estado = "ESPERANDO_NUEVA_FECHA";
+
+                return {
+                    mensaje: `❌ El horario del médico todavía no está vigente para esa fecha.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            if (
+                horario.fecha_fin &&
+                sesion.nuevaFecha > horario.fecha_fin
+            ) {
+
+                sesion.estado = "ESPERANDO_NUEVA_FECHA";
+
+                return {
+                    mensaje: `❌ El horario del médico ya no está vigente para esa fecha.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            // ==========================================
+            // BUSCAR CITAS OCUPADAS
+            // ==========================================
+
+            const citasExistentes = await Cita.findAll({
+                where: {
+                    medico_id: sesion.medicoId,
+                    fecha: sesion.nuevaFecha,
+                    estado_id: 1
+                }
+            });
+
+            const horasOcupadas = citasExistentes.map(
+                cita => String(cita.hora).substring(0, 5)
+            );
+
+            // ==========================================
+            // GENERAR HORARIOS
+            // ==========================================
+
+            const horariosDisponibles = [];
+
+            let horaActual = horario.hora_inicio;
+            const horaFin = horario.hora_fin;
+
+            while (horaActual < horaFin) {
+
+                const horaFormateada =
+                    horaActual.substring(0, 5);
+
+                if (!horasOcupadas.includes(horaFormateada)) {
+                    horariosDisponibles.push(horaFormateada);
+                }
+
+                const [horas, minutos] =
+                    horaActual.split(":").map(Number);
+
+                const minutosTotales =
+                    horas * 60 + minutos + 30;
+
+                const nuevaHora =
+                    Math.floor(minutosTotales / 60);
+
+                const nuevosMinutos =
+                    minutosTotales % 60;
+
+                horaActual =
+                    `${String(nuevaHora).padStart(2, "0")}:${String(nuevosMinutos).padStart(2, "0")}:00`;
+            }
+
+            // ==========================================
+            // NO HAY HORARIOS
+            // ==========================================
+
+            if (horariosDisponibles.length === 0) {
+
+                sesion.estado = "ESPERANDO_NUEVA_FECHA";
+
+                return {
+                    mensaje: `❌ No hay horarios disponibles para el ${fechaIngresada}.
+
+Por favor selecciona otra fecha.`
+                };
+            }
+
+            // ==========================================
+            // MOSTRAR HORARIOS
+            // ==========================================
+
+            const listaHorarios = horariosDisponibles
+                .map(hora => `🕐 ${hora}`)
+                .join("\n");
+
+            sesion.horariosReprogramacion =
+                horariosDisponibles;
+
+            sesion.estado = "ESPERANDO_NUEVA_HORA";
+
+            return {
+                mensaje: `📅 Nueva fecha: ${fechaIngresada}
+
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+
+Horarios disponibles:
+
+${listaHorarios}
+
+Escribe la nueva hora que prefieres.
+
+Ejemplo: 08:30`
+            };
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error consultando horarios para reprogramación:",
+                error
+            );
+
+            return {
+                mensaje: "❌ Ocurrió un error consultando los horarios disponibles."
+            };
+        }
+    }
+
+
+    // ==========================================
+    // ESPERANDO NUEVA HORA
+    // ==========================================
+
+    if (sesion.estado === "ESPERANDO_NUEVA_HORA") {
+
+        const horaIngresada = mensaje.trim();
+
+        // ==========================================
+        // VALIDAR FORMATO
+        // ==========================================
+
+        const formatoHora = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+        if (!formatoHora.test(horaIngresada)) {
+
+            return {
+                mensaje: `⚠️ El formato de hora no es válido.
+
+Por favor utiliza:
+
+HH:MM
+
+Ejemplo:
+08:30`
+            };
+        }
+
+        // ==========================================
+        // VERIFICAR DISPONIBILIDAD
+        // ==========================================
+
+        if (!sesion.horariosReprogramacion.includes(horaIngresada)) {
+
+            return {
+                mensaje: `❌ La hora ${horaIngresada} no está disponible.
+
+Por favor selecciona una de las horas disponibles que te mostré anteriormente.`
+            };
+        }
+
+        // ==========================================
+        // GUARDAR NUEVA HORA
+        // ==========================================
+
+        sesion.nuevaHora = horaIngresada;
+
+        sesion.estado = "CONFIRMANDO_REPROGRAMACION";
+
+        // ==========================================
+        // MOSTRAR RESUMEN
+        // ==========================================
+
+        return {
+            mensaje: `📋 Resumen de la reprogramación
+
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+🏥 ${sesion.especialidadNombre}
+
+📅 Cita actual:
+${sesion.citaFechaAnterior
+                    ? sesion.citaFechaAnterior.split("-").reverse().join("/")
+                    : "Fecha actual"}
+
+🕐 Hora actual:
+${sesion.citaHoraAnterior || "Hora actual"}
+
+🔄 Nueva fecha:
+${sesion.nuevaFecha.split("-").reverse().join("/")}
+
+🕐 Nueva hora:
+${sesion.nuevaHora}
+
+¿Deseas confirmar la reprogramación?
+
+1️⃣ Sí, reprogramar
+2️⃣ No, cancelar`
+        };
+    }
+
+    
+    // ==========================================
+    // CONFIRMAR REPROGRAMACION
+    // ==========================================
+
+
+    if (sesion.estado === "CONFIRMANDO_REPROGRAMACION") {
+
+    if (mensajeNormalizado === "1") {
+
+        try {
+
+            // Buscar nuevamente la cita para evitar que haya cambiado
+            const cita = await Cita.findOne({
+                where: {
+                    id_cita: sesion.citaReprogramarId,
+                    paciente_id: sesion.pacienteId,
+                    estado_id: 1
+                }
+            });
+
+            if (!cita) {
+                sesion.estado = "PACIENTE_VALIDADO";
+
+                return {
+                    mensaje: `❌ La cita ya no está disponible para reprogramación.
+
+Regresando al menú principal.`
+                };
+            }
+
+            // Verificar que el nuevo horario todavía esté disponible
+            const citaExistente = await Cita.findOne({
+                where: {
+                    medico_id: sesion.medicoId,
+                    fecha: sesion.nuevaFecha,
+                    hora: sesion.nuevaHora,
+                    estado_id: 1
+                }
+            });
+
+            if (citaExistente && citaExistente.id_cita !== cita.id_cita) {
+
+                sesion.estado = "PACIENTE_VALIDADO";
+
+                return {
+                    mensaje: `❌ Lo siento, ese horario acaba de ser ocupado por otra cita.
+
+La reprogramación no se realizó.
+
+Regresando al menú principal.`
+                };
+            }
+
+            // Guardar la reprogramación
+            await cita.update({
+                fecha: sesion.nuevaFecha,
+                hora: sesion.nuevaHora,
+                reprogramado_por: sesion.usuarioId,
+                fecha_reprogramacion: new Date()
+            });
+
+            const fechaAnterior = sesion.citaFechaAnterior
+                ? sesion.citaFechaAnterior.split("-").reverse().join("/")
+                : "Fecha anterior";
+
+            const fechaNueva = sesion.nuevaFecha
+                .split("-")
+                .reverse()
+                .join("/");
+
+            sesion.estado = "PACIENTE_VALIDADO";
+
+            return {
+                mensaje: `✅ ¡Cita reprogramada correctamente!
+
+👨‍⚕️ Dr. ${sesion.medicoNombre}
+🏥 ${sesion.especialidadNombre}
+
+📋 Cita: #${cita.id_cita}
+
+📅 Fecha anterior:
+${fechaAnterior}
+
+🕐 Hora anterior:
+${sesion.citaHoraAnterior}
+
+🔄 Nueva fecha:
+${fechaNueva}
+
+🕐 Nueva hora:
+${sesion.nuevaHora}
+
+Tu cita continúa en estado pendiente. 📌`
+            };
+
+        } catch (error) {
+
+            console.error(
+                "❌ Error reprogramando cita:",
+                error
+            );
+
+            return {
+                mensaje: `❌ Ocurrió un error al intentar reprogramar la cita.
+
+Por favor, intenta nuevamente.`
+            };
+        }
+    }
+
+    if (mensajeNormalizado === "2") {
+
+        sesion.estado = "PACIENTE_VALIDADO";
+
+        return {
+            mensaje: `❌ Reprogramación cancelada.
+
+La cita original permanece sin cambios.
+
+¿Qué deseas hacer?
+
+1️⃣ Solicitar una cita
+2️⃣ Consultar mis citas
+3️⃣ Cancelar una cita
+4️⃣ Reprogramar una cita`
+        };
+    }
+
+    return {
+        mensaje: `❌ Opción no válida.
+
+1️⃣ Sí, reprogramar
+2️⃣ No, cancelar`
+    };
+}
     // ==========================================
     // SELECCION ESPECIALIDAD
     // ==========================================
