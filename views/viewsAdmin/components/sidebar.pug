@@ -1,0 +1,203 @@
+//- ==========================================
+//- SIDEBAR ADMINISTRATIVO
+//- ==========================================
+
+aside(
+    id="sidebar"
+    class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 bg-indigo-600 text-white flex flex-col transition-all duration-300 -translate-x-full md:translate-x-0"
+)
+
+    //- ==========================================
+    //- LOGO
+    //- ==========================================
+
+    div
+
+        div(class="flex items-center justify-between p-6")
+
+            h1(class="sidebar-text text-2xl font-bold")
+                | SIGCMI
+
+            button(
+                type="button"
+                onclick="toggleSidebar()"
+                class="p-2 rounded-lg hover:bg-indigo-500 transition"
+                aria-label="Abrir menú"
+            )
+
+                svg(
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-7 h-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                )
+
+                    path(
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4 6h16M4 12h16M4 18h16"
+                    )
+
+
+        //- ==========================================
+        //- BIENVENIDA
+        //- ==========================================
+
+        div(class="sidebar-text px-6 pb-6")
+
+            p(class="text-indigo-200 text-sm")
+                | Bienvenido
+
+            p(class="font-bold")
+                = usuarios.nombre
+
+            p(class="text-indigo-200 text-sm")
+                | Admin
+
+
+        //- ==========================================
+        //- NAVEGACIÓN
+        //- ==========================================
+
+        nav(class="px-3 space-y-1")
+
+            // Dashboard
+            a(
+                href="/admin/dashboard"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-house w-6 text-center")
+                span(class="sidebar-text") Dashboard
+
+
+            // Usuarios
+            a(
+                href="/admin/usuarios"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-users w-6 text-center")
+                span(class="sidebar-text") Usuarios
+
+
+            // Pacientes
+            a(
+                href="/admin/pacientes"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-heart-pulse w-6 text-center")
+                span(class="sidebar-text") Pacientes
+
+
+            // Médicos
+            a(
+                href="/admin/medicos"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-user-doctor w-6 text-center")
+                span(class="sidebar-text") Médicos
+
+
+            // Especialidades
+            a(
+                href="/admin/especialidades"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-hospital w-6 text-center")
+                span(class="sidebar-text") Especialidades
+
+
+            // Citas
+            a(
+                href="/admin/citas"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-calendar-check w-6 text-center")
+                span(class="sidebar-text") Citas
+
+
+            // Calendario
+            a(
+                href="/admin/calendario"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-calendar-days w-6 text-center")
+                span(class="sidebar-text") Calendario
+
+
+            // Horarios
+            a(
+                href="/admin/horarios"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-clock w-6 text-center")
+                span(class="sidebar-text") Horarios
+
+
+            // Diagnósticos
+            a(
+                href="/admin/diagnosticos"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-stethoscope w-6 text-center")
+                span(class="sidebar-text") Diagnósticos
+
+
+            // Prescripciones
+            a(
+                href="/admin/prescripciones"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-pills w-6 text-center")
+                span(class="sidebar-text") Prescripciones
+
+
+            // WhatsApp
+            a(
+                href="/admin/whatsapp"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-brands fa-whatsapp w-6 text-center")
+                span(class="sidebar-text") WhatsApp
+
+
+            // Reportes
+            a(
+                href="/admin/reportes"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
+            )
+                i(class="fa-solid fa-chart-column w-6 text-center")
+                span(class="sidebar-text") Reportes
+
+
+    //- ==========================================
+    //- CERRAR SESIÓN
+    //- ==========================================
+
+    div(class="mt-auto p-3")
+
+        form(action="/auth/logout" method="POST")
+
+            button(
+                type="submit"
+                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 text-white"
+            )
+
+                svg(
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="w-6 h-6 shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                )
+
+                    path(
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    )
+
+                span(class="sidebar-text")
+                    | Cerrar Sesión

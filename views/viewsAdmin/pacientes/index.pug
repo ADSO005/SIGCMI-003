@@ -1,0 +1,415 @@
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+
+        title SIGCMI - Gestión de Pacientes
+
+        script(src="https://cdn.tailwindcss.com")
+
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-slate-50 text-slate-800")
+
+        div(class="flex min-h-screen")
+
+            // ==========================================
+            // SIDEBAR
+            // ==========================================
+
+            include ../components/sidebar.pug
+            include ../components/sidebarOverlay.pug
+
+            // ==========================================
+            // CONTENIDO PRINCIPAL
+            // ==========================================
+
+            main(
+                id="mainContent"
+                class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6"
+            )
+
+                // ======================================
+                // BOTÓN MOBILE
+                // ======================================
+
+                div(class="md:hidden mb-4")
+                    button(
+                        type="button"
+                        onclick="toggleSidebar()"
+                        class="p-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
+                        aria-label="Abrir menú"
+                    )
+                        i(class="fa-solid fa-bars text-xl")
+
+                // ======================================
+                // ENCABEZADO
+                // ======================================
+
+                div(
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
+                )
+
+                    div
+                        h1(
+                            class="text-3xl font-bold text-slate-900"
+                        ) Gestión de Pacientes
+
+                        p(
+                            class="text-slate-500 mt-1"
+                        ) Administra los pacientes registrados en SIGCMI
+
+                    div(
+                        class="text-sm text-slate-500 flex items-center gap-2"
+                    )
+                        i(class="fa-solid fa-calendar")
+                        | #{new Date().toLocaleDateString("es-CO")}
+
+                // ======================================
+                // SEPARADOR
+                // ======================================
+
+                div(class="border-b border-slate-200 mb-6")
+
+                // ======================================
+                // ESTADÍSTICAS
+                // ======================================
+
+                div(
+                    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-6"
+                )
+
+                    // TOTAL
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
+                    )
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(
+                                    class="text-sm text-slate-500"
+                                ) Total pacientes
+
+                                p(
+                                    class="text-3xl font-bold text-slate-900 mt-1"
+                                ) #{totalPacientes}
+
+                            div(
+                                class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"
+                            )
+                                i(class="fa-solid fa-users text-xl")
+
+                    // ACTIVOS
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
+                    )
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(
+                                    class="text-sm text-slate-500"
+                                ) Pacientes activos
+
+                                p(
+                                    class="text-3xl font-bold text-slate-900 mt-1"
+                                ) #{pacientesActivos}
+
+                            div(
+                                class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center"
+                            )
+                                i(class="fa-solid fa-user-check text-xl")
+
+                    // INACTIVOS
+                    div(
+                        class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
+                    )
+                        div(class="flex items-center justify-between")
+
+                            div
+                                p(
+                                    class="text-sm text-slate-500"
+                                ) Pacientes inactivos
+
+                                p(
+                                    class="text-3xl font-bold text-slate-900 mt-1"
+                                ) #{pacientesInactivos}
+
+                            div(
+                                class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center"
+                            )
+                                i(class="fa-solid fa-user-slash text-xl")
+
+                // ======================================
+                // TABLA
+                // ======================================
+
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+                )
+
+                    // ==================================
+                    // CABECERA TABLA
+                    // ==================================
+
+                    div(
+                        class="p-5 border-b border-slate-200"
+                    )
+
+                        div(
+                            class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+                        )
+
+                            div
+                                h2(
+                                    class="text-xl font-bold text-slate-900"
+                                ) Pacientes registrados
+
+                                p(
+                                    class="text-sm text-slate-500 mt-1"
+                                ) Consulta y administra los pacientes del sistema.
+
+                            div(
+                                class="flex flex-col sm:flex-row gap-3"
+                            )
+
+                                // BUSCADOR
+                                div(class="relative")
+
+                                    i(
+                                        class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                                    )
+
+                                    input(
+                                        type="text"
+                                        id="buscarPaciente"
+                                        placeholder="Buscar paciente..."
+                                        class="w-full sm:w-64 pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    )
+
+                                // FILTRO
+                                select(
+                                    id="filtroEstadoPaciente"
+                                    class="w-full sm:w-40 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                )
+                                    option(value="") Todos los estados
+                                    option(value="activo") Activos
+                                    option(value="inactivo") Inactivos
+
+                                // REGISTRAR
+                                a(
+                                    href="/admin/pacientes/nuevo"
+                                    class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-lg transition"
+                                )
+                                    i(class="fa-solid fa-user-plus")
+                                    | Registrar paciente
+
+                    // ==================================
+                    // TABLA RESPONSIVE
+                    // ==================================
+
+                    div(class="overflow-x-auto")
+
+                        table(class="w-full min-w-[1000px]")
+
+                            thead(
+                                class="bg-slate-50 border-b border-slate-200"
+                            )
+
+                                tr
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Paciente
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Documento
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Correo
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Teléfono
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Ciudad
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Estado
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Registro
+
+                                    th(
+                                        class="text-left px-5 py-4 text-sm font-semibold text-slate-600"
+                                    ) Acciones
+
+                            tbody(id="tablaPacientes")
+
+                                if pacientesLista.length
+
+                                    each paciente in pacientesLista
+
+                                        tr(
+                                            class="paciente-fila border-b border-slate-100 hover:bg-slate-50 transition"
+                                            data-nombre=paciente.nombre
+                                            data-correo=paciente.correo
+                                            data-documento=paciente.documento
+                                            data-estado=paciente.estado ? "activo" : "inactivo"
+                                        )
+
+                                            // PACIENTE
+                                            td(class="px-5 py-4")
+
+                                                div(
+                                                    class="flex items-center gap-3"
+                                                )
+
+                                                    div(
+                                                        class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0"
+                                                    )
+                                                        i(class="fa-solid fa-user")
+
+                                                    div
+                                                        p(
+                                                            class="font-semibold text-slate-900"
+                                                        ) #{paciente.nombre}
+
+                                                        p(
+                                                            class="text-xs text-slate-500"
+                                                        ) ID: #{paciente.id}
+
+                                            // DOCUMENTO
+                                            td(class="px-5 py-4")
+
+                                                p(
+                                                    class="text-xs text-slate-500"
+                                                ) #{paciente.tipoDocumento || "N/A"}
+
+                                                p(
+                                                    class="font-medium text-slate-800"
+                                                ) #{paciente.documento || "N/A"}
+
+                                            // CORREO
+                                            td(
+                                                class="px-5 py-4 text-sm text-slate-700"
+                                            )
+                                                | #{paciente.correo || "N/A"}
+
+                                            // TELÉFONO
+                                            td(
+                                                class="px-5 py-4 text-sm text-slate-700"
+                                            )
+                                                | #{paciente.telefono || "N/A"}
+
+                                            // CIUDAD
+                                            td(
+                                                class="px-5 py-4 text-sm text-slate-700"
+                                            )
+                                                | #{paciente.ciudad || "N/A"}
+
+                                            // ESTADO
+                                            td(class="px-5 py-4")
+
+                                                if paciente.estado
+
+                                                    span(
+                                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700"
+                                                    )
+                                                        | Activo
+
+                                                else
+
+                                                    span(
+                                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"
+                                                    )
+                                                        | Inactivo
+
+                                            // REGISTRO
+                                            td(
+                                                class="px-5 py-4 text-sm text-slate-600"
+                                            )
+
+                                                if paciente.fechaRegistro
+                                                    = new Date(paciente.fechaRegistro).toLocaleDateString("es-CO")
+                                                else
+                                                    | N/A
+
+                                            // ACCIONES
+                                            td(class="px-5 py-4")
+
+                                                div(
+                                                    class="flex items-center gap-2"
+                                                )
+
+                                                    button(
+                                                        type="button"
+                                                        class="btnVerPaciente w-9 h-9 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+                                                        title="Ver paciente"
+                                                        data-id=paciente.id
+                                                    )
+                                                        i(class="fa-solid fa-eye")
+
+                                                    button.btnEditarPaciente(
+                                                        type="button"
+                                                        data-id=paciente.id
+                                                    )
+                                                        i(class="fa-solid fa-pen-to-square")
+
+                                                    button(
+                                                        type="button"
+                                                        class="btnCambiarEstadoPaciente w-9 h-9 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition"
+                                                        title="Cambiar estado"
+                                                        data-id=paciente.id
+                                                        data-estado=paciente.estado
+                                                    )
+                                                        i(class="fa-solid fa-power-off")
+
+                                else
+
+                                    tr
+
+                                        td(
+                                            colspan="8"
+                                            class="px-5 py-12 text-center text-slate-500"
+                                        )
+
+                                            i(
+                                                class="fa-solid fa-user-slash text-3xl mb-3"
+                                            )
+
+                                            p No hay pacientes registrados.
+
+                    // ==================================
+                    // MENSAJE DE FILTRO
+                    // ==================================
+
+                    div(
+                        id="sinResultadosPacientes"
+                        class="hidden px-5 py-10 text-center text-slate-500"
+                    )
+
+                        i(
+                            class="fa-solid fa-magnifying-glass text-3xl mb-3"
+                        )
+
+                        p No se encontraron pacientes con los criterios seleccionados.
+
+
+        include ../components/modals/verPaciente.pug
+        include ../components/modals/editarPaciente.pug
+        // ==========================================
+        // JAVASCRIPT
+        // ==========================================
+
+        script(src="/admin/js/toggleSidebar.js")
+        script(src="/admin/js/pacientes.js")

@@ -1,0 +1,317 @@
+div(
+    id="modalPrescripcion"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4"
+)
+
+    div(
+        class="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border-2 border-blue-200"
+    )
+
+        // =====================================================
+        // HEADER
+        // =====================================================
+
+        div(
+            class="flex items-center justify-between px-6 py-5 bg-blue-600 rounded-t-2xl"
+        )
+
+            div(class="flex items-center gap-4")
+
+                div(
+                    class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center border border-white/30"
+                )
+                    i(
+                        class="fa-solid fa-prescription-bottle-medical text-white text-xl"
+                    )
+
+                div
+                    h2(
+                        class="text-xl font-bold text-white"
+                    ) Detalle de la Prescripción
+
+                    p(
+                        class="text-blue-100 text-sm mt-1"
+                    ) Información completa del medicamento
+
+            button(
+                type="button"
+                class="btnCerrarModalPrescripcion w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/30 transition flex items-center justify-center"
+                title="Cerrar"
+            )
+                i(class="fa-solid fa-xmark text-lg")
+
+
+        // =====================================================
+        // CONTENIDO
+        // =====================================================
+
+        div(class="p-6 space-y-6")
+
+
+            // =================================================
+            // INFORMACIÓN DEL MEDICAMENTO
+            // =================================================
+
+            div(
+                class="border-2 border-blue-100 rounded-2xl overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 bg-blue-50 border-b-2 border-blue-100"
+                )
+                    div(class="flex items-center gap-3")
+
+                        div(
+                            class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-pills")
+
+                        h3(
+                            class="font-bold text-blue-900"
+                        ) Información del medicamento
+
+                div(class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4")
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4 bg-white"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Medicamento
+
+                        p(
+                            id="modalPrescripcionMedicamento"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4 bg-white"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Dosis
+
+                        p(
+                            id="modalPrescripcionDosis"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4 bg-white"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Frecuencia
+
+                        p(
+                            id="modalPrescripcionFrecuencia"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4 bg-white"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Duración
+
+                        p(
+                            id="modalPrescripcionDuracion"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+
+            // =================================================
+            // INFORMACIÓN DEL PACIENTE
+            // =================================================
+
+            div(
+                class="border-2 border-blue-100 rounded-2xl overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 bg-blue-50 border-b-2 border-blue-100"
+                )
+                    div(class="flex items-center gap-3")
+
+                        div(
+                            class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-user")
+
+                        h3(
+                            class="font-bold text-blue-900"
+                        ) Información del paciente
+
+                div(class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4")
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Paciente
+
+                        p(
+                            id="modalPrescripcionPaciente"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Documento
+
+                        p(
+                            id="modalPrescripcionDocumento"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+
+            // =================================================
+            // INFORMACIÓN MÉDICA
+            // =================================================
+
+            div(
+                class="border-2 border-blue-100 rounded-2xl overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 bg-blue-50 border-b-2 border-blue-100"
+                )
+                    div(class="flex items-center gap-3")
+
+                        div(
+                            class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-user-doctor")
+
+                        h3(
+                            class="font-bold text-blue-900"
+                        ) Información médica
+
+                div(class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4")
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Médico
+
+                        p(
+                            id="modalPrescripcionMedico"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Especialidad
+
+                        p(
+                            id="modalPrescripcionEspecialidad"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+
+            // =================================================
+            // DIAGNÓSTICO
+            // =================================================
+
+            div(
+                class="border-2 border-blue-100 rounded-2xl overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 bg-blue-50 border-b-2 border-blue-100"
+                )
+                    div(class="flex items-center gap-3")
+
+                        div(
+                            class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-stethoscope")
+
+                        h3(
+                            class="font-bold text-blue-900"
+                        ) Diagnóstico
+
+                div(class="p-5")
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4 bg-white"
+                    )
+                        p(
+                            id="modalPrescripcionDiagnostico"
+                            class="text-slate-700 leading-relaxed"
+                        ) -
+
+
+            // =================================================
+            // INFORMACIÓN DE LA CITA
+            // =================================================
+
+            div(
+                class="border-2 border-blue-100 rounded-2xl overflow-hidden"
+            )
+
+                div(
+                    class="px-5 py-4 bg-blue-50 border-b-2 border-blue-100"
+                )
+                    div(class="flex items-center gap-3")
+
+                        div(
+                            class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-calendar-check")
+
+                        h3(
+                            class="font-bold text-blue-900"
+                        ) Información de la cita
+
+                div(class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4")
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Fecha
+
+                        p(
+                            id="modalPrescripcionFecha"
+                            class="text-slate-800 font-semibold mt-1"
+                        ) -
+
+                    div(
+                        class="border border-blue-100 rounded-xl p-4"
+                    )
+                        p(
+                            class="text-xs font-semibold text-blue-500 uppercase tracking-wide"
+                        ) Estado
+
+                        p(
+                            id="modalPrescripcionEstado"
+                            class="inline-flex mt-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 font-semibold text-sm"
+                        ) -
+
+
+        // =====================================================
+        // FOOTER
+        // =====================================================
+
+        div(
+            class="px-6 py-4 bg-slate-50 border-t-2 border-blue-100 rounded-b-2xl flex justify-end"
+        )
+
+            button(
+                type="button"
+                class="btnCerrarModalPrescripcion px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition shadow-sm"
+            )
+                i(class="fa-solid fa-xmark mr-2")
+                | Cerrar

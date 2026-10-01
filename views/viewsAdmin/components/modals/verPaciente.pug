@@ -1,0 +1,405 @@
+// ==========================================
+// MODAL - VER PACIENTE
+// ==========================================
+
+div(
+    id="modalVerPaciente"
+    class="hidden fixed inset-0 z-[100] items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4"
+)
+
+    div(
+        class="relative w-full max-w-5xl max-h-[92vh] overflow-hidden bg-white rounded-3xl shadow-2xl"
+    )
+
+        // ======================================
+        // HEADER
+        // ======================================
+
+        div(
+            class="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 px-6 md:px-8 py-7 text-white"
+        )
+
+            // Decoración
+            div(
+                class="absolute -top-20 -right-20 w-56 h-56 bg-white/10 rounded-full"
+            )
+
+            div(
+                class="absolute -bottom-24 -left-16 w-48 h-48 bg-white/5 rounded-full"
+            )
+
+            div(
+                class="relative flex items-start justify-between gap-4"
+            )
+
+                div(
+                    class="flex items-center gap-5"
+                )
+
+                    // Avatar
+                    div(
+                        class="w-20 h-20 rounded-2xl bg-white/15 border border-white/20 backdrop-blur flex items-center justify-center shadow-lg shrink-0"
+                    )
+                        i(
+                            class="fa-solid fa-user text-3xl text-white"
+                        )
+
+                    div
+
+                        div(
+                            class="flex items-center gap-2 mb-1"
+                        )
+                            span(
+                                class="text-indigo-100 text-xs font-semibold uppercase tracking-wider"
+                            ) Perfil del paciente
+
+                        h2(
+                            id="ver_nombre_completo"
+                            class="text-2xl md:text-3xl font-bold tracking-tight"
+                        ) -
+
+                        p(
+                            id="ver_correo"
+                            class="text-indigo-100 text-sm md:text-base mt-1"
+                        ) -
+
+                        div(class="mt-3")
+
+                            span(
+                                id="ver_estado"
+                                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/15 border border-white/20"
+                            )
+                                span(
+                                    class="w-1.5 h-1.5 rounded-full bg-emerald-300"
+                                )
+                                | -
+
+                // Botón cerrar
+                button(
+                    type="button"
+                    id="btnCerrarVerPaciente"
+                    class="relative w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition"
+                    title="Cerrar"
+                )
+                    i(class="fa-solid fa-xmark text-lg")
+
+
+        // ======================================
+        // CONTENIDO
+        // ======================================
+
+        div(
+            class="overflow-y-auto max-h-[calc(92vh-190px)] p-6 md:p-8 bg-slate-50"
+        )
+
+            // ==================================
+            // IDENTIFICACIÓN
+            // ==================================
+
+            div(
+                class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"
+            )
+
+                // Documento
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
+                )
+
+                    div(
+                        class="flex items-center gap-3 mb-3"
+                    )
+
+                        div(
+                            class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-id-card")
+
+                        div
+                            p(
+                                class="text-xs text-slate-400 uppercase tracking-wide font-semibold"
+                            ) Documento
+
+                            p(
+                                id="ver_tipo_documento"
+                                class="text-sm font-semibold text-slate-800"
+                            ) -
+
+                    p(
+                        id="ver_numero_documento"
+                        class="text-lg font-bold text-slate-900"
+                    ) -
+
+                // Teléfono
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
+                )
+
+                    div(
+                        class="flex items-center gap-3 mb-3"
+                    )
+
+                        div(
+                            class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-phone")
+
+                        div
+                            p(
+                                class="text-xs text-slate-400 uppercase tracking-wide font-semibold"
+                            ) Teléfono
+
+                    p(
+                        id="ver_telefono"
+                        class="text-lg font-bold text-slate-900"
+                    ) -
+
+                // Fecha nacimiento
+                div(
+                    class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
+                )
+
+                    div(
+                        class="flex items-center gap-3 mb-3"
+                    )
+
+                        div(
+                            class="w-10 h-10 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center"
+                        )
+                            i(class="fa-solid fa-cake-candles")
+
+                        div
+                            p(
+                                class="text-xs text-slate-400 uppercase tracking-wide font-semibold"
+                            ) Nacimiento
+
+                    p(
+                        id="ver_fecha_nacimiento"
+                        class="text-lg font-bold text-slate-900"
+                    ) -
+
+
+            // ==================================
+            // INFORMACIÓN PERSONAL
+            // ==================================
+
+            div(
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden"
+            )
+
+                div(
+                    class="px-6 py-5 border-b border-slate-100 flex items-center gap-3"
+                )
+
+                    div(
+                        class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"
+                    )
+                        i(class="fa-solid fa-user")
+
+                    div
+                        h3(
+                            class="font-bold text-slate-900"
+                        ) Información personal
+
+                        p(
+                            class="text-xs text-slate-500 mt-0.5"
+                        ) Datos de identificación y contacto
+
+                div(
+                    class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6"
+                )
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Correo electrónico
+
+                        p(
+                            id="ver_correo_personal"
+                            class="text-sm font-medium text-slate-800"
+                        ) -
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Fecha de registro
+
+                        p(
+                            id="ver_fecha_registro"
+                            class="text-sm font-medium text-slate-800"
+                        ) -
+
+            // ==================================
+            // INFORMACIÓN MÉDICA
+            // ==================================
+
+            div(
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 overflow-hidden"
+            )
+
+                div(
+                    class="px-6 py-5 border-b border-slate-100 flex items-center gap-3"
+                )
+
+                    div(
+                        class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center"
+                    )
+                        i(class="fa-solid fa-heart-pulse")
+
+                    div
+                        h3(
+                            class="font-bold text-slate-900"
+                        ) Información médica
+
+                        p(
+                            class="text-xs text-slate-500 mt-0.5"
+                        ) Información clínica registrada
+
+                div(
+                    class="p-6"
+                )
+
+                    // Tipo de sangre
+                    div(
+                        class="mb-6"
+                    )
+
+                        div(
+                            class="flex items-center gap-2 mb-2"
+                        )
+
+                            i(
+                                class="fa-solid fa-droplet text-rose-500"
+                            )
+
+                            p(
+                                class="text-xs font-semibold uppercase tracking-wide text-slate-400"
+                            ) Tipo de sangre
+
+                        div(
+                            class="inline-flex items-center px-4 py-2 rounded-xl bg-rose-50 text-rose-700 font-bold"
+                        )
+                            span(
+                                id="ver_tipo_sangre"
+                            ) -
+
+                    // Alergias y condiciones
+                    div(
+                        class="grid grid-cols-1 md:grid-cols-2 gap-5"
+                    )
+
+                        div(
+                            class="rounded-2xl bg-amber-50 border border-amber-100 p-5"
+                        )
+
+                            div(
+                                class="flex items-center gap-2 mb-3"
+                            )
+                                i(
+                                    class="fa-solid fa-triangle-exclamation text-amber-600"
+                                )
+
+                                p(
+                                    class="text-sm font-bold text-amber-800"
+                                ) Alergias
+
+                            p(
+                                id="ver_alergias"
+                                class="text-sm text-amber-900 leading-relaxed whitespace-pre-line"
+                            ) -
+
+                        div(
+                            class="rounded-2xl bg-blue-50 border border-blue-100 p-5"
+                        )
+
+                            div(
+                                class="flex items-center gap-2 mb-3"
+                            )
+                                i(
+                                    class="fa-solid fa-notes-medical text-blue-600"
+                                )
+
+                                p(
+                                    class="text-sm font-bold text-blue-800"
+                                ) Condiciones médicas
+
+                            p(
+                                id="ver_condiciones_medicas"
+                                class="text-sm text-blue-900 leading-relaxed whitespace-pre-line"
+                            ) -
+
+
+            // ==================================
+            // UBICACIÓN
+            // ==================================
+
+            div(
+                class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+            )
+
+                div(
+                    class="px-6 py-5 border-b border-slate-100 flex items-center gap-3"
+                )
+
+                    div(
+                        class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center"
+                    )
+                        i(class="fa-solid fa-location-dot")
+
+                    div
+                        h3(
+                            class="font-bold text-slate-900"
+                        ) Ubicación
+
+                        p(
+                            class="text-xs text-slate-500 mt-0.5"
+                        ) Información de residencia
+
+                div(
+                    class="p-6 grid grid-cols-1 md:grid-cols-3 gap-5"
+                )
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Departamento
+
+                        p(
+                            id="ver_departamento"
+                            class="text-sm font-semibold text-slate-800"
+                        ) -
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Ciudad
+
+                        p(
+                            id="ver_ciudad"
+                            class="text-sm font-semibold text-slate-800"
+                        ) -
+
+                    div
+                        p(
+                            class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1"
+                        ) Dirección
+
+                        p(
+                            id="ver_direccion"
+                            class="text-sm font-semibold text-slate-800"
+                        ) -
+
+        // ======================================
+        // FOOTER
+        // ======================================
+
+        div(
+            class="px-6 md:px-8 py-4 bg-white border-t border-slate-200 flex justify-end"
+        )
+
+            button(
+                type="button"
+                id="btnCerrarVerPacienteFooter"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl transition shadow-sm"
+            )
+                i(class="fa-solid fa-xmark")
+                | Cerrar

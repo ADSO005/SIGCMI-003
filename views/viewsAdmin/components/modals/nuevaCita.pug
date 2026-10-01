@@ -1,0 +1,207 @@
+// =====================================================
+// MODAL NUEVA CITA
+// =====================================================
+div(
+    id="modalNuevaCita"
+    class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4"
+)
+
+    div(
+        class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden"
+    )
+
+        // Encabezado
+        div(
+            class="bg-indigo-600 text-white px-6 py-5 flex items-center justify-between"
+        )
+
+            div
+                h2(class="text-xl font-bold")
+                    i(class="fa-solid fa-calendar-plus mr-2")
+                    | Nueva Cita
+
+                p(class="text-indigo-200 text-sm mt-1")
+                    | Programa una nueva cita médica
+
+            button(
+                    type="button"
+                    id="btnCerrarNuevaCita"
+                    class="text-white hover:text-indigo-200 text-2xl"
+            ) 
+                i(class="fa-solid fa-xmark")
+
+
+        // Contenido
+        div(class="p-6")
+
+            form(
+                action="/admin/citas/nueva"
+                method="POST"
+                id="formNuevaCita"
+            )
+
+                div(class="grid grid-cols-1 md:grid-cols-2 gap-5")
+
+                    // Paciente
+                    div
+                        label(
+                            for="modal_paciente_id"
+                            class="block text-sm font-semibold text-slate-700 mb-2"
+                        )
+                            | Paciente
+
+                        select(
+                            id="modal_paciente_id"
+                            name="paciente_id"
+                            required
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        ) 
+                            option(value="")
+                                | Seleccione un paciente
+
+                            if pacientes
+                                each paciente in pacientes
+                                    option(value=paciente.id_paciente)
+                                        = paciente.Usuario.nombres + " " + paciente.Usuario.apellidos
+
+
+                    // Especialidad
+                    div
+                        label(
+                            for="modal_especialidad_id"
+                            class="block text-sm font-semibold text-slate-700 mb-2"
+                        )
+                            | Especialidad
+
+                        select(
+                            id="modal_especialidad_id"
+                            name="especialidad_id"
+                            required
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        )
+                            option(value="")
+                                | Seleccione una especialidad
+
+                            if especialidades
+                                each especialidad in especialidades
+                                    option(value=especialidad.id_especialidad)
+                                        = especialidad.nombre
+
+
+                    // Médico
+                    div
+                        label(
+                            for="modal_medico_id"
+                            class="block text-sm font-semibold text-slate-700 mb-2"
+                        )
+                            | Médico
+
+                        select(
+                            id="modal_medico_id"
+                            name="medico_id"
+                            required
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        )
+                            option(value="")
+                                | Seleccione una especialidad primero
+
+                            if medicos
+                                each medico in medicos
+                                    option(
+                                        value=medico.id_medico
+                                        data-especialidad=medico.especialidad_id
+                                    )
+                                        = medico.Usuario.nombres + " " + medico.Usuario.apellidos
+
+
+                    // Fecha
+                    div
+                        label(
+                            for="modal_fecha"
+                            class="block text-sm font-semibold text-slate-700 mb-2"
+                        )
+                            | Fecha
+
+                        input(
+                            type="date"
+                            id="modal_fecha"
+                            name="fecha"
+                            required
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        )
+
+
+                    // Hora
+                    div
+                        label(
+                            for="modal_hora"
+                            class="block text-sm font-semibold text-slate-700 mb-2"
+                        )
+                            | Hora disponible
+
+                        select(
+                            id="modal_hora"
+                            name="hora"
+                            required
+                            disabled
+                            class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-400"
+                        )
+                            option(value="")
+                                | Seleccione médico y fecha
+
+
+
+
+                // Motivo
+                div(class="mt-5")
+                    label(
+                        for="modal_motivo"
+                        class="block text-sm font-semibold text-slate-700 mb-2"
+                    )
+                        | Motivo de consulta
+
+                    textarea(
+                        id="modal_motivo"
+                        name="motivo_consulta"
+                        rows="3"
+                        placeholder="Ingrese el motivo de la consulta..."
+                        class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    )
+
+                div(
+                    id="errorNuevaCita"
+                    class="hidden mt-5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3"
+                )
+
+                    div(class="flex items-start gap-3")
+                        i(class="fa-solid fa-circle-exclamation mt-1")
+
+                        div
+                            p(class="font-semibold")
+                                | No se puede crear la cita
+
+                            p(
+                                id="mensajeErrorNuevaCita"
+                                class="text-sm mt-1"
+                            )
+                div(
+                    id="exitoNuevaCita"
+                    class="hidden mt-5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3"
+                )
+                    i(class="fa-solid fa-circle-check mr-2")
+                    | Datos de la cita válidos.
+
+                // Botones
+                div(class="flex justify-end gap-3 mt-6")
+                    button(
+                        type="button"
+                        id="btnCancelarNuevaCita"
+                        class="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100"
+                    ) Cancelar
+
+                    button(
+                        type="submit"
+                        class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                    )
+                        i(class="fa-solid fa-calendar-check mr-2")
+                        | Crear Cita
