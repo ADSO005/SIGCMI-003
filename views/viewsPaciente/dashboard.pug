@@ -72,8 +72,8 @@ block content
       // DIAGNÓSTICOS
       // ======================================
 
-      a.btn.diag.btn-diagnosticos(
-        href="/diagnosticos"
+      button.btn.diag.btn-diagnosticos#btnAbrirDiagnosticos(
+        type="button"
       )
         | Ver Diagnósticos
 
@@ -166,7 +166,6 @@ block content
 
           .fila-campos
 
-
             .campo
 
               label(for="fecha")
@@ -241,7 +240,6 @@ block content
           // ==================================
 
           .acciones-formulario
-
 
             button.btn-confirmar(
               type="submit"
@@ -377,15 +375,14 @@ block content
       .card-notificaciones
 
         h3
-
           i.icon-bell
           | Notificaciones
 
         p
           | Configura cómo deseas recibir notificaciones sobre tus citas.
 
-        a.btn.btn-primario(
-          href="/notificaciones"
+        button.btn.btn-primario#btnAbrirNotificaciones(
+          type="button"
         )
           | Configurar Notificaciones
 
@@ -402,17 +399,14 @@ block content
           | Nuestro equipo está disponible para asistirte.
 
         p
-
           i.icon-phone
           | 3137458332
 
         p
-
           i.icon-email
           | herrerayulieth254@gmail.com
 
         p
-
           i.icon-clock
           | Lunes-Viernes 8:00-20:00
 
@@ -449,3 +443,34 @@ block content
       }
 
     }
+
+
+  // ==========================================
+  // MODAL DE NOTIFICACIONES
+  // ==========================================
+
+  include Includes/modalNotificaciones
+
+  // ==========================================
+  // MODAL HISTORIAL DE DIAGNÓSTICOS
+  // ==========================================
+
+  link(
+  rel="stylesheet"
+  href="/patient/css/diagnosticHistory.css"
+)
+
+  include Includes/modalDiagnosticos
+
+
+  // ==========================================
+  // JAVASCRIPT DIAGNÓSTICOS
+  // ==========================================
+
+  script(src="/patient/js/diagnosticHistory.js")
+
+  // ==========================================
+  // JAVASCRIPT NOTIFICACIONES
+  // ==========================================
+
+  script(src="/patient/js/notificationSettings.js")

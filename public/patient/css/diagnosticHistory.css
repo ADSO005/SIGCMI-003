@@ -1,0 +1,218 @@
+    .diagnosticos-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.60);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .diagnosticos-container {
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.30);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .diagnosticos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 25px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .diagnosticos-header-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .diagnosticos-header-icon {
+      font-size: 30px;
+    }
+
+    .diagnosticos-header h2 {
+      margin: 0;
+      font-size: 22px;
+      color: #111827;
+    }
+
+    .diagnosticos-header p {
+      margin: 5px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .diagnosticos-close {
+      border: none;
+      background: transparent;
+      font-size: 32px;
+      cursor: pointer;
+      color: #6b7280;
+      line-height: 1;
+    }
+
+    .diagnosticos-close:hover {
+      color: #111827;
+    }
+
+    .diagnosticos-body {
+      padding: 20px 25px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .diagnostico-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      overflow: hidden;
+    }
+
+    .diagnostico-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border: none;
+      background: #f8fafc;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .diagnostico-header:hover {
+      background: #f1f5f9;
+    }
+
+    .diagnostico-header-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .diagnostico-icon {
+      font-size: 24px;
+    }
+
+    .diagnostico-header-info div {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .diagnostico-header-info strong {
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .diagnostico-header-info span {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .diagnostico-arrow {
+      font-size: 14px;
+    }
+
+    .diagnostico-content {
+      display: none;
+      padding: 20px;
+      background: white;
+    }
+
+    .diagnostico-item.active .diagnostico-content {
+      display: block;
+    }
+
+    .diagnostico-section {
+      margin-bottom: 20px;
+    }
+
+    .diagnostico-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .diagnostico-section h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #111827;
+    }
+
+    .diagnostico-section p {
+      margin: 0;
+      line-height: 1.6;
+      color: #4b5563;
+    }
+
+    .signos-vitales {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .signo {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      background: #f8fafc;
+      border-radius: 8px;
+    }
+
+    .signo .label {
+      color: #6b7280;
+    }
+
+    .signo .valor {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .diagnosticos-footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 15px 25px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .diagnosticos-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+
+    .diagnosticos-btn:hover {
+      background: #1d4ed8;
+    }
+
+    @media (max-width: 600px) {
+
+      .diagnosticos-modal {
+        padding: 10px;
+      }
+
+      .diagnosticos-container {
+        max-height: 95vh;
+      }
+
+      .signos-vitales {
+        grid-template-columns: 1fr;
+      }
+
+    }

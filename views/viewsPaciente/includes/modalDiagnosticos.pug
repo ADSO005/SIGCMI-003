@@ -1,0 +1,260 @@
+// ==========================================
+// MODAL HISTORIAL DE DIAGNÓSTICOS
+// ==========================================
+
+div#modalDiagnosticos.diagnosticos-modal
+
+  .diagnosticos-container
+
+    // ========================================
+    // ENCABEZADO
+    // ========================================
+
+    header.diagnosticos-header
+
+      .diagnosticos-header-info
+
+        .diagnosticos-header-icon
+          | 📋
+
+        div
+
+          h2 Historial de Diagnósticos
+
+          p
+            | Consulta tus diagnósticos y tratamientos anteriores
+
+
+      button#cerrarDiagnosticos.diagnosticos-close(
+        type="button"
+        aria-label="Cerrar"
+      )
+        | ×
+
+
+    // ========================================
+    // CONTENIDO
+    // ========================================
+
+    .diagnosticos-body
+
+
+      // ======================================
+      // DIAGNÓSTICO 1
+      // ======================================
+
+      article.diagnostico-item
+
+        button.diagnostico-header(
+          type="button"
+          data-diagnostico="1"
+        )
+
+          .diagnostico-header-info
+
+            .diagnostico-icon
+              | 🩺
+
+            div
+
+              strong Diagnóstico de Medicina General
+
+              span
+                | 15 de septiembre de 2026
+
+
+          span.diagnostico-arrow
+            | ▼
+
+
+        .diagnostico-content
+
+          .diagnostico-section
+
+            h3 Signos Vitales
+
+            .signos-vitales
+
+              .signo
+
+                span.label
+                  | Presión arterial
+
+                span.valor
+                  | 120/80 mmHg
+
+
+              .signo
+
+                span.label
+                  | Frecuencia cardíaca
+
+                span.valor
+                  | 72 lpm
+
+
+              .signo
+
+                span.label
+                  | Temperatura
+
+                span.valor
+                  | 36.5 °C
+
+
+              .signo
+
+                span.label
+                  | Saturación de oxígeno
+
+                span.valor
+                  | 98 %
+
+
+          .diagnostico-section
+
+            h3 Diagnóstico
+
+            p
+              | Infección respiratoria aguda.
+
+
+          .diagnostico-section
+
+            h3 Tratamiento
+
+            p
+              | Reposo, hidratación y seguimiento de los síntomas.
+
+
+          .diagnostico-section
+
+            h3 Prescripción Médica
+
+            p
+              | Acetaminofén 500 mg cada 8 horas por 3 días.
+
+
+          .diagnostico-section
+
+            h3 Notas adicionales
+
+            p
+              | Realizar control médico si los síntomas persisten.
+
+
+
+      // ======================================
+      // DIAGNÓSTICO 2
+      // ======================================
+
+      article.diagnostico-item.active
+
+        button.diagnostico-header(
+          type="button"
+          data-diagnostico="2"
+        )
+
+          .diagnostico-header-info
+
+            .diagnostico-icon
+              | 🩺
+
+            div
+
+              strong Diagnóstico de Medicina General
+
+              span
+                | 20 de agosto de 2026
+
+
+          span.diagnostico-arrow
+            | ▲
+
+
+        .diagnostico-content
+
+          .diagnostico-section
+
+            h3 Signos Vitales
+
+            .signos-vitales
+
+              .signo
+
+                span.label
+                  | Presión arterial
+
+                span.valor
+                  | 118/78 mmHg
+
+
+              .signo
+
+                span.label
+                  | Frecuencia cardíaca
+
+                span.valor
+                  | 75 lpm
+
+
+              .signo
+
+                span.label
+                  | Temperatura
+
+                span.valor
+                  | 36.7 °C
+
+
+              .signo
+
+                span.label
+                  | Saturación de oxígeno
+
+                span.valor
+                  | 99 %
+
+
+          .diagnostico-section
+
+            h3 Diagnóstico
+
+            p
+              | Dolor de garganta y síntomas respiratorios.
+
+
+          .diagnostico-section
+
+            h3 Tratamiento
+
+            p
+              | Hidratación abundante y reposo.
+
+
+          .diagnostico-section
+
+            h3 Prescripción Médica
+
+            p
+              | Tratamiento sintomático según evolución.
+
+
+          .diagnostico-section
+
+            h3 Notas adicionales
+
+            p
+              | Se recomienda seguimiento médico.
+
+
+    // ========================================
+    // PIE DEL MODAL
+    // ========================================
+
+    footer.diagnosticos-footer
+
+      button#cerrarDiagnosticosFooter.diagnosticos-btn(
+        type="button"
+      )
+        | Cerrar
