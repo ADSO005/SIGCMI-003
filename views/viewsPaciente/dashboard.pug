@@ -18,14 +18,14 @@ block content
 
 
     form(
-        action="/auth/logout"
-        method="POST"
+      action="/auth/logout"
+      method="POST"
     )
 
-        button.btn-logout(type="submit")
+      button.btn-logout(type="submit")
 
-            i.icon-logout
-            | Cerrar Sesión
+        i.icon-logout
+        | Cerrar Sesión
 
 
   // ==========================================
@@ -331,9 +331,9 @@ block content
                 // ============================
 
                 .cita-acciones
-
-                  a.reprogramar(
-                    href=`/citas/${cita.id}/reprogramar`
+                  button.reprogramar.btn-reprogramar(
+                    type="button"
+                    data-cita-id=cita.id
                   )
                     | Reprogramar
 
@@ -474,3 +474,8 @@ block content
   // ==========================================
 
   script(src="/patient/js/notificationSettings.js")
+
+  include includes/modalReprogramarCita
+  link(rel="stylesheet", href="/patient/css/rescheduleAppointment.css")
+    
+  script(src="/patient/js/rescheduleAppointment.js")

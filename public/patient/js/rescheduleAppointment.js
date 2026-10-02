@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         alert("La cita fue reprogramada correctamente.");
 
-        cerrarModal();
+      cerrarModal();
 
     });
 
