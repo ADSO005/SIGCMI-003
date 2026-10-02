@@ -10,6 +10,7 @@ import pacienteRoutes from "./routes/paciente/pacienteRoutes.js";
 
 import asociarModelos from "./models/asociaciones.js";
 
+import whatsappRoutes from "./routes/whatsapp/whatsappRoutes.js";
 // =====================================
 // ASOCIACIONES DE SEQUELIZE
 // =====================================
@@ -29,6 +30,7 @@ app.set("views", "./views");
 
 app.use("/auth", userRoutes);
 app.use("/admin", adminRoutes);
+app.use("/whatsapp", whatsappRoutes);
 app.use("/medico", medicoRoutes);
 app.use("/paciente", pacienteRoutes);
 
