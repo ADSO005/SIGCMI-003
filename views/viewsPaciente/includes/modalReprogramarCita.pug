@@ -1,0 +1,71 @@
+div#modalReprogramarCita.reprogramar-modal
+  .reprogramar-container
+
+    header.reprogramar-header
+      h2 Reprogramar Cita
+
+      button#cerrarReprogramar.reprogramar-close(
+        type="button"
+        aria-label="Cerrar"
+      )
+        | ×
+
+    form#formReprogramarCita
+
+      .reprogramar-field
+        label(for="especialidad")
+          | Especialidad
+
+        select#especialidad(name="especialidad" required)
+          option(value="") Seleccionar especialidad
+          option(value="medicina-general") Medicina General
+          option(value="odontologia") Odontología
+          option(value="psicologia") Psicología
+          option(value="nutricion") Nutrición
+
+      .reprogramar-field
+        label(for="medico")
+          | Médico
+
+        select#medico(name="medico" required)
+          option(value="") Seleccionar médico
+          option(value="carlos-perez") Dr. Carlos Pérez
+          option(value="maria-gomez") Dra. María Gómez
+
+      .reprogramar-row
+
+        .reprogramar-field
+          label(for="fecha")
+            | Fecha
+
+          input#fecha(
+            type="date"
+            name="fecha"
+            required
+          )
+
+        .reprogramar-field
+          label(for="hora")
+            | Hora
+
+          select#hora(name="hora" required)
+            option(value="") Seleccionar hora
+            option(value="08:00") 08:00
+            option(value="09:00") 09:00
+            option(value="10:00") 10:00
+            option(value="11:00") 11:00
+            option(value="14:00") 14:00
+            option(value="15:00") 15:00
+            option(value="16:00") 16:00
+
+      .reprogramar-actions
+
+        button#btnConfirmarReprogramar.reprogramar-btn(
+          type="submit"
+        )
+          | Reprogramar
+
+        button#btnCancelarReprogramar.reprogramar-btn-cancel(
+          type="button"
+        )
+          | Cancelar

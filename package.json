@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/app.css./public/patient/css/output.css --watch",
+    "css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/patient/css/output.css --watch",
     "dev": "concurrently \"npm run server\" \"npm run css\" node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
