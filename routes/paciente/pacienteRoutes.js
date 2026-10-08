@@ -12,6 +12,11 @@ import {
 
 const router = express.Router();
 
+
+// ======================================================
+// DASHBOARD DEL PACIENTE
+// ======================================================
+
 router.get(
     "/dashboard",
     auth,
@@ -20,25 +25,13 @@ router.get(
 
         try {
 
-            // ==========================================
-            // USUARIO AUTENTICADO
-            // ==========================================
-
             const usuarioId = req.usuario.id_usuario;
 
-
             if (!usuarioId) {
-
                 return res.status(401).send(
                     "No se pudo identificar al usuario."
                 );
-
             }
-
-
-            // ==========================================
-            // BUSCAR PACIENTE
-            // ==========================================
 
             const paciente = await Paciente.findOne({
 
@@ -61,19 +54,12 @@ router.get(
 
             });
 
-
             if (!paciente) {
-
                 return res.status(404).send(
                     "No se encontró el paciente asociado al usuario."
                 );
-
             }
 
-
-            // ==========================================
-            // BUSCAR CITAS DEL PACIENTE
-            // ==========================================
 
             const citasDB = await Cita.findAll({
 
@@ -112,17 +98,12 @@ router.get(
             });
 
 
-            // ==========================================
-            // ADAPTAR CITAS PARA EL PUG
-            // ==========================================
-
             const citas = citasDB.map(cita => {
 
                 const nombreDoctor =
                     cita.Medico?.Usuario
                         ? `${cita.Medico.Usuario.nombres} ${cita.Medico.Usuario.apellidos}`
                         : "Médico no disponible";
-
 
                 return {
 
@@ -146,10 +127,6 @@ router.get(
             });
 
 
-            // ==========================================
-            // DATOS DEL PACIENTE PARA LA VISTA
-            // ==========================================
-
             const pacienteVista = {
 
                 id: paciente.id_paciente,
@@ -172,10 +149,6 @@ router.get(
             };
 
 
-            // ==========================================
-            // RENDER
-            // ==========================================
-
             res.render(
                 "viewsPaciente/dashboard",
                 {
@@ -194,6 +167,163 @@ router.get(
 
             res.status(500).send(
                 "Error al cargar el dashboard del paciente."
+            );
+
+        }
+
+    }
+);
+
+
+// ======================================================
+// PERFIL DEL PACIENTE
+// ======================================================
+
+// ======================================================
+// PERFIL DEL PACIENTE
+// ======================================================
+
+router.get(
+    "/perfil",
+    auth,
+    role(3),
+    async (req, res) => {
+
+        try {
+
+            // ==========================================
+            // USUARIO AUTENTICADO
+            // ==========================================
+
+            const usuarioId = req.usuario.id_usuario;
+
+            if (!usuarioId) {
+                return res.status(401).send(
+                    "No se pudo identificar al usuario."
+                );
+            }
+
+
+            // ==========================================
+            // BUSCAR PACIENTE + USUARIO
+            // ==========================================
+
+            const paciente = await Paciente.findOne({
+
+                where: {
+                    usuario_id: usuarioId
+                },
+
+                include: [
+                    {
+                        model: Usuario,
+                        attributes: [
+                            "id_usuario",
+                            "nombres",
+                            "apellidos",
+                            "correo",
+                            "telefono",
+                            "tipo_documento",
+                            "numero_documento"
+                        ]
+                    }
+                ]
+
+            });
+
+
+            if (!paciente) {
+
+                return res.status(404).send(
+                    "No se encontró el paciente asociado al usuario."
+                );
+
+            }
+
+
+            // ==========================================
+            // DATOS PARA LA VISTA
+            // ==========================================
+
+            const pacienteVista = {
+
+                id: paciente.id_paciente,
+
+                nombre:
+                    `${paciente.Usuario.nombres} ${paciente.Usuario.apellidos}`,
+
+                nombres:
+                    paciente.Usuario.nombres,
+
+                apellidos:
+                    paciente.Usuario.apellidos,
+
+                correo:
+                    paciente.Usuario.correo,
+
+                telefono:
+                    paciente.Usuario.telefono,
+
+                fechaNacimiento:
+                    paciente.fecha_nacimiento,
+
+                tipoDocumento:
+                    paciente.Usuario.tipo_documento,
+
+                numeroDocumento:
+                    paciente.Usuario.numero_documento,
+
+                tipoSangre:
+                    paciente.tipo_sangre,
+
+                alergias:
+                    paciente.alergias,
+
+                condicionesMedicas:
+                    paciente.condiciones_medicas,
+
+                direccion:
+                    paciente.direccion,
+
+                departamento:
+                    paciente.departamento,
+
+                ciudad:
+                    paciente.ciudad,
+
+                contactoEmergencia: {
+
+                    nombres: "",
+                    apellidos: "",
+                    telefono: "",
+                    correo: ""
+
+                }
+
+            };
+
+
+            // ==========================================
+            // MOSTRAR PERFIL
+            // ==========================================
+
+            res.render(
+                "viewsPaciente/profile",
+                {
+                    paciente: pacienteVista
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error al cargar perfil del paciente:",
+                error
+            );
+
+            res.status(500).send(
+                "Error al cargar el perfil del paciente."
             );
 
         }

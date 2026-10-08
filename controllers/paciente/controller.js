@@ -66,7 +66,7 @@ export const mostrarPerfil = (req, res) => {
         }
     };
 
-    res.render('viewspaciente/profile', {
+    res.render('viewsPaciente/profile', {
         paciente
     });
 };
