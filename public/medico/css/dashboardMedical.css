@@ -267,6 +267,8 @@ nav a:hover {
   display: block;
 }
 
+/* Etapa 2: referencia desactivada; estilos migrados al Pug. */
+@media not all {
 /* ----------------- CARDS ESTADÍSTICAS ---------------- */
 .cards {
   display: grid;
@@ -590,6 +592,9 @@ nav a:hover {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.7);
   margin-top: 2px;
+}
+
+
 }
 
 /* ------------------- VISTA PACIENTES -------------------------------------- */
@@ -1359,16 +1364,22 @@ nav a:hover {
   width: 15px !important;
 }
 
+/* Etapa 2: breakpoint migrado al Pug. */
+@media not all {
 @media (max-width: 1024px) {
   .cards {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+}
 
+/* Etapa 2: breakpoint migrado al Pug. */
+@media not all {
 @media (max-width: 480px) {
   .cards {
     grid-template-columns: 1fr;
   }
+}
 }
 /*
 .portal-medico .sidebar .line-1,
