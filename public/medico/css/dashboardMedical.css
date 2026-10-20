@@ -1,18 +1,21 @@
-* {
+.portal-medico,
+.portal-medico *,
+.portal-medico *::before,
+.portal-medico *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, sans-serif;
 }
 
-body {
+body.portal-medico {
     background: #0f172a;
     color: #fff;
 }
-
 .container {
     position: relative;
     width: 100%;
+    max-width: none;
 }
 
 /* -------------------------- SIDEBAR ------------------------- */
@@ -66,11 +69,12 @@ body {
     transform: scale(1.1);
 }
 
-hr {
-    margin-top: 10px;
+.portal-medico .sidebar hr {
+    width: calc(100% + 40px);
     margin-left: -20px;
-    width: 113%;
-    border-color: rgba(255,255,255,0.2);
+    margin-top: 10px;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .line-1 { margin-bottom: 15px; background-color: #ffff; }
@@ -225,7 +229,8 @@ nav a:hover {
     background: #f5f5f5;
     min-height: 100vh;
     width: calc(100% - 350px);
-    float: right;
+    margin-left: 350px;
+    float: none;
     transition: 0.3s;
     padding: 20px 24px;
     color: black;
@@ -233,6 +238,7 @@ nav a:hover {
 
 .main.collapsed {
     width: calc(100% - 80px);
+    margin-left: 80px;
 }
 
 /* Ocultar / mostrar vistas */
@@ -1387,4 +1393,15 @@ nav a:hover {
   .cards {
     grid-template-columns: 1fr;
   }
+}
+
+.portal-medico .sidebar .line-1,
+.portal-medico .sidebar .line-2,
+.portal-medico .sidebar .line-3 {
+    width: calc(100% + 40px);
+    margin-left: -20px;
+}
+
+.portal-medico .sidebar .line-3 {
+    margin-top: auto;
 }

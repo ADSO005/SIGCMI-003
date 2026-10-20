@@ -38,8 +38,8 @@ html(lang="es")
         //- ===== BODY =====
         .auth-body
           .form-heading
-            h2.form-title Crear Cuenta
-            p.form-subtitle Regístrate para comenzar a usar SIGCMI
+            h2.form-title Registro de Pacientes
+            p.form-subtitle Crea tu cuenta para gestionar tus citas médicas
 
           form.register-form(action="/auth/register" method="POST" novalidate=true)
             .form-grid
@@ -107,6 +107,6 @@ html(lang="es")
 
             p.auth-footer
               | ¿Ya tienes cuenta?
-              a.auth-footer__link(href="/login")  Inicia Sesión
+              a.auth-footer__link(href="/auth/login")  Inicia Sesión
 
     script(src="/js/register.js")
