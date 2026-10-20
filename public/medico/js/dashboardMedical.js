@@ -48,47 +48,120 @@ function cerrarSesion() {
 }
 
 // BOTON INICIAR CONSULTA
-function iniciarConsulta(id) {
-  const cita = document.getElementById(id);
-  if (!cita) return;
-  
-  cita.classList.replace("estado-pendiente", "estado-encurso");
-  
-  const state = cita.querySelector(".state");
-  if (state) {
-    state.textContent = "En curso";
-    state.className = "state yellowState";
-  }
-  
-  const hour = cita.querySelector(".hour");
-  if (hour) hour.classList.add("hour-encurso");
-  
-  const btn = cita.querySelector(".btn-iniciar");
-  if (btn) {
-    btn.textContent = "Finalizar Consulta";
-    btn.className = "btn-consulta btn-finalizar";
-    btn.setAttribute("onclick", `finalizarConsulta('${id}')`);
-  }
+async function iniciarConsulta(id) {
+    try {
+        // Obtener el ID numérico de la cita
+        const idCita = id.replace("cita", "");
+
+        // Enviar la solicitud al servidor
+        const respuesta = await fetch(`/medico/citas/${idCita}/estado`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                estado_id: 2
+            })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            alert(resultado.mensaje || "No se pudo iniciar la consulta");
+            return;
+        }
+
+        // Actualizar la interfaz después de guardar en MySQL
+        const cita = document.getElementById(id);
+
+        if (!cita) return;
+
+        cita.classList.replace("estado-pendiente", "estado-encurso");
+
+        const state = cita.querySelector(".state");
+
+        if (state) {
+            state.textContent = "En Curso";
+            state.className = "state yellowState";
+        }
+
+        const hour = cita.querySelector(".hour");
+
+        if (hour) {
+            hour.classList.add("hour-encurso");
+        }
+
+        const btn = cita.querySelector(".btn-iniciar");
+
+        if (btn) {
+            btn.textContent = "Finalizar Consulta";
+            btn.className = "btn-consulta btn-finalizar";
+            btn.setAttribute("onclick", `finalizarConsulta('${id}')`);
+        }
+
+        console.log("✅ Consulta iniciada correctamente:", resultado);
+
+    } catch (error) {
+        console.error("❌ Error al iniciar consulta:", error);
+        alert("Ocurrió un error al conectar con el servidor");
+    }
 }
 
 // BOTON FINALIZAR CONSULTA
-function finalizarConsulta(id) {
-  const cita = document.getElementById(id);
-  if (!cita) return;
+async function finalizarConsulta(id) {
+    try {
+        const idCita = id.replace("cita", "");
 
-  cita.classList.replace("estado-encurso", "estado-completada");
-  
-  const state = cita.querySelector(".state");
-  if (state) {
-    state.textContent = "Completado";
-    state.className = "state greenState";
-  }
-  
-  const hour = cita.querySelector(".hour");
-  if (hour) hour.classList.remove("hour-encurso");
-  
-  const btnRow = cita.querySelector(".btn-full-row");
-  if (btnRow) btnRow.style.display = "none";
+        // Actualizar el estado en MySQL
+        const respuesta = await fetch(`/medico/citas/${idCita}/estado`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                estado_id: 3
+            })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            alert(resultado.mensaje || "No se pudo finalizar la consulta");
+            return;
+        }
+
+        // Actualizar la interfaz
+        const cita = document.getElementById(id);
+
+        if (!cita) return;
+
+        cita.classList.replace("estado-encurso", "estado-completada");
+
+        const state = cita.querySelector(".state");
+
+        if (state) {
+            state.textContent = "Completada";
+            state.className = "state greenState";
+        }
+
+        const hour = cita.querySelector(".hour");
+
+        if (hour) {
+            hour.classList.remove("hour-encurso");
+        }
+
+        const btnRow = cita.querySelector(".btn-full-row");
+
+        if (btnRow) {
+            btnRow.style.display = "none";
+        }
+
+        console.log("✅ Consulta finalizada correctamente:", resultado);
+
+    } catch (error) {
+        console.error("❌ Error al finalizar consulta:", error);
+        alert("Ocurrió un error al conectar con el servidor");
+    }
 }
 
 // MODAL GESTIÓN CITAS

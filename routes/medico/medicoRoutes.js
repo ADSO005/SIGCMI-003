@@ -4,7 +4,8 @@ import role from "../../middleware/role.js";
 
 import {
     dashboard,
-    detallePaciente
+    detallePaciente,
+    actualizarEstadoCita
 } from "../../controllers/medico/medicoController.js";
 
 const router = express.Router();
@@ -21,6 +22,13 @@ router.get(
     auth,
     role(2),
     detallePaciente
+);
+
+router.patch(
+    "/citas/:id/estado",
+    auth,
+    role(2),
+    actualizarEstadoCita
 );
 
 export default router;

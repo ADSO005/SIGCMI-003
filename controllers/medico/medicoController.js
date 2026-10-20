@@ -230,7 +230,80 @@ const detallePaciente = async (req, res) => {
     }
 };
 
+const actualizarEstadoCita = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { estado_id } = req.body;
+
+        // Validar el ID de la cita
+        if (!/^[1-9]\d*$/.test(String(id))) {
+            return res.status(400).json({
+                mensaje: "ID de cita inválido"
+            });
+        }
+
+        // Validar el estado solicitado
+        if (![2, 3].includes(estado_id)) {
+            return res.status(400).json({
+                mensaje: "Estado de cita no permitido"
+            });
+        }
+
+        // Buscar al médico autenticado
+        const medico = await Medico.findOne({
+            where: {
+                usuario_id: req.usuario.id_usuario
+            }
+        });
+
+        if (!medico) {
+            return res.status(404).json({
+                mensaje: "No se encontró el perfil del médico"
+            });
+        }
+
+        // Solo permitir las transiciones:
+        // Pendiente (1) -> En Curso (2)
+        // En Curso (2) -> Completada (3)
+        const estadoAnterior = estado_id === 2 ? 1 : 2;
+
+        // Actualizar únicamente si la cita pertenece al médico
+        // y todavía tiene el estado anterior esperado.
+        const [filasActualizadas] = await Cita.update(
+            {
+                estado_id
+            },
+            {
+                where: {
+                    id_cita: id,
+                    medico_id: medico.id_medico,
+                    estado_id: estadoAnterior
+                }
+            }
+        );
+
+        if (filasActualizadas === 0) {
+            return res.status(409).json({
+                mensaje: "No se pudo actualizar la cita. Verifica que te pertenezca y que su estado permita este cambio."
+            });
+        }
+
+        return res.json({
+            mensaje: "Estado de la cita actualizado correctamente",
+            id_cita: Number(id),
+            estado_id
+        });
+
+    } catch (error) {
+        console.error("❌ Error al actualizar la cita:", error);
+
+        return res.status(500).json({
+            mensaje: "Error al actualizar el estado de la cita"
+        });
+    }
+};
 export {
     dashboard,
-    detallePaciente
+    detallePaciente,
+    actualizarEstadoCita
 };
