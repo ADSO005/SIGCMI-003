@@ -1,76 +1,84 @@
 //- MODAL GESTIÓN DE CITAS
-#modalGestionCitas.modal-overlay(onclick='cerrarModalFuera(event)')
-  .modal-gc(onclick='event.stopPropagation()')
-    .modal-gc-header
-      .modal-gc-header-left
-        .modal-gc-icon
+#modalGestionCitas.modal-overlay(class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/30 [&.abierto]:flex [&_.pill]:whitespace-nowrap [&_.pill-encurso]:bg-[#b8f0cd] [&_.pill-encurso]:text-[#287a3b] [&_.pill-cancelado]:bg-[#fbe0e3] [&_.pill-cancelado]:text-[#c0392b] [&_.pill]:px-[5px] [&_.pill]:py-px [&_.pill]:text-[10px] [&_.pill]:leading-3 [&_.pill]:font-semibold [&_.pill-completada]:bg-[#b8f0cd] [&_.pill-completada]:text-[#1bce60] [&_.pill-cancelada]:bg-[#fbe0e3] [&_.pill-cancelada]:text-[#c0392b]" onclick='cerrarModalFuera(event)')
+  .modal-gc(class="flex w-[780px] max-w-[95vw] max-h-[88vh] flex-col overflow-hidden rounded-[14px] bg-white" onclick='event.stopPropagation()')
+    .modal-gc-header(class="flex shrink-0 items-center justify-between gap-3 bg-[#465DE5] px-6 py-4 [&_h2]:m-0 [&_h2]:text-[22px] [&_h2]:leading-7 [&_h2]:font-bold [&_h2]:text-white [&_p]:mt-[2px] [&_p]:text-[12px] [&_p]:font-semibold [&_p]:text-white/90")
+      .modal-gc-header-left(class="flex min-w-0 items-center gap-3")
+        .modal-gc-icon(class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white [&>img]:h-6 [&>img]:w-6 [&>img]:object-contain")
           img(src='/medico/img/Calendar22.png' alt='Icono Citas')
         div
           h2 Gestión de Citas
           p#modalSubtitulo Total de citas 3
-      button.modal-gc-close(onclick='cerrarModal()') ✕
-    .modal-gc-filtros
-      input.modal-gc-search(type='text' placeholder='Buscar por paciente.' oninput='filtrarCitas()')
-      select.modal-gc-select(onchange='filtrarCitas()')
-        option(value) Todos los estados
-        option(value='Pendiente') Pendiente
-        option(value='Completado') Completado
-        option(value='Cancelado') Cancelado
-    #listaCitas.modal-gc-body
-      .cita-card(data-estado='Pendiente')
-        .cita-card-top
-          .cita-fecha
+      button.modal-gc-close(class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-[22px] font-bold text-white transition-opacity hover:opacity-75" onclick='cerrarModal()') ✕
+    .modal-gc-filtros(class="flex shrink-0 items-center gap-3 bg-[#f5f5f5] px-5 py-5 [@media(max-width:640px)]:flex-col [@media(max-width:640px)]:items-stretch")
+      .modal-search-field(class="relative min-w-0 flex-1")
+        svg(class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#c4c8d2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true")
+          circle(cx="10" cy="10" r="6")
+          path(d="m15 15 6 6")
+        input.modal-gc-search(class="min-w-0 w-full rounded-lg border border-[#d9d9d9] bg-white py-2 pl-9 pr-3 text-[12px] text-[#1a202c] placeholder:text-[#969db3] outline-none focus:border-[#465DE5] focus:ring-[3px] focus:ring-[#465DE5]/10" type='text' placeholder='Buscar por paciente.' oninput='filtrarCitas()')
+      .modal-status-field(class="flex shrink-0 items-center gap-2")
+        svg(class="h-4 w-4 shrink-0 text-[#bfc2c6]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+          path(d="M3 4h18l-7 8v8l-4-2v-6z")
+        select.modal-gc-select(class="min-w-0 cursor-pointer rounded-lg border border-[#ddd] bg-white px-2 py-2 text-[12px] text-[#969db3] outline-none focus:border-[#465DE5]" onchange='filtrarCitas()')
+          option(value) Todos los estados
+          option(value='Pendiente') Pendiente
+          option(value='En Curso') En Curso
+          option(value='Completado') Completada
+          option(value='Cancelado') Cancelada
+    #listaCitas.modal-gc-body(class="min-h-0 flex-1 grid grid-cols-2 items-start content-start gap-x-[10px] gap-y-5 overflow-y-auto overscroll-contain bg-white px-7 pt-6 pb-10 [@media(max-width:640px)]:grid-cols-1 [@media(max-width:640px)]:px-4 [&>.sin-resultados]:col-span-full [&>.sin-resultados]:py-10 [&>.sin-resultados]:text-center [&>.sin-resultados]:text-[14px] [&>.sin-resultados]:text-[#a0aec0]")
+      .cita-card(class="min-w-0 flex flex-col gap-[6px] rounded-[10px] border border-[#bfbfbf] bg-white p-[10px] [&_img]:h-4 [&_img]:w-4 [&_img]:shrink-0 [&_img]:object-contain" data-estado='Pendiente')
+        .cita-card-top(class="mb-[2px] flex flex-wrap items-center justify-between gap-2")
+          .cita-fecha(class="flex items-center gap-2 text-[12px] font-bold text-black")
             img(src='/medico/img/Calendar22.png' alt)
             |  14 abr 2026
-          span.pill.pill-pendiente Pendiente
-        .cita-info
+          span.pill.pill-pendiente(class="bg-[#c4c9ff] text-[#465DE5] px-[5px] py-px text-[10px] leading-3 font-semibold") Pendiente
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/Clock.png' alt)
           |  09:00
-        .cita-info
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/person.png' alt)
           |  Juan Martínez López
-        .cita-info
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/image 218.png' alt)
           |  Dra. Ana López
-        .cita-motivo Control cardiológico
-        .cita-btns
-          button.btn-repro(onclick='event.stopPropagation(); abrirReprogramar(this)') Reprogramar
-          button.btn-cancel-cita Cancelar
-      .cita-card(data-estado='Pendiente')
-        .cita-card-top
-          .cita-fecha
+        .cita-motivo(class="ml-6 mt-0 text-[12px] leading-4 text-[#333]") Control cardiológico
+        .cita-btns(class="mt-3 flex gap-[14px]")
+          button.btn-repro(class="min-w-0 flex-[2] cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-2 py-[5px] text-[12px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" onclick='event.stopPropagation(); abrirReprogramar(this)') Reprogramar
+          button.btn-cancel-cita(class="min-w-0 flex-1 cursor-pointer rounded-[9px] border border-[#465DE5] bg-[#eef8ff] px-2 py-[5px] text-[12px] leading-4 font-semibold text-[#465DE5] transition-colors hover:bg-[#465DE5]/10") Cancelar
+      .cita-card(class="min-w-0 flex flex-col gap-[6px] rounded-[10px] border border-[#bfbfbf] bg-white p-[10px] [&_img]:h-4 [&_img]:w-4 [&_img]:shrink-0 [&_img]:object-contain" data-estado='Pendiente')
+        .cita-card-top(class="mb-[2px] flex flex-wrap items-center justify-between gap-2")
+          .cita-fecha(class="flex items-center gap-2 text-[12px] font-bold text-black")
             img(src='/medico/img/Calendar22.png' alt)
             |  18 abr 2026
-          span.pill.pill-pendiente Pendiente
-        .cita-info
+          span.pill.pill-pendiente(class="bg-[#c4c9ff] text-[#465DE5] px-[5px] py-px text-[10px] leading-3 font-semibold") Pendiente
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/Clock.png' alt)
           |  10:00
-        .cita-info
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/person.png' alt)
           |  María González Pérez
-        .cita-info
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/image 218.png' alt)
           |  Dr. Carlos Pérez
-        .cita-motivo Consulta general - Control de rutina
-        .cita-btns
-          button.btn-repro(onclick='event.stopPropagation(); abrirReprogramar(this)') Reprogramar
-          button.btn-cancel-cita Cancelar
-      .cita-card(data-estado='Completado')
-        .cita-card-top
-          .cita-fecha
+        .cita-motivo(class="ml-6 mt-0 text-[12px] leading-4 text-[#333]") Consulta general - Control de rutina
+        .cita-btns(class="mt-3 flex gap-[14px]")
+          button.btn-repro(class="min-w-0 flex-[2] cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-2 py-[5px] text-[12px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" onclick='event.stopPropagation(); abrirReprogramar(this)') Reprogramar
+          button.btn-cancel-cita(class="min-w-0 flex-1 cursor-pointer rounded-[9px] border border-[#465DE5] bg-[#eef8ff] px-2 py-[5px] text-[12px] leading-4 font-semibold text-[#465DE5] transition-colors hover:bg-[#465DE5]/10") Cancelar
+      .cita-card(class="min-w-0 flex flex-col gap-[6px] rounded-[10px] border border-[#bfbfbf] bg-white p-[10px] [&_img]:h-4 [&_img]:w-4 [&_img]:shrink-0 [&_img]:object-contain" data-estado='Completado')
+        .cita-card-top(class="mb-[2px] flex flex-wrap items-center justify-between gap-2")
+          .cita-fecha(class="flex items-center gap-2 text-[12px] font-bold text-black")
             img(src='/medico/img/Calendar22.png' alt)
             |  18 abr 2026
-          span.pill.pill-completado Completado
-        .cita-info
+          span.pill.pill-completado(class="bg-[#b8f0cd] text-[#1bce60] px-[5px] py-px text-[10px] leading-3 font-semibold") Completado
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/Clock.png' alt)
           |  14:00
-        .cita-info
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/person.png' alt)
           |  Ana Rodríguez Silva
-        .cita-info
+        .cita-info(class="flex items-center gap-2 text-[12px] leading-4 text-[#333]")
           img(src='/medico/img/image 218.png' alt)
           |  Dr. Luis García
-        .cita-motivo Vacunación pediátrica
+        .cita-motivo(class="ml-6 mt-0 text-[12px] leading-4 text-[#333]") Vacunación pediátrica
 
 //- MODAL REPROGRAMAR
 #modalReprogramar.modal-overlay(onclick='cerrarReprogramarFuera(event)')

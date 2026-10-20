@@ -1,81 +1,81 @@
-#modalHorarios.modal-overlay(onclick='cerrarModalHorariosFuera(event)')
-  .modal-gc(style='width:520px;' onclick='event.stopPropagation()')
-    .modal-gc-header
-      .modal-gc-header-left
-        .modal-gc-icon
+#modalHorarios.modal-overlay(class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/30 [&.abierto]:flex" onclick='cerrarModalHorariosFuera(event)')
+  .modal-gc(class="flex w-[750px] max-w-[95vw] max-h-[92vh] flex-col overflow-hidden rounded-[12px] bg-white" onclick='event.stopPropagation()')
+    .modal-gc-header(class="flex shrink-0 items-center justify-between bg-[#465DE5] px-7 py-5 [&_h2]:text-[22px] [&_h2]:leading-7 [&_h2]:font-bold [&_h2]:text-white [&_p]:mt-1 [&_p]:text-[12px] [&_p]:font-semibold [&_p]:text-white [@media(max-width:480px)]:px-4 [@media(max-width:480px)]:[&_h2]:text-[18px]")
+      .modal-gc-header-left(class="flex items-center gap-4")
+        .modal-gc-icon(class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white [&>img]:h-6 [&>img]:w-6 [&>img]:object-contain")
           img(src='/medico/img/Calendar22.png' alt)
         div
           h2 Mi Horario de Atención
           p Configura tus días y horarios disponibles
-    .horarios-body
-      #diaLunes.dia-row
-        .dia-top
-          .dia-left
-            label.switch
-              input(type='checkbox' onchange="toggleDia('diaLunes', this)")
-              span.slider
-            span.dia-nombre Lunes
-          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaLunes')") Agregar Horario
-        .dia-horas
-      #diaMartes.dia-row
-        .dia-top
-          .dia-left
-            label.switch
-              input(type='checkbox' onchange="toggleDia('diaMartes', this)")
-              span.slider
-            span.dia-nombre Martes
-          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaMartes')") Agregar Horario
-        .dia-horas
-      #diaMiercoles.dia-row
-        .dia-top
-          .dia-left
-            label.switch
-              input(type='checkbox' onchange="toggleDia('diaMiercoles', this)")
-              span.slider
-            span.dia-nombre Miércoles
-          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaMiercoles')") Agregar Horario
-        .dia-horas
-      #diaJueves.dia-row
-        .dia-top
-          .dia-left
-            label.switch
-              input(type='checkbox' onchange="toggleDia('diaJueves', this)")
-              span.slider
-            span.dia-nombre Jueves
-          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaJueves')") Agregar Horario
-        .dia-horas
-      #diaViernes.dia-row
-        .dia-top
-          .dia-left
-            label.switch
-              input(type='checkbox' onchange="toggleDia('diaViernes', this)")
-              span.slider
-            span.dia-nombre Viernes
-          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaViernes')") Agregar Horario
-        .dia-horas
-      #diaSabado.dia-row
-        .dia-top
-          .dia-left
-            label.switch
-              input(type='checkbox' onchange="toggleDia('diaSabado', this)")
-              span.slider
-            span.dia-nombre Sábado
-          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaSabado')") Agregar Horario
-        .dia-horas
-      #diaDomingo.dia-row
-        .dia-top
-          .dia-left
-            label.switch
-              input(type='checkbox' onchange="toggleDia('diaDomingo', this)")
-              span.slider
-            span.dia-nombre Domingo
-          button.btn-agregar-hora(style='display:none;' onclick="agregarHora('diaDomingo')") Agregar Horario
-        .dia-horas
-      .info-box
+    .horarios-body(class="min-h-0 flex flex-col gap-4 overflow-y-auto overscroll-contain px-7 pt-5 pb-0 [@media(max-width:480px)]:px-4")
+      #diaLunes.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
+        .dia-top(class="flex min-h-6 items-center justify-between gap-3")
+          .dia-left(class="flex items-center gap-2")
+            label.switch(class="relative inline-block h-[18px] w-[42px] shrink-0")
+              input(class="peer sr-only" type='checkbox' onchange="toggleDia('diaLunes', this)")
+              span.slider(class="absolute inset-0 cursor-pointer rounded-full border border-[#8b8790] bg-white transition-colors duration-300 before:absolute before:left-[2px] before:top-px before:h-[14px] before:w-[14px] before:rounded-full before:bg-[#8b8790] before:transition-transform before:duration-300 before:content-[''] peer-checked:border-[#465DE5] peer-checked:bg-[#465DE5] peer-checked:before:translate-x-[22px] peer-checked:before:bg-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#465DE5]")
+            span.dia-nombre(class="text-[13px] font-semibold text-black") Lunes
+          button.btn-agregar-hora(class="shrink-0 cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-3 py-[5px] text-[11px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" style='display:none;' onclick="agregarHora('diaLunes')") Agregar Horario
+        .dia-horas(class="flex flex-col gap-2 empty:hidden [&>.hora-row]:mt-0 [&>.hora-row]:flex [&>.hora-row]:items-center [&>.hora-row]:gap-2 [&>.hora-row]:rounded-[10px] [&>.hora-row]:bg-white [&>.hora-row]:p-2 [&>.hora-row]:before:block [&>.hora-row]:before:h-4 [&>.hora-row]:before:w-4 [&>.hora-row]:before:shrink-0 [&>.hora-row]:before:bg-[url('/medico/img/Clock.png')] [&>.hora-row]:before:bg-contain [&>.hora-row]:before:bg-no-repeat [&>.hora-row]:before:content-[''] [&_input]:min-w-0 [&_input]:w-[100px] [&_input]:rounded [&_input]:border [&_input]:border-[#ddd] [&_input]:bg-white [&_input]:px-2 [&_input]:py-px [&_input]:text-[12px] [&_input]:font-semibold [&_input]:text-[#777] [&_input]:outline-none [&_input:focus]:border-[#465DE5] [&_span]:text-[12px] [&_span]:text-[#666] [&_.btn-eliminar-hora]:ml-auto [&_.btn-eliminar-hora]:shrink-0 [&_.btn-eliminar-hora]:cursor-pointer [&_.btn-eliminar-hora]:rounded-lg [&_.btn-eliminar-hora]:border [&_.btn-eliminar-hora]:border-red-300 [&_.btn-eliminar-hora]:bg-red-100 [&_.btn-eliminar-hora]:px-2 [&_.btn-eliminar-hora]:py-px [&_.btn-eliminar-hora]:text-[16px] [&_.btn-eliminar-hora]:leading-5 [&_.btn-eliminar-hora]:text-red-600 [&_.btn-eliminar-hora:hover]:bg-red-200 [@media(max-width:480px)]:[&_input]:w-[82px] [@media(max-width:480px)]:[&>.hora-row]:gap-1")
+      #diaMartes.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
+        .dia-top(class="flex min-h-6 items-center justify-between gap-3")
+          .dia-left(class="flex items-center gap-2")
+            label.switch(class="relative inline-block h-[18px] w-[42px] shrink-0")
+              input(class="peer sr-only" type='checkbox' onchange="toggleDia('diaMartes', this)")
+              span.slider(class="absolute inset-0 cursor-pointer rounded-full border border-[#8b8790] bg-white transition-colors duration-300 before:absolute before:left-[2px] before:top-px before:h-[14px] before:w-[14px] before:rounded-full before:bg-[#8b8790] before:transition-transform before:duration-300 before:content-[''] peer-checked:border-[#465DE5] peer-checked:bg-[#465DE5] peer-checked:before:translate-x-[22px] peer-checked:before:bg-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#465DE5]")
+            span.dia-nombre(class="text-[13px] font-semibold text-black") Martes
+          button.btn-agregar-hora(class="shrink-0 cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-3 py-[5px] text-[11px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" style='display:none;' onclick="agregarHora('diaMartes')") Agregar Horario
+        .dia-horas(class="flex flex-col gap-2 empty:hidden [&>.hora-row]:mt-0 [&>.hora-row]:flex [&>.hora-row]:items-center [&>.hora-row]:gap-2 [&>.hora-row]:rounded-[10px] [&>.hora-row]:bg-white [&>.hora-row]:p-2 [&>.hora-row]:before:block [&>.hora-row]:before:h-4 [&>.hora-row]:before:w-4 [&>.hora-row]:before:shrink-0 [&>.hora-row]:before:bg-[url('/medico/img/Clock.png')] [&>.hora-row]:before:bg-contain [&>.hora-row]:before:bg-no-repeat [&>.hora-row]:before:content-[''] [&_input]:min-w-0 [&_input]:w-[100px] [&_input]:rounded [&_input]:border [&_input]:border-[#ddd] [&_input]:bg-white [&_input]:px-2 [&_input]:py-px [&_input]:text-[12px] [&_input]:font-semibold [&_input]:text-[#777] [&_input]:outline-none [&_input:focus]:border-[#465DE5] [&_span]:text-[12px] [&_span]:text-[#666] [&_.btn-eliminar-hora]:ml-auto [&_.btn-eliminar-hora]:shrink-0 [&_.btn-eliminar-hora]:cursor-pointer [&_.btn-eliminar-hora]:rounded-lg [&_.btn-eliminar-hora]:border [&_.btn-eliminar-hora]:border-red-300 [&_.btn-eliminar-hora]:bg-red-100 [&_.btn-eliminar-hora]:px-2 [&_.btn-eliminar-hora]:py-px [&_.btn-eliminar-hora]:text-[16px] [&_.btn-eliminar-hora]:leading-5 [&_.btn-eliminar-hora]:text-red-600 [&_.btn-eliminar-hora:hover]:bg-red-200 [@media(max-width:480px)]:[&_input]:w-[82px] [@media(max-width:480px)]:[&>.hora-row]:gap-1")
+      #diaMiercoles.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
+        .dia-top(class="flex min-h-6 items-center justify-between gap-3")
+          .dia-left(class="flex items-center gap-2")
+            label.switch(class="relative inline-block h-[18px] w-[42px] shrink-0")
+              input(class="peer sr-only" type='checkbox' onchange="toggleDia('diaMiercoles', this)")
+              span.slider(class="absolute inset-0 cursor-pointer rounded-full border border-[#8b8790] bg-white transition-colors duration-300 before:absolute before:left-[2px] before:top-px before:h-[14px] before:w-[14px] before:rounded-full before:bg-[#8b8790] before:transition-transform before:duration-300 before:content-[''] peer-checked:border-[#465DE5] peer-checked:bg-[#465DE5] peer-checked:before:translate-x-[22px] peer-checked:before:bg-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#465DE5]")
+            span.dia-nombre(class="text-[13px] font-semibold text-black") Miércoles
+          button.btn-agregar-hora(class="shrink-0 cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-3 py-[5px] text-[11px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" style='display:none;' onclick="agregarHora('diaMiercoles')") Agregar Horario
+        .dia-horas(class="flex flex-col gap-2 empty:hidden [&>.hora-row]:mt-0 [&>.hora-row]:flex [&>.hora-row]:items-center [&>.hora-row]:gap-2 [&>.hora-row]:rounded-[10px] [&>.hora-row]:bg-white [&>.hora-row]:p-2 [&>.hora-row]:before:block [&>.hora-row]:before:h-4 [&>.hora-row]:before:w-4 [&>.hora-row]:before:shrink-0 [&>.hora-row]:before:bg-[url('/medico/img/Clock.png')] [&>.hora-row]:before:bg-contain [&>.hora-row]:before:bg-no-repeat [&>.hora-row]:before:content-[''] [&_input]:min-w-0 [&_input]:w-[100px] [&_input]:rounded [&_input]:border [&_input]:border-[#ddd] [&_input]:bg-white [&_input]:px-2 [&_input]:py-px [&_input]:text-[12px] [&_input]:font-semibold [&_input]:text-[#777] [&_input]:outline-none [&_input:focus]:border-[#465DE5] [&_span]:text-[12px] [&_span]:text-[#666] [&_.btn-eliminar-hora]:ml-auto [&_.btn-eliminar-hora]:shrink-0 [&_.btn-eliminar-hora]:cursor-pointer [&_.btn-eliminar-hora]:rounded-lg [&_.btn-eliminar-hora]:border [&_.btn-eliminar-hora]:border-red-300 [&_.btn-eliminar-hora]:bg-red-100 [&_.btn-eliminar-hora]:px-2 [&_.btn-eliminar-hora]:py-px [&_.btn-eliminar-hora]:text-[16px] [&_.btn-eliminar-hora]:leading-5 [&_.btn-eliminar-hora]:text-red-600 [&_.btn-eliminar-hora:hover]:bg-red-200 [@media(max-width:480px)]:[&_input]:w-[82px] [@media(max-width:480px)]:[&>.hora-row]:gap-1")
+      #diaJueves.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
+        .dia-top(class="flex min-h-6 items-center justify-between gap-3")
+          .dia-left(class="flex items-center gap-2")
+            label.switch(class="relative inline-block h-[18px] w-[42px] shrink-0")
+              input(class="peer sr-only" type='checkbox' onchange="toggleDia('diaJueves', this)")
+              span.slider(class="absolute inset-0 cursor-pointer rounded-full border border-[#8b8790] bg-white transition-colors duration-300 before:absolute before:left-[2px] before:top-px before:h-[14px] before:w-[14px] before:rounded-full before:bg-[#8b8790] before:transition-transform before:duration-300 before:content-[''] peer-checked:border-[#465DE5] peer-checked:bg-[#465DE5] peer-checked:before:translate-x-[22px] peer-checked:before:bg-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#465DE5]")
+            span.dia-nombre(class="text-[13px] font-semibold text-black") Jueves
+          button.btn-agregar-hora(class="shrink-0 cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-3 py-[5px] text-[11px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" style='display:none;' onclick="agregarHora('diaJueves')") Agregar Horario
+        .dia-horas(class="flex flex-col gap-2 empty:hidden [&>.hora-row]:mt-0 [&>.hora-row]:flex [&>.hora-row]:items-center [&>.hora-row]:gap-2 [&>.hora-row]:rounded-[10px] [&>.hora-row]:bg-white [&>.hora-row]:p-2 [&>.hora-row]:before:block [&>.hora-row]:before:h-4 [&>.hora-row]:before:w-4 [&>.hora-row]:before:shrink-0 [&>.hora-row]:before:bg-[url('/medico/img/Clock.png')] [&>.hora-row]:before:bg-contain [&>.hora-row]:before:bg-no-repeat [&>.hora-row]:before:content-[''] [&_input]:min-w-0 [&_input]:w-[100px] [&_input]:rounded [&_input]:border [&_input]:border-[#ddd] [&_input]:bg-white [&_input]:px-2 [&_input]:py-px [&_input]:text-[12px] [&_input]:font-semibold [&_input]:text-[#777] [&_input]:outline-none [&_input:focus]:border-[#465DE5] [&_span]:text-[12px] [&_span]:text-[#666] [&_.btn-eliminar-hora]:ml-auto [&_.btn-eliminar-hora]:shrink-0 [&_.btn-eliminar-hora]:cursor-pointer [&_.btn-eliminar-hora]:rounded-lg [&_.btn-eliminar-hora]:border [&_.btn-eliminar-hora]:border-red-300 [&_.btn-eliminar-hora]:bg-red-100 [&_.btn-eliminar-hora]:px-2 [&_.btn-eliminar-hora]:py-px [&_.btn-eliminar-hora]:text-[16px] [&_.btn-eliminar-hora]:leading-5 [&_.btn-eliminar-hora]:text-red-600 [&_.btn-eliminar-hora:hover]:bg-red-200 [@media(max-width:480px)]:[&_input]:w-[82px] [@media(max-width:480px)]:[&>.hora-row]:gap-1")
+      #diaViernes.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
+        .dia-top(class="flex min-h-6 items-center justify-between gap-3")
+          .dia-left(class="flex items-center gap-2")
+            label.switch(class="relative inline-block h-[18px] w-[42px] shrink-0")
+              input(class="peer sr-only" type='checkbox' onchange="toggleDia('diaViernes', this)")
+              span.slider(class="absolute inset-0 cursor-pointer rounded-full border border-[#8b8790] bg-white transition-colors duration-300 before:absolute before:left-[2px] before:top-px before:h-[14px] before:w-[14px] before:rounded-full before:bg-[#8b8790] before:transition-transform before:duration-300 before:content-[''] peer-checked:border-[#465DE5] peer-checked:bg-[#465DE5] peer-checked:before:translate-x-[22px] peer-checked:before:bg-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#465DE5]")
+            span.dia-nombre(class="text-[13px] font-semibold text-black") Viernes
+          button.btn-agregar-hora(class="shrink-0 cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-3 py-[5px] text-[11px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" style='display:none;' onclick="agregarHora('diaViernes')") Agregar Horario
+        .dia-horas(class="flex flex-col gap-2 empty:hidden [&>.hora-row]:mt-0 [&>.hora-row]:flex [&>.hora-row]:items-center [&>.hora-row]:gap-2 [&>.hora-row]:rounded-[10px] [&>.hora-row]:bg-white [&>.hora-row]:p-2 [&>.hora-row]:before:block [&>.hora-row]:before:h-4 [&>.hora-row]:before:w-4 [&>.hora-row]:before:shrink-0 [&>.hora-row]:before:bg-[url('/medico/img/Clock.png')] [&>.hora-row]:before:bg-contain [&>.hora-row]:before:bg-no-repeat [&>.hora-row]:before:content-[''] [&_input]:min-w-0 [&_input]:w-[100px] [&_input]:rounded [&_input]:border [&_input]:border-[#ddd] [&_input]:bg-white [&_input]:px-2 [&_input]:py-px [&_input]:text-[12px] [&_input]:font-semibold [&_input]:text-[#777] [&_input]:outline-none [&_input:focus]:border-[#465DE5] [&_span]:text-[12px] [&_span]:text-[#666] [&_.btn-eliminar-hora]:ml-auto [&_.btn-eliminar-hora]:shrink-0 [&_.btn-eliminar-hora]:cursor-pointer [&_.btn-eliminar-hora]:rounded-lg [&_.btn-eliminar-hora]:border [&_.btn-eliminar-hora]:border-red-300 [&_.btn-eliminar-hora]:bg-red-100 [&_.btn-eliminar-hora]:px-2 [&_.btn-eliminar-hora]:py-px [&_.btn-eliminar-hora]:text-[16px] [&_.btn-eliminar-hora]:leading-5 [&_.btn-eliminar-hora]:text-red-600 [&_.btn-eliminar-hora:hover]:bg-red-200 [@media(max-width:480px)]:[&_input]:w-[82px] [@media(max-width:480px)]:[&>.hora-row]:gap-1")
+      #diaSabado.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
+        .dia-top(class="flex min-h-6 items-center justify-between gap-3")
+          .dia-left(class="flex items-center gap-2")
+            label.switch(class="relative inline-block h-[18px] w-[42px] shrink-0")
+              input(class="peer sr-only" type='checkbox' onchange="toggleDia('diaSabado', this)")
+              span.slider(class="absolute inset-0 cursor-pointer rounded-full border border-[#8b8790] bg-white transition-colors duration-300 before:absolute before:left-[2px] before:top-px before:h-[14px] before:w-[14px] before:rounded-full before:bg-[#8b8790] before:transition-transform before:duration-300 before:content-[''] peer-checked:border-[#465DE5] peer-checked:bg-[#465DE5] peer-checked:before:translate-x-[22px] peer-checked:before:bg-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#465DE5]")
+            span.dia-nombre(class="text-[13px] font-semibold text-black") Sábado
+          button.btn-agregar-hora(class="shrink-0 cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-3 py-[5px] text-[11px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" style='display:none;' onclick="agregarHora('diaSabado')") Agregar Horario
+        .dia-horas(class="flex flex-col gap-2 empty:hidden [&>.hora-row]:mt-0 [&>.hora-row]:flex [&>.hora-row]:items-center [&>.hora-row]:gap-2 [&>.hora-row]:rounded-[10px] [&>.hora-row]:bg-white [&>.hora-row]:p-2 [&>.hora-row]:before:block [&>.hora-row]:before:h-4 [&>.hora-row]:before:w-4 [&>.hora-row]:before:shrink-0 [&>.hora-row]:before:bg-[url('/medico/img/Clock.png')] [&>.hora-row]:before:bg-contain [&>.hora-row]:before:bg-no-repeat [&>.hora-row]:before:content-[''] [&_input]:min-w-0 [&_input]:w-[100px] [&_input]:rounded [&_input]:border [&_input]:border-[#ddd] [&_input]:bg-white [&_input]:px-2 [&_input]:py-px [&_input]:text-[12px] [&_input]:font-semibold [&_input]:text-[#777] [&_input]:outline-none [&_input:focus]:border-[#465DE5] [&_span]:text-[12px] [&_span]:text-[#666] [&_.btn-eliminar-hora]:ml-auto [&_.btn-eliminar-hora]:shrink-0 [&_.btn-eliminar-hora]:cursor-pointer [&_.btn-eliminar-hora]:rounded-lg [&_.btn-eliminar-hora]:border [&_.btn-eliminar-hora]:border-red-300 [&_.btn-eliminar-hora]:bg-red-100 [&_.btn-eliminar-hora]:px-2 [&_.btn-eliminar-hora]:py-px [&_.btn-eliminar-hora]:text-[16px] [&_.btn-eliminar-hora]:leading-5 [&_.btn-eliminar-hora]:text-red-600 [&_.btn-eliminar-hora:hover]:bg-red-200 [@media(max-width:480px)]:[&_input]:w-[82px] [@media(max-width:480px)]:[&>.hora-row]:gap-1")
+      #diaDomingo.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
+        .dia-top(class="flex min-h-6 items-center justify-between gap-3")
+          .dia-left(class="flex items-center gap-2")
+            label.switch(class="relative inline-block h-[18px] w-[42px] shrink-0")
+              input(class="peer sr-only" type='checkbox' onchange="toggleDia('diaDomingo', this)")
+              span.slider(class="absolute inset-0 cursor-pointer rounded-full border border-[#8b8790] bg-white transition-colors duration-300 before:absolute before:left-[2px] before:top-px before:h-[14px] before:w-[14px] before:rounded-full before:bg-[#8b8790] before:transition-transform before:duration-300 before:content-[''] peer-checked:border-[#465DE5] peer-checked:bg-[#465DE5] peer-checked:before:translate-x-[22px] peer-checked:before:bg-white peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#465DE5]")
+            span.dia-nombre(class="text-[13px] font-semibold text-black") Domingo
+          button.btn-agregar-hora(class="shrink-0 cursor-pointer rounded-[9px] border-0 bg-[#465DE5] px-3 py-[5px] text-[11px] leading-4 font-semibold text-white transition-opacity hover:opacity-85" style='display:none;' onclick="agregarHora('diaDomingo')") Agregar Horario
+        .dia-horas(class="flex flex-col gap-2 empty:hidden [&>.hora-row]:mt-0 [&>.hora-row]:flex [&>.hora-row]:items-center [&>.hora-row]:gap-2 [&>.hora-row]:rounded-[10px] [&>.hora-row]:bg-white [&>.hora-row]:p-2 [&>.hora-row]:before:block [&>.hora-row]:before:h-4 [&>.hora-row]:before:w-4 [&>.hora-row]:before:shrink-0 [&>.hora-row]:before:bg-[url('/medico/img/Clock.png')] [&>.hora-row]:before:bg-contain [&>.hora-row]:before:bg-no-repeat [&>.hora-row]:before:content-[''] [&_input]:min-w-0 [&_input]:w-[100px] [&_input]:rounded [&_input]:border [&_input]:border-[#ddd] [&_input]:bg-white [&_input]:px-2 [&_input]:py-px [&_input]:text-[12px] [&_input]:font-semibold [&_input]:text-[#777] [&_input]:outline-none [&_input:focus]:border-[#465DE5] [&_span]:text-[12px] [&_span]:text-[#666] [&_.btn-eliminar-hora]:ml-auto [&_.btn-eliminar-hora]:shrink-0 [&_.btn-eliminar-hora]:cursor-pointer [&_.btn-eliminar-hora]:rounded-lg [&_.btn-eliminar-hora]:border [&_.btn-eliminar-hora]:border-red-300 [&_.btn-eliminar-hora]:bg-red-100 [&_.btn-eliminar-hora]:px-2 [&_.btn-eliminar-hora]:py-px [&_.btn-eliminar-hora]:text-[16px] [&_.btn-eliminar-hora]:leading-5 [&_.btn-eliminar-hora]:text-red-600 [&_.btn-eliminar-hora:hover]:bg-red-200 [@media(max-width:480px)]:[&_input]:w-[82px] [@media(max-width:480px)]:[&>.hora-row]:gap-1")
+      .info-box(class="mt-1 flex gap-2 rounded-lg border border-[#7b85ff] bg-[#e8eafd] p-3 [&>span]:shrink-0 [&>span]:text-[16px] [&>span]:text-[#465DE5] [&_strong]:mb-1 [&_strong]:block [&_strong]:text-[13px] [&_strong]:font-normal [&_strong]:text-black [&_p]:m-0 [&_p]:text-[12px] [&_p]:leading-4 [&_p]:text-[#4a4a4a]")
         span ⓘ
         div
           strong Información Importante
           p Los pacientes solo podrán agendar citas en los horarios que configures aquí. Puedes tener múltiples horarios por día (por ejemplo, mañana y tarde).
-    .modal-gc-footer
-      button.btn-cancel-cita(style='flex:1; padding:11px;' onclick='cerrarModalHorarios()') Cancelar
-      button.btn-repro(style='flex:1; padding:11px;' onclick='guardarHorarios()') Guardar Horario
+    .modal-gc-footer(class="flex shrink-0 gap-12 bg-white px-[66px] py-5 [@media(max-width:480px)]:gap-3 [@media(max-width:480px)]:px-4")
+      button.btn-cancel-cita(class="flex-1 cursor-pointer rounded-lg border border-[#bdc1e5] bg-[#d7d7d7] px-3 py-2 text-[13px] leading-5 font-semibold text-black transition-colors hover:bg-[#ccc]" onclick='cerrarModalHorarios()') Cancelar
+      button.btn-repro(class="flex-1 cursor-pointer rounded-lg border-0 bg-[#465DE5] px-3 py-2 text-[13px] leading-5 font-semibold text-white transition-opacity hover:opacity-85" onclick='guardarHorarios()') Guardar Horario

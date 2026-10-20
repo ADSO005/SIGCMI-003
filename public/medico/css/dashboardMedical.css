@@ -711,9 +711,10 @@ nav a:hover {
 
 /**/
 
+/* Etapa 4: reglas heredadas excluidas de Gestion de Citas; los otros modales las conservan. */
 /* -----------------------MODAL GESTIÓN DE CITAS ------------------ */
 
-.modal-overlay {
+.modal-overlay:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
@@ -723,11 +724,11 @@ nav a:hover {
   justify-content: center;
 }
 
-.modal-overlay.abierto {
+.modal-overlay.abierto:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   display: flex;
 }
 
-.modal-gc {
+.modal-gc:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   background: #fff;
   border-radius: 14px;
   width: 780px;
@@ -739,7 +740,7 @@ nav a:hover {
 }
 
 /* Header azul */
-.modal-gc-header {
+.modal-gc-header:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   background: #465DE5;
   padding: 20px 24px;
   display: flex;
@@ -748,13 +749,13 @@ nav a:hover {
   flex-shrink: 0;
 }
 
-.modal-gc-header-left {
+.modal-gc-header-left:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.modal-gc-icon {
+.modal-gc-icon:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   font-size: 28px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
@@ -767,20 +768,20 @@ nav a:hover {
   background-color: white;
 }
 
-.modal-gc-header h2 {
+.modal-gc-header h2:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   color: #fff;
   font-size: 20px;
   font-weight: 700;
   margin: 0;
 }
 
-.modal-gc-header p {
+.modal-gc-header p:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   color: rgba(255, 255, 255, 0.75);
   font-size: 13px;
   margin: 2px 0 0;
 }
 
-.modal-gc-close {
+.modal-gc-close:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: #fff;
@@ -795,12 +796,12 @@ nav a:hover {
   transition: 0.2s;
 }
 
-.modal-gc-close:hover {
+.modal-gc-close:hover:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   background: rgba(255, 255, 255, 0.35);
 }
 
 /* Barra de filtros */
-.modal-gc-filtros {
+.modal-gc-filtros:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   padding: 16px 24px;
   display: flex;
   gap: 12px;
@@ -808,7 +809,7 @@ nav a:hover {
   flex-shrink: 0;
 }
 
-.modal-gc-search {
+.modal-gc-search:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   flex: 1;
   padding: 9px 14px;
   border: 1px solid #dde3ea;
@@ -818,12 +819,12 @@ nav a:hover {
   color: #1a202c;
 }
 
-.modal-gc-search:focus {
+.modal-gc-search:focus:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   border-color: #465DE5;
   box-shadow: 0 0 0 3px rgba(70, 93, 229, 0.1);
 }
 
-.modal-gc-select {
+.modal-gc-select:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   padding: 9px 14px;
   border: 1px solid #dde3ea;
   border-radius: 8px;
@@ -834,12 +835,12 @@ nav a:hover {
   outline: none;
 }
 
-.modal-gc-select:focus {
+.modal-gc-select:focus:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   border-color: #465DE5;
 }
 
 /* Grid de citas */
-.modal-gc-body {
+.modal-gc-body:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   padding: 20px 24px;
   overflow-y: auto;
   display: grid;
@@ -849,7 +850,7 @@ nav a:hover {
 }
 
 /* Tarjeta de cita */
-.cita-card {
+.cita-card:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 16px;
@@ -859,62 +860,62 @@ nav a:hover {
   gap: 6px;
 }
 
-.cita-card-top {
+.cita-card-top:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
 }
 
-.cita-fecha {
+.cita-fecha:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   font-size: 13px;
   font-weight: 600;
   color: #1a202c;
 }
 
 /* Pills de estado */
-.pill {
+.pill:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   font-size: 11px;
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 20px;
 }
 
-.pill-pendiente {
+.pill-pendiente:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   background: rgba(70, 93, 229, 0.12);
   color: #465DE5;
 }
 
-.pill-completado {
+.pill-completado:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   background: rgba(37, 211, 102, 0.15);
   color: #1a7a3f;
 }
 
-.pill-cancelado {
+.pill-cancelado:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   background: rgba(220, 53, 69, 0.12);
   color: #c0392b;
 }
 
 /* Líneas de info */
-.cita-info {
+.cita-info:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   font-size: 13px;
   color: #4a5568;
 }
 
-.cita-motivo {
+.cita-motivo:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   font-size: 12px;
   color: #718096;
   margin-top: 2px;
 }
 
 /* Botones de la cita */
-.cita-btns {
+.cita-btns:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   display: flex;
   gap: 10px;
   margin-top: 10px;
 }
 
-.btn-repro {
+.btn-repro:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   flex: 1;
   padding: 9px;
   background: #465DE5;
@@ -927,11 +928,11 @@ nav a:hover {
   transition: 0.2s;
 }
 
-.btn-repro:hover {
+.btn-repro:hover:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   opacity: 0.85;
 }
 
-.btn-cancel-cita {
+.btn-cancel-cita:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   flex: 1;
   padding: 9px;
   background: #fff;
@@ -944,12 +945,12 @@ nav a:hover {
   transition: 0.2s;
 }
 
-.btn-cancel-cita:hover {
+.btn-cancel-cita:hover:where(:not(#modalGestionCitas, #modalGestionCitas *, #modalHorarios, #modalHorarios *)) {
   background: rgba(70, 93, 229, 0.07);
 }
 
 /* Sin resultados */
-.sin-resultados {
+.sin-resultados:where(:not(#modalGestionCitas, #modalGestionCitas *)) {
   grid-column: 1 / -1;
   text-align: center;
   color: #a0aec0;
@@ -979,6 +980,8 @@ nav a:hover {
   box-shadow: 0 0 0 3px rgba(70, 93, 229, 0.1);
 }
 
+/* Horarios: referencia desactivada; estilos en modalHorarios.pug. */
+@media not all {
 /* ------------------- MODAL HORARIOS------------------ */
 
 .horarios-body {
@@ -1160,6 +1163,9 @@ nav a:hover {
   gap: 12px;
   padding: 16px 24px;
   border-top: 1px solid #eee;
+}
+
+
 }
 
 /* Etapa 3: estilos migrados a Mis Pacientes en Pug; referencia desactivada. */
