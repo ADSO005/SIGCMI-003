@@ -1162,6 +1162,8 @@ nav a:hover {
   border-top: 1px solid #eee;
 }
 
+/* Etapa 3: estilos migrados a Mis Pacientes en Pug; referencia desactivada. */
+@media not all {
 /* ------------------ VISTA PACIENTES ------------------ */
 .pacientes-layout {
   display: grid;
@@ -1362,6 +1364,9 @@ nav a:hover {
   min-width: 15px;
   height: 15px !important;
   width: 15px !important;
+}
+
+
 }
 
 /* Etapa 2: breakpoint migrado al Pug. */

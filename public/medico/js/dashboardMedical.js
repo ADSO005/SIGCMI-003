@@ -513,7 +513,6 @@ function filtrarPacientes(query) {
     if (!sinRes) {
       sinRes = document.createElement('p');
       sinRes.className = 'sin-pacientes';
-      sinRes.style.cssText = 'padding: 15px; text-align: center; color: #666; font-size: 14px;';
       sinRes.textContent = 'No se encontraron pacientes.';
       document.querySelector('.pacientes-lista').appendChild(sinRes);
     }
