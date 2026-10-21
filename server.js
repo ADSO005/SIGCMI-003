@@ -17,12 +17,8 @@ import whatsappRoutes from "./routes/whatsapp/whatsappRoutes.js";
 
 asociarModelos();
 
-// =====================================
-// CONFIGURACIÓN DE VISTAS
-// =====================================
 
-app.set("view engine", "pug");
-app.set("views", "./views");
+
 
 // =====================================
 // RUTAS
@@ -51,9 +47,9 @@ try {
         console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
     });
 
-} catch (error) {
-
-    console.error("❌ Error al conectar la base de datos");
-    console.error(error);
+    } catch (error) {
+    
+        console.error("❌ Error al conectar la base de datos");
+        console.error(error);
 
 }
