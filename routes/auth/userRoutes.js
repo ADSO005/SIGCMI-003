@@ -36,7 +36,7 @@ router.get("/confirm-register/:token", confirmRegister);
 // Cerrar sesión
 // ===============================
 
-router.get("/logout", logout);
+router.post("/logout", logout);
 
 // ===============================
 // Recuperar contraseña

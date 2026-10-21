@@ -4,15 +4,39 @@ html(lang="es")
         meta(charset="UTF-8")
         meta(name="viewport" content="width=device-width, initial-scale=1.0")
         title SIGCMI - Registrar Paciente
-
-        script(src="https://cdn.tailwindcss.com")
-        link(rel="stylesheet" href="/admin/css/input.css")
+        link(rel="stylesheet" href="/admin/css/output.css")
         link(
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
         )
 
     body(class="bg-white text-slate-800")
+
+        dialog#logoutModal(
+            aria-labelledby="logoutModalTitle"
+            class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
+        )
+            div(class="p-6")
+                h2#logoutModalTitle(class="text-xl font-bold")
+                    | Confirmar cierre de sesión
+
+                p(class="mt-2 text-slate-600")
+                    | ¿Seguro que deseas cerrar tu sesión?
+
+                div(class="mt-6 flex justify-end gap-3")
+                    button(
+                        type="button"
+                        onclick="document.getElementById('logoutModal').close()"
+                        class="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-100"
+                    )
+                        | Cancelar
+
+                    form(action="/auth/logout" method="POST")
+                        button(
+                            type="submit"
+                            class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
+                        )
+                            | Sí, cerrar sesión
 
         div(class="flex min-h-screen")
 
@@ -163,8 +187,11 @@ html(lang="es")
                         method="POST"
                     )
                         button(
-                            type="submit"
+                            type="button"
+                            onclick="document.getElementById('logoutModal').showModal()"
                             class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 text-white"
+                            aria-haspopup="dialog"
+                            aria-controls="logoutModal"
                         )
                             svg(
                                 xmlns="http://www.w3.org/2000/svg"

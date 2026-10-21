@@ -2,6 +2,32 @@
 //- SIDEBAR ADMINISTRATIVO
 //- ==========================================
 
+dialog#logoutModal(
+    aria-labelledby="logoutModalTitle"
+    class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
+)
+    div(class="p-6")
+        h2#logoutModalTitle(class="text-xl font-bold")
+            | Confirmar cierre de sesión
+
+        p(class="mt-2 text-slate-600")
+            | ¿Seguro que deseas cerrar tu sesión?
+
+        div(class="mt-6 flex justify-end gap-3")
+            button(
+                type="button"
+                onclick="document.getElementById('logoutModal').close()"
+                class="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-100"
+            )
+                | Cancelar
+
+            form(action="/auth/logout" method="POST")
+                button(
+                    type="submit"
+                    class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
+                )
+                    | Sí, cerrar sesión
+
 aside(
     id="sidebar"
     class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 bg-indigo-600 text-white flex flex-col transition-all duration-300 -translate-x-full md:translate-x-0"
@@ -11,7 +37,7 @@ aside(
     //- LOGO
     //- ==========================================
 
-    div
+    div(class="flex flex-1 min-h-0 flex-col")
 
         div(class="flex items-center justify-between p-6")
 
@@ -61,7 +87,7 @@ aside(
         //- NAVEGACIÓN
         //- ==========================================
 
-        nav(class="px-3 space-y-1")
+        nav(class="flex-1 min-h-0 overflow-y-auto px-3 space-y-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden")
 
             // Dashboard
             a(
@@ -180,8 +206,11 @@ aside(
         form(action="/auth/logout" method="POST")
 
             button(
-                type="submit"
+                type="button"
+                onclick="document.getElementById('logoutModal').showModal()"
                 class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 text-white"
+                aria-haspopup="dialog"
+                aria-controls="logoutModal"
             )
 
                 svg(
