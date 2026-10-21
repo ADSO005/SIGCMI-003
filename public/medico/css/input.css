@@ -1,6 +1,3 @@
 @import "tailwindcss";
 
-@import "./register.css";
-@import "./dashboardMedical.css";
-
 @source "../../../views";

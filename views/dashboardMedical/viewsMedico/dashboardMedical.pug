@@ -5,7 +5,7 @@ block content
     class="min-h-screen w-[calc(100%-314px)] ml-[314px] float-none bg-white px-9 pb-7 [@media(max-width:768px)]:px-5 text-black transition-all duration-300 ease-[ease] [&.collapsed]:w-[calc(100%-80px)] [&.collapsed]:ml-[80px] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:ml-0 [@media(max-width:768px)]:[&.collapsed]:w-full [@media(max-width:768px)]:[&.collapsed]:ml-0"
   )
     // VISTA: AGENDA
-    section#agendaView.view.active
+    section#agendaView.view.active(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
       header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
@@ -113,7 +113,7 @@ block content
               .proxima-motivo(class="text-[12px] leading-4 font-light text-white mt-1") Medicina interna
     // fin agendaView
 
-    section#pacientesView.view
+    section#pacientesView.view(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
       header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico

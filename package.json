@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/app.css./public/patient/css/output.css --watch",
-    "dev": "concurrently \"npm run server\" \"npm run css\" node server.js",
+    "css": "concurrently \"npm run css:general\" \"npm run css:paciente\"",
+    "css:general": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/app.css --watch",
+    "css:paciente": "npx @tailwindcss/cli -i ./public/patient/css/input.css -o ./public/patient/css/output.css --watch",
+    "dev": "concurrently \"npm run server\" \"npm run css\"",
     "css:medico": "npx @tailwindcss/cli -i ./public/medico/css/input.css -o ./public/medico/css/output.css --watch",
     "dev:medico": "concurrently \"npm run server\" \"npm run css:medico\"",
     "test": "echo \"Error: no test specified\" && exit 1",

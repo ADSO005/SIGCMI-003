@@ -81,20 +81,20 @@
         .cita-motivo(class="ml-6 mt-0 text-[12px] leading-4 text-[#333]") Vacunación pediátrica
 
 //- MODAL REPROGRAMAR
-#modalReprogramar.modal-overlay(onclick='cerrarReprogramarFuera(event)')
-  .modal-gc(style='width:420px;' onclick='event.stopPropagation()')
-    .modal-gc-header
-      .modal-gc-header-left
+#modalReprogramar.modal-overlay(class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/45 [&.abierto]:flex" onclick='cerrarReprogramarFuera(event)')
+  .modal-gc(class="flex w-[420px] max-w-[95vw] max-h-[88vh] flex-col overflow-hidden rounded-[14px] bg-white" onclick='event.stopPropagation()')
+    .modal-gc-header(class="flex shrink-0 items-center justify-between bg-[#465DE5] px-6 py-5 [&_h2]:m-0 [&_h2]:text-[20px] [&_h2]:font-bold [&_h2]:text-white [&_p]:mt-[2px] [&_p]:text-[13px] [&_p]:text-white/75")
+      .modal-gc-header-left(class="flex items-center gap-[14px]")
         div
           h2 Reprogramar Cita
           p#reprogramarNombre
-    div(style='padding: 24px; display:flex; flex-direction:column; gap:16px;')
+    div(class="flex flex-col gap-4 p-6")
       div
-        label.repro-label Reprogramar Cita
-        input.repro-input(type='date')
+        label.repro-label(class="mb-[6px] block text-[13px] text-[#4a5568]") Reprogramar Cita
+        input.repro-input(class="w-full rounded-lg border border-[#dde3ea] px-[14px] py-[10px] text-[13px] text-[#1a202c] outline-none focus:border-[#465DE5] focus:ring-[3px] focus:ring-[#465DE5]/10" type='date')
       div
-        label.repro-label Reprogramar Hora
-        input.repro-input(type='time')
-      div(style='display:flex; gap:12px; margin-top:8px;')
-        button.btn-cancel-cita(style='flex:1; padding:11px;' onclick='cerrarReprogramar()') Cancelar
-        button.btn-repro(style='flex:1; padding:11px;' onclick='guardarReprogramar()') Guardar
+        label.repro-label(class="mb-[6px] block text-[13px] text-[#4a5568]") Reprogramar Hora
+        input.repro-input(class="w-full rounded-lg border border-[#dde3ea] px-[14px] py-[10px] text-[13px] text-[#1a202c] outline-none focus:border-[#465DE5] focus:ring-[3px] focus:ring-[#465DE5]/10" type='time')
+      div(class="mt-2 flex gap-3")
+        button.btn-cancel-cita(class="flex-1 cursor-pointer rounded-lg border-[1.5px] border-[#465DE5] bg-white p-[11px] text-[13px] font-semibold text-[#465DE5] transition-all duration-200 ease-[ease] hover:bg-[#465DE5]/[0.07]" onclick='cerrarReprogramar()') Cancelar
+        button.btn-repro(class="flex-1 cursor-pointer rounded-lg border-0 bg-[#465DE5] p-[11px] text-[13px] font-semibold text-white transition-all duration-200 ease-[ease] hover:opacity-85" onclick='guardarReprogramar()') Guardar
