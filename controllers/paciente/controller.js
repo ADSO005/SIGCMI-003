@@ -70,3 +70,51 @@ export const mostrarPerfil = (req, res) => {
         paciente
     });
 };
+
+import { Diagnostico, Medico, Prescripcion, Paciente, Usuario } from '../../models/index.js';
+
+// Renderizar la vista de Historial de Diagnósticos del Paciente
+const obtenerHistorialDiagnosticos = async (req, res) => {
+    try {
+        // Obtener el ID del usuario o paciente desde la sesión/token (req.usuario)
+        const usuarioId = req.usuario.id;
+
+        // Buscar el perfil de paciente asociado al usuario
+        const paciente = await Paciente.findOne({ where: { usuario_id: usuarioId } });
+
+        if (!paciente) {
+            return res.redirect('/auth/login');
+        }
+
+        // Consultar diagnósticos del paciente con sus asociaciones
+        const diagnosticos = await Diagnostico.findAll({
+            where: { paciente_id: paciente.id },
+            include: [
+                {
+                    model: Medico,
+                    include: [{ model: Usuario, attributes: ['nombre', 'apellido'] }]
+                },
+                {
+                    model: Prescripcion
+                }
+            ],
+            order: [['fecha_registro', 'DESC']]
+        });
+
+        res.render('viewsPaciente/diagnosticHistory', {
+            pagina: 'Historial de Diagnósticos',
+            nombreUsuario: `${req.usuario.nombre} ${req.usuario.apellido}`,
+            diagnosticos
+        });
+    } catch (error) {
+        console.error('Error al obtener el historial de diagnósticos:', error);
+        res.status(500).render('viewsPaciente/diagnosticHistory', {
+            pagina: 'Historial de Diagnósticos',
+            errores: [{ msg: 'Hubo un error al cargar la información' }]
+        });
+    }
+};
+
+export {
+    obtenerHistorialDiagnosticos
+};
