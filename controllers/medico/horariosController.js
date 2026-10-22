@@ -41,6 +41,64 @@ export const listarHorarios = async (req, res) => {
     }
 };
 
+export const guardarHorarios = async (req, res) => {
+    try {
+        const { horarios } = req.body ?? {};
+
+        if (!Array.isArray(horarios)) {
+            return res.status(400).json({
+                mensaje: "Los horarios deben enviarse como un arreglo"
+            });
+        }
+        for (const horario of horarios) {
+
+            if (!horario || typeof horario !== "object" || Array.isArray(horario)) {
+                return res.status(400).json({
+                    mensaje: "Cada horario debe ser un objeto válido"
+                });
+            }
+
+            if (!diasSemana.includes(horario.dia_semana)) {
+                return res.status(400).json({
+                    mensaje: "El día de la semana no es válido"
+                });
+            }
+
+            if (!rangoValido(horario.hora_inicio, horario.hora_fin)) {
+                return res.status(400).json({
+                    mensaje: "El rango de horas no es válido"
+                });
+            }
+        }
+        for (let i = 0; i < horarios.length; i++) {
+            for (let j = i + 1; j < horarios.length; j++) {
+
+                const primero = horarios[i];
+                const segundo = horarios[j];
+
+                if (
+                    primero.dia_semana === segundo.dia_semana &&
+                    horariosSolapados(primero, segundo)
+                ) {
+                    return res.status(400).json({
+                        mensaje: "Existen franjas horarias superpuestas"
+                    });
+                }
+            }
+        }
+                return res.status(501).json({
+                    mensaje: "El guardado de horarios todavía no está implementado"
+                });
+
+    } catch (error) {
+        console.error("Error al guardar horarios:", error);
+
+        return res.status(500).json({
+            mensaje: "Ocurrió un error al procesar los horarios"
+        });
+    }
+};
+
 // Funciones auxiliares
 
 function convertirAMinutos(hora) {
@@ -73,4 +131,14 @@ function rangoValido(inicio, fin) {
     }
 
     return convertirAMinutos(inicio) < convertirAMinutos(fin);
+}
+
+function horariosSolapados(primero, segundo) {
+    const inicioPrimero = convertirAMinutos(primero.hora_inicio);
+    const finPrimero = convertirAMinutos(primero.hora_fin);
+
+    const inicioSegundo = convertirAMinutos(segundo.hora_inicio);
+    const finSegundo = convertirAMinutos(segundo.hora_fin);
+
+    return inicioPrimero < finSegundo && inicioSegundo < finPrimero;
 }
