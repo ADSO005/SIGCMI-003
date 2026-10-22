@@ -1,0 +1,25 @@
+extends ../layout/index
+
+block contenido
+    .py-6.px-4(class="sm:px-6 lg:px-8 max-w-7xl mx-auto")
+        // Encabezado de la Sección
+        .mb-6
+            h1.text-2xl.font-bold.text-slate-800 Historial de Diagnósticos
+            p.text-sm.text-slate-500 Consulta el registro de tus valoraciones médicas, diagnósticos y tratamientos prescritos.
+
+        // Mensaje de Error (si existe)
+        if errores
+            .mb-4.p-4.bg-red-50.border-l-4.border-red-500.rounded-r-md
+                each error in errores
+                    p.text-sm.text-red-700.font-medium= error.msg
+
+        // Contenedor Principal (Grid de 2 Columnas)
+        .grid.grid-cols-1(class="lg:grid-cols-12 gap-6")
+            // Panel Izquierdo: Lista de Diagnósticos
+            .lg:col-span-5
+                #lista-diagnosticos.space-y-3
+                    // Aquí agregaremos la lista en el siguiente commit
+
+            // Panel Derecho: Detalle del Diagnóstico Seleccionado
+            .lg:col-span-7
+                #detalle-diagnostico
