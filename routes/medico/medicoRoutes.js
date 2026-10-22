@@ -1,6 +1,7 @@
 import express from "express";
 import auth from "../../middleware/auth.js";
 import role from "../../middleware/role.js";
+import { listarHorarios } from "../../controllers/medico/horariosController.js";
 
 import {
     dashboard,
@@ -9,6 +10,13 @@ import {
 } from "../../controllers/medico/medicoController.js";
 
 const router = express.Router();
+
+router.get(
+    "/horarios",
+    auth,
+    role(2),
+    listarHorarios
+);
 
 router.get(
     "/dashboard",

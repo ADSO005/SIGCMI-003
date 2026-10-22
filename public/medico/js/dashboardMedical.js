@@ -238,54 +238,198 @@ function cerrarReprogramarFuera(event) {
 }
 
 // MODAL HORARIO
-function abrirModalHorarios() {
-  document.getElementById("modalHorarios")?.classList.add("abierto");
+const diasHorario = new Set([
+  "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"
+]);
+let peticionHorarios = null;
+let versionCargaHorarios = 0;
+
+function normalizarHoraHorario(valor) {
+  if (typeof valor !== "string" || !/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(valor)) {
+    throw new Error("La respuesta contiene horas no validas.");
+  }
+  return valor.slice(0, 5);
+}
+
+function obtenerDiaHorario(diaId) {
+  if (typeof diaId !== "string" || !diasHorario.has(diaId.slice(3)) || !diaId.startsWith("dia")) {
+    throw new Error("La respuesta contiene un dia no valido.");
+  }
+  const dia = document.getElementById(diaId);
+  if (!dia || !document.getElementById("modalHorarios")?.contains(dia)) {
+    throw new Error("No se encontro el dia del horario.");
+  }
+  return dia;
+}
+
+function mensajeHorarios(texto, error = false) {
+  const mensaje = document.getElementById("estadoCargaHorarios");
+  if (mensaje) {
+    mensaje.textContent = texto;
+    mensaje.setAttribute("role", error ? "alert" : "status");
+  }
+}
+
+function limpiarHorarios() {
+  document.querySelectorAll("#modalHorarios .dia-row").forEach(dia => {
+    dia.classList.remove("activo");
+    dia.querySelector('input[type="checkbox"]').checked = false;
+    dia.querySelector(".btn-agregar-hora").style.display = "none";
+    dia.querySelector(".dia-horas").replaceChildren();
+  });
+}
+
+function bloquearEdicionHorarios(bloquear) {
+  document.querySelectorAll('#modalHorarios .dia-row input, #modalHorarios .dia-row button').forEach(control => {
+    control.disabled = bloquear;
+  });
+  const guardar = document.getElementById("guardarHorarioBtn");
+  if (guardar) guardar.disabled = true;
+}
+
+async function abrirModalHorarios() {
+  const modal = document.getElementById("modalHorarios");
+  if (!modal) return;
+  peticionHorarios?.abort();
+  const version = ++versionCargaHorarios;
+  const peticion = new AbortController();
+  peticionHorarios = peticion;
+  limpiarHorarios();
+  bloquearEdicionHorarios(true);
+  mensajeHorarios("Cargando horarios. El guardado todavia no esta disponible.");
+  modal.classList.add("abierto");
+
+  try {
+    const respuesta = await fetch("/medico/horarios", {
+      credentials: "same-origin",
+      cache: "no-store",
+      signal: peticion.signal
+    });
+    if (version !== versionCargaHorarios) return;
+    if (respuesta.redirected || respuesta.status === 401) {
+      throw new Error("La sesion ha expirado. Inicia sesion nuevamente para consultar tus horarios.");
+    }
+    if (!respuesta.ok) {
+      const mensajes = {
+        403: "No tienes permiso para consultar estos horarios.",
+        404: "No se encontro tu perfil medico."
+      };
+      throw new Error(mensajes[respuesta.status] || "No se pudieron cargar los horarios. Intenta abrir el modal nuevamente.");
+    }
+    if (!respuesta.headers.get("content-type")?.includes("application/json")) {
+      throw new Error("El servidor no devolvio una respuesta JSON valida.");
+    }
+    const datos = await respuesta.json();
+    if (version !== versionCargaHorarios) return;
+    if (!datos || !Array.isArray(datos.horarios)) {
+      throw new Error("La respuesta de horarios no es valida.");
+    }
+    const ids = new Set();
+    // Validar todo antes de insertar: un registro incorrecto invalida la carga completa.
+    const horarios = datos.horarios.map(horario => {
+      if (!horario || !Number.isSafeInteger(horario.id_horario) || horario.id_horario <= 0 ||
+          ids.has(horario.id_horario) || !diasHorario.has(horario.dia_semana) ||
+          !["Pendiente", "Aprobado", "Rechazado"].includes(horario.estado)) {
+        throw new Error("La respuesta contiene un horario no valido.");
+      }
+      ids.add(horario.id_horario);
+      const inicio = normalizarHoraHorario(horario.hora_inicio);
+      const fin = normalizarHoraHorario(horario.hora_fin);
+      if (inicio >= fin) throw new Error("La respuesta contiene un rango horario no valido.");
+      obtenerDiaHorario("dia" + horario.dia_semana);
+      return { ...horario, inicio, fin };
+    });
+    horarios.forEach(horario => {
+      const diaId = "dia" + horario.dia_semana;
+      mostrarDiaActivo(diaId);
+      const fila = mostrarHorario(diaId, horario.inicio, horario.fin);
+      fila.dataset.idHorario = String(horario.id_horario);
+      fila.dataset.estado = horario.estado;
+    });
+    bloquearEdicionHorarios(false);
+    mensajeHorarios(horarios.length
+      ? "Horarios cargados. Los cambios son temporales: el guardado todavia no esta disponible."
+      : "No tienes horarios registrados. El guardado todavia no esta disponible.");
+  } catch (error) {
+    if (version !== versionCargaHorarios || error.name === "AbortError") return;
+    limpiarHorarios();
+    bloquearEdicionHorarios(true);
+    mensajeHorarios(error instanceof SyntaxError
+      ? "El servidor devolvio datos incorrectos. No se cargaron los horarios."
+      : error.message || "No se pudieron cargar los horarios.", true);
+  } finally {
+    if (version === versionCargaHorarios) peticionHorarios = null;
+  }
 }
 
 function cerrarModalHorarios() {
+  ++versionCargaHorarios;
+  peticionHorarios?.abort();
+  peticionHorarios = null;
   document.getElementById("modalHorarios")?.classList.remove("abierto");
+  limpiarHorarios();
+  bloquearEdicionHorarios(true);
+  mensajeHorarios("El guardado de horarios todavia no esta disponible.");
 }
 
 function cerrarModalHorariosFuera(e) {
   if (e.target.id === "modalHorarios") cerrarModalHorarios();
 }
 
-function toggleDia(diaId, checkbox) {
-  const dia = document.getElementById(diaId);
-  if (!dia) return;
-  
-  const btn = dia.querySelector(".btn-agregar-hora");
-  const horasContenedor = dia.querySelector(".dia-horas");
+function mostrarDiaActivo(diaId) {
+  const dia = obtenerDiaHorario(diaId);
+  dia.querySelector('input[type="checkbox"]').checked = true;
+  dia.classList.add("activo");
+  dia.querySelector(".btn-agregar-hora").style.display = "block";
+}
 
+function mostrarHorario(diaId, inicio, fin) {
+  const dia = obtenerDiaHorario(diaId);
+  const horaInicio = normalizarHoraHorario(inicio);
+  const horaFin = normalizarHoraHorario(fin);
+  if (horaInicio >= horaFin) throw new Error("Rango horario no valido.");
+  const fila = document.createElement("div");
+  fila.className = "hora-row";
+  const desde = document.createElement("input");
+  desde.type = "time";
+  desde.value = horaInicio;
+  const separador = document.createElement("span");
+  separador.textContent = "a";
+  const hasta = document.createElement("input");
+  hasta.type = "time";
+  hasta.value = horaFin;
+  const eliminar = document.createElement("button");
+  eliminar.type = "button";
+  eliminar.className = "btn-eliminar-hora";
+  eliminar.textContent = String.fromCodePoint(0x1F5D1);
+  eliminar.setAttribute("aria-label", "Eliminar rango horario");
+  eliminar.addEventListener("click", () => fila.remove());
+  fila.append(desde, separador, hasta, eliminar);
+  dia.querySelector(".dia-horas").appendChild(fila);
+  return fila;
+}
+
+function toggleDia(diaId, checkbox) {
+  const dia = obtenerDiaHorario(diaId);
+  if (checkbox.disabled) return;
   if (checkbox.checked) {
-    dia.classList.add("activo");
-    if (btn) btn.style.display = "block";
+    mostrarDiaActivo(diaId);
     agregarHora(diaId);
   } else {
     dia.classList.remove("activo");
-    if (btn) btn.style.display = "none";
-    if (horasContenedor) horasContenedor.innerHTML = "";
+    dia.querySelector(".btn-agregar-hora").style.display = "none";
+    dia.querySelector(".dia-horas").replaceChildren();
   }
 }
 
 function agregarHora(diaId) {
-  const contenedor = document.querySelector(`#${diaId} .dia-horas`);
-  if (!contenedor) return;
-
-  const fila = document.createElement("div");
-  fila.className = "hora-row";
-  fila.innerHTML = `
-    <input type="time" value="08:00">
-    <span>a</span>
-    <input type="time" value="12:00">
-    <button class="btn-eliminar-hora" onclick="this.parentElement.remove()">&#128465;</button>
-  `;
-  contenedor.appendChild(fila);
+  const dia = obtenerDiaHorario(diaId);
+  if (dia.querySelector('input[type="checkbox"]').disabled) return;
+  mostrarHorario(diaId, "08:00", "12:00");
 }
 
 function guardarHorarios() {
-  alert("Horario guardado correctamente.");
-  cerrarModalHorarios();
+  mensajeHorarios("El guardado de horarios todavia no esta disponible.");
 }
 
 // SELECCIONAR PACIENTE DE LA LISTA

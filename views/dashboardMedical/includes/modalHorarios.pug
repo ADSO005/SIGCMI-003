@@ -76,6 +76,7 @@
         div
           strong Información Importante
           p Los pacientes solo podrán agendar citas en los horarios que configures aquí. Puedes tener múltiples horarios por día (por ejemplo, mañana y tarde).
+    p#estadoCargaHorarios(class="px-7 pt-3 text-[12px] text-[#4a4a4a]" role="status" aria-live="polite") El guardado de horarios todavia no esta disponible.
     .modal-gc-footer(class="flex shrink-0 gap-12 bg-white px-[66px] py-5 [@media(max-width:480px)]:gap-3 [@media(max-width:480px)]:px-4")
       button.btn-cancel-cita(class="flex-1 cursor-pointer rounded-lg border border-[#bdc1e5] bg-[#d7d7d7] px-3 py-2 text-[13px] leading-5 font-semibold text-black transition-colors hover:bg-[#ccc]" onclick='cerrarModalHorarios()') Cancelar
-      button.btn-repro(class="flex-1 cursor-pointer rounded-lg border-0 bg-[#465DE5] px-3 py-2 text-[13px] leading-5 font-semibold text-white transition-opacity hover:opacity-85" onclick='guardarHorarios()') Guardar Horario
+      button.btn-repro(class="flex-1 cursor-pointer rounded-lg border-0 bg-[#465DE5] px-3 py-2 text-[13px] leading-5 font-semibold text-white transition-opacity hover:opacity-85" id='guardarHorarioBtn' disabled=true aria-describedby='estadoCargaHorarios' title='Guardado todavia no disponible' onclick='guardarHorarios()') Guardar Horario
