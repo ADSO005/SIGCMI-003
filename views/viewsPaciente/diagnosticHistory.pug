@@ -17,8 +17,27 @@ block contenido
         .grid.grid-cols-1(class="lg:grid-cols-12 gap-6")
             // Panel Izquierdo: Lista de Diagnósticos
             .lg:col-span-5
-                #lista-diagnosticos.space-y-3
-                    // Aquí agregaremos la lista en el siguiente commit
+                #lista-diagnosticos.space-y-3.overflow-y-auto.max-h-[calc(100vh-250px)]
+                    if diagnosticos && diagnosticos.length
+                        each diag in diagnosticos
+                            .diagnostic-card.bg-white.p-4.rounded-xl.shadow-sm.border.border-slate-200.cursor-pointer.transition-all(
+                                class="hover:border-indigo-500 hover:shadow-md"
+                                data-id=diag.id_diagnostico
+                            )
+                                .flex.justify-between.items-start.mb-2
+                                    span.text-xs.font-semibold.px-2.py-1.bg-indigo-50.text-indigo-600.rounded-full
+                                        | #{new Date(diag.fecha_diagnostico).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    span.text-xs.text-slate-400 ID: ##{diag.id_diagnostico}
+                                
+                                h3.font-bold.text-slate-800.text-base.mb-1= diag.diagnostico
+                                
+                                p.text-xs.text-slate-500.flex.items-center.gap-1.mb-2
+                                    span.font-medium Dr(a). #{diag.Medico && diag.Medico.Usuario ? `${diag.Medico.Usuario.nombres} ${diag.Medico.Usuario.apellidos}` : 'No asignado'}
+                                
+                                p.text-xs.text-slate-600.line-clamp-2= diag.observaciones || 'Sin observaciones adicionales registradas.'
+                    else
+                        .bg-white.p-6.rounded-xl.shadow-sm.border.border-slate-200.text-center
+                            p.text-sm.text-slate-500 No tienes diagnósticos registrados en el historial.
 
             // Panel Derecho: Detalle del Diagnóstico Seleccionado
             .lg:col-span-7
