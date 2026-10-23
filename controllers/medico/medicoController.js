@@ -117,7 +117,7 @@ const hoy = new Date().toLocaleDateString("en-CA");
         console.log("Citas de hoy:", citasHoy.length);
 
         res.render(
-            "dashboardMedical/viewsMedico/dashboardMedical",
+            "viewsMedico/dashboardMedical",
             {
                 usuario: req.usuario,
                 medico,
