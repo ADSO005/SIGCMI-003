@@ -6,24 +6,23 @@ block content
   // ENCABEZADO
   // ==========================================
 
+    // ==========================================
+  // PATIENT PORTAL HEADER
+  // ==========================================
+
   header.top-bar
-
     .brand
-
       i.icon-user
 
       div
         strong Portal del Paciente
         p Bienvenido, #{paciente.nombre}
 
-
     form(
       action="/auth/logout"
       method="POST"
     )
-
       button.btn-logout(type="submit")
-
         i.icon-logout
         | Cerrar Sesión
 
