@@ -71,50 +71,49 @@ export const mostrarPerfil = (req, res) => {
     });
 };
 
-import { Diagnostico, Medico, Prescripcion, Paciente, Usuario } from '../../models/index.js';
+import { Diagnostico, Medico, Prescripcion, Cita, Paciente, Usuario } from '../../models/index.js';
 
 // Renderizar la vista de Historial de Diagnósticos del Paciente
-const obtenerHistorialDiagnosticos = async (req, res) => {
+export const obtenerHistorialDiagnosticos = async (req, res) => {
     try {
-        // Obtener el ID del usuario o paciente desde la sesión/token (req.usuario)
-        const usuarioId = req.usuario.id;
-
-        // Buscar el perfil de paciente asociado al usuario
-        const paciente = await Paciente.findOne({ where: { usuario_id: usuarioId } });
-
+        // ---- BYPASS TEMPORAL PARA VER LA VISTA ----
+        const paciente = await Paciente.findOne(); // Toma el primer paciente que encuentre en tu BD
+        
         if (!paciente) {
-            return res.redirect('/auth/login');
+            return res.send("La tabla de pacientes está vacía en la base de datos.");
         }
+        // ------------------------------------------
 
-        // Consultar diagnósticos del paciente con sus asociaciones
-        const diagnosticos = await Diagnostico.findAll({
-            where: { paciente_id: paciente.id },
+const diagnosticos = await Diagnostico.findAll({
+    include: [
+        {
+            model: Cita,
+            required: true,
+            where: { paciente_id: paciente.id_paciente || paciente.id },
             include: [
                 {
                     model: Medico,
-                    include: [{ model: Usuario, attributes: ['nombre', 'apellido'] }]
-                },
-                {
-                    model: Prescripcion
+                    include: [{ model: Usuario, attributes: ['nombres', 'apellidos'] }]
                 }
-            ],
-            order: [['fecha_registro', 'DESC']]
-        });
+            ]
+        },
+        {
+            model: Prescripcion
+        }
+    ],
+    order: [['id_diagnostico', 'DESC']] // <--- Cambiado a una columna real de la tabla
+});
 
         res.render('viewsPaciente/diagnosticHistory', {
             pagina: 'Historial de Diagnósticos',
-            nombreUsuario: `${req.usuario.nombre} ${req.usuario.apellido}`,
             diagnosticos
         });
     } catch (error) {
         console.error('Error al obtener el historial de diagnósticos:', error);
         res.status(500).render('viewsPaciente/diagnosticHistory', {
             pagina: 'Historial de Diagnósticos',
+            diagnosticos: [],
             errores: [{ msg: 'Hubo un error al cargar la información' }]
         });
     }
-};
-
-export {
-    obtenerHistorialDiagnosticos
 };

@@ -1,50 +1,65 @@
-extends ../layout/index
+extends ./layouts/layout
 
 block contenido
     .py-6.px-4(class="sm:px-6 lg:px-8 max-w-7xl mx-auto")
-        // Encabezado de la Sección
-        .mb-6
-            h1.text-2xl.font-bold.text-slate-800 Historial de Diagnósticos
-            p.text-sm.text-slate-500 Consulta el registro de tus valoraciones médicas, diagnósticos y tratamientos prescritos.
+        
+        //- Contenedor Principal en Flexbox horizontal para asegurar que vayan lado a lado
+        div(class="flex flex-col lg:flex-row gap-6 items-start")
+            
+            //- ==========================================
+            //- PANEL IZQUIERDO: Título, Subtítulo y Lista
+            //- ==========================================
+            div(class="w-full lg:w-5/12")
+                //- Encabezado de la Sección
+                .mb-5
+                    h1.text-2xl.font-bold.text-slate-800 Historial de Diagnósticos
+                    p.text-sm.text-slate-500 Todos tus diagnósticos médicos.
 
-        // Mensaje de Error (si existe)
-        if errores
-            .mb-4.p-4.bg-red-50.border-l-4.border-red-500.rounded-r-md
-                each error in errores
-                    p.text-sm.text-red-700.font-medium= error.msg
-
-        // Contenedor Principal (Grid de 2 Columnas)
-        .grid.grid-cols-1(class="lg:grid-cols-12 gap-6")
-            // Panel Izquierdo: Lista de Diagnósticos
-            .lg:col-span-5
-                #lista-diagnosticos.space-y-3.overflow-y-auto.max-h-[calc(100vh-250px)]
+                #lista-diagnosticos.space-y-3.overflow-y-auto(class="max-h-[calc(100vh-220px)]")
                     if diagnosticos && diagnosticos.length
                         each diag in diagnosticos
-                            .diagnostic-card.bg-white.p-4.rounded-xl.shadow-sm.border.border-slate-200.cursor-pointer.transition-all(
-                                class="hover:border-indigo-500 hover:shadow-md"
+                            div(class="diagnostic-card bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer transition-all hover:border-indigo-500 hover:shadow-md"
                                 data-id=diag.id_diagnostico
+                                data-fecha=diag.fecha_diagnostico ? new Date(diag.fecha_diagnostico).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Sin fecha'
+                                data-diagnostico=diag.diagnostico || 'Sin título'
+                                data-medico=diag.Medico && diag.Medico.Usuario ? `${diag.Medico.Usuario.nombres} ${diag.Medico.Usuario.apellidos}` : 'No asignado'
+                                data-temperatura=diag.temperatura || ''
+                                data-presion=diag.presion_arterial || ''
+                                data-frecuencia=diag.frecuencia_cardiaca || ''
+                                data-peso=diag.peso || ''
+                                data-tratamiento=diag.tratamiento || ''
+                                data-prescripcion=diag.prescripcion || diag.medicamentos || ''
+                                data-observaciones=diag.observaciones || diag.notas || ''
                             )
-                                .flex.justify-between.items-start.mb-2
-                                    span.text-xs.font-semibold.px-2.py-1.bg-indigo-50.text-indigo-600.rounded-full
-                                        | #{new Date(diag.fecha_diagnostico).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                    span.text-xs.text-slate-400 ID: ##{diag.id_diagnostico}
-                                
-                                h3.font-bold.text-slate-800.text-base.mb-1= diag.diagnostico
-                                
-                                p.text-xs.text-slate-500.flex.items-center.gap-1.mb-2
-                                    span.font-medium Dr(a). #{diag.Medico && diag.Medico.Usuario ? `${diag.Medico.Usuario.nombres} ${diag.Medico.Usuario.apellidos}` : 'No asignado'}
-                                
-                                p.text-xs.text-slate-600.line-clamp-2= diag.observaciones || 'Sin observaciones adicionales registradas.'
-                    else
-                        .bg-white.p-6.rounded-xl.shadow-sm.border.border-slate-200.text-center
-                            p.text-sm.text-slate-500 No tienes diagnósticos registrados en el historial.
+                                div(class="flex justify-between items-center")
+                                    div
+                                        span(class="text-xs font-semibold px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full")
+                                            | #{diag.fecha_diagnostico ? new Date(diag.fecha_diagnostico).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Sin fecha'}
+                                        
+                                        h3(class="font-bold text-slate-800 text-base mt-2")= diag.diagnostico || 'Diagnóstico sin título'
+                                        
+                                        p(class="text-xs text-slate-500 mt-1")
+                                            strong Dr(a).: 
+                                            | #{diag.Medico && diag.Medico.Usuario ? `${diag.Medico.Usuario.nombres} ${diag.Medico.Usuario.apellidos}` : 'No asignado'}
+                                        
+                                        p(class="text-xs text-slate-600 mt-1 line-clamp-1")
+                                            strong Síntomas: 
+                                            | #{diag.sintomas || 'No registrados'}
 
-            // Panel Derecho: Detalle del Diagnóstico Seleccionado
-            .lg:col-span-7
-                #detalle-diagnostico.bg-white.p-6.rounded-xl.shadow-sm.border.border-slate-200.min-h-[450px].flex.flex-col.justify-center.items-center.text-center
-                    // Estado inicial (Placeholder cuando no hay selección)
-                    .text-slate-400
-                        svg.w-16.h-16.mx-auto.mb-3.text-slate-300(fill="none" stroke="currentColor" viewBox="0 0 24 24")
+                                    div(class="text-slate-400 pl-2")
+                                        svg(class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24")
+                                            path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7")
+                    else
+                        div(class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center")
+                            p(class="text-sm text-slate-500") No hay diagnósticos registrados.
+
+            //- ==========================================
+            //- PANEL DERECHO: Formulario de Detalles
+            //- ==========================================
+            div(class="w-full lg:w-7/12")
+                #detalle-diagnostico(class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 min-h-[500px] sticky top-6 flex flex-col justify-center items-center text-center")
+                    div(class="text-slate-400")
+                        svg(class="w-16 h-16 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24")
                             path(stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01")
-                        p.text-base.font-medium.text-slate-600 Selecciona un diagnóstico
-                        p.text-sm.text-slate-400 Haz clic en cualquiera de las tarjetas de la izquierda para ver el detalle completo, signos vitales y prescripciones.
+                        p(class="text-base font-medium text-slate-600") Selecciona un diagnóstico
+                        p(class="text-sm text-slate-400") Haz clic en la flecha de cualquier tarjeta de la izquierda para desplegar el formulario con los detalles completos.
