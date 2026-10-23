@@ -243,6 +243,9 @@ const diasHorario = new Set([
 ]);
 let peticionHorarios = null;
 let versionCargaHorarios = 0;
+let revisionHorario = null;
+let horariosCargados = false;
+let guardandoHorario = false;
 
 function normalizarHoraHorario(valor) {
   if (typeof valor !== "string" || !/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(valor)) {
@@ -280,23 +283,36 @@ function limpiarHorarios() {
 }
 
 function bloquearEdicionHorarios(bloquear) {
-  document.querySelectorAll('#modalHorarios .dia-row input, #modalHorarios .dia-row button').forEach(control => {
-    control.disabled = bloquear;
+  document.querySelectorAll("#modalHorarios .dia-row").forEach(dia => {
+    const filas = Array.from(dia.querySelector(".dia-horas").children);
+    const protegido = filas.some(f => ["Aprobado", "Rechazado"].includes(f.dataset.estado));
+    dia.querySelector('input[type="checkbox"]').disabled = bloquear || protegido;
+    dia.querySelector(".btn-agregar-hora").disabled = bloquear;
+    filas.forEach(fila => {
+      const inmutable = ["Aprobado", "Rechazado"].includes(fila.dataset.estado);
+      fila.querySelectorAll("input, button").forEach(control => { control.disabled = bloquear || inmutable; });
+      fila.title = inmutable ? "Horario " + fila.dataset.estado + ": requiere revisión administrativa para modificarlo" : "Horario pendiente de aprobación";
+    });
   });
   const guardar = document.getElementById("guardarHorarioBtn");
-  if (guardar) guardar.disabled = true;
+  if (guardar) guardar.disabled = bloquear || !horariosCargados || guardandoHorario;
+  const cancelar = document.getElementById("cancelarHorarioBtn");
+  if (cancelar) cancelar.disabled = guardandoHorario;
 }
 
-async function abrirModalHorarios() {
+async function abrirModalHorarios({ despuesDeGuardar = false } = {}) {
+  if (guardandoHorario) return false;
   const modal = document.getElementById("modalHorarios");
   if (!modal) return;
   peticionHorarios?.abort();
   const version = ++versionCargaHorarios;
   const peticion = new AbortController();
   peticionHorarios = peticion;
+  horariosCargados = false;
+  revisionHorario = null;
   limpiarHorarios();
   bloquearEdicionHorarios(true);
-  mensajeHorarios("Cargando horarios. El guardado todavia no esta disponible.");
+  mensajeHorarios("Cargando horarios...");
   modal.classList.add("abierto");
 
   try {
@@ -321,7 +337,7 @@ async function abrirModalHorarios() {
     }
     const datos = await respuesta.json();
     if (version !== versionCargaHorarios) return;
-    if (!datos || !Array.isArray(datos.horarios)) {
+    if (!datos || !Array.isArray(datos.horarios) || typeof datos.revision !== "string" || !/^[a-f0-9]{64}$/.test(datos.revision)) {
       throw new Error("La respuesta de horarios no es valida.");
     }
     const ids = new Set();
@@ -345,16 +361,19 @@ async function abrirModalHorarios() {
       const fila = mostrarHorario(diaId, horario.inicio, horario.fin);
       fila.dataset.idHorario = String(horario.id_horario);
       fila.dataset.estado = horario.estado;
+      fila.dataset.inicioOriginal = horario.hora_inicio;
+      fila.dataset.finOriginal = horario.hora_fin;
     });
+    revisionHorario = datos.revision;
+    horariosCargados = true;
     bloquearEdicionHorarios(false);
-    mensajeHorarios(horarios.length
-      ? "Horarios cargados. Los cambios son temporales: el guardado todavia no esta disponible."
-      : "No tienes horarios registrados. El guardado todavia no esta disponible.");
+    mensajeHorarios(despuesDeGuardar ? "Horarios guardados y verificados. Las nuevas franjas quedan pendientes de aprobación." : "Horarios cargados. Los aprobados y rechazados son de solo lectura.");
+    return true;
   } catch (error) {
     if (version !== versionCargaHorarios || error.name === "AbortError") return;
     limpiarHorarios();
     bloquearEdicionHorarios(true);
-    mensajeHorarios(error instanceof SyntaxError
+    mensajeHorarios(despuesDeGuardar ? "El guardado fue confirmado, pero no se pudo verificar la recarga. Vuelve a abrir el modal." : error instanceof SyntaxError
       ? "El servidor devolvio datos incorrectos. No se cargaron los horarios."
       : error.message || "No se pudieron cargar los horarios.", true);
   } finally {
@@ -363,13 +382,16 @@ async function abrirModalHorarios() {
 }
 
 function cerrarModalHorarios() {
+  if (guardandoHorario) return;
+  horariosCargados = false;
+  revisionHorario = null;
   ++versionCargaHorarios;
   peticionHorarios?.abort();
   peticionHorarios = null;
   document.getElementById("modalHorarios")?.classList.remove("abierto");
   limpiarHorarios();
   bloquearEdicionHorarios(true);
-  mensajeHorarios("El guardado de horarios todavia no esta disponible.");
+  mensajeHorarios("Los cambios no guardados se descartan al cerrar.");
 }
 
 function cerrarModalHorariosFuera(e) {
@@ -424,12 +446,78 @@ function toggleDia(diaId, checkbox) {
 
 function agregarHora(diaId) {
   const dia = obtenerDiaHorario(diaId);
-  if (dia.querySelector('input[type="checkbox"]').disabled) return;
+  if (!horariosCargados || guardandoHorario) return;
   mostrarHorario(diaId, "08:00", "12:00");
 }
 
-function guardarHorarios() {
-  mensajeHorarios("El guardado de horarios todavia no esta disponible.");
+function recogerHorarios() {
+  const horarios = [];
+  document.querySelectorAll("#modalHorarios .dia-row").forEach(dia => {
+    const diaSemana = dia.id.slice(3);
+    if (!diasHorario.has(diaSemana)) throw new Error("Día no válido");
+    const filas = Array.from(dia.querySelector(".dia-horas").children);
+    if (dia.querySelector('input[type="checkbox"]').checked && !filas.length) throw new Error("Agrega una franja para " + diaSemana);
+    filas.forEach(fila => {
+      const inputs = fila.querySelectorAll('input[type="time"]');
+      const inicio = normalizarHoraHorario(inputs[0].value), fin = normalizarHoraHorario(inputs[1].value);
+      if (inicio >= fin) throw new Error("El inicio debe ser anterior al final en " + diaSemana);
+      const horario = { dia_semana: diaSemana, hora_inicio: inicio, hora_fin: fin };
+      if (fila.dataset.idHorario) {
+        horario.id_horario = Number(fila.dataset.idHorario);
+        if (!Number.isSafeInteger(horario.id_horario) || horario.id_horario <= 0) throw new Error("Identificador de franja no válido");
+        // Preservar segundos existentes cuando no se ha editado el campo.
+        if (fila.dataset.inicioOriginal?.slice(0, 5) === inicio) horario.hora_inicio = fila.dataset.inicioOriginal;
+        if (fila.dataset.finOriginal?.slice(0, 5) === fin) horario.hora_fin = fila.dataset.finOriginal;
+      }
+      horarios.push({ horario, estado: fila.dataset.estado });
+    });
+  });
+  const activos = horarios.filter(h => h.estado !== "Rechazado").map(h => h.horario);
+  for (let i = 0; i < activos.length; i++) for (let j = i + 1; j < activos.length; j++) {
+    const a = activos[i], b = activos[j];
+    const normal = h => h.length === 5 ? h + ":00" : h;
+    if (a.dia_semana === b.dia_semana && normal(a.hora_inicio) < normal(b.hora_fin) && normal(b.hora_inicio) < normal(a.hora_fin)) throw new Error("Hay franjas duplicadas o superpuestas");
+  }
+  return horarios.map(h => h.horario);
+}
+
+async function guardarHorarios() {
+  if (guardandoHorario || !horariosCargados || !revisionHorario) return;
+  let horarios;
+  try { horarios = recogerHorarios(); }
+  catch (error) { mensajeHorarios(error.message, true); return; }
+  guardandoHorario = true;
+  bloquearEdicionHorarios(true);
+  mensajeHorarios("Guardando horarios. Espera la confirmación antes de cerrar.");
+  let errorRecuperable = false;
+  try {
+    const respuesta = await fetch("/medico/horarios", {
+      method: "PUT", credentials: "same-origin",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify({ horarios, revision: revisionHorario })
+    });
+    if (respuesta.redirected || respuesta.status === 401) throw new Error("La sesión expiró. Inicia sesión y vuelve a abrir el modal.");
+    if (!respuesta.headers.get("content-type")?.includes("application/json")) throw new Error("Respuesta inesperada. Recarga tus horarios antes de reintentar.");
+    const datos = await respuesta.json();
+    if (!respuesta.ok) {
+      errorRecuperable = respuesta.status === 400 || respuesta.status === 409;
+      // Los conflictos requieren recargar la revisión, no reenviar una captura antigua.
+      if (respuesta.status === 409) errorRecuperable = false;
+      throw new Error(typeof datos?.mensaje === "string" ? datos.mensaje : "No se pudieron guardar los horarios");
+    }
+    if (typeof datos?.mensaje !== "string") throw new Error("No se pudo confirmar el resultado. Recarga tus horarios.");
+    guardandoHorario = false;
+    await abrirModalHorarios({ despuesDeGuardar: true });
+  } catch (error) {
+    guardandoHorario = false;
+    if (!errorRecuperable) { horariosCargados = false; revisionHorario = null; }
+    bloquearEdicionHorarios(!errorRecuperable);
+    mensajeHorarios((error.message || "No se pudo confirmar el guardado.") + (errorRecuperable ? "" : " Cierra y vuelve a abrir el modal antes de reintentar."), true);
+  } finally {
+    guardandoHorario = false;
+    const cancelar = document.getElementById("cancelarHorarioBtn");
+    if (cancelar) cancelar.disabled = false;
+  }
 }
 
 // SELECCIONAR PACIENTE DE LA LISTA
