@@ -341,8 +341,8 @@ router.get(
 
 router.get(
     "/historial-diagnosticos",
-    auth,
-    role(3),
+    // auth,
+    // role(3),
     obtenerHistorialDiagnosticos
 );
 

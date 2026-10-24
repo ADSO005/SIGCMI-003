@@ -71,49 +71,40 @@ export const mostrarPerfil = (req, res) => {
     });
 };
 
-import { Diagnostico, Medico, Prescripcion, Cita, Paciente, Usuario } from '../../models/index.js';
-
-// Renderizar la vista de Historial de Diagnósticos del Paciente
 export const obtenerHistorialDiagnosticos = async (req, res) => {
     try {
-        // ---- BYPASS TEMPORAL PARA VER LA VISTA ----
-        const paciente = await Paciente.findOne(); // Toma el primer paciente que encuentre en tu BD
-        
-        if (!paciente) {
-            return res.send("La tabla de pacientes está vacía en la base de datos.");
-        }
-        // ------------------------------------------
-
-const diagnosticos = await Diagnostico.findAll({
-    include: [
-        {
-            model: Cita,
-            required: true,
-            where: { paciente_id: paciente.id_paciente || paciente.id },
-            include: [
-                {
-                    model: Medico,
-                    include: [{ model: Usuario, attributes: ['nombres', 'apellidos'] }]
+        // Aquí va tu lógica o los datos de prueba simulados que pusimos antes
+        const diagnosticos = [
+            {
+                id_diagnostico: 1,
+                fecha_diagnostico: '2026-10-15',
+                diagnostico: 'Infección Respiratoria Aguda (Faringitis)',
+                sintomas: 'Dolor de garganta, tos seca, fiebre moderada.',
+                temperatura: '38.5',
+                presion_arterial: '120/80',
+                frecuencia_cardiaca: '88',
+                peso: '70.5',
+                tratamiento: 'Reposo absoluto e hidratación.',
+                prescripcion: 'Ibuprofeno 600mg + Amoxicilina 500mg.',
+                observaciones: 'Amígdalas inflamadas.',
+                Citum: {
+                    Medico: {
+                        Usuario: {
+                            nombres: 'Carlos Alberto',
+                            apellidos: 'Mendoza Ruiz'
+                        }
+                    }
                 }
-            ]
-        },
-        {
-            model: Prescripcion
-        }
-    ],
-    order: [['id_diagnostico', 'DESC']] // <--- Cambiado a una columna real de la tabla
-});
+            }
+        ];
 
-        res.render('viewsPaciente/diagnosticHistory', {
-            pagina: 'Historial de Diagnósticos',
+        return res.render('viewsPaciente/diagnosticHistory', {
+            titulo: 'Historial de Diagnósticos',
             diagnosticos
         });
+
     } catch (error) {
-        console.error('Error al obtener el historial de diagnósticos:', error);
-        res.status(500).render('viewsPaciente/diagnosticHistory', {
-            pagina: 'Historial de Diagnósticos',
-            diagnosticos: [],
-            errores: [{ msg: 'Hubo un error al cargar la información' }]
-        });
+        console.error("Error al obtener diagnósticos:", error);
+        res.status(500).send("Error en el servidor");
     }
 };

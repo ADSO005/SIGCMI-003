@@ -3,14 +3,11 @@ extends ./layouts/layout
 block contenido
     .py-6.px-4(class="sm:px-6 lg:px-8 max-w-7xl mx-auto")
         
-        //- Contenedor Principal en Flexbox horizontal para asegurar que vayan lado a lado
+        //- Contenedor Principal: Lista a la izquierda, Detalle a la derecha
         div(class="flex flex-col lg:flex-row gap-6 items-start")
             
-            //- ==========================================
             //- PANEL IZQUIERDO: Título, Subtítulo y Lista
-            //- ==========================================
             div(class="w-full lg:w-5/12")
-                //- Encabezado de la Sección
                 .mb-5
                     h1.text-2xl.font-bold.text-slate-800 Historial de Diagnósticos
                     p.text-sm.text-slate-500 Todos tus diagnósticos médicos.
@@ -31,35 +28,37 @@ block contenido
                                 data-prescripcion=diag.prescripcion || diag.medicamentos || ''
                                 data-observaciones=diag.observaciones || diag.notas || ''
                             )
-                                div(class="flex justify-between items-center")
-                                    div
-                                        span(class="text-xs font-semibold px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full")
+                                //- Flex con tamaño explícito para evitar que colapse la flecha
+                                div(class="flex items-center justify-between gap-3")
+                                    div(class="flex-1 min-w-0")
+                                        span(class="inline-block text-xs font-semibold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-full mb-1")
                                             | #{diag.fecha_diagnostico ? new Date(diag.fecha_diagnostico).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Sin fecha'}
                                         
-                                        h3(class="font-bold text-slate-800 text-base mt-2")= diag.diagnostico || 'Diagnóstico sin título'
+                                        h3(class="font-bold text-slate-800 text-base truncate")= diag.diagnostico || 'Diagnóstico sin título'
                                         
-                                        p(class="text-xs text-slate-500 mt-1")
+                                        p(class="text-xs text-slate-500 mt-0.5")
                                             strong Dr(a).: 
                                             | #{diag.Medico && diag.Medico.Usuario ? `${diag.Medico.Usuario.nombres} ${diag.Medico.Usuario.apellidos}` : 'No asignado'}
                                         
-                                        p(class="text-xs text-slate-600 mt-1 line-clamp-1")
+                                        p(class="text-xs text-slate-600 mt-0.5 truncate")
                                             strong Síntomas: 
                                             | #{diag.sintomas || 'No registrados'}
 
-                                    div(class="text-slate-400 pl-2")
-                                        svg(class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24")
-                                            path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7")
+                                    //- Contenedor de la flecha con ancho y alto forzado (w-7 h-7)
+                                    div(class="text-indigo-500 w-7 h-7 shrink-0 flex items-center justify-center bg-indigo-50 rounded-full")
+                                        svg(class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24")
+                                            path(stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7")
                     else
                         div(class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center")
                             p(class="text-sm text-slate-500") No hay diagnósticos registrados.
 
-            //- ==========================================
             //- PANEL DERECHO: Formulario de Detalles
-            //- ==========================================
             div(class="w-full lg:w-7/12")
                 #detalle-diagnostico(class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 min-h-[500px] sticky top-6 flex flex-col justify-center items-center text-center")
                     div(class="text-slate-400")
                         svg(class="w-16 h-16 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24")
                             path(stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012-2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01")
                         p(class="text-base font-medium text-slate-600") Selecciona un diagnóstico
-                        p(class="text-sm text-slate-400") Haz clic en la flecha de cualquier tarjeta de la izquierda para desplegar el formulario con los detalles completos.
+                        p(class="text-sm text-slate-400") Haz clic en cualquier tarjeta de la izquierda para desplegar el formulario con los detalles completos.
+
+    script(src="/patient/js/diagnosticHistory.js")
