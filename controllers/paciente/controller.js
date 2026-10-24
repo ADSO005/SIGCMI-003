@@ -110,5 +110,5 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
 };
 
 export const getNotificationSettings = (req, res) => {
-    res.render('patient/notifications');
+    res.render('viewsPaciente/notificationsSetting');
 };
