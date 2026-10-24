@@ -108,3 +108,7 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
         res.status(500).send("Error en el servidor");
     }
 };
+
+export const getNotificationSettings = (req, res) => {
+    res.render('patient/notifications');
+};

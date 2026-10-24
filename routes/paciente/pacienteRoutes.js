@@ -14,6 +14,8 @@ import {
     obtenerHistorialDiagnosticos
 } from "../../controllers/paciente/controller.js";
 
+import { getNotificationSettings } from '../../controllers/paciente/controller.js';
+
 const router = express.Router();
 
 
@@ -345,5 +347,7 @@ router.get(
     // role(3),
     obtenerHistorialDiagnosticos
 );
+
+router.get('/notifications', getNotificationSettings);
 
 export default router;
