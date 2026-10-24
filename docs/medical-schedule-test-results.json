@@ -1,0 +1,104 @@
+{
+  "fecha": "2026-10-23",
+  "base": "sigcmi_medical_test_20261023",
+  "prefijoTablas": "audit_1792794546168_",
+  "verificacionesConexion": 255,
+  "produccionConsultada": false,
+  "resultados": [
+    {
+      "prueba": "GET inicial y revision",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "crear varias franjas contiguas sin descanso obligatorio",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "actualizar preservando ID",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "eliminar pendiente",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "400 sin escrituras: dia/formato/rango/duplicado/solapamiento",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "sin sesion 302 y otro rol 403",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "perfil inexistente 404",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "horario ajeno 403 y query no altera identidad",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "aprobados y rechazados no se pueden eliminar/editar",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "aprobador conservado e idempotencia",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "citas futuras bloquean alteracion de franja",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "rollback MySQL real ante fallo intermedio",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "PUT concurrentes: un commit y un conflicto",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "persistencia en nueva conexion MySQL",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "JavaScript servido HTTP 200",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "modal: GET PUT GET con varias franjas sobre MySQL aislado",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "modal: persistencia despues de nueva instancia de pagina",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "modal: editar y eliminar sobre MySQL aislado",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    },
+    {
+      "prueba": "modal: cancelar descarta borrador sin PUT",
+      "resultado": "APROBADA",
+      "base": "sigcmi_medical_test_20261023"
+    }
+  ]
+}
