@@ -1,481 +1,281 @@
+
 extends layout
 
 block content
-
-  // ==========================================
-  // ENCABEZADO
-  // ==========================================
-
-  header.top-bar
-
-    .brand
-
-      i.icon-user
-
-      div
-        strong Portal del Paciente
-        p Bienvenido, #{paciente.nombre}
-
-
-    form(
-      action="/auth/logout"
-      method="POST"
-    )
-
-      button.btn-logout(type="submit")
-
-        i.icon-logout
-        | Cerrar Sesión
-
-
-  // ==========================================
-  // CONTENIDO PRINCIPAL
-  // ==========================================
-
-  .layout-grid
-
-
-    // ========================================
-    // COLUMNA IZQUIERDA
-    // ========================================
-
-    .col-principal
-
-
-      // ======================================
-      // BOTONES DE ACCIONES
-      // ======================================
-
-      .acciones
-
-        // NUEVA CITA WEB
-        button.btn-primario#btnNuevaCita(
-          type="button"
-          onclick="abrirNuevaCita()"
-        )
-
-          span +
-          | Nueva Cita Web
-
-
-        // WHATSAPP
-        a.btn.btn-whatsapp(
-          href="https://wa.me/3137458332"
-          target="_blank"
-        )
-
-          i.icon-whatsapp
-          | Agendar por WhatsApp
-
-
-      // ======================================
-      // DIAGNÓSTICOS
-      // ======================================
-
-      button.btn.diag.btn-diagnosticos#btnAbrirDiagnosticos(
-        type="button"
-      )
-        | Ver Diagnósticos
-
-
-      // ======================================
-      // FORMULARIO NUEVA CITA
-      // ======================================
-
-      section.card-nueva-cita#formNuevaCita(
-        style="display: none;"
-      )
-
-        h2 Agendar Nueva Cita
-
-
-        form(
-          action="/citas/nueva"
-          method="POST"
-        )
-
-
-          // ==================================
-          // ESPECIALIDAD
-          // ==================================
-
-          .campo
-
-            label(for="especialidad")
-              | Especialidad
-
-
-            select#especialidad(
-              name="especialidad"
-              required
-            )
-
-              option(value="")
-                | Seleccionar especialidad
-
-              option(value="medicina-general")
-                | Medicina General
-
-              option(value="odontologia")
-                | Odontología
-
-              option(value="pediatria")
-                | Pediatría
-
-              option(value="cardiologia")
-                | Cardiología
-
-              option(value="dermatologia")
-                | Dermatología
-
-
-          // ==================================
-          // MÉDICO
-          // ==================================
-
-          .campo
-
-            label(for="medico")
-              | Médico
-
-
-            select#medico(
-              name="medico"
-              required
-            )
-
-              option(value="")
-                | Seleccionar médico
-
-              option(value="1")
-                | Dr. Carlos Pérez
-
-              option(value="2")
-                | Dra. María Rodríguez
-
-              option(value="3")
-                | Dr. Andrés Gómez
-
-              option(value="4")
-                | Dra. Laura Martínez
-
-
-          // ==================================
-          // FECHA Y HORA
-          // ==================================
-
-          .fila-campos
-
-            .campo
-
-              label(for="fecha")
-                | Fecha
-
-
-              input#fecha(
-                type="date"
-                name="fecha"
-                required
-              )
-
-
-            .campo
-
-              label(for="hora")
-                | Hora
-
-
-              select#hora(
-                name="hora"
-                required
-              )
-
-                option(value="")
-                  | Seleccionar hora
-
-                option(value="08:00")
-                  | 08:00
-
-                option(value="09:00")
-                  | 09:00
-
-                option(value="10:00")
-                  | 10:00
-
-                option(value="11:00")
-                  | 11:00
-
-                option(value="14:00")
-                  | 14:00
-
-                option(value="15:00")
-                  | 15:00
-
-                option(value="16:00")
-                  | 16:00
-
-                option(value="17:00")
-                  | 17:00
-
-
-          // ==================================
-          // MOTIVO DE CONSULTA
-          // ==================================
-
-          .campo
-
-            label(for="motivo")
-              | Motivo de consulta
-
-
-            textarea#motivo(
-              name="motivo"
-              rows="3"
-              placeholder="Describe brevemente el motivo de tu consulta..."
-            )
-
-
-          // ==================================
-          // BOTONES
-          // ==================================
-
-          .acciones-formulario
-
-            button.btn-confirmar(
-              type="submit"
-            )
-              | Confirmar Cita
-
-
-            button.btn-cancelar(
-              type="button"
-              onclick="cerrarNuevaCita()"
-            )
-              | Cancelar
-
-
-      // ======================================
-      // MIS CITAS
-      // ======================================
-
-      section.card-citas
-
-        .titulo-citas
-
-          h2 Mis Citas
-
-          span.total-citas
-            | #{citas.length} citas
-
-
-        // ====================================
-        // VALIDACIÓN DE CITAS
-        // ====================================
-
-        if citas.length === 0
-
-          .sin-citas
-
-            i.icon-calendar
-
-            p
-              | No tienes citas registradas.
-
-
-        else
-
-          .lista-citas
-
-            each cita in citas
-
-              .cita-item
-
-
-                // ============================
-                // INFORMACIÓN
-                // ============================
-
-                .cita-info
-
-                  .cita-icono
-
-                    i.icon-calendar
-
-
-                  .cita-datos
-
-                    p.cita-fecha
-                      | #{cita.fecha}
-
-                    p.cita-hora
-                      | #{cita.hora} - #{cita.consultorio}
-
-                    p.cita-doctor
-                      | #{cita.doctor}
-
-
-                // ============================
-                // ESTADO
-                // ============================
-
-                .cita-estado
-
-                  span.badge(
-                    class=`badge-${cita.estado.toLowerCase()}`
-                  )
-                    | #{cita.estado}
-
-
-                // ============================
-                // ACCIONES DE LA CITA
-                // ============================
-
-                .cita-acciones
-                  button.reprogramar.btn-reprogramar(
-                    type="button"
-                    data-cita-id=cita.id
-                  )
-                    | Reprogramar
-
-                  a.cancelar(
-                    href=`/citas/${cita.id}/cancelar`
-                  )
-                    | Cancelar
-
-
-
-    // ========================================
-    // COLUMNA DERECHA
-    // ========================================
-
-    aside.col-sidebar
-
-
-      // ======================================
-      // PERFIL
-      // ======================================
-
-      .card-perfil
-
-        i.icon-user-circle
-
-        p
-          | #{paciente.nombre}
-
-        a.btn.btn-primario(
-          href="/paciente/perfil"
-        )
-          | Ver Mi Perfil
-
-
-      // ======================================
-      // NOTIFICACIONES
-      // ======================================
-
-      .card-notificaciones
-
-        h3
+  .min-h-screen.bg-slate-50.text-slate-800(class="lg:flex")
+    // BARRA LATERAL
+    aside.flex.w-full.flex-col.bg-white.p-5.text-slate-800.border-r.border-slate-200(class="lg:min-h-screen lg:w-64 lg:shrink-0 lg:p-6")
+      a.flex.items-center.gap-3.rounded-xl.p-3(href="/paciente/dashboard")
+        .flex.h-11.w-11.items-center.justify-center.rounded-xl.bg-indigo-600.text-xl.font-bold.text-white
+          | S
+        div
+          strong.block.text-lg.font-bold.text-indigo-700 SIGCMI
+          span.block.text-xs.text-slate-500 Portal del paciente
+
+      .mt-8.rounded-xl.bg-indigo-50.p-4
+        .flex.items-center.gap-3
+          .flex.h-11.w-11.shrink-0.items-center.justify-center.rounded-full.bg-indigo-100.text-lg.font-bold.text-indigo-700
+            i.icon-user
+          div.min-w-0
+            p.text-xs.text-slate-500 Mi perfil
+            p.break-words.font-semibold.text-slate-800 #{paciente.nombre}
+
+        a.mt-4.block.rounded-lg.bg-indigo-600.px-3.py-2.text-center.text-sm.font-semibold.text-white.transition(href="/paciente/perfil" class="hover:bg-indigo-700")
+          | Ver mi perfil
+
+      nav.mt-8.flex.flex-col.gap-2(aria-label="Navegación del paciente")
+        a.flex.items-center.gap-3.rounded-xl.bg-indigo-600.px-4.py-3.font-semibold.text-white(href="/paciente/dashboard")
+          i.icon-home
+          | Inicio
+
+        a.flex.items-center.gap-3.rounded-xl.px-4.py-3.text-slate-600.transition(href="#misCitas" class="hover:bg-indigo-50 hover:text-indigo-700")
+          i.icon-calendar
+          | Mis citas
+
+        a.flex.items-center.gap-3.rounded-xl.px-4.py-3.text-slate-600.transition(href="#formNuevaCita" onclick="abrirNuevaCita()" class="hover:bg-indigo-50 hover:text-indigo-700")
+          i.icon-calendar-plus
+          | Agendar cita
+
+        a.flex.items-center.gap-3.rounded-xl.px-4.py-3.text-slate-600.transition(href="#notificaciones" class="hover:bg-indigo-50 hover:text-indigo-700")
           i.icon-bell
           | Notificaciones
 
-        p
-          | Configura cómo deseas recibir notificaciones sobre tus citas.
+      .mt-6.border-t.border-slate-200.pt-5(class="lg:mt-auto")
+        form(action="/auth/logout" method="POST")
+          button.flex.w-full.items-center.gap-3.rounded-xl.px-4.py-3.text-left.font-semibold.text-slate-600.transition(type="submit" class="hover:bg-rose-50 hover:text-rose-700")
+            i.icon-logout
+            | Cerrar sesión
 
-        button.btn.btn-primario#btnAbrirNotificaciones(
-          type="button"
-        )
-          | Configurar Notificaciones
+    // CONTENIDO PRINCIPAL
+    .min-w-0.flex-1
+      header.flex.flex-wrap.items-center.justify-between.gap-4.border-b.border-slate-200.bg-white.p-5(class="sm:p-7")
+        div
+          p.text-sm.font-semibold.text-indigo-600 Portal del Paciente
+          h1.mt-1.text-2xl.font-bold.tracking-tight.text-slate-900(class="sm:text-3xl")
+            | ¡Bienvenido/a!
+          p.mt-2.text-sm.text-slate-500
+            | Hola, #{paciente.nombre}. Aquí puedes gestionar tus citas médicas.
 
+        .relative.flex.items-center.gap-3
+          button.menu-toggle.flex.items-center.justify-center.gap-2.rounded-xl.border.border-slate-200.bg-white.px-4.py-3.text-sm.font-semibold.text-slate-700.transition(type="button" id="btnMenuPaciente" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="menuPaciente" class="hover:bg-indigo-50 hover:text-indigo-700")
+            i.icon-menu
+            | Menú
 
-      // ======================================
-      // AYUDA
-      // ======================================
+          nav#menuPaciente.absolute.right-0.top-14.z-50.hidden.min-w-48.flex-col.gap-1.rounded-xl.border.border-slate-200.bg-white.p-3.text-slate-800.shadow-xl(aria-label="Menú rápido")
+            a.rounded-lg.p-3.transition(href="/paciente/dashboard" class="hover:bg-indigo-50") Inicio
+            a.rounded-lg.p-3.transition(href="#misCitas" class="hover:bg-indigo-50") Mis citas
+            a.rounded-lg.p-3.transition(href="#formNuevaCita" onclick="abrirNuevaCita()" class="hover:bg-indigo-50") Agendar cita
+            a.rounded-lg.p-3.transition(href="/paciente/perfil" class="hover:bg-indigo-50") Mi perfil
 
-      .card-ayuda
+      .grid.grid-cols-1.items-start.gap-6.p-4(class="xl:grid-cols-[minmax(0,1fr)_320px] sm:p-7")
+        // COLUMNA CENTRAL
+        main.flex.min-w-0.flex-col.gap-6
+          section#misCitas.overflow-hidden.rounded-2xl.border.border-slate-200.bg-white.shadow-sm
+            .flex.flex-wrap.items-center.justify-between.gap-3.p-5(class="sm:p-6")
+              div
+                h2.text-xl.font-bold.text-slate-900 Mis citas
+                p.mt-1.text-sm.text-slate-500 Revisa el estado de tus citas médicas.
+              span.inline-flex.items-center.rounded-full.bg-indigo-50.px-3.py-2.text-sm.font-semibold.text-indigo-700
+                | #{citas.length} citas
 
-        h3 ¿Necesitas Ayuda?
+            if !citas || citas.length === 0
+              .mx-5.mb-5.rounded-xl.border.border-dashed.border-slate-300.bg-slate-50.p-8.text-center(class="sm:mx-6")
+                .mx-auto.flex.h-14.w-14.items-center.justify-center.rounded-full.bg-indigo-50.text-2xl.text-indigo-600
+                  i.icon-calendar
+                h3.mt-4.font-semibold.text-slate-800 Aún no tienes citas
+                p.mt-2.text-sm.text-slate-500
+                  | Cuando agendes una cita, podrás consultarla aquí.
+                button.mt-5.inline-flex.items-center.justify-center.gap-2.rounded-xl.bg-indigo-600.px-5.py-3.font-semibold.text-white.transition(type="button" onclick="abrirNuevaCita()" class="hover:bg-indigo-700")
+                  span +
+                  | Agendar una cita
+            else
+              .overflow-x-auto
+                table.w-full.text-left.text-sm
+                  thead.bg-indigo-50.text-xs.uppercase.tracking-wide.text-indigo-800
+                    tr
+                      th.px-5.py-4.font-semibold(class="sm:px-6") Fecha y hora
+                      th.px-5.py-4.font-semibold Médico
+                      th.px-5.py-4.font-semibold Estado
 
-        p
-          | Nuestro equipo está disponible para asistirte.
+                  tbody.divide-y.divide-slate-100
+                    each cita in citas
+                      tr.transition(class="hover:bg-indigo-50/50")
+                        td.px-5.py-5.align-top(class="sm:px-6")
+                          p.font-semibold.text-slate-800 #{cita.fecha}
+                          p.mt-1.text-xs.text-slate-500 #{cita.hora}
+                          p.mt-1.text-xs.text-slate-500 #{cita.consultorio}
 
-        p
-          i.icon-phone
-          | 3137458332
+                        td.px-5.py-5.align-top
+                          p.font-medium.text-slate-800 #{cita.doctor}
 
-        p
-          i.icon-email
-          | herrerayulieth254@gmail.com
+                        td.px-5.py-5.align-top
+                          span.inline-flex.whitespace-nowrap.rounded-full.bg-slate-100.px-3.py-1.text-xs.font-semibold.text-slate-700(class=`badge-${cita.estado.toLowerCase()}`)
+                            | #{cita.estado}
 
-        p
-          i.icon-clock
-          | Lunes-Viernes 8:00-20:00
+          // FORMULARIO DE NUEVA CITA
+          section#formNuevaCita.hidden.rounded-2xl.border.border-slate-200.bg-white.p-5.shadow-sm(class="sm:p-6")
+            .flex.items-start.justify-between.gap-4
+              div
+                h2.text-xl.font-bold.text-slate-900 Agendar nueva cita
+                p.mt-1.text-sm.text-slate-500 Completa los datos para solicitar tu cita médica.
+              button.flex.h-9.w-9.shrink-0.items-center.justify-center.rounded-lg.bg-slate-100.text-slate-600.transition(type="button" aria-label="Cerrar formulario" onclick="cerrarNuevaCita()" class="hover:bg-slate-200")
+                | ✕
 
+            form.mt-5(action="/citas/nueva" method="POST")
+              .mb-4
+                label.mb-2.block.text-sm.font-semibold.text-slate-700(for="especialidad") Especialidad
+                select#especialidad.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="especialidad" required class="focus:border-indigo-500")
+                  option(value="") Seleccionar especialidad
+                  option(value="medicina-general") Medicina General
+                  option(value="odontologia") Odontología
+                  option(value="pediatria") Pediatría
+                  option(value="cardiologia") Cardiología
+                  option(value="dermatologia") Dermatología
 
+              .mb-4
+                label.mb-2.block.text-sm.font-semibold.text-slate-700(for="medico") Médico
+                select#medico.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="medico" required)
+                  option(value="") Seleccionar médico
+                  option(value="1") Dr. Carlos Pérez
+                  option(value="2") Dra. María Rodríguez
+                  option(value="3") Dr. Andrés Gómez
+                  option(value="4") Dra. Laura Martínez
 
-  // ==========================================
-  // JAVASCRIPT
-  // ==========================================
+              .grid.grid-cols-1.gap-4(class="sm:grid-cols-2")
+                .mb-4
+                  label.mb-2.block.text-sm.font-semibold.text-slate-700(for="fecha") Fecha
+                  input#fecha.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(type="date" name="fecha" required)
 
+                .mb-4
+                  label.mb-2.block.text-sm.font-semibold.text-slate-700(for="hora") Hora
+                  select#hora.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="hora" required)
+                    option(value="") Seleccionar hora
+                    option(value="08:00") 08:00
+                    option(value="09:00") 09:00
+                    option(value="10:00") 10:00
+                    option(value="11:00") 11:00
+                    option(value="14:00") 14:00
+                    option(value="15:00") 15:00
+                    option(value="16:00") 16:00
+                    option(value="17:00") 17:00
+
+              .mb-4
+                label.mb-2.block.text-sm.font-semibold.text-slate-700(for="motivo") Motivo de consulta
+                textarea#motivo.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="motivo" rows="3" placeholder="Describe brevemente el motivo de tu consulta...")
+
+              .flex.flex-wrap.gap-3
+                button.inline-flex.items-center.justify-center.rounded-xl.bg-indigo-600.px-5.py-3.font-semibold.text-white.transition(type="submit" class="hover:bg-indigo-700")
+                  | Confirmar cita
+                button.inline-flex.items-center.justify-center.rounded-xl.border.border-slate-300.px-5.py-3.font-semibold.text-slate-700.transition(type="button" onclick="cerrarNuevaCita()" class="hover:bg-slate-100")
+                  | Cancelar
+
+        // COLUMNA DERECHA
+        aside.flex.flex-col.gap-6
+          section.rounded-2xl.border.border-slate-200.bg-white.p-5.shadow-sm
+            .flex.items-center.gap-3
+              .flex.h-12.w-12.items-center.justify-center.rounded-full.bg-indigo-100.text-xl.text-indigo-700
+                i.icon-calendar
+              div
+                h2.font-bold.text-slate-900 Próxima cita
+                p.text-xs.text-slate-500 Resumen de tus citas
+
+            if citas && citas.length > 0
+              .mt-5.rounded-xl.bg-indigo-50.p-4
+                p.text-sm.font-semibold.text-indigo-900 #{citas[0].fecha}
+                p.mt-1.text-sm.text-slate-600 #{citas[0].hora}
+                p.mt-2.text-sm.text-slate-600 #{citas[0].doctor}
+                p.mt-1.text-xs.text-slate-500 #{citas[0].consultorio}
+            else
+              p.mt-5.text-sm.text-slate-500 No tienes citas programadas.
+
+          // BLOQUE .acciones CONSERVADO SIN CAMBIOS
+          .acciones
+            button.btn-primario#btnNuevaCita(type="button" onclick="abrirNuevaCita()")
+              span +
+              | Nueva Cita Web
+
+            a.btn.btn-whatsapp(href="https://wa.me/3137458332" target="_blank")
+              i.icon-whatsapp
+              | Agendar por WhatsApp
+
+          section#notificaciones.rounded-2xl.border.border-slate-200.bg-white.p-5.shadow-sm
+            .flex.items-center.gap-3
+              .flex.h-11.w-11.items-center.justify-center.rounded-full.bg-indigo-100.text-indigo-700
+                i.icon-bell
+              h2.font-bold.text-slate-900 Notificaciones
+            p.mt-3.text-sm.text-slate-600 Configura cómo deseas recibir notificaciones sobre tus citas.
+            button#btnAbrirNotificaciones.mt-4.w-full.rounded-xl.bg-indigo-50.px-4.py-3.text-sm.font-semibold.text-indigo-700.transition(type="button" class="hover:bg-indigo-100")
+              | Configurar notificaciones
+
+          section.rounded-2xl.border.border-slate-200.bg-white.p-5.shadow-sm
+            h2.font-bold.text-slate-900 ¿Necesitas ayuda?
+            p.mt-2.text-sm.text-slate-600 Nuestro equipo está disponible para asistirte.
+            p.mt-4.flex.items-center.gap-2.text-sm.text-slate-700
+              i.icon-phone
+              | 3137458332
+            p.mt-2.break-words.text-sm.text-slate-700
+              i.icon-email
+              |  herrerayulieth254@gmail.com
+            p.mt-2.text-sm.text-slate-500
+              i.icon-clock
+              |  Lunes a viernes, 8:00-20:00
+
+  // JAVASCRIPT DEL DASHBOARD
   script.
-
     function abrirNuevaCita() {
-
       const formulario = document.getElementById('formNuevaCita');
 
       if (formulario) {
-        formulario.style.display = 'block';
-
+        formulario.classList.remove('hidden');
         formulario.scrollIntoView({
           behavior: 'smooth',
           block: 'start'
         });
       }
-
     }
 
-
     function cerrarNuevaCita() {
-
       const formulario = document.getElementById('formNuevaCita');
 
       if (formulario) {
-        formulario.style.display = 'none';
+        formulario.classList.add('hidden');
       }
-
     }
 
+    const btnMenuPaciente = document.getElementById('btnMenuPaciente');
+    const menuPaciente = document.getElementById('menuPaciente');
 
-  // ==========================================
-  // MODAL DE NOTIFICACIONES
-  // ==========================================
+    if (btnMenuPaciente && menuPaciente) {
+      btnMenuPaciente.addEventListener('click', () => {
+        const menuAbierto =
+          btnMenuPaciente.getAttribute('aria-expanded') === 'true';
 
-  include Includes/modalNotificaciones
+        btnMenuPaciente.setAttribute('aria-expanded', String(!menuAbierto));
+        menuPaciente.classList.toggle('hidden', menuAbierto);
+        menuPaciente.classList.toggle('flex', !menuAbierto);
+      });
 
-  // ==========================================
-  // MODAL HISTORIAL DE DIAGNÓSTICOS
-  // ==========================================
+      menuPaciente.addEventListener('click', (event) => {
+        if (event.target.closest('a')) {
+          menuPaciente.classList.add('hidden');
+          menuPaciente.classList.remove('flex');
+          btnMenuPaciente.setAttribute('aria-expanded', 'false');
+        }
+      });
 
-  link(
-  rel="stylesheet"
-  href="/patient/css/diagnosticHistory.css"
-)
+      document.addEventListener('click', (event) => {
+        if (
+          !menuPaciente.contains(event.target) &&
+          !btnMenuPaciente.contains(event.target)
+        ) {
+          menuPaciente.classList.add('hidden');
+          menuPaciente.classList.remove('flex');
+          btnMenuPaciente.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
 
-  include Includes/modalDiagnosticos
-
-
-  // ==========================================
-  // JAVASCRIPT DIAGNÓSTICOS
-  // ==========================================
-
-  script(src="/patient/js/diagnosticHistory.js")
-
-  // ==========================================
-  // JAVASCRIPT NOTIFICACIONES
-  // ==========================================
+  // MODAL Y SCRIPT DE NOTIFICACIONES CONSERVADOS
+  include includes/modalNotificaciones
 
   script(src="/patient/js/notificationSettings.js")
-
-  include includes/modalReprogramarCita
-  link(rel="stylesheet", href="/patient/css/rescheduleAppointment.css")
-    
-  script(src="/patient/js/rescheduleAppointment.js")
