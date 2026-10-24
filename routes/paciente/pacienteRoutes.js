@@ -2,12 +2,14 @@ import express from "express";
 import auth from "../../middleware/auth.js";
 import role from "../../middleware/role.js";
 
+
 import {
     Paciente,
     Usuario,
     Cita,
     Medico,
-    EstadoCita
+    EstadoCita,
+    ConfiguracionNotificacion
 } from "../../models/index.js";
 
 const router = express.Router();
@@ -330,5 +332,121 @@ router.get(
 
     }
 );
+
+
+/**
+ * Obtiene las preferencias de notificación del paciente autenticado.
+ */
+router.get(
+    "/notificaciones/configuracion",
+    auth,
+    role(3),
+    async (req, res) => {
+        try {
+            const usuarioId = req.usuario.id_usuario;
+
+            let configuracion = await ConfiguracionNotificacion.findOne({
+                where: {
+                    usuario_id: usuarioId
+                }
+            });
+
+            if (!configuracion) {
+                configuracion = await ConfiguracionNotificacion.create({
+                    usuario_id: usuarioId
+                });
+            }
+
+            return res.json({
+                ok: true,
+                configuracion
+            });
+        } catch (error) {
+            console.error(
+                "Error al consultar preferencias de notificación:",
+                error
+            );
+
+            return res.status(500).json({
+                ok: false,
+                mensaje: "No fue posible consultar las preferencias de notificación."
+            });
+        }
+    }
+);
+
+
+/**
+ * Guarda las preferencias de notificación del paciente autenticado.
+ */
+router.put(
+    "/notificaciones/configuracion",
+    auth,
+    role(3),
+    async (req, res) => {
+        try {
+            const usuarioId = req.usuario.id_usuario;
+
+            const camposPermitidos = [
+                "correo",
+                "sms",
+                "whatsapp",
+                "recordatorio_24h",
+                "recordatorio_1h",
+                "confirmacion_cita",
+                "cancelacion_cita",
+                "reprogramacion",
+                "nuevo_diagnostico",
+                "actualizaciones"
+            ];
+
+            const cambios = {};
+
+            for (const campo of camposPermitidos) {
+                if (typeof req.body[campo] === "boolean") {
+                    cambios[campo] = req.body[campo];
+                }
+            }
+
+            if (Object.keys(cambios).length === 0) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: "No se recibieron preferencias válidas."
+                });
+            }
+
+            let configuracion =
+                await ConfiguracionNotificacion.findOne({
+                    where: { usuario_id: usuarioId }
+                });
+
+            if (!configuracion) {
+                configuracion = await ConfiguracionNotificacion.create({
+                    usuario_id: usuarioId,
+                    ...cambios
+                });
+            } else {
+                await configuracion.update(cambios);
+            }
+
+            return res.json({
+                ok: true,
+                mensaje: "Preferencias guardadas correctamente.",
+                configuracion
+            });
+        } catch (error) {
+            console.error(
+                "Error al guardar preferencias de notificación:",
+                error
+            );
+
+            return res.status(500).json({
+                ok: false,
+                mensaje: "No fue posible guardar las preferencias."
+            });
+        }
+    }
+);
+
 
 export default router;
