@@ -1,0 +1,40 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title SIGCMI - Configuración de Notificaciones
+    link(rel="stylesheet", href="/patient/css/output.css")
+
+  body(class="bg-slate-50 font-sans antialiased min-h-screen")
+
+    //- 1. SIDEBAR FIJO
+    include ../includes/sidebar
+
+    //- 2. CONTENEDOR PRINCIPAL CON MARGEN IZQUIERDO PARA EL SIDEBAR
+    div(class="pl-[314px] [@media(max-width:768px)]:pl-0 transition-all duration-300 flex flex-col min-h-screen")
+      
+      //- HEADER SUPERIOR
+      header(class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shadow-2xs")
+        div
+          h1(class="text-2xl font-bold text-slate-800") Portal del Paciente
+          p(class="text-xs text-slate-500 mt-0.5") 
+            span(class="font-medium text-slate-700") 
+              script.
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.write(new Date().toLocaleDateString('es-CO', options));
+
+      //- CUERPO DE LA VISTA: DOS CAJAS GRANDES
+      main(class="p-6 flex-1 flex flex-col")
+        form#form-notificaciones(class="w-full flex-1 flex flex-col" action="/patient/notifications/save" method="POST")
+          div(class="grid grid-cols-2 gap-6 items-start w-full flex-1")
+            
+            //- CAJA IZQUIERDA: Canales y Recordatorios
+            div(class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs flex flex-col h-[calc(100vh-140px)] overflow-y-auto space-y-6")
+              p(class="text-sm font-semibold text-slate-600") [ Aquí irá el contenido de canales y recordatorios ]
+
+            //- CAJA DERECHA: Eventos y Botones
+            div(class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs flex flex-col h-[calc(100vh-140px)] overflow-y-auto justify-between")
+              p(class="text-sm font-semibold text-slate-600") [ Aquí irá el contenido de eventos y botones ]
+
+    script(src="/patient/js/notifications.js")
