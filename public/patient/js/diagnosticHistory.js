@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 fecha: card.getAttribute("data-fecha"),
                 diagnostico: card.getAttribute("data-diagnostico"),
                 medico: card.getAttribute("data-medico"),
+                sintomas: card.getAttribute("data-sintomas"),
                 temperatura: card.getAttribute("data-temperatura"),
                 presion: card.getAttribute("data-presion"),
                 frecuencia: card.getAttribute("data-frecuencia"),
@@ -40,26 +41,34 @@ document.addEventListener("DOMContentLoaded", () => {
             detailContainer.className = "bg-white p-6 rounded-xl shadow-sm border border-slate-200 sticky top-6 text-left";
             detailContainer.innerHTML = `
                 <div class="space-y-5 text-slate-700">
-                    <!-- Encabezado con Botón de Cierre con dimensiones fijas (w-10 h-10) -->
-                    <div class="border-b pb-4 flex items-start justify-between gap-4">
-                        <div class="flex items-start gap-3 flex-1 min-w-0">
-                            <button id="btn-cerrar-detalle" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors shrink-0 flex items-center justify-center shadow-sm cursor-pointer" title="Cerrar detalles">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
-                                </svg>
-                            </button>
-                            <div class="min-w-0">
-                                <span class="inline-block text-xs font-semibold px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full mb-1">${diag.fecha || 'Sin fecha'}</span>
-                                <h2 class="text-xl font-bold text-slate-800 leading-tight">${diag.diagnostico}</h2>
-                                <p class="text-xs text-slate-500 mt-1">Atendido por: <span class="font-medium text-slate-700">${diag.medico}</span></p>
-                            </div>
+                    <!-- Cabecera idéntica a la izquierda + flecha sutil de retroceso/cierre -->
+                    <div class="flex items-start gap-3.5 pb-2">
+                        <button id="btn-cerrar-detalle" class="text-slate-300 hover:text-indigo-600 shrink-0 flex items-center transition-colors cursor-pointer mt-3" title="Volver">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"></path>
+                            </svg>
+                        </button>
+
+                        <div class="w-11 h-11 rounded-full bg-slate-100 text-slate-500 shrink-0 flex items-center justify-center mt-0.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 3h6"></path>
+                            </svg>
                         </div>
-                        <span class="text-xs text-slate-400 font-medium shrink-0 pt-1">ID: #${diag.id || 'N/A'}</span>
+
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-slate-800 text-base leading-tight truncate">${diag.diagnostico || 'Diagnóstico sin título'}</h3>
+                            <p class="text-xs text-slate-500 font-medium mt-1">${diag.fecha || 'Sin fecha'}</p>
+                            <p class="text-xs text-slate-600 font-medium mt-0.5">${diag.medico}</p>
+                            <p class="text-xs text-slate-500 mt-1 truncate">
+                                <span class="font-semibold text-slate-700">Sintomas:</span> ${diag.sintomas || 'No registrados'}
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- Signos Vitales -->
+                    <!-- Signos Vitales (Título perfectamente centrado) -->
                     <div>
-                        <h3 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">Signos Vitales</h3>
+                        <h3 class="text-center text-sm font-semibold text-slate-700 mb-3">Signos Vitales</h3>
                         <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
                             <div>
                                 <label class="text-xs text-slate-500 block mb-1">Temperatura</label>
