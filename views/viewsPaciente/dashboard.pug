@@ -4,7 +4,7 @@ extends layout
 block content
   .min-h-screen.bg-slate-50.text-slate-800(class="lg:flex")
     // BARRA LATERAL
-    aside.flex.w-full.flex-col.bg-white.p-5.text-slate-800.border-r.border-slate-200(class="lg:min-h-screen lg:w-64 lg:shrink-0 lg:p-6")
+    aside.flex.w-full.flex-col.border-r.border-slate-200.bg-white.p-5(class="lg:min-h-screen lg:w-64 lg:shrink-0 lg:p-6")
       a.flex.items-center.gap-3.rounded-xl.p-3(href="/paciente/dashboard")
         .flex.h-11.w-11.items-center.justify-center.rounded-xl.bg-indigo-600.text-xl.font-bold.text-white
           | S
@@ -32,13 +32,13 @@ block content
           i.icon-calendar
           | Mis citas
 
-        a.flex.items-center.gap-3.rounded-xl.px-4.py-3.text-slate-600.transition(href="#formNuevaCita" onclick="abrirNuevaCita()" class="hover:bg-indigo-50 hover:text-indigo-700")
+        button.flex.items-center.gap-3.rounded-xl.px-4.py-3.text-left.text-slate-600(type="button" class="hover:bg-indigo-50 hover:text-indigo-700")
           i.icon-calendar-plus
           | Agendar cita
 
-        a.flex.items-center.gap-3.rounded-xl.px-4.py-3.text-slate-600.transition(href="#notificaciones" class="hover:bg-indigo-50 hover:text-indigo-700")
-          i.icon-bell
-          | Notificaciones
+        button.flex.items-center.gap-3.rounded-xl.px-4.py-3.text-left.text-slate-600(type="button" class="hover:bg-indigo-50 hover:text-indigo-700")
+          i.icon-stethoscope
+          | Mis diagnósticos
 
       .mt-6.border-t.border-slate-200.pt-5(class="lg:mt-auto")
         form(action="/auth/logout" method="POST")
@@ -54,17 +54,16 @@ block content
           h1.mt-1.text-2xl.font-bold.tracking-tight.text-slate-900(class="sm:text-3xl")
             | ¡Bienvenido/a!
           p.mt-2.text-sm.text-slate-500
-            | Hola, #{paciente.nombre}. Aquí puedes gestionar tus citas médicas.
+            | Hola, #{paciente.nombre}. Aquí puedes consultar tus citas médicas.
 
-        .relative.flex.items-center.gap-3
-          button.menu-toggle.flex.items-center.justify-center.gap-2.rounded-xl.border.border-slate-200.bg-white.px-4.py-3.text-sm.font-semibold.text-slate-700.transition(type="button" id="btnMenuPaciente" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="menuPaciente" class="hover:bg-indigo-50 hover:text-indigo-700")
+        .relative
+          button#btnMenuPaciente.flex.items-center.justify-center.gap-2.rounded-xl.border.border-slate-200.bg-white.px-4.py-3.text-sm.font-semibold.text-slate-700(type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="menuPaciente" class="hover:bg-indigo-50 hover:text-indigo-700")
             i.icon-menu
             | Menú
 
           nav#menuPaciente.absolute.right-0.top-14.z-50.hidden.min-w-48.flex-col.gap-1.rounded-xl.border.border-slate-200.bg-white.p-3.text-slate-800.shadow-xl(aria-label="Menú rápido")
             a.rounded-lg.p-3.transition(href="/paciente/dashboard" class="hover:bg-indigo-50") Inicio
             a.rounded-lg.p-3.transition(href="#misCitas" class="hover:bg-indigo-50") Mis citas
-            a.rounded-lg.p-3.transition(href="#formNuevaCita" onclick="abrirNuevaCita()" class="hover:bg-indigo-50") Agendar cita
             a.rounded-lg.p-3.transition(href="/paciente/perfil" class="hover:bg-indigo-50") Mi perfil
 
       .grid.grid-cols-1.items-start.gap-6.p-4(class="xl:grid-cols-[minmax(0,1fr)_320px] sm:p-7")
@@ -74,7 +73,7 @@ block content
             .flex.flex-wrap.items-center.justify-between.gap-3.p-5(class="sm:p-6")
               div
                 h2.text-xl.font-bold.text-slate-900 Mis citas
-                p.mt-1.text-sm.text-slate-500 Revisa el estado de tus citas médicas.
+                p.mt-1.text-sm.text-slate-500 Consulta el estado de tus citas médicas.
               span.inline-flex.items-center.rounded-full.bg-indigo-50.px-3.py-2.text-sm.font-semibold.text-indigo-700
                 | #{citas.length} citas
 
@@ -84,10 +83,7 @@ block content
                   i.icon-calendar
                 h3.mt-4.font-semibold.text-slate-800 Aún no tienes citas
                 p.mt-2.text-sm.text-slate-500
-                  | Cuando agendes una cita, podrás consultarla aquí.
-                button.mt-5.inline-flex.items-center.justify-center.gap-2.rounded-xl.bg-indigo-600.px-5.py-3.font-semibold.text-white.transition(type="button" onclick="abrirNuevaCita()" class="hover:bg-indigo-700")
-                  span +
-                  | Agendar una cita
+                  | Cuando tengas citas registradas, aparecerán aquí.
             else
               .overflow-x-auto
                 table.w-full.text-left.text-sm
@@ -96,7 +92,6 @@ block content
                       th.px-5.py-4.font-semibold(class="sm:px-6") Fecha y hora
                       th.px-5.py-4.font-semibold Médico
                       th.px-5.py-4.font-semibold Estado
-
                   tbody.divide-y.divide-slate-100
                     each cita in citas
                       tr.transition(class="hover:bg-indigo-50/50")
@@ -104,70 +99,11 @@ block content
                           p.font-semibold.text-slate-800 #{cita.fecha}
                           p.mt-1.text-xs.text-slate-500 #{cita.hora}
                           p.mt-1.text-xs.text-slate-500 #{cita.consultorio}
-
                         td.px-5.py-5.align-top
                           p.font-medium.text-slate-800 #{cita.doctor}
-
                         td.px-5.py-5.align-top
-                          span.inline-flex.whitespace-nowrap.rounded-full.bg-slate-100.px-3.py-1.text-xs.font-semibold.text-slate-700(class=`badge-${cita.estado.toLowerCase()}`)
+                          span.inline-flex.whitespace-nowrap.rounded-full.bg-slate-100.px-3.py-1.text-xs.font-semibold.text-slate-700(class=`badge-${String(cita.estado).toLowerCase()}`)
                             | #{cita.estado}
-
-          // FORMULARIO DE NUEVA CITA
-          section#formNuevaCita.hidden.rounded-2xl.border.border-slate-200.bg-white.p-5.shadow-sm(class="sm:p-6")
-            .flex.items-start.justify-between.gap-4
-              div
-                h2.text-xl.font-bold.text-slate-900 Agendar nueva cita
-                p.mt-1.text-sm.text-slate-500 Completa los datos para solicitar tu cita médica.
-              button.flex.h-9.w-9.shrink-0.items-center.justify-center.rounded-lg.bg-slate-100.text-slate-600.transition(type="button" aria-label="Cerrar formulario" onclick="cerrarNuevaCita()" class="hover:bg-slate-200")
-                | ✕
-
-            form.mt-5(action="/citas/nueva" method="POST")
-              .mb-4
-                label.mb-2.block.text-sm.font-semibold.text-slate-700(for="especialidad") Especialidad
-                select#especialidad.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="especialidad" required class="focus:border-indigo-500")
-                  option(value="") Seleccionar especialidad
-                  option(value="medicina-general") Medicina General
-                  option(value="odontologia") Odontología
-                  option(value="pediatria") Pediatría
-                  option(value="cardiologia") Cardiología
-                  option(value="dermatologia") Dermatología
-
-              .mb-4
-                label.mb-2.block.text-sm.font-semibold.text-slate-700(for="medico") Médico
-                select#medico.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="medico" required)
-                  option(value="") Seleccionar médico
-                  option(value="1") Dr. Carlos Pérez
-                  option(value="2") Dra. María Rodríguez
-                  option(value="3") Dr. Andrés Gómez
-                  option(value="4") Dra. Laura Martínez
-
-              .grid.grid-cols-1.gap-4(class="sm:grid-cols-2")
-                .mb-4
-                  label.mb-2.block.text-sm.font-semibold.text-slate-700(for="fecha") Fecha
-                  input#fecha.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(type="date" name="fecha" required)
-
-                .mb-4
-                  label.mb-2.block.text-sm.font-semibold.text-slate-700(for="hora") Hora
-                  select#hora.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="hora" required)
-                    option(value="") Seleccionar hora
-                    option(value="08:00") 08:00
-                    option(value="09:00") 09:00
-                    option(value="10:00") 10:00
-                    option(value="11:00") 11:00
-                    option(value="14:00") 14:00
-                    option(value="15:00") 15:00
-                    option(value="16:00") 16:00
-                    option(value="17:00") 17:00
-
-              .mb-4
-                label.mb-2.block.text-sm.font-semibold.text-slate-700(for="motivo") Motivo de consulta
-                textarea#motivo.w-full.rounded-xl.border.border-slate-300.bg-white.p-3.text-slate-800(name="motivo" rows="3" placeholder="Describe brevemente el motivo de tu consulta...")
-
-              .flex.flex-wrap.gap-3
-                button.inline-flex.items-center.justify-center.rounded-xl.bg-indigo-600.px-5.py-3.font-semibold.text-white.transition(type="submit" class="hover:bg-indigo-700")
-                  | Confirmar cita
-                button.inline-flex.items-center.justify-center.rounded-xl.border.border-slate-300.px-5.py-3.font-semibold.text-slate-700.transition(type="button" onclick="cerrarNuevaCita()" class="hover:bg-slate-100")
-                  | Cancelar
 
         // COLUMNA DERECHA
         aside.flex.flex-col.gap-6
@@ -188,24 +124,15 @@ block content
             else
               p.mt-5.text-sm.text-slate-500 No tienes citas programadas.
 
-          // BLOQUE .acciones CONSERVADO SIN CAMBIOS
+          // BOTONES VISUALES
           .acciones
-            button.btn-primario#btnNuevaCita(type="button" onclick="abrirNuevaCita()")
+            button.btn-primario#btnNuevaCita(type="button")
               span +
               | Nueva Cita Web
 
-            a.btn.btn-whatsapp(href="https://wa.me/3137458332" target="_blank")
+            button.btn.btn-whatsapp(type="button")
               i.icon-whatsapp
               | Agendar por WhatsApp
-
-          section#notificaciones.rounded-2xl.border.border-slate-200.bg-white.p-5.shadow-sm
-            .flex.items-center.gap-3
-              .flex.h-11.w-11.items-center.justify-center.rounded-full.bg-indigo-100.text-indigo-700
-                i.icon-bell
-              h2.font-bold.text-slate-900 Notificaciones
-            p.mt-3.text-sm.text-slate-600 Configura cómo deseas recibir notificaciones sobre tus citas.
-            button#btnAbrirNotificaciones.mt-4.w-full.rounded-xl.bg-indigo-50.px-4.py-3.text-sm.font-semibold.text-indigo-700.transition(type="button" class="hover:bg-indigo-100")
-              | Configurar notificaciones
 
           section.rounded-2xl.border.border-slate-200.bg-white.p-5.shadow-sm
             h2.font-bold.text-slate-900 ¿Necesitas ayuda?
@@ -215,67 +142,38 @@ block content
               | 3137458332
             p.mt-2.break-words.text-sm.text-slate-700
               i.icon-email
-              |  herrerayulieth254@gmail.com
+              | herrerayulieth254@gmail.com
             p.mt-2.text-sm.text-slate-500
               i.icon-clock
-              |  Lunes a viernes, 8:00-20:00
+              | Lunes a viernes, 8:00-20:00
 
-  // JAVASCRIPT DEL DASHBOARD
+  // MENÚ DESPLEGABLE
   script.
-    function abrirNuevaCita() {
-      const formulario = document.getElementById('formNuevaCita');
-
-      if (formulario) {
-        formulario.classList.remove('hidden');
-        formulario.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
-    }
-
-    function cerrarNuevaCita() {
-      const formulario = document.getElementById('formNuevaCita');
-
-      if (formulario) {
-        formulario.classList.add('hidden');
-      }
-    }
-
     const btnMenuPaciente = document.getElementById('btnMenuPaciente');
     const menuPaciente = document.getElementById('menuPaciente');
 
     if (btnMenuPaciente && menuPaciente) {
       btnMenuPaciente.addEventListener('click', () => {
-        const menuAbierto =
-          btnMenuPaciente.getAttribute('aria-expanded') === 'true';
+        const abierto = btnMenuPaciente.getAttribute('aria-expanded') === 'true';
 
-        btnMenuPaciente.setAttribute('aria-expanded', String(!menuAbierto));
-        menuPaciente.classList.toggle('hidden', menuAbierto);
-        menuPaciente.classList.toggle('flex', !menuAbierto);
-      });
-
-      menuPaciente.addEventListener('click', (event) => {
-        if (event.target.closest('a')) {
-          menuPaciente.classList.add('hidden');
-          menuPaciente.classList.remove('flex');
-          btnMenuPaciente.setAttribute('aria-expanded', 'false');
-        }
+        btnMenuPaciente.setAttribute('aria-expanded', String(!abierto));
+        menuPaciente.classList.toggle('hidden', abierto);
+        menuPaciente.classList.toggle('flex', !abierto);
       });
 
       document.addEventListener('click', (event) => {
-        if (
-          !menuPaciente.contains(event.target) &&
-          !btnMenuPaciente.contains(event.target)
-        ) {
+        if (!menuPaciente.contains(event.target) && !btnMenuPaciente.contains(event.target)) {
           menuPaciente.classList.add('hidden');
           menuPaciente.classList.remove('flex');
           btnMenuPaciente.setAttribute('aria-expanded', 'false');
         }
       });
+
+      menuPaciente.querySelectorAll('a').forEach((enlace) => {
+        enlace.addEventListener('click', () => {
+          menuPaciente.classList.add('hidden');
+          menuPaciente.classList.remove('flex');
+          btnMenuPaciente.setAttribute('aria-expanded', 'false');
+        });
+      });
     }
-
-  // MODAL Y SCRIPT DE NOTIFICACIONES CONSERVADOS
-  include includes/modalNotificaciones
-
-  script(src="/patient/js/notificationSettings.js")
