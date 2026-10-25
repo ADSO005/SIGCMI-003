@@ -303,6 +303,17 @@
   }
 }
 @layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
   .absolute {
     position: absolute;
   }
@@ -1169,11 +1180,20 @@
   .bg-slate-50 {
     background-color: var(--color-slate-50);
   }
+  .bg-slate-50\/50 {
+    background-color: color-mix(in srgb, oklch(98.4% 0.003 247.858) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-50) 50%, transparent);
+    }
+  }
   .bg-slate-100 {
     background-color: var(--color-slate-100);
   }
   .bg-slate-200 {
     background-color: var(--color-slate-200);
+  }
+  .bg-slate-300 {
+    background-color: var(--color-slate-300);
   }
   .bg-slate-400 {
     background-color: var(--color-slate-400);
@@ -1880,6 +1900,9 @@
   .group-\[\.collapsed\]\:px-0:is(:where(.group):is(.collapsed) *) {
     padding-inline: 0px;
   }
+  .peer-checked\:bg-indigo-600:is(:where(.peer):checked ~ *) {
+    background-color: var(--color-indigo-600);
+  }
   .placeholder\:text-slate-400::placeholder {
     color: var(--color-slate-400);
   }
@@ -1888,6 +1911,49 @@
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-slate-950) 60%, transparent);
     }
+  }
+  .after\:absolute::after {
+    content: var(--tw-content);
+    position: absolute;
+  }
+  .after\:top-\[2px\]::after {
+    content: var(--tw-content);
+    top: 2px;
+  }
+  .after\:left-\[2px\]::after {
+    content: var(--tw-content);
+    left: 2px;
+  }
+  .after\:h-5::after {
+    content: var(--tw-content);
+    height: calc(var(--spacing) * 5);
+  }
+  .after\:w-5::after {
+    content: var(--tw-content);
+    width: calc(var(--spacing) * 5);
+  }
+  .after\:rounded-full::after {
+    content: var(--tw-content);
+    border-radius: calc(infinity * 1px);
+  }
+  .after\:bg-white::after {
+    content: var(--tw-content);
+    background-color: var(--color-white);
+  }
+  .after\:transition-all::after {
+    content: var(--tw-content);
+    transition-property: all;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .after\:content-\[\'\'\]::after {
+    --tw-content: '';
+    content: var(--tw-content);
+  }
+  .peer-checked\:after\:translate-x-full:is(:where(.peer):checked ~ *)::after {
+    content: var(--tw-content);
+    --tw-translate-x: 100%;
+    translate: var(--tw-translate-x) var(--tw-translate-y);
   }
   @media (hover: hover) {
     .hover\:scale-110:hover {
@@ -2353,6 +2419,9 @@
     .lg\:justify-between {
       justify-content: space-between;
     }
+    .lg\:p-8 {
+      padding: calc(var(--spacing) * 8);
+    }
   }
   @media (width >= 80rem) {
     .xl\:col-span-2 {
@@ -2660,6 +2729,11 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-content {
+  syntax: "*";
+  initial-value: "";
+  inherits: false;
+}
 @property --tw-scale-x {
   syntax: "*";
   inherits: false;
@@ -2735,6 +2809,7 @@
       --tw-backdrop-sepia: initial;
       --tw-duration: initial;
       --tw-ease: initial;
+      --tw-content: "";
       --tw-scale-x: 1;
       --tw-scale-y: 1;
       --tw-scale-z: 1;
