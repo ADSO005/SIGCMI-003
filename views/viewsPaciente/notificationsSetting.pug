@@ -25,26 +25,26 @@ html(lang="es")
                 document.write(new Date().toLocaleDateString('es-CO', options));
 
       //- Contenido principal dentro de tu vista actual (manteniendo tu sidebar y header intactos)
-main(class="flex-1 overflow-y-auto p-8")
-  form(action="/paciente/notifications" method="POST")
+      main(class="flex-1 overflow-y-auto p-8")
+        form(action="/paciente/notifications" method="POST")
     
-    //- Tarjeta Contenedora Principal
-    div(class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 lg:p-8 max-w-4xl")
+          //- Tarjeta Contenedora Principal
+          div(class="bg-white rounded-2xl border border-slate-200 shadow-2xs p-6 lg:p-8 max-w-4xl")
       
-      //- Bloque 1: Canales de Notificación
-      div(class="space-y-4")
-        h2(class="text-lg font-bold text-slate-900") Canales de Notificación
-        p(class="text-xs text-slate-500 mb-4") Elige por dónde deseas recibir las alertas del sistema.
+            //- Bloque 1: Canales de Notificación
+            div(class="space-y-4")
+              h2(class="text-lg font-bold text-slate-900") Canales de Notificación
+              p(class="text-xs text-slate-500 mb-4") Elige por dónde deseas recibir las alertas del sistema.
 
-        //- Correo Electrónico
-        div(class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/50")
-          div(class="flex items-center gap-3")
-            div(class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm") @
-            div
-              p(class="text-sm font-bold text-slate-800") Correo Electrónico
-              p(class="text-xs text-slate-500") Alertas directas a tu email registrado
-          label(class="relative inline-flex items-center cursor-pointer")
-            input(type="checkbox" name="email_channel" class="sr-only peer" checked)
-            div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
+              //- Correo Electrónico
+              div(class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50/50")
+                div(class="flex items-center gap-3")
+                  div(class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm") @
+                  div
+                    p(class="text-sm font-bold text-slate-800") Correo Electrónico
+                    p(class="text-xs text-slate-500") Alertas directas a tu email registrado
+                label(class="relative inline-flex items-center cursor-pointer")
+                  input(type="checkbox" name="email_channel" class="sr-only peer" checked)
+                  div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
-    script(src="/patient/js/notifications.js")
+          script(src="/patient/js/notifications.js")
