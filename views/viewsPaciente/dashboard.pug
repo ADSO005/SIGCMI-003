@@ -34,7 +34,7 @@ block content
       header.page-header
         div
           h1 Portal del Paciente
-          p 3 de Abril del 2026
+          p= new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'America/Bogota' })
       .dashboard-grid
         main.appointments-panel#misCitas
           .appointments-inner
