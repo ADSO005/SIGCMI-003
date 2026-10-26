@@ -10,6 +10,10 @@ import {
     EstadoCita
 } from "../../models/index.js";
 
+import {
+    obtenerHistorialDiagnosticos
+} from "../../controllers/paciente/controller.js";
+
 const router = express.Router();
 
 // ======================================================
@@ -82,5 +86,16 @@ router.get("/perfil/editar", async (req, res) => {
         res.status(500).send("Error al cargar el formulario de edición.");
     }
 });
+
+// ======================================================
+// HISTORIAL DE DIAGNÓSTICOS DEL PACIENTE
+// ======================================================
+
+router.get(
+    "/historial-diagnosticos",
+    // auth,
+    // role(3),
+    obtenerHistorialDiagnosticos
+);
 
 export default router;

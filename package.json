@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
-  "scripts": {
+
+"scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
     "css": "npx @tailwindcss/cli -i ./public/auth/css/input.css -o ./public/auth/css/output.css --watch",
