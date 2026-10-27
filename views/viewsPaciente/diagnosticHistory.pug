@@ -1,0 +1,161 @@
+doctype html
+html(lang="es")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title SIGCMI - Portal del Paciente
+    link(rel="stylesheet", href="/patient/css/output.css")
+
+  body(class="bg-slate-50 font-sans antialiased min-h-screen")
+
+    //- 1. SIDEBAR FIJO
+    include ../includes/sidebar
+
+    //- 2. CONTENEDOR PRINCIPAL CON MARGEN IZQUIERDO PARA EL SIDEBAR
+    div(class="pl-[314px] [@media(max-width:768px)]:pl-0 transition-all duration-300 flex flex-col min-h-screen")
+      
+      //- HEADER SUPERIOR
+      header(class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shadow-2xs")
+        div
+          h1(class="text-2xl font-bold text-slate-800") Portal del Paciente
+          p(class="text-xs text-slate-500 mt-0.5") 
+            span(class="font-medium text-slate-700") 
+              script.
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.write(new Date().toLocaleDateString('es-CO', options));
+
+      //- CUERPO DE LA VISTA: DOS CAJAS GRANDES QUE OCUPAN TODA LA PANTALLA A LO LARGO
+      main(class="p-6 flex-1 flex flex-col")
+        div(class="w-full flex-1 flex flex-col")
+          div(class="grid grid-cols-2 gap-6 items-start w-full flex-1")
+            
+            //- ==========================================
+            //- CAJA GRANDE IZQUIERDA: HISTORIAL DE DIAGNÓSTICOS
+            //- ==========================================
+            div(class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs flex flex-col h-[calc(100vh-140px)]")
+              
+              .mb-6.shrink-0
+                h2(class="text-2xl font-bold text-slate-900") Historial de Diagnósticos
+                p(class="text-sm text-slate-500 mt-1") Todos tus diagnósticos médicos.
+
+              #lista-diagnosticos(class="space-y-4 overflow-y-auto flex-1 pr-1")
+                if diagnosticos && diagnosticos.length
+                  each diag in diagnosticos
+                    div(class="diagnostic-card group bg-white p-4 rounded-2xl border border-slate-300 cursor-pointer transition-all hover:border-indigo-400 hover:shadow-xs flex items-center justify-between gap-4"
+                      data-id=diag.id_diagnostico
+                      data-fecha=diag.fecha_diagnostico ? new Date(diag.fecha_diagnostico).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''
+                      data-diagnostico=diag.diagnostico || 'Sin título'
+                      data-medico=diag.Medico && diag.Medico.Usuario ? `Dr. ${diag.Medico.Usuario.nombres} ${diag.Medico.Usuario.apellidos}` : 'Dr. No asignado'
+                      data-sintomas=diag.sintomas || ''
+                      data-temperatura=diag.temperatura || ''
+                      data-presion=diag.presion_arterial || ''
+                      data-frecuencia=diag.frecuencia_cardiaca || ''
+                      data-peso=diag.peso || ''
+                      data-tratamiento=diag.tratamiento || ''
+                      data-prescripcion=diag.prescripcion || diag.medicamentos || ''
+                      data-observaciones=diag.observaciones || diag.notas || ''
+                    )
+                      div(class="flex items-start gap-3.5 flex-1 min-w-0")
+                        //- Icono de File Gris dentro de círculo gris claro
+                        div(class="w-11 h-11 rounded-full bg-slate-100 text-slate-500 shrink-0 flex items-center justify-center mt-0.5")
+                          svg(class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z")
+                            path(stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 3h6")
+
+                        div(class="flex-1 min-w-0")
+                          h3(class="font-bold text-slate-800 text-base leading-tight truncate")= diag.diagnostico || 'Diagnóstico sin título'
+                          p(class="text-xs text-slate-500 font-medium mt-1")
+                            | #{diag.fecha_diagnostico ? new Date(diag.fecha_diagnostico).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Sin fecha'}
+                          p(class="text-xs text-slate-600 font-medium mt-0.5")
+                            | #{diag.Medico && diag.Medico.Usuario ? `Dr. ${diag.Medico.Usuario.nombres} ${diag.Medico.Usuario.apellidos}` : 'Dr. No asignado'}
+                          p(class="text-xs text-slate-500 mt-1 truncate")
+                            span(class="font-semibold text-slate-700") Sintomas:
+                            | #{diag.sintomas || ' No registrados'}
+
+                      //- Flecha de despliegue más sutil hacia la derecha
+                      div(class="text-slate-300 group-hover:text-indigo-600 shrink-0 flex items-center transition-colors")
+                        svg(class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24")
+                          path(stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5")
+
+                else
+                  div(class="p-8 text-center text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-200")
+                    p(class="text-sm font-medium") No tienes diagnósticos registrados en este momento.
+
+            //- ==========================================
+            //- CAJA GRANDE DERECHA: DESPLIEGUE DEL DIAGNÓSTICO
+            //- ==========================================
+            div(class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs flex flex-col h-[calc(100vh-140px)] overflow-y-auto")
+              
+              #detalle-diagnostico(class="h-full flex flex-col justify-center items-center text-center")
+                #placeholder-detalle(class="text-slate-400 py-12")
+                  div(class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3")
+                    svg(class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24")
+                      path(stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z")
+                  p(class="text-base font-semibold text-slate-700") Selecciona un diagnóstico
+                  p(class="text-xs text-slate-400 mt-1 max-w-xs mx-auto") Haz clic en cualquiera de los registros de la izquierda para desplegar la información completa.
+
+                #contenido-detalle(class="hidden w-full text-left space-y-5")
+                  //- Cabecera del detalle idéntica estructuralmente a la tarjeta izquierda (sin ID, sin línea inferior)
+                  div(class="flex items-start gap-3.5 pb-2")
+                    button#btn-back-mobile(class="lg:hidden text-slate-400 hover:text-slate-600 mt-1")
+                      svg(class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24")
+                        path(stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5")
+
+                    div(class="w-11 h-11 rounded-full bg-slate-100 text-slate-500 shrink-0 flex items-center justify-center mt-0.5")
+                      svg(class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24")
+                        path(stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z")
+                        path(stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 3h6")
+
+                    div(class="flex-1 min-w-0")
+                      h3#det-titulo(class="font-bold text-slate-800 text-base leading-tight truncate") Resfriado Comun
+                      p#det-fecha(class="text-xs text-slate-500 font-medium mt-1") 28 / 02 / 2026
+                      p#det-medico(class="text-xs text-slate-600 font-medium mt-0.5") Dr. Carlos Perez
+                      p(class="text-xs text-slate-500 mt-1 truncate")
+                        span(class="font-semibold text-slate-700") Sintomas: 
+                        span#det-sintomas-val dolor en la garganta...
+
+                  //- Signos Vitales (Título perfectamente centrado)
+                  div
+                    h4(class="text-center text-sm font-semibold text-slate-700 mb-3") Signos Vitales
+                    div(class="grid grid-cols-2 gap-3")
+                      div(class="bg-white p-3 rounded-xl border border-slate-300")
+                        p(class="text-[11px] text-slate-500 font-medium") Temperatura
+                        p#det-temp(class="text-sm font-bold text-slate-800 mt-0.5") 37.2°C
+                      
+                      div(class="bg-white p-3 rounded-xl border border-slate-300")
+                        p(class="text-[11px] text-slate-500 font-medium") Presión Arterial
+                        p#det-presion(class="text-sm font-bold text-slate-800 mt-0.5") 120/78 mmHg
+                      
+                      div(class="bg-white p-3 rounded-xl border border-slate-300")
+                        p(class="text-[11px] text-slate-500 font-medium") Frecuencia Cardíaca
+                        p#det-frecuencia(class="text-sm font-bold text-slate-800 mt-0.5") 82 bpm
+                      
+                      div(class="bg-white p-3 rounded-xl border border-slate-300")
+                        p(class="text-[11px] text-slate-500 font-medium") Peso
+                        p#det-peso(class="text-sm font-bold text-slate-800 mt-0.5") 72 kg
+
+                  //- Diagnóstico Completo
+                  div
+                    h4(class="text-sm font-semibold text-slate-700 mb-1.5") Diagnóstico Completo
+                    div(class="bg-white p-3.5 rounded-xl border border-slate-300 text-xs text-slate-600")
+                      p#det-diag-completo Resfriado común (Rinofaringitis viral aguda)
+
+                  //- Tratamiento
+                  div
+                    h4(class="text-sm font-semibold text-slate-700 mb-1.5") Tratamiento
+                    div(class="bg-white p-3.5 rounded-xl border border-slate-300 text-xs text-slate-600")
+                      p#det-tratamiento Reposo relativo, ingesta abundante de líquidos...
+
+                  //- Prescripción Médica
+                  div
+                    h4(class="text-sm font-semibold text-slate-700 mb-1.5") Prescripción Médica
+                    div(class="bg-white p-3.5 rounded-xl border border-slate-300 text-xs text-slate-600")
+                      p#det-prescripcion Paracetamol: 500mg | Cada 6 horas
+
+                  //- Notas Adicionales
+                  div
+                    h4(class="text-sm font-semibold text-slate-700 mb-1.5") Notas Adicionales
+                    div(class="bg-white p-3.5 rounded-xl border border-slate-300 text-xs text-slate-600")
+                      p#det-observaciones Cuadro viral típico. No requiere antibióticos.
+
+    script(src="/patient/js/diagnosticHistory.js")

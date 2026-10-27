@@ -70,3 +70,41 @@ export const mostrarPerfil = (req, res) => {
         paciente
     });
 };
+
+export const obtenerHistorialDiagnosticos = async (req, res) => {
+    try {
+        // Aquí va tu lógica o los datos de prueba simulados que pusimos antes
+        const diagnosticos = [
+            {
+                id_diagnostico: 1,
+                fecha_diagnostico: '2026-10-15',
+                diagnostico: 'Infección Respiratoria Aguda (Faringitis)',
+                sintomas: 'Dolor de garganta, tos seca, fiebre moderada.',
+                temperatura: '38.5',
+                presion_arterial: '120/80',
+                frecuencia_cardiaca: '88',
+                peso: '70.5',
+                tratamiento: 'Reposo absoluto e hidratación.',
+                prescripcion: 'Ibuprofeno 600mg + Amoxicilina 500mg.',
+                observaciones: 'Amígdalas inflamadas.',
+                Citum: {
+                    Medico: {
+                        Usuario: {
+                            nombres: 'Carlos Alberto',
+                            apellidos: 'Mendoza Ruiz'
+                        }
+                    }
+                }
+            }
+        ];
+
+        return res.render('viewsPaciente/diagnosticHistory', {
+            titulo: 'Historial de Diagnósticos',
+            diagnosticos
+        });
+
+    } catch (error) {
+        console.error("Error al obtener diagnósticos:", error);
+        res.status(500).send("Error en el servidor");
+    }
+};
