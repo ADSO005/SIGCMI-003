@@ -15,20 +15,14 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
-
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ADSO005/SIGCMI-003.git"
   },
-
-
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
-
-
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -41,8 +35,6 @@
     "pug": "^3.0.4",
     "sequelize": "^6.37.8"
   },
-
-
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/cli": "^4.3.3",
