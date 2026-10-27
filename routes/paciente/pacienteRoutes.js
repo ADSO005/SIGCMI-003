@@ -14,6 +14,10 @@ import {
     obtenerHistorialDiagnosticos
 } from "../../controllers/paciente/controller.js";
 
+import { getNotificationSettings } from '../../controllers/paciente/controller.js';
+
+const router = express.Router();
+
 const router = express.Router();
 
 // ======================================================
@@ -97,5 +101,18 @@ router.get(
     // role(3),
     obtenerHistorialDiagnosticos
 );
+
+// ======================================================
+// HISTORIAL DE DIAGNÓSTICOS DEL PACIENTE
+// ======================================================
+
+router.get(
+    "/historial-diagnosticos",
+    // auth,
+    // role(3),
+    obtenerHistorialDiagnosticos
+);
+
+router.get('/notifications', getNotificationSettings);
 
 export default router;
