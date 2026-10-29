@@ -15,13 +15,10 @@ export const showRegisterForm = (req, res) => {
 // POST /auth/register
 export const register = async (req, res) => {
 
-    console.log(req.body);
-    console.log("Correo recibido:", `"${req.body.email}"`);
     // Verificar si el correo ya existe
     const existeCorreo = await Usuario.findOne({
         where: { correo: req.body.email }
     });
-    console.log("Resultado búsqueda:", existeCorreo);
 
     if (existeCorreo) {
         return res.status(400).render("viewsPaciente/register", {
@@ -67,7 +64,6 @@ export const register = async (req, res) => {
         correo: usuario.correo,
         token: usuario.token
     });
-    console.log("Usuario creado:", usuario.id_usuario);
 
     res.redirect("/auth/login");
 
@@ -131,7 +127,7 @@ export const checkEmail = async (req, res) => {
 
     } catch (error) {
 
-        console.error(error);
+        console.error("No se pudo completar la comprobación de disponibilidad del dato.");
 
         return res.status(500).json({
             existe: false,
@@ -173,7 +169,7 @@ export const checkDocument = async (req, res) => {
 
     } catch (error) {
 
-        console.error(error);
+        console.error("No se pudo completar la comprobación de disponibilidad del dato.");
 
         return res.status(500).json({
             existe: false,
