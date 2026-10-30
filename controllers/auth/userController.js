@@ -79,11 +79,8 @@ const login = async (req, res) => {
 
     const token = generateJWT(usuario);
 
-    console.log("JWT:", token);
 
-    console.log(passwordCorrecta);
 
-    console.log(usuario);
 
     res.cookie("_token", token, {
         httpOnly: true,

@@ -4,23 +4,23 @@ block content
   div(class="min-h-screen bg-blue-50 pb-12 relative")
     // Formulario principal que envuelve toda la vista
     form(id="formEditarPerfil" action="/paciente/perfil/editar" method="POST")
-      
+
       // Encabezado Azul Superior con Botones
       header(class="bg-indigo-700 text-white px-6 py-4 flex items-center justify-between shadow-md")
         a(href="/paciente/perfil" class="flex items-center gap-2 text-lg font-medium hover:opacity-90")
           span ←
           span Mi Perfil
-        
+
         div(class="flex items-center gap-3")
           a(
-            href="/paciente/perfil" 
+            href="/paciente/perfil"
             class="text-xs font-semibold bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-1"
           )
             span ✕
             span Cancelar
-          
+
           button(
-            type="button" 
+            type="button"
             id="btnAbrirModal"
             class="text-xs font-semibold bg-white text-indigo-700 hover:bg-blue-50 px-4 py-2 rounded-lg transition shadow flex items-center gap-1 cursor-pointer"
           )
@@ -29,7 +29,7 @@ block content
 
       // Contenedor principal de 2 columnas
       main(class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-2 gap-6")
-        
+
         // ==========================================
         // COLUMNA IZQUIERDA
         // ==========================================
@@ -156,7 +156,7 @@ block content
                   placeholder="Repetir contraseña nueva*"
                   class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
                 )
-                
+
                 button(
                   type="button"
                   class="w-full bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold py-2 rounded-xl transition mt-2 cursor-pointer"
@@ -327,19 +327,19 @@ block content
       // MODAL: CONFIRMAR IDENTIDAD (Con capa gris y posición fija de X)
       // ======================================================
       div(
-        id="modalConfirmarIdentidad" 
+        id="modalConfirmarIdentidad"
         class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden"
       )
         div(class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl border border-blue-100 transform transition-all relative")
-          
+
           // Encabezado del Modal con posición relativa para el botón de cierre
           div(class="bg-indigo-600 text-white p-6 text-center relative")
             button(
-              type="button" 
+              type="button"
               id="btnCerrarModalX"
               class="absolute top-3 left-3 z-10 text-white/80 hover:text-white text-base font-bold cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition"
             ) ✕
-            
+
             h3(class="text-base font-bold mb-2 pr-4") Confirmar Identidad
             p(class="text-xs text-indigo-100 leading-relaxed px-2")
               | Por seguridad, ingresa tu contraseña para guardar los cambios en tu perfil.
