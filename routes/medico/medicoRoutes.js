@@ -4,7 +4,13 @@ import role from "../../middleware/role.js";
 import { listarHorarios, guardarHorarios } from "../../controllers/medico/horariosController.js";
 import {dashboard, detallePaciente, actualizarEstadoCita} from "../../controllers/medico/medicoController.js";
 
+import { presentarSolicitudHorario, listarSolicitudesHorarios } from "../../controllers/medico/solicitudesHorariosController.js";
+
 const router = express.Router();
+
+router.get("/solicitudes-horarios", auth, role(2), listarSolicitudesHorarios);
+
+router.post("/solicitudes-horarios", auth, role(2), presentarSolicitudHorario);
 
 router.get("/horarios",auth, role(2), listarHorarios);
 
