@@ -1,2 +1,5 @@
 /node_modules
 /.env
+/public/admin/css/output.css
+/public/medico/css/output.css
+/public/patient/css/output.css
