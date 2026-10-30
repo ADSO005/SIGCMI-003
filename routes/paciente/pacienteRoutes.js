@@ -15,6 +15,7 @@ import {
 } from "../../controllers/paciente/controller.js";
 
 import { listarConfiguracionNotificaciones } from '../../controllers/paciente/controller.js';
+import { actualizarConfiguracionNotificaciones } from '../../controllers/paciente/controller.js';
 
 const router = express.Router();
 
@@ -112,5 +113,5 @@ router.get(
 );
 
 router.get('/notificaciones', listarConfiguracionNotificaciones);
-
+router.post('/notificacion', actualizarConfiguracionNotificaciones);
 export default router;
