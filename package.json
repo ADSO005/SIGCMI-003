@@ -3,30 +3,30 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
-    "css": "concurrently \"npm run css:auth\" \"npm run css:admin\" \"npm run css:paciente\" \"npm run css:medico\"",
-    "css:auth": "npx @tailwindcss/cli -i ./public/auth/css/input.css -o ./public/auth/css/output.css --watch",
-    "css:general": "npm run css:auth",
+    "css": "npx @tailwindcss/cli -i ./public/auth/css/input.css -o ./public/auth/css/output.css --watch",
     "css:admin": "npx @tailwindcss/cli -i ./public/admin/css/input.css -o ./public/admin/css/output.css --watch",
-    "css:paciente": "npx @tailwindcss/cli -i ./public/patient/css/input.css -o ./public/patient/css/output.css --watch",
+    "css:patient": "npx @tailwindcss/cli -i ./public/patient/css/input.css -o ./public/patient/css/output.css --watch",
     "css:medico": "npx @tailwindcss/cli -i ./public/medico/css/input.css -o ./public/medico/css/output.css --watch",
-    "dev": "concurrently \"npm run server\" \"npm run css\"",
-    "dev:medico": "concurrently \"npm run server\" \"npm run css:medico\"",
+    "dev": "concurrently \"npm run server\" \"npm run css\" \"npm run css:admin\" \"npm run css:patient\" \"npm run css:medico\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "css:patient": "npm run css:paciente"
+    "lint:fix": "eslint . --fix"
+
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ADSO005/SIGCMI-003.git"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
+
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -39,6 +39,7 @@
     "pug": "^3.0.4",
     "sequelize": "^6.37.8"
   },
+
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/cli": "^4.3.3",
