@@ -306,6 +306,9 @@
   .pointer-events-none {
     pointer-events: none;
   }
+  .visible {
+    visibility: visible;
+  }
   .sr-only {
     position: absolute;
     width: 1px;
@@ -933,6 +936,9 @@
   }
   .items-center {
     align-items: center;
+  }
+  .items-end {
+    align-items: flex-end;
   }
   .items-start {
     align-items: flex-start;
@@ -2591,11 +2597,17 @@
   .active\:scale-\[0\.98\]:active {
     scale: 0.98;
   }
+  .disabled\:cursor-not-allowed:disabled {
+    cursor: not-allowed;
+  }
   .disabled\:bg-slate-100:disabled {
     background-color: var(--color-slate-100);
   }
   .disabled\:text-slate-400:disabled {
     color: var(--color-slate-400);
+  }
+  .disabled\:opacity-60:disabled {
+    opacity: 60%;
   }
   @media (width >= 40rem) {
     .sm\:h-14 {

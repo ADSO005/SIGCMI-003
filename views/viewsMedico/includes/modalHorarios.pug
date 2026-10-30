@@ -6,8 +6,14 @@
           img(src='/medico/img/Calendar22.png' alt)
         div
           h2 Mi Horario de Atención
-          p Consulta tus horarios. El guardado está temporalmente deshabilitado.
+          p Propón tus días y franjas para una semana completa.
     .horarios-body(class="min-h-0 flex flex-col gap-4 overflow-y-auto overscroll-contain px-7 pt-5 pb-0 [@media(max-width:480px)]:px-4")
+      .semana-horarios(class="flex flex-wrap items-end gap-3 text-[12px] text-[#4a4a4a]")
+        label(class="flex flex-col gap-1" for="semanaHorarioInicio") Semana: lunes
+          input#semanaHorarioInicio(type="date" class="rounded border border-[#ddd] bg-white px-2 py-1" onchange="cambiarSemanaHorarios()")
+        p(class="text-[#4a4a4a]") Hasta el domingo:
+          span#semanaHorarioFin
+      p#historialSolicitudesHorarios(class="text-[12px] text-[#4a4a4a]" aria-live="polite")
       #diaLunes.dia-row(class="flex flex-col gap-[10px] rounded-[10px] border border-[#d1d1d1] bg-[#efefef] px-3 py-[10px] [&.activo]:border-transparent [&.activo]:bg-[#e8eafd]")
         .dia-top(class="flex min-h-6 items-center justify-between gap-3")
           .dia-left(class="flex items-center gap-2")
@@ -75,8 +81,8 @@
         span ⓘ
         div
           strong Información Importante
-          p Puedes consultar los horarios existentes. El guardado se está adaptando al nuevo sistema de solicitudes semanales; por ahora no es posible agregar, editar ni eliminar franjas desde este modal.
-    p#estadoCargaHorarios(class="px-7 pt-3 text-[12px] text-[#4a4a4a]" role="status" aria-live="polite") Solo lectura. El guardado se está adaptando al sistema de solicitudes semanales. No se guardaron cambios.
+          p Cada solicitud comprende de lunes a domingo. Puedes proponer varias franjas por día entre las 07:00 y las 19:00. La solicitud queda pendiente y solo habilita citas después de la aprobación administrativa.
+    p#estadoCargaHorarios(class="px-7 pt-3 text-[12px] text-[#4a4a4a]" role="status" aria-live="polite") Selecciona una semana para consultar o presentar una solicitud.
     .modal-gc-footer(class="flex shrink-0 gap-12 bg-white px-[66px] py-5 [@media(max-width:480px)]:gap-3 [@media(max-width:480px)]:px-4")
       button.btn-cancel-cita(class="flex-1 cursor-pointer rounded-lg border border-[#bdc1e5] bg-[#d7d7d7] px-3 py-2 text-[13px] leading-5 font-semibold text-black transition-colors hover:bg-[#ccc]" id='cancelarHorarioBtn' onclick='cerrarModalHorarios()') Cancelar
-      button.btn-repro(class="flex-1 cursor-pointer rounded-lg border-0 bg-[#465DE5] px-3 py-2 text-[13px] leading-5 font-semibold text-white transition-opacity hover:opacity-85" id='guardarHorarioBtn' disabled=true aria-describedby='estadoCargaHorarios' title='Guardado temporalmente no disponible: adaptación a solicitudes semanales' onclick='guardarHorarios()') Guardado no disponible
+      button.btn-repro(class="flex-1 cursor-pointer rounded-lg border-0 bg-[#465DE5] px-3 py-2 text-[13px] leading-5 font-semibold text-white transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-60" id='guardarHorarioBtn' disabled=true aria-describedby='estadoCargaHorarios' title='Enviar una solicitud pendiente de aprobación' onclick='guardarHorarios()') Enviar solicitud

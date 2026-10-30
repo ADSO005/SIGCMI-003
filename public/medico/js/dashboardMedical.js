@@ -237,297 +237,285 @@ function cerrarReprogramarFuera(event) {
   if (event.target.id === "modalReprogramar") cerrarReprogramar();
 }
 
-// MODAL HORARIO
-// Protección temporal coordinada con el PUT: consulta disponible, guardado bloqueado.
-const guardadoHorariosHeredadoHabilitado = false;
-const avisoGuardadoHorarios = 'Solo lectura. El guardado se está adaptando al sistema de solicitudes semanales. No se guardaron cambios.';
-const diasHorario = new Set([
-  "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"
-]);
+// MODAL HORARIO: solicitudes semanales, sin utilizar el PUT heredado.
+const diasHorario = new Set(['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']);
 let peticionHorarios = null;
 let versionCargaHorarios = 0;
-let revisionHorario = null;
 let horariosCargados = false;
 let guardandoHorario = false;
+let solicitudPendienteHorario = null;
+let semanaConsultadaHorario = null;
+let configuracionHorario = null;
+
+function lunesActualHorario(ahora = new Date()) {
+  const partes = Object.fromEntries(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(ahora).map(p => [p.type, p.value]));
+  const fecha = new Date(partes.year + '-' + partes.month + '-' + partes.day + 'T00:00:00Z');
+  fecha.setUTCDate(fecha.getUTCDate() - (fecha.getUTCDay() + 6) % 7);
+  return fecha.toISOString().slice(0, 10);
+}
+
+function semanaHorario(inicio) {
+  if (typeof inicio !== 'string' || !/^[1-9]\d{3}-\d{2}-\d{2}$/.test(inicio)) throw new Error('Selecciona el lunes de la semana.');
+  const fecha = new Date(inicio + 'T00:00:00Z');
+  if (Number.isNaN(fecha.getTime()) || fecha.toISOString().slice(0, 10) !== inicio || fecha.getUTCDay() !== 1) throw new Error('La fecha inicial debe ser un lunes válido.');
+  fecha.setUTCDate(fecha.getUTCDate() + 6);
+  return { fecha_inicio: inicio, fecha_fin: fecha.toISOString().slice(0, 10) };
+}
 
 function normalizarHoraHorario(valor) {
-  if (typeof valor !== "string" || !/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(valor)) {
-    throw new Error("La respuesta contiene horas no validas.");
-  }
+  if (typeof valor !== 'string' || !/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(valor)) throw new Error('Completa las horas con un formato válido.');
   return valor.slice(0, 5);
 }
 
 function obtenerDiaHorario(diaId) {
-  if (typeof diaId !== "string" || !diasHorario.has(diaId.slice(3)) || !diaId.startsWith("dia")) {
-    throw new Error("La respuesta contiene un dia no valido.");
-  }
+  if (typeof diaId !== 'string' || !diasHorario.has(diaId.slice(3)) || !diaId.startsWith('dia')) throw new Error('Día no válido.');
   const dia = document.getElementById(diaId);
-  if (!dia || !document.getElementById("modalHorarios")?.contains(dia)) {
-    throw new Error("No se encontro el dia del horario.");
-  }
+  if (!dia || !document.getElementById('modalHorarios')?.contains(dia)) throw new Error('No se encontró el día.');
   return dia;
 }
 
 function mensajeHorarios(texto, error = false) {
-  const mensaje = document.getElementById("estadoCargaHorarios");
-  if (mensaje) {
-    mensaje.textContent = texto;
-    mensaje.setAttribute("role", error ? "alert" : "status");
-  }
+  const mensaje = document.getElementById('estadoCargaHorarios');
+  if (mensaje) { mensaje.textContent = texto; mensaje.setAttribute('role', error ? 'alert' : 'status'); }
 }
 
 function limpiarHorarios() {
-  document.querySelectorAll("#modalHorarios .dia-row").forEach(dia => {
-    dia.classList.remove("activo");
+  document.querySelectorAll('#modalHorarios .dia-row').forEach(dia => {
+    dia.classList.remove('activo');
     dia.querySelector('input[type="checkbox"]').checked = false;
-    dia.querySelector(".btn-agregar-hora").style.display = "none";
-    dia.querySelector(".dia-horas").replaceChildren();
+    dia.querySelector('.btn-agregar-hora').style.display = 'none';
+    dia.querySelector('.dia-horas').replaceChildren();
   });
 }
 
 function bloquearEdicionHorarios(bloquear) {
-  bloquear = bloquear || !guardadoHorariosHeredadoHabilitado;
-  document.querySelectorAll("#modalHorarios .dia-row").forEach(dia => {
-    const filas = Array.from(dia.querySelector(".dia-horas").children);
-    const protegido = filas.some(f => ["Aprobado", "Rechazado"].includes(f.dataset.estado));
-    dia.querySelector('input[type="checkbox"]').disabled = bloquear || protegido;
-    dia.querySelector(".btn-agregar-hora").disabled = bloquear;
-    filas.forEach(fila => {
-      const inmutable = ["Aprobado", "Rechazado"].includes(fila.dataset.estado);
-      fila.querySelectorAll("input, button").forEach(control => { control.disabled = bloquear || inmutable; });
-      fila.title = inmutable ? "Horario " + fila.dataset.estado + ": requiere revisión administrativa para modificarlo" : "Horario pendiente de aprobación";
+  const pendiente = !!solicitudPendienteHorario;
+  const pasado = semanaConsultadaHorario && semanaConsultadaHorario < lunesActualHorario();
+  const deshabilitar = bloquear || !horariosCargados || guardandoHorario || pendiente || !!pasado;
+  document.querySelectorAll('#modalHorarios .dia-row').forEach(dia => {
+    const interruptor = dia.querySelector('input[type="checkbox"]');
+    interruptor.disabled = deshabilitar;
+    const etiqueta = dia.querySelector('label.switch');
+    etiqueta.style.opacity = pendiente ? '0.45' : '';
+    etiqueta.style.pointerEvents = pendiente ? 'none' : '';
+    etiqueta.title = pendiente ? 'Día de una solicitud pendiente: solo lectura' : '';
+    const agregar = dia.querySelector('.btn-agregar-hora');
+    agregar.disabled = deshabilitar;
+    agregar.style.display = !pendiente && interruptor.checked ? 'block' : 'none';
+    dia.querySelectorAll('.hora-row input, .hora-row button').forEach(control => {
+      control.disabled = deshabilitar;
+      if (control.classList.contains('btn-eliminar-hora')) control.style.display = pendiente ? 'none' : '';
     });
   });
-  const guardar = document.getElementById("guardarHorarioBtn");
-  if (guardar) guardar.disabled = bloquear || !horariosCargados || guardandoHorario;
-  const cancelar = document.getElementById("cancelarHorarioBtn");
-  if (cancelar) cancelar.disabled = guardandoHorario;
+  const enviar = document.getElementById('guardarHorarioBtn');
+  enviar.disabled = deshabilitar;
+  enviar.textContent = pendiente ? 'Pendiente de aprobación' : 'Enviar solicitud';
+  enviar.title = pendiente ? 'Esta solicitud ya fue enviada y está en revisión administrativa.' : 'Enviar una solicitud pendiente de aprobación';
+  const cerrar = document.getElementById('cancelarHorarioBtn');
+  cerrar.disabled = guardandoHorario;
+  cerrar.textContent = pendiente ? 'Cerrar' : 'Cancelar';
+  document.getElementById('semanaHorarioInicio').disabled = guardandoHorario;
+}
+async function respuestaSemanal(respuesta) {
+  if (respuesta.redirected || respuesta.status === 401) throw new Error('La sesión expiró. Inicia sesión nuevamente.');
+  if (respuesta.status === 403) throw new Error('No tienes permiso para gestionar solicitudes médicas.');
+  if (!respuesta.headers.get('content-type')?.includes('application/json')) throw new Error('El servidor devolvió una respuesta inesperada.');
+  return respuesta.json();
 }
 
-async function abrirModalHorarios({ despuesDeGuardar = false } = {}) {
-  despuesDeGuardar = guardadoHorariosHeredadoHabilitado && despuesDeGuardar;
+function validarRespuestaSemanal(datos, semana) {
+  if (!datos || datos.fecha_inicio !== semana.fecha_inicio || datos.fecha_fin !== semana.fecha_fin || !Array.isArray(datos.solicitudes)) throw new Error('La respuesta no corresponde a la semana seleccionada.');
+  const config = datos.configuracion;
+  if (!Number.isSafeInteger(config?.duracionConsultaMinutos) || config.duracionConsultaMinutos <= 0 || !Number.isSafeInteger(config.descansoPosteriorMinutos) || config.descansoPosteriorMinutos < 0) throw new Error('La configuración de consulta no es válida.');
+  const ids = new Set(), versiones = new Set();
+  let pendientes = 0;
+  datos.solicitudes.forEach(s => {
+    if (!Number.isSafeInteger(s.id_solicitud) || s.id_solicitud <= 0 || ids.has(s.id_solicitud) || !Number.isSafeInteger(s.version) || s.version <= 0 || versiones.has(s.version) || s.fecha_inicio !== semana.fecha_inicio || s.fecha_fin !== semana.fecha_fin || !['Pendiente', 'Aprobado', 'Rechazado', 'Retirada'].includes(s.estado) || !Array.isArray(s.detalles) || !s.detalles.length) throw new Error('La respuesta contiene una solicitud incorrecta.');
+    ids.add(s.id_solicitud); versiones.add(s.version);
+    if (s.estado === 'Pendiente') pendientes++;
+    const detalles = new Set();
+    s.detalles.forEach(d => {
+      if (!Number.isSafeInteger(d.id_detalle) || d.id_detalle <= 0 || detalles.has(d.id_detalle) || !diasHorario.has(d.dia_semana)) throw new Error('La respuesta contiene una franja incorrecta.');
+      detalles.add(d.id_detalle);
+      if (normalizarHoraHorario(d.hora_inicio) >= normalizarHoraHorario(d.hora_fin)) throw new Error('La respuesta contiene un rango incorrecto.');
+    });
+  });
+  if (pendientes > 1) throw new Error('Existen pendientes inconsistentes; se requiere revisión.');
+  return datos;
+}
+
+function representarSolicitudesHorarios(datos) {
+  limpiarHorarios();
+  solicitudPendienteHorario = datos.solicitudes.find(s => s.estado === 'Pendiente') || null;
+  configuracionHorario = datos.configuracion;
+  const resumen = datos.solicitudes.map(s => 'Solicitud ' + s.id_solicitud + ', versión ' + s.version + ': ' + s.estado).join(' | ');
+  document.getElementById('historialSolicitudesHorarios').textContent = resumen || 'Todavía no hay solicitudes para esta semana.';
+  if (solicitudPendienteHorario) solicitudPendienteHorario.detalles.forEach(d => {
+    mostrarDiaActivo('dia' + d.dia_semana);
+    mostrarHorario('dia' + d.dia_semana, d.hora_inicio, d.hora_fin);
+  });
+  horariosCargados = true;
+  bloquearEdicionHorarios(false);
+}
+
+async function abrirModalHorarios({ conservarSemana = false, confirmacion = '', solicitudConfirmada = null } = {}) {
   if (guardandoHorario) return false;
-  const modal = document.getElementById("modalHorarios");
-  if (!modal) return;
+  const modal = document.getElementById('modalHorarios');
+  if (!modal) return false;
+  const selector = document.getElementById('semanaHorarioInicio');
+  if (!conservarSemana) selector.value = lunesActualHorario();
   peticionHorarios?.abort();
   const version = ++versionCargaHorarios;
-  const peticion = new AbortController();
-  peticionHorarios = peticion;
-  horariosCargados = false;
-  revisionHorario = null;
-  limpiarHorarios();
-  bloquearEdicionHorarios(true);
-  mensajeHorarios("Cargando horarios...");
-  modal.classList.add("abierto");
-
+  const peticion = new AbortController(); peticionHorarios = peticion;
+  horariosCargados = false; solicitudPendienteHorario = null; semanaConsultadaHorario = null; configuracionHorario = null;
+  limpiarHorarios(); bloquearEdicionHorarios(true);
+  document.getElementById('historialSolicitudesHorarios').textContent = '';
+  document.getElementById('semanaHorarioFin').textContent = '';
+  modal.classList.add('abierto');
   try {
-    const respuesta = await fetch("/medico/horarios", {
-      credentials: "same-origin",
-      cache: "no-store",
-      signal: peticion.signal
-    });
-    if (version !== versionCargaHorarios) return;
-    if (respuesta.redirected || respuesta.status === 401) {
-      throw new Error("La sesion ha expirado. Inicia sesion nuevamente para consultar tus horarios.");
-    }
-    if (!respuesta.ok) {
-      const mensajes = {
-        403: "No tienes permiso para consultar estos horarios.",
-        404: "No se encontro tu perfil medico."
-      };
-      throw new Error(mensajes[respuesta.status] || "No se pudieron cargar los horarios. Intenta abrir el modal nuevamente.");
-    }
-    if (!respuesta.headers.get("content-type")?.includes("application/json")) {
-      throw new Error("El servidor no devolvio una respuesta JSON valida.");
-    }
-    const datos = await respuesta.json();
-    if (version !== versionCargaHorarios) return;
-    if (!datos || !Array.isArray(datos.horarios) || typeof datos.revision !== "string" || !/^[a-f0-9]{64}$/.test(datos.revision)) {
-      throw new Error("La respuesta de horarios no es valida.");
-    }
-    const ids = new Set();
-    // Validar todo antes de insertar: un registro incorrecto invalida la carga completa.
-    const horarios = datos.horarios.map(horario => {
-      if (!horario || !Number.isSafeInteger(horario.id_horario) || horario.id_horario <= 0 ||
-          ids.has(horario.id_horario) || !diasHorario.has(horario.dia_semana) ||
-          !["Pendiente", "Aprobado", "Rechazado"].includes(horario.estado)) {
-        throw new Error("La respuesta contiene un horario no valido.");
-      }
-      ids.add(horario.id_horario);
-      const inicio = normalizarHoraHorario(horario.hora_inicio);
-      const fin = normalizarHoraHorario(horario.hora_fin);
-      if (inicio >= fin) throw new Error("La respuesta contiene un rango horario no valido.");
-      obtenerDiaHorario("dia" + horario.dia_semana);
-      return { ...horario, inicio, fin };
-    });
-    horarios.forEach(horario => {
-      const diaId = "dia" + horario.dia_semana;
-      mostrarDiaActivo(diaId);
-      const fila = mostrarHorario(diaId, horario.inicio, horario.fin);
-      fila.dataset.idHorario = String(horario.id_horario);
-      fila.dataset.estado = horario.estado;
-      fila.dataset.inicioOriginal = horario.hora_inicio;
-      fila.dataset.finOriginal = horario.hora_fin;
-    });
-    revisionHorario = datos.revision;
-    horariosCargados = true;
-    bloquearEdicionHorarios(false);
-    mensajeHorarios(!guardadoHorariosHeredadoHabilitado ? avisoGuardadoHorarios : despuesDeGuardar ? "Horarios guardados y verificados. Las nuevas franjas quedan pendientes de aprobación." : "Horarios cargados. Los aprobados y rechazados son de solo lectura.");
+    const semana = semanaHorario(selector.value);
+    semanaConsultadaHorario = semana.fecha_inicio;
+    document.getElementById('semanaHorarioFin').textContent = semana.fecha_fin;
+    mensajeHorarios('Consultando solicitudes semanales...');
+    const respuesta = await fetch('/medico/solicitudes-horarios?fecha_inicio=' + encodeURIComponent(semana.fecha_inicio), { credentials: 'same-origin', cache: 'no-store', signal: peticion.signal });
+    if (version !== versionCargaHorarios) return false;
+    const datos = await respuestaSemanal(respuesta);
+    if (version !== versionCargaHorarios) return false;
+    if (!respuesta.ok) throw new Error(typeof datos?.mensaje === 'string' ? datos.mensaje : 'No se pudieron consultar las solicitudes.');
+    validarRespuestaSemanal(datos, semana);
+    if (solicitudConfirmada !== null && !datos.solicitudes.some(s => s.id_solicitud === solicitudConfirmada)) throw new Error('La consulta no incluye la solicitud confirmada. Vuelve a abrir el modal.');
+    representarSolicitudesHorarios(datos);
+    mensajeHorarios(confirmacion || (solicitudPendienteHorario
+      ? 'Solicitud pendiente, versión ' + solicitudPendienteHorario.version + '. Solo lectura; todavía no habilita citas.'
+      : semana.fecha_inicio < lunesActualHorario() ? 'Semana pasada: puedes consultar su historial, pero no presentar solicitudes.'
+      : 'Puedes preparar una nueva propuesta. El historial no se modifica y la disponibilidad aprobada se conserva.'));
     return true;
   } catch (error) {
-    if (version !== versionCargaHorarios || error.name === "AbortError") return;
-    limpiarHorarios();
-    bloquearEdicionHorarios(true);
-    mensajeHorarios(despuesDeGuardar ? "El guardado fue confirmado, pero no se pudo verificar la recarga. Vuelve a abrir el modal." : error instanceof SyntaxError
-      ? "El servidor devolvio datos incorrectos. No se cargaron los horarios."
-      : error.message || "No se pudieron cargar los horarios.", true);
-  } finally {
-    if (version === versionCargaHorarios) peticionHorarios = null;
-  }
+    if (version !== versionCargaHorarios || error.name === 'AbortError') return false;
+    horariosCargados = false; bloquearEdicionHorarios(true);
+    mensajeHorarios((confirmacion ? confirmacion + ' No se pudo verificar la recarga. ' : '') + (error.message || 'No se pudo consultar la semana.'), true);
+    return false;
+  } finally { if (version === versionCargaHorarios) peticionHorarios = null; }
+}
+
+function cambiarSemanaHorarios() {
+  if (!guardandoHorario) return abrirModalHorarios({ conservarSemana: true });
 }
 
 function cerrarModalHorarios() {
   if (guardandoHorario) return;
-  horariosCargados = false;
-  revisionHorario = null;
-  ++versionCargaHorarios;
-  peticionHorarios?.abort();
-  peticionHorarios = null;
-  document.getElementById("modalHorarios")?.classList.remove("abierto");
-  limpiarHorarios();
-  bloquearEdicionHorarios(true);
-  mensajeHorarios("Los cambios no guardados se descartan al cerrar.");
+  ++versionCargaHorarios; peticionHorarios?.abort(); peticionHorarios = null;
+  horariosCargados = false; solicitudPendienteHorario = null;
+  document.getElementById('modalHorarios')?.classList.remove('abierto');
+  limpiarHorarios(); bloquearEdicionHorarios(true);
+  mensajeHorarios('El borrador se descarta al cerrar. Las solicitudes enviadas permanecen guardadas.');
 }
 
 function cerrarModalHorariosFuera(e) {
-  if (e.target.id === "modalHorarios") cerrarModalHorarios();
+  if (e.target.id === 'modalHorarios') cerrarModalHorarios();
 }
 
 function mostrarDiaActivo(diaId) {
   const dia = obtenerDiaHorario(diaId);
   dia.querySelector('input[type="checkbox"]').checked = true;
-  dia.classList.add("activo");
-  dia.querySelector(".btn-agregar-hora").style.display = "block";
+  dia.classList.add('activo'); dia.querySelector('.btn-agregar-hora').style.display = 'block';
 }
 
 function mostrarHorario(diaId, inicio, fin) {
-  const dia = obtenerDiaHorario(diaId);
-  const horaInicio = normalizarHoraHorario(inicio);
-  const horaFin = normalizarHoraHorario(fin);
-  if (horaInicio >= horaFin) throw new Error("Rango horario no valido.");
-  const fila = document.createElement("div");
-  fila.className = "hora-row";
-  const desde = document.createElement("input");
-  desde.type = "time";
-  desde.value = horaInicio;
-  const separador = document.createElement("span");
-  separador.textContent = "a";
-  const hasta = document.createElement("input");
-  hasta.type = "time";
-  hasta.value = horaFin;
-  const eliminar = document.createElement("button");
-  eliminar.type = "button";
-  eliminar.className = "btn-eliminar-hora";
-  eliminar.textContent = String.fromCodePoint(0x1F5D1);
-  eliminar.setAttribute("aria-label", "Eliminar rango horario");
-  eliminar.addEventListener("click", () => fila.remove());
-  fila.append(desde, separador, hasta, eliminar);
-  dia.querySelector(".dia-horas").appendChild(fila);
+  const dia = obtenerDiaHorario(diaId), horaInicio = normalizarHoraHorario(inicio), horaFin = normalizarHoraHorario(fin);
+  if (horaInicio >= horaFin) throw new Error('El inicio debe ser anterior al final.');
+  const fila = document.createElement('div'); fila.className = 'hora-row';
+  const desde = document.createElement('input'); desde.type = 'time'; desde.value = horaInicio;
+  const hasta = document.createElement('input'); hasta.type = 'time'; hasta.value = horaFin;
+  for (const input of [desde, hasta]) { input.min = '07:00'; input.max = '19:00'; input.step = '60'; }
+  const separador = document.createElement('span'); separador.textContent = 'a';
+  const eliminar = document.createElement('button'); eliminar.type = 'button'; eliminar.className = 'btn-eliminar-hora';
+  eliminar.textContent = String.fromCodePoint(0x1F5D1); eliminar.setAttribute('aria-label', 'Eliminar rango horario');
+  eliminar.addEventListener('click', () => { if (!eliminar.disabled) fila.remove(); });
+  fila.append(desde, separador, hasta, eliminar); dia.querySelector('.dia-horas').appendChild(fila);
   return fila;
 }
 
 function toggleDia(diaId, checkbox) {
-  const dia = obtenerDiaHorario(diaId);
   if (checkbox.disabled) return;
-  if (checkbox.checked) {
-    mostrarDiaActivo(diaId);
-    agregarHora(diaId);
-  } else {
-    dia.classList.remove("activo");
-    dia.querySelector(".btn-agregar-hora").style.display = "none";
-    dia.querySelector(".dia-horas").replaceChildren();
-  }
+  const dia = obtenerDiaHorario(diaId);
+  if (checkbox.checked) { mostrarDiaActivo(diaId); agregarHora(diaId); }
+  else { dia.classList.remove('activo'); dia.querySelector('.btn-agregar-hora').style.display = 'none'; dia.querySelector('.dia-horas').replaceChildren(); }
 }
 
 function agregarHora(diaId) {
-  const dia = obtenerDiaHorario(diaId);
-  if (!horariosCargados || guardandoHorario) return;
-  mostrarHorario(diaId, "08:00", "12:00");
+  if (!horariosCargados || guardandoHorario || solicitudPendienteHorario || semanaConsultadaHorario < lunesActualHorario()) return;
+  mostrarHorario(diaId, '08:00', '12:00');
 }
 
 function recogerHorarios() {
-  const horarios = [];
-  document.querySelectorAll("#modalHorarios .dia-row").forEach(dia => {
-    const diaSemana = dia.id.slice(3);
-    if (!diasHorario.has(diaSemana)) throw new Error("Día no válido");
-    const filas = Array.from(dia.querySelector(".dia-horas").children);
-    if (dia.querySelector('input[type="checkbox"]').checked && !filas.length) throw new Error("Agrega una franja para " + diaSemana);
+  const franjas = [];
+  document.querySelectorAll('#modalHorarios .dia-row').forEach(dia => {
+    const nombre = dia.id.slice(3);
+    if (!diasHorario.has(nombre)) throw new Error('Día no válido.');
+    if (!dia.querySelector('input[type="checkbox"]').checked) return;
+    const filas = Array.from(dia.querySelector('.dia-horas').children);
+    if (!filas.length) throw new Error('Agrega una franja para ' + nombre + '.');
     filas.forEach(fila => {
       const inputs = fila.querySelectorAll('input[type="time"]');
       const inicio = normalizarHoraHorario(inputs[0].value), fin = normalizarHoraHorario(inputs[1].value);
-      if (inicio >= fin) throw new Error("El inicio debe ser anterior al final en " + diaSemana);
-      const horario = { dia_semana: diaSemana, hora_inicio: inicio, hora_fin: fin };
-      if (fila.dataset.idHorario) {
-        horario.id_horario = Number(fila.dataset.idHorario);
-        if (!Number.isSafeInteger(horario.id_horario) || horario.id_horario <= 0) throw new Error("Identificador de franja no válido");
-        // Preservar segundos existentes cuando no se ha editado el campo.
-        if (fila.dataset.inicioOriginal?.slice(0, 5) === inicio) horario.hora_inicio = fila.dataset.inicioOriginal;
-        if (fila.dataset.finOriginal?.slice(0, 5) === fin) horario.hora_fin = fila.dataset.finOriginal;
-      }
-      horarios.push({ horario, estado: fila.dataset.estado });
+      if (inicio < '07:00' || fin > '19:00' || inicio >= fin) throw new Error('Las franjas deben estar entre 07:00 y 19:00, con inicio anterior al final.');
+      franjas.push({ dia_semana: nombre, hora_inicio: inicio, hora_fin: fin });
     });
   });
-  const activos = horarios.filter(h => h.estado !== "Rechazado").map(h => h.horario);
-  for (let i = 0; i < activos.length; i++) for (let j = i + 1; j < activos.length; j++) {
-    const a = activos[i], b = activos[j];
-    const normal = h => h.length === 5 ? h + ":00" : h;
-    if (a.dia_semana === b.dia_semana && normal(a.hora_inicio) < normal(b.hora_fin) && normal(b.hora_inicio) < normal(a.hora_fin)) throw new Error("Hay franjas duplicadas o superpuestas");
+  if (!franjas.length || franjas.length > 200) throw new Error('Selecciona entre 1 y 200 franjas.');
+  const minutos = h => Number(h.slice(0, 2)) * 60 + Number(h.slice(3, 5));
+  for (const dia of diasHorario) {
+    const rangos = franjas.filter(f => f.dia_semana === dia).sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio));
+    let inicio = null, fin = null;
+    for (const r of rangos) {
+      const a = minutos(r.hora_inicio), b = minutos(r.hora_fin);
+      if (fin !== null && a < fin) throw new Error('Hay franjas duplicadas o superpuestas en ' + dia + '.');
+      if (fin !== null && a !== fin) {
+        if (fin - inicio < configuracionHorario.duracionConsultaMinutos) throw new Error('Cada intervalo continuo debe permitir una consulta completa.');
+        inicio = a;
+      }
+      if (inicio === null) inicio = a;
+      fin = b;
+    }
+    if (fin !== null && fin - inicio < configuracionHorario.duracionConsultaMinutos) throw new Error('Cada intervalo continuo debe permitir una consulta completa.');
   }
-  return horarios.map(h => h.horario);
+  return franjas;
 }
 
 async function guardarHorarios() {
-  if (!guardadoHorariosHeredadoHabilitado) {
-    bloquearEdicionHorarios(true);
-    mensajeHorarios(avisoGuardadoHorarios);
-    return;
-  }
-  if (guardandoHorario || !horariosCargados || !revisionHorario) return;
-  let horarios;
-  try { horarios = recogerHorarios(); }
-  catch (error) { mensajeHorarios(error.message, true); return; }
-  guardandoHorario = true;
-  bloquearEdicionHorarios(true);
-  mensajeHorarios("Guardando horarios. Espera la confirmación antes de cerrar.");
-  let errorRecuperable = false;
+  if (guardandoHorario || !horariosCargados || solicitudPendienteHorario) return;
+  let semana, franjas;
   try {
-    const respuesta = await fetch("/medico/horarios", {
-      method: "PUT", credentials: "same-origin",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({ horarios, revision: revisionHorario })
+    semana = semanaHorario(document.getElementById('semanaHorarioInicio').value);
+    if (semana.fecha_inicio !== semanaConsultadaHorario) throw new Error('Consulta la semana seleccionada antes de enviar.');
+    if (semana.fecha_inicio < lunesActualHorario()) throw new Error('No puedes presentar una semana pasada.');
+    franjas = recogerHorarios();
+  } catch (error) { mensajeHorarios(error.message, true); return; }
+  guardandoHorario = true; bloquearEdicionHorarios(true);
+  mensajeHorarios('Enviando solicitud. Espera la confirmación antes de cerrar.');
+  let enviada = false, recuperable = false;
+  try {
+    const respuesta = await fetch('/medico/solicitudes-horarios', {
+      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ ...semana, franjas }),
     });
-    if (respuesta.redirected || respuesta.status === 401) throw new Error("La sesión expiró. Inicia sesión y vuelve a abrir el modal.");
-    if (!respuesta.headers.get("content-type")?.includes("application/json")) throw new Error("Respuesta inesperada. Recarga tus horarios antes de reintentar.");
-    const datos = await respuesta.json();
+    const datos = await respuestaSemanal(respuesta);
     if (!respuesta.ok) {
-      errorRecuperable = respuesta.status === 400 || respuesta.status === 409;
-      // Los conflictos requieren recargar la revisión, no reenviar una captura antigua.
-      if (respuesta.status === 409) errorRecuperable = false;
-      throw new Error(typeof datos?.mensaje === "string" ? datos.mensaje : "No se pudieron guardar los horarios");
+      recuperable = respuesta.status === 400;
+      throw new Error(typeof datos?.mensaje === 'string' ? datos.mensaje : 'No se pudo presentar la solicitud.');
     }
-    if (typeof datos?.mensaje !== "string") throw new Error("No se pudo confirmar el resultado. Recarga tus horarios.");
+    if (respuesta.status !== 201 || datos?.solicitud?.estado !== 'Pendiente' || !Number.isSafeInteger(datos.solicitud.id_solicitud) || datos.solicitud.fecha_inicio !== semana.fecha_inicio || datos.solicitud.fecha_fin !== semana.fecha_fin || typeof datos.mensaje !== 'string') throw new Error('No se pudo confirmar la respuesta de guardado.');
+    enviada = true;
+    const confirmacion = datos.mensaje + ' Solicitud ' + datos.solicitud.id_solicitud + '. Todavía no habilita citas.';
     guardandoHorario = false;
-    await abrirModalHorarios({ despuesDeGuardar: true });
+    await abrirModalHorarios({ conservarSemana: true, confirmacion, solicitudConfirmada: datos.solicitud.id_solicitud });
   } catch (error) {
     guardandoHorario = false;
-    if (!errorRecuperable) { horariosCargados = false; revisionHorario = null; }
-    bloquearEdicionHorarios(!errorRecuperable);
-    mensajeHorarios((error.message || "No se pudo confirmar el guardado.") + (errorRecuperable ? "" : " Cierra y vuelve a abrir el modal antes de reintentar."), true);
-  } finally {
-    guardandoHorario = false;
-    const cancelar = document.getElementById("cancelarHorarioBtn");
-    if (cancelar) cancelar.disabled = false;
-  }
+    if (!recuperable) horariosCargados = false;
+    bloquearEdicionHorarios(!recuperable);
+    mensajeHorarios((error.message || 'Error de comunicación.') + (recuperable ? ' Corrige el borrador y vuelve a enviar.' : enviada ? ' La solicitud se guardó; vuelve a consultar la semana.' : ' El borrador se conserva. Vuelve a consultar la semana antes de reintentar; no se puede asegurar el resultado.'), true);
+  } finally { guardandoHorario = false; bloquearEdicionHorarios(!horariosCargados); }
 }
 
 // SELECCIONAR PACIENTE DE LA LISTA
