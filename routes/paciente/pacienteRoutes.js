@@ -1,24 +1,14 @@
 import express from "express";
-import auth from "../../middleware/auth.js";
-import role from "../../middleware/role.js";
+const router = express.Router();
 
 import {
-    Paciente,
-    Usuario,
-    Cita,
-    Medico,
-    EstadoCita
-} from "../../models/index.js";
-
-import {
-    obtenerHistorialDiagnosticos
+    obtenerHistorialDiagnosticos,
+    getNotificationSettings
 } from "../../controllers/paciente/controller.js";
 
-import { getNotificationSettings } from '../../controllers/paciente/controller.js';
 
-const router = express.Router();
 
-const router = express.Router();
+
 
 // ======================================================
 // VISTA: PERFIL DEL PACIENTE (GET /paciente/perfil)
