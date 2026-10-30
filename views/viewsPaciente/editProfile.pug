@@ -1,0 +1,411 @@
+extends ./layout
+
+block content
+  div(class="min-h-screen bg-blue-50 pb-12 relative")
+    // Formulario principal que envuelve toda la vista
+    form(id="formEditarPerfil" action="/paciente/perfil/editar" method="POST")
+
+      // Encabezado Azul Superior con Botones
+      header(class="bg-indigo-700 text-white px-6 py-4 flex items-center justify-between shadow-md")
+        a(href="/paciente/perfil" class="flex items-center gap-2 text-lg font-medium hover:opacity-90")
+          span ←
+          span Mi Perfil
+
+        div(class="flex items-center gap-3")
+          a(
+            href="/paciente/perfil"
+            class="text-xs font-semibold bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition flex items-center gap-1"
+          )
+            span ✕
+            span Cancelar
+
+          button(
+            type="button"
+            id="btnAbrirModal"
+            class="text-xs font-semibold bg-white text-indigo-700 hover:bg-blue-50 px-4 py-2 rounded-lg transition shadow flex items-center gap-1 cursor-pointer"
+          )
+            span 💾
+            span Guardar Cambios
+
+      // Contenedor principal de 2 columnas
+      main(class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-2 gap-6")
+
+        // ==========================================
+        // COLUMNA IZQUIERDA
+        // ==========================================
+        div(class="flex flex-col gap-6")
+
+          // Tarjeta de Avatar y Nombre
+          div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100 text-center flex flex-col items-center")
+            div(class="w-24 h-24 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-4xl font-bold mb-4")
+              | 👤
+            h1(class="text-xl font-bold text-slate-800")
+              | #{paciente.nombres ? (paciente.nombres + ' ' + (paciente.apellidos || '')) : 'Juan Esteban Montoya Marin'}
+
+          // Tarjeta: Información Personal
+          div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
+            div(class="flex items-center gap-2 mb-4 text-indigo-600 font-semibold text-sm")
+              span 👤
+              span Información Personal
+
+            div(class="space-y-3")
+              // Nombres
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 👤
+                div(class="w-full text-xs")
+                  label(for="nombres" class="block text-slate-500 font-medium mb-0.5") Nombres
+                  input(
+                    id="nombres"
+                    name="nombres"
+                    type="text"
+                    value=paciente.nombres || ''
+                    required
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Apellidos
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 👤
+                div(class="w-full text-xs")
+                  label(for="apellidos" class="block text-slate-500 font-medium mb-0.5") Apellidos
+                  input(
+                    id="apellidos"
+                    name="apellidos"
+                    type="text"
+                    value=paciente.apellidos || ''
+                    required
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Correo Electrónico
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") ✉
+                div(class="w-full text-xs")
+                  label(for="correo" class="block text-slate-500 font-medium mb-0.5") Correo Electrónico
+                  input(
+                    id="correo"
+                    name="correo"
+                    type="email"
+                    value=paciente.correo || ''
+                    required
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Teléfono
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 📞
+                div(class="w-full text-xs")
+                  label(for="telefono" class="block text-slate-500 font-medium mb-0.5") Teléfono
+                  input(
+                    id="telefono"
+                    name="telefono"
+                    type="tel"
+                    value=paciente.telefono || ''
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Fecha de Nacimiento
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 📅
+                div(class="w-full text-xs")
+                  label(for="fechaNacimiento" class="block text-slate-500 font-medium mb-0.5") Fecha de Nacimiento
+                  input(
+                    id="fechaNacimiento"
+                    name="fechaNacimiento"
+                    type="date"
+                    value=paciente.fechaNacimiento ? String(paciente.fechaNacimiento).slice(0, 10) : ''
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Tipo de Documento (Solo Lectura)
+              div(class="flex items-center gap-3 bg-blue-100/60 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-400") 💳
+                div(class="w-full text-xs")
+                  p(class="text-slate-500 font-medium") Tipo de Documento
+                  p(class="font-semibold text-slate-600") #{paciente.tipoDocumento || 'CC'}
+
+              // Número de Documento (Solo Lectura)
+              div(class="flex items-center gap-3 bg-blue-100/60 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-400") 💳
+                div(class="w-full text-xs")
+                  p(class="text-slate-500 font-medium") Número de Documento
+                  p(class="font-semibold text-slate-600") #{paciente.numeroDocumento || '1234567890'}
+
+            // Formulario de Contraseña Integrado
+            div(class="mt-6 pt-4 border-t border-slate-100")
+              h2(class="text-xs font-bold text-slate-700 mb-1") Cambiar Contraseña ▾
+              p(class="text-xs text-slate-400 mb-4")
+                | La contraseña debe tener al menos 6 caracteres e incluir una combinación de números, letras y caracteres especiales(!@#$%).
+
+              div(class="space-y-3")
+                input(
+                  type="password"
+                  name="passwordActual"
+                  placeholder="Contraseña actual*"
+                  class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
+                )
+                input(
+                  type="password"
+                  name="passwordNueva"
+                  placeholder="Contraseña nueva*"
+                  class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
+                )
+                input(
+                  type="password"
+                  name="confirmarPassword"
+                  placeholder="Repetir contraseña nueva*"
+                  class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
+                )
+
+                button(
+                  type="button"
+                  class="w-full bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold py-2 rounded-xl transition mt-2 cursor-pointer"
+                ) Cambiar Contraseña
+
+
+        // ==========================================
+        // COLUMNA DERECHA
+        // ==========================================
+        div(class="flex flex-col gap-6")
+
+          // Tarjeta: Información Médica
+          div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
+            div(class="flex items-center gap-2 mb-4 text-red-500 font-semibold text-sm")
+              span ❤️
+              span Información Médica
+
+            div(class="space-y-3")
+              // Tipo de Sangre
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 🩺
+                div(class="w-full text-xs")
+                  label(for="tipoSangre" class="block text-slate-500 font-medium mb-0.5") Tipo de Sangre
+                  select(
+                    id="tipoSangre"
+                    name="tipoSangre"
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+                    option(value="" selected=(!paciente.tipoSangre)) Seleccionar
+                    each tipo in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+                      option(value=tipo selected=(paciente.tipoSangre === tipo))= tipo
+
+              // Alergias
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 🩺
+                div(class="w-full text-xs")
+                  label(for="alergias" class="block text-slate-500 font-medium mb-0.5") Alergias
+                  input(
+                    id="alergias"
+                    name="alergias"
+                    type="text"
+                    value=paciente.alergias || ''
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Condiciones Médicas
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 📋
+                div(class="w-full text-xs")
+                  label(for="condicionesMedicas" class="block text-slate-500 font-medium mb-0.5") Condiciones Médicas
+                  input(
+                    id="condicionesMedicas"
+                    name="condicionesMedicas"
+                    type="text"
+                    value=paciente.condicionesMedicas || ''
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+          // Tarjeta: Dirección de Residencia
+          div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
+            div(class="flex items-center gap-2 mb-4 text-indigo-600 font-semibold text-sm")
+              span 🏠
+              span Dirección de Residencia
+
+            div(class="space-y-3")
+              // Dirección
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                div(class="w-full text-xs")
+                  label(for="direccion" class="block text-slate-500 font-medium mb-0.5") Dirección de Residencia
+                  input(
+                    id="direccion"
+                    name="direccion"
+                    type="text"
+                    value=paciente.direccion || ''
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Departamento
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                div(class="w-full text-xs")
+                  label(for="departamento" class="block text-slate-500 font-medium mb-0.5") Departamento
+                  input(
+                    id="departamento"
+                    name="departamento"
+                    type="text"
+                    value=paciente.departamento || ''
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              // Ciudad
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                div(class="w-full text-xs")
+                  label(for="ciudad" class="block text-slate-500 font-medium mb-0.5") Ciudad/Municipio
+                  input(
+                    id="ciudad"
+                    name="ciudad"
+                    type="text"
+                    value=paciente.ciudad || ''
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+          // Tarjeta: Contacto de Emergencia
+          div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
+            div(class="flex items-center gap-2 mb-4 text-amber-500 font-semibold text-sm")
+              span 📞
+              span Contacto de Emergencia
+
+            div(class="space-y-3")
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 👤
+                div(class="w-full text-xs")
+                  label(for="contactoNombres" class="block text-slate-500 font-medium mb-0.5") Nombres
+                  input(
+                    id="contactoNombres"
+                    name="contactoNombres"
+                    type="text"
+                    value=paciente.contactoEmergencia ? paciente.contactoEmergencia.nombres : ''
+                    placeholder="(Nombres)"
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 👤
+                div(class="w-full text-xs")
+                  label(for="contactoApellidos" class="block text-slate-500 font-medium mb-0.5") Apellidos
+                  input(
+                    id="contactoApellidos"
+                    name="contactoApellidos"
+                    type="text"
+                    value=paciente.contactoEmergencia ? paciente.contactoEmergencia.apellidos : ''
+                    placeholder="(Apellidos)"
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") 📞
+                div(class="w-full text-xs")
+                  label(for="contactoTelefono" class="block text-slate-500 font-medium mb-0.5") Teléfono
+                  input(
+                    id="contactoTelefono"
+                    name="contactoTelefono"
+                    type="tel"
+                    value=paciente.contactoEmergencia ? paciente.contactoEmergencia.telefono : ''
+                    placeholder="Ninguno"
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+              div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+                span(class="text-indigo-500") ✉
+                div(class="w-full text-xs")
+                  label(for="contactoCorreo" class="block text-slate-500 font-medium mb-0.5") Correo Electrónico
+                  input(
+                    id="contactoCorreo"
+                    name="contactoCorreo"
+                    type="email"
+                    value=paciente.contactoEmergencia ? paciente.contactoEmergencia.correo : ''
+                    placeholder="usuario@sigcmi.com"
+                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                  )
+
+          // Tarjeta: Seguridad y Privacidad
+          div(class="bg-blue-200 rounded-2xl p-5 text-indigo-950 border border-blue-300")
+            h3(class="text-xs font-bold mb-1") Seguridad y Privacidad
+            p(class="text-xs text-indigo-900 leading-relaxed")
+              | Tu información está protegida con los más altos estándares de seguridad. Cualquier modificación requiere confirmación de contraseña para garantizar que solo tú puedas realizar cambios.
+
+      // ======================================================
+      // MODAL: CONFIRMAR IDENTIDAD (Con capa gris y posición fija de X)
+      // ======================================================
+      div(
+        id="modalConfirmarIdentidad"
+        class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden"
+      )
+        div(class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl border border-blue-100 transform transition-all relative")
+
+          // Encabezado del Modal con posición relativa para el botón de cierre
+          div(class="bg-indigo-600 text-white p-6 text-center relative")
+            button(
+              type="button"
+              id="btnCerrarModalX"
+              class="absolute top-3 left-3 z-10 text-white/80 hover:text-white text-base font-bold cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition"
+            ) ✕
+
+            h3(class="text-base font-bold mb-2 pr-4") Confirmar Identidad
+            p(class="text-xs text-indigo-100 leading-relaxed px-2")
+              | Por seguridad, ingresa tu contraseña para guardar los cambios en tu perfil.
+
+          // Cuerpo del Modal
+          div(class="p-6 space-y-4 text-center")
+            div(class="text-left")
+              label(for="passwordConfirmacion" class="block text-xs font-semibold text-slate-700 mb-2") Contraseña
+              input(
+                type="password"
+                id="passwordConfirmacion"
+                name="passwordConfirmacion"
+                placeholder="Ingresa tu Contraseña"
+                class="w-full bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              )
+
+            // Botones de Acción del Modal
+            div(class="space-y-2 pt-2")
+              button(
+                type="button"
+                id="btnConfirmarSubmit"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow cursor-pointer"
+              ) Confirmar
+
+              button(
+                type="button"
+                id="btnCancelarModal"
+                class="w-full bg-blue-50 hover:bg-blue-100 text-slate-700 font-semibold text-xs py-2.5 rounded-xl border border-blue-200 transition cursor-pointer"
+              ) Cancelar
+
+  // Script en línea para controlar la apertura/cierre del modal
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('modalConfirmarIdentidad');
+      const btnAbrir = document.getElementById('btnAbrirModal');
+      const btnCerrarX = document.getElementById('btnCerrarModalX');
+      const btnCancelar = document.getElementById('btnCancelarModal');
+      const btnConfirmar = document.getElementById('btnConfirmarSubmit');
+      const form = document.getElementById('formEditarPerfil');
+      const inputPass = document.getElementById('passwordConfirmacion');
+
+      const abrirModal = () => {
+        modal.classList.remove('hidden');
+        inputPass.value = '';
+        inputPass.focus();
+      };
+
+      const cerrarModal = () => {
+        modal.classList.add('hidden');
+      };
+
+      btnAbrir.addEventListener('click', abrirModal);
+      btnCerrarX.addEventListener('click', cerrarModal);
+      btnCancelar.addEventListener('click', cerrarModal);
+
+      btnConfirmar.addEventListener('click', () => {
+        if (!inputPass.value.trim()) {
+          alert('Por favor ingresa tu contraseña para confirmar.');
+          return;
+        }
+        form.submit();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          cerrarModal();
+        }
+      });
+    });

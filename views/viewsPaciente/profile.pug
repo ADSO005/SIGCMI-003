@@ -1,253 +1,204 @@
-extends layout
+extends ./layout
 
 block content
+  div(class="min-h-screen bg-blue-50 pb-12")
+    // Bar de navegación superior (Encabezado azul)
+    header(class="bg-indigo-700 text-white px-6 py-4 flex items-center justify-between shadow-md")
+      a(href="/paciente/dashboard" class="flex items-center gap-2 text-lg font-medium hover:opacity-90")
+        span ←
+        span Mi Perfil
 
-  // ==========================================
-  // ENCABEZADO DEL PERFIL
-  // ==========================================
+      a(href="/paciente/perfil/editar" class="text-sm font-semibold bg-indigo-800 hover:bg-indigo-900 px-4 py-2 rounded-lg transition")
+        | Editar Perfil
 
-  header.profile-header
+    // Contenedor principal
+    main(class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-2 gap-6")
 
-    a.profile-back(href="/paciente/dashboard")
-      span ←
-      | Mi Perfil
+      // ==========================================
+      // COLUMNA IZQUIERDA
+      // ==========================================
+      div(class="flex flex-col gap-6")
 
-    a.profile-edit(href="/paciente/perfil/editar")
-      | Editar Perfil
+        // Tarjeta de Avatar y Nombre
+        div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100 text-center flex flex-col items-center")
+          div(class="w-24 h-24 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-4xl font-bold mb-4")
+            | 👤
+          h1(class="text-xl font-bold text-slate-800")
+            | #{paciente.nombre || (paciente.nombres + ' ' + paciente.apellidos)}
 
+        // Tarjeta: Información Personal y Cambiar Contraseña
+        div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
 
-  // ==========================================
-  // CONTENEDOR PRINCIPAL
-  // ==========================================
+          // Subtítulo
+          div(class="flex items-center gap-2 mb-4 text-indigo-600 font-semibold text-sm")
+            span 👤
+            span Información Personal
 
-  main.profile-container
+          // Campos de datos de lectura
+          div(class="space-y-3")
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 👤
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Nombres
+                p(class="font-semibold text-slate-800") #{paciente.nombres || 'No registrado'}
 
-    // ========================================
-    // COLUMNA IZQUIERDA
-    // ========================================
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 👤
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Apellidos
+                p(class="font-semibold text-slate-800") #{paciente.apellidos || 'No registrado'}
 
-    section.profile-left
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") ✉
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Correo Electrónico
+                p(class="font-semibold text-slate-800") #{paciente.correo || 'No registrado'}
 
-      // TARJETA PRINCIPAL
-      .profile-card.profile-user-card
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 📞
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Teléfono
+                p(class="font-semibold text-slate-800") #{paciente.telefono || 'No registrado'}
 
-        .profile-avatar
-          span 👤
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 📅
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Fecha de Nacimiento
+                p(class="font-semibold text-slate-800") #{paciente.fechaNacimiento || 'No registrada'}
 
-        h1 #{paciente.nombre}
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 💳
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Tipo de Documento
+                p(class="font-semibold text-slate-800") #{paciente.tipoDocumento || 'No registrado'}
 
-        p.profile-user-role Paciente
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 💳
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Número de Documento
+                p(class="font-semibold text-slate-800") #{paciente.numeroDocumento || 'No registrado'}
 
+          // Sección de Cambiar Contraseña incorporada abajo
+          div(class="mt-6 pt-4 border-t border-slate-100")
+            h2(class="text-xs font-bold text-slate-700 mb-1") Cambiar Contraseña ▾
+            p(class="text-xs text-slate-400 mb-4")
+              | La contraseña debe tener al menos 6 caracteres e incluir una combinación de números, letras y caracteres especiales(!@#$%).
 
-      // INFORMACIÓN PERSONAL
-      section.profile-card
+            form(action="/paciente/perfil/cambiar-password" method="POST" class="space-y-3")
+              input(
+                type="password"
+                name="passwordActual"
+                placeholder="Contraseña actual*"
+                class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
+              )
+              input(
+                type="password"
+                name="passwordNueva"
+                placeholder="Contraseña nueva*"
+                class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
+              )
+              input(
+                type="password"
+                name="confirmarPassword"
+                placeholder="Repetir contraseña nueva*"
+                class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
+              )
 
-        .section-title
-          .section-icon 👤
-          div
-            h2 Información Personal
-            p Datos básicos del paciente
-
-        .profile-fields
-
-          .profile-field
-            span.field-icon 👤
-            .field-content
-              span.field-label Nombres
-              strong #{paciente.nombres || 'No registrado'}
-
-          .profile-field
-            span.field-icon 👤
-            .field-content
-              span.field-label Apellidos
-              strong #{paciente.apellidos || 'No registrado'}
-
-          .profile-field
-            span.field-icon ✉
-            .field-content
-              span.field-label Correo Electrónico
-              strong #{paciente.correo || 'No registrado'}
-
-          .profile-field
-            span.field-icon ☎
-            .field-content
-              span.field-label Teléfono
-              strong #{paciente.telefono || 'No registrado'}
-
-          .profile-field
-            span.field-icon 📅
-            .field-content
-              span.field-label Fecha de Nacimiento
-              strong #{paciente.fechaNacimiento || 'No registrada'}
-
-          .profile-field
-            span.field-icon ▣
-            .field-content
-              span.field-label Tipo de Documento
-              strong #{paciente.tipoDocumento || 'No registrado'}
-
-          .profile-field
-            span.field-icon ▣
-            .field-content
-              span.field-label Número de Documento
-              strong #{paciente.numeroDocumento || 'No registrado'}
-
-
-      // CAMBIO DE CONTRASEÑA
-      section.profile-card.password-card
-
-        .section-title
-          .section-icon 🔒
-          div
-            h2 Cambiar Contraseña
-            p La contraseña debe tener mínimo 6 caracteres.
-
-        form.password-form(action="/paciente/perfil/cambiar-password" method="POST")
-
-          .form-group
-            label(for="passwordActual") Contraseña actual
-            input(
-              type="password"
-              id="passwordActual"
-              name="passwordActual"
-              placeholder="Ingresa tu contraseña actual"
-            )
-
-          .form-group
-            label(for="passwordNueva") Contraseña nueva
-            input(
-              type="password"
-              id="passwordNueva"
-              name="passwordNueva"
-              placeholder="Ingresa tu nueva contraseña"
-            )
-
-          .form-group
-            label(for="confirmarPassword") Repetir contraseña nueva
-            input(
-              type="password"
-              id="confirmarPassword"
-              name="confirmarPassword"
-              placeholder="Repite tu nueva contraseña"
-            )
-
-          button.btn-password(type="submit")
-            | Cambiar Contraseña
+              button(
+                type="submit"
+                class="w-full bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold py-2 rounded-xl transition mt-2"
+              ) Cambiar Contraseña
 
 
-    // ========================================
-    // COLUMNA DERECHA
-    // ========================================
+      // ==========================================
+      // COLUMNA DERECHA
+      // ==========================================
+      div(class="flex flex-col gap-6")
 
-    section.profile-right
+        // Tarjeta: Información Médica
+        div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
+          div(class="flex items-center gap-2 mb-4 text-red-500 font-semibold text-sm")
+            span ❤️
+            span Información Médica
 
-      // INFORMACIÓN MÉDICA
-      section.profile-card
+          div(class="space-y-3")
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 🩺
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Tipo de Sangre
+                p(class="font-semibold text-slate-800") #{paciente.tipoSangre || 'No registrado'}
 
-        .section-title
-          .section-icon.medical-icon ♥
-          div
-            h2 Información Médica
-            p Información importante para tu atención
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 🩺
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Alergias
+                p(class="font-semibold text-slate-800") #{paciente.alergias || 'Ninguna'}
 
-        .profile-fields
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 📋
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Condiciones Médicas
+                p(class="font-semibold text-slate-800") #{paciente.condicionesMedicas || 'Ninguna'}
 
-          .profile-field
-            span.field-icon 🩸
-            .field-content
-              span.field-label Tipo de Sangre
-              strong #{paciente.tipoSangre || 'No registrado'}
+        // Tarjeta: Dirección de Residencia
+        div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
+          div(class="flex items-center gap-2 mb-4 text-indigo-600 font-semibold text-sm")
+            span 🏠
+            span Dirección de Residencia
 
-          .profile-field
-            span.field-icon ⚕
-            .field-content
-              span.field-label Alergias
-              strong #{paciente.alergias || 'Ninguna registrada'}
+          div(class="space-y-3")
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Dirección de Residencia
+                p(class="font-semibold text-slate-800") #{paciente.direccion || 'No registrada'}
 
-          .profile-field
-            span.field-icon 🩺
-            .field-content
-              span.field-label Condiciones Médicas
-              strong #{paciente.condicionesMedicas || 'Ninguna registrada'}
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Departamento
+                p(class="font-semibold text-slate-800") #{paciente.departamento || 'No registrado'}
 
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Ciudad/Municipio
+                p(class="font-semibold text-slate-800") #{paciente.ciudad || 'No registrada'}
 
-      // DIRECCIÓN
-      section.profile-card
+        // Tarjeta: Contacto de Emergencia
+        div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
+          div(class="flex items-center gap-2 mb-4 text-amber-500 font-semibold text-sm")
+            span 📞
+            span Contacto de Emergencia
 
-        .section-title
-          .section-icon 🏠
-          div
-            h2 Dirección de Residencia
-            p Lugar de residencia registrado
+          div(class="space-y-3")
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 👤
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Nombres
+                p(class="font-semibold text-slate-800")
+                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.nombres ? paciente.contactoEmergencia.nombres : '(Nombres)'}
 
-        .profile-fields
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 👤
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Apellidos
+                p(class="font-semibold text-slate-800")
+                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.apellidos ? paciente.contactoEmergencia.apellidos : '(Apellidos)'}
 
-          .profile-field.field-full
-            span.field-icon 📍
-            .field-content
-              span.field-label Dirección
-              strong #{paciente.direccion || 'No registrada'}
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") 📞
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Teléfono
+                p(class="font-semibold text-slate-800")
+                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.telefono ? paciente.contactoEmergencia.telefono : 'Ninguno'}
 
-          .profile-field
-            span.field-icon 🌎
-            .field-content
-              span.field-label Departamento
-              strong #{paciente.departamento || 'No registrado'}
+            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
+              span(class="text-indigo-500") ✉
+              div(class="text-xs")
+                p(class="text-slate-500 font-medium") Correo Electrónico
+                p(class="font-semibold text-slate-800")
+                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.correo ? paciente.contactoEmergencia.correo : 'usuario@sigcmi.com'}
 
-          .profile-field
-            span.field-icon 🏙
-            .field-content
-              span.field-label Ciudad / Municipio
-              strong #{paciente.ciudad || 'No registrada'}
-
-
-      // CONTACTO DE EMERGENCIA
-      section.profile-card
-
-        .section-title
-          .section-icon.emergency-icon ☎
-          div
-            h2 Contacto de Emergencia
-            p Persona que podemos contactar en caso de emergencia
-
-        .profile-fields
-
-          .profile-field
-            span.field-icon 👤
-            .field-content
-              span.field-label Nombres
-              strong #{paciente.contactoEmergencia.nombres || 'No registrado'}
-
-          .profile-field
-            span.field-icon 👤
-            .field-content
-              span.field-label Apellidos
-              strong #{paciente.contactoEmergencia.apellidos || 'No registrado'}
-
-          .profile-field
-            span.field-icon ☎
-            .field-content
-              span.field-label Teléfono
-              strong #{paciente.contactoEmergencia.telefono || 'No registrado'}
-
-          .profile-field
-            span.field-icon ✉
-            .field-content
-              span.field-label Correo Electrónico
-              strong #{paciente.contactoEmergencia.correo || 'No registrado'}
-
-
-      // SEGURIDAD
-      section.security-card
-
-        .security-icon
-          | 🔒
-
-        .security-content
-          h2 Seguridad y Privacidad
-          p
-            | Tu información está protegida con los más altos estándares
-            | de seguridad. Cualquier modificación requiere confirmación.
-
-        a.security-button(href="/paciente/perfil/seguridad")
-          | Administrar Seguridad
+        // Tarjeta: Seguridad y Privacidad
+        div(class="bg-blue-200 rounded-2xl p-5 text-indigo-950 border border-blue-300")
+          h3(class="text-xs font-bold mb-1") Seguridad y Privacidad
+          p(class="text-xs text-indigo-900 leading-relaxed")
+            | Tu información está protegida con los más altos estándares de seguridad. Cualquier modificación requiere confirmación de contraseña para garantizar que solo tú puedas realizar cambios.

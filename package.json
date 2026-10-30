@@ -16,7 +16,8 @@
     "dev:medico": "concurrently \"npm run server\" \"npm run css:medico\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "css:patient": "npm run css:paciente"
   },
   "repository": {
     "type": "git",
