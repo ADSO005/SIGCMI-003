@@ -5,7 +5,6 @@ import db from "./config/db.js";
 
 import userRoutes from "./routes/auth/userRoutes.js";
 import adminRoutes from "./routes/admin/adminRoutes.js";
-import medicoRoutes from "./routes/medico/medicoRoutes.js";
 import pacienteRoutes from "./routes/paciente/pacienteRoutes.js";
 
 import asociarModelos from "./models/asociaciones.js";
@@ -27,7 +26,6 @@ asociarModelos();
 app.use("/auth", userRoutes);
 app.use("/admin", adminRoutes);
 app.use("/whatsapp", whatsappRoutes);
-app.use("/medico", medicoRoutes);
 app.use("/paciente", pacienteRoutes);
 
 // =====================================

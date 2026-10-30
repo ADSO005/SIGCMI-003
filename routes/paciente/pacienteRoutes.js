@@ -7,9 +7,6 @@ import {
 } from "../../controllers/paciente/controller.js";
 
 
-
-
-
 // ======================================================
 // VISTA: PERFIL DEL PACIENTE (GET /paciente/perfil)
 // ======================================================
@@ -92,16 +89,6 @@ router.get(
     obtenerHistorialDiagnosticos
 );
 
-// ======================================================
-// HISTORIAL DE DIAGNÓSTICOS DEL PACIENTE
-// ======================================================
-
-router.get(
-    "/historial-diagnosticos",
-    // auth,
-    // role(3),
-    obtenerHistorialDiagnosticos
-);
 
 router.get('/notifications', getNotificationSettings);
 
