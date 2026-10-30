@@ -1,5 +1,7 @@
+import ConfiguracionNotificacion from '../../models/ConfiguracionNotificacion.js';
+
 export const mostrarDashboard = (req, res) => {
-    
+
     const paciente = {
         nombre: 'Juan'
     };
@@ -109,6 +111,21 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
     }
 };
 
-export const getNotificationSettings = (req, res) => {
-    res.render('viewsPaciente/notificationsSetting');
+export const listarConfiguracionNotificaciones = async (req, res) => {
+    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+
+    // Simular que esto vino de BD
+    const configuracionNotificaciones = {
+        correo: con.correo,
+        sms: con.sms,
+        whatsapp: con.whatsapp,
+        recordatorio_24h: con.recordatorio_24h,
+        recordatorio_1h: con.recordatorio_1h,
+        confirmacion_cita: con.confirmacion_cita,
+        cancelacion_cita: con.cancelacion_cita,
+        reprogramacion: con.reprogramacion,
+        nuevo_diagnostico: con.nuevo_diagnostico
+    };
+
+    res.render('viewsPaciente/notificationsSetting', configuracionNotificaciones);
 };

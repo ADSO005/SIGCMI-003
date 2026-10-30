@@ -14,9 +14,7 @@ import {
     obtenerHistorialDiagnosticos
 } from "../../controllers/paciente/controller.js";
 
-import { getNotificationSettings } from '../../controllers/paciente/controller.js';
-
-const router = express.Router();
+import { listarConfiguracionNotificaciones } from '../../controllers/paciente/controller.js';
 
 const router = express.Router();
 
@@ -113,6 +111,6 @@ router.get(
     obtenerHistorialDiagnosticos
 );
 
-router.get('/notifications', getNotificationSettings);
+router.get('/notificaciones', listarConfiguracionNotificaciones);
 
 export default router;

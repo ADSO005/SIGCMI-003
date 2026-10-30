@@ -54,7 +54,7 @@ html(lang="es")
                         p(class="text-sm font-bold text-slate-800") Correo Electrónico
                         p(class="text-xs text-slate-500") Recibe notificaciones por email
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="email_channel" class="sr-only peer" checked)
+                      input(type="checkbox" name="email_channel" class="sr-only peer" checked=correo)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                   //- SMS
@@ -67,7 +67,7 @@ html(lang="es")
                         p(class="text-sm font-bold text-slate-800") SMS
                         p(class="text-xs text-slate-500") Recibe mensajes de texto
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="sms_channel" class="sr-only peer")
+                      input(type="checkbox" name="sms_channel" class="sr-only peer" checked=sms)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                   //- WhatsApp
@@ -80,7 +80,7 @@ html(lang="es")
                         p(class="text-sm font-bold text-slate-800") WhatsApp
                         p(class="text-xs text-slate-500") Recibe mensajes por WhatsApp
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="whatsapp_channel" class="sr-only peer" checked)
+                      input(type="checkbox" name="whatsapp_channel" class="sr-only peer" checked=whatsapp)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                 //- ---------- Recordatorios de citas ----------
@@ -100,7 +100,7 @@ html(lang="es")
                         p(class="text-sm font-bold text-slate-800") Recordatorio 24 horas antes
                         p(class="text-xs text-slate-500") Un día antes de tu cita
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="recordatorio_24h" class="sr-only peer" checked)
+                      input(type="checkbox" name="recordatorio_24h" class="sr-only peer" checked=recordatorio_24h)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                   //- Recordatorio 1 hora antes
@@ -113,7 +113,7 @@ html(lang="es")
                         p(class="text-sm font-bold text-slate-800") Recordatorio 1 hora antes
                         p(class="text-xs text-slate-500") Una hora antes de tu cita
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="recordatorio_1h" class="sr-only peer" checked)
+                      input(type="checkbox" name="recordatorio_1h" class="sr-only peer" checked=recordatorio_1h)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
               //- =========================================================
@@ -135,7 +135,7 @@ html(lang="es")
                       p(class="text-sm font-bold text-slate-800") Confirmación de citas
                       p(class="text-xs text-slate-500") Cuando se confirme una cita
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="evento_confirmacion" class="sr-only peer" checked)
+                      input(type="checkbox" name="evento_confirmacion" class="sr-only peer" checked=confirmacion_cita)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                   //- Cancelación de citas
@@ -144,7 +144,7 @@ html(lang="es")
                       p(class="text-sm font-bold text-slate-800") Cancelación de citas
                       p(class="text-xs text-slate-500") Cuando se cancele una cita
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="evento_cancelacion" class="sr-only peer")
+                      input(type="checkbox" name="evento_cancelacion" class="sr-only peer" checked=cancelacion_cita)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                   //- Reprogramación de citas
@@ -153,7 +153,7 @@ html(lang="es")
                       p(class="text-sm font-bold text-slate-800") Reprogramación de citas
                       p(class="text-xs text-slate-500") Cuando se reprograme una cita
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="evento_reprogramacion" class="sr-only peer" checked)
+                      input(type="checkbox" name="evento_reprogramacion" class="sr-only peer" checked=reprogramacion)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                   //- Nuevos diagnósticos
@@ -162,7 +162,7 @@ html(lang="es")
                       p(class="text-sm font-bold text-slate-800") Nuevos diagnósticos
                       p(class="text-xs text-slate-500") Cuando haya un nuevo diagnóstico
                     label(class="relative inline-flex items-center cursor-pointer")
-                      input(type="checkbox" name="evento_diagnostico" class="sr-only peer")
+                      input(type="checkbox" name="evento_diagnostico" class="sr-only peer" checked=nuevo_diagnostico)
                       div(class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600")
 
                 //- ---------- Bloque inferior: info + botones ----------
