@@ -1,23 +1,10 @@
 import express from "express";
-import auth from "../../middleware/auth.js";
-import role from "../../middleware/role.js";
-
-import {
-    Paciente,
-    Usuario,
-    Cita,
-    Medico,
-    EstadoCita
-} from "../../models/index.js";
-
-import {
-    obtenerHistorialDiagnosticos
-} from "../../controllers/paciente/controller.js";
-
-import { getNotificationSettings } from '../../controllers/paciente/controller.js';
-
 const router = express.Router();
 
+import {
+    obtenerHistorialDiagnosticos,
+    getNotificationSettings
+} from "../../controllers/paciente/controller.js";
 
 
 // ======================================================
@@ -102,16 +89,6 @@ router.get(
     obtenerHistorialDiagnosticos
 );
 
-// ======================================================
-// HISTORIAL DE DIAGNÓSTICOS DEL PACIENTE
-// ======================================================
-
-router.get(
-    "/historial-diagnosticos",
-    // auth,
-    // role(3),
-    obtenerHistorialDiagnosticos
-);
 
 router.get('/notifications', getNotificationSettings);
 
