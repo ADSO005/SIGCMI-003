@@ -27,6 +27,10 @@ block content
             span 💾
             span Guardar Cambios
 
+      if mensajeExito
+        div(class="max-w-6xl mx-auto mt-4 px-4")
+          div(role="status" class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800")= mensajeExito
+
       // Contenedor principal de 2 columnas
       main(class="max-w-6xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-2 gap-6")
         
@@ -328,6 +332,7 @@ block content
       // ======================================================
       div(
         id="modalConfirmarIdentidad" 
+        data-abrir-modal=abrirModal ? 'true' : 'false'
         class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden"
       )
         div(class="bg-white rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl border border-blue-100 transform transition-all relative")
@@ -337,7 +342,7 @@ block content
             button(
               type="button" 
               id="btnCerrarModalX"
-              class="absolute top-3 left-3 z-10 text-white/80 hover:text-white text-base font-bold cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition"
+              class="absolute top-3 right-3 z-10 text-white/80 hover:text-white text-base font-bold cursor-pointer w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition"
             ) ✕
             
             h3(class="text-base font-bold mb-2 pr-4") Confirmar Identidad
@@ -353,8 +358,11 @@ block content
                 id="passwordConfirmacion"
                 name="passwordConfirmacion"
                 placeholder="Ingresa tu Contraseña"
+                required
                 class="w-full bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               )
+              if errorContrasena
+                p(id="errorContrasena" role="alert" class="mt-2 text-left text-xs font-medium text-red-600")= errorContrasena
 
             // Botones de Acción del Modal
             div(class="space-y-2 pt-2")
@@ -383,7 +391,6 @@ block content
 
       const abrirModal = () => {
         modal.classList.remove('hidden');
-        inputPass.value = '';
         inputPass.focus();
       };
 
@@ -397,11 +404,14 @@ block content
 
       btnConfirmar.addEventListener('click', () => {
         if (!inputPass.value.trim()) {
-          alert('Por favor ingresa tu contraseña para confirmar.');
+          inputPass.focus();
+          inputPass.reportValidity();
           return;
         }
-        form.submit();
+        form.requestSubmit();
       });
+
+      if (modal.dataset.abrirModal === 'true') abrirModal();
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
