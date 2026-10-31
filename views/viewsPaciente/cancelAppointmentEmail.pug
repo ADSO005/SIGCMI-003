@@ -1,0 +1,50 @@
+﻿extends ./layout
+
+block content
+  main(class="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-8")
+    .bg-white.rounded-3xl.shadow-2xl.max-w-lg.w-full.overflow-hidden
+      //- ENCABEZADO SIGCMI
+      .bg-gradient-to-r.from-blue-700.to-blue-500.p-8.text-center.text-white
+        h1.text-4xl.font-extrabold SIGCMI
+        p.mt-2.opacity-90
+          | Sistema Integral de Gestión
+          br
+          | de Citas Médicas
+
+      //- FORMULARIO PARA CONFIRMAR EL CORREO
+      .p-8
+        h2.mb-2.text-center.text-3xl.font-bold.text-slate-800 Confirmar identidad
+        p.mb-6.text-center.text-gray-500
+          | Ingresa el correo electrónico asociado a tu cuenta. Te enviaremos un código para confirmar la cancelación.
+
+        .mb-6.rounded-xl.bg-blue-50.p-4.text-sm.text-slate-700
+          p.font-semibold Cita que deseas cancelar
+          p.mt-1 Fecha: #{cita.fecha}
+          p Hora: #{String(cita.hora).slice(0, 5)}
+
+        if error
+          div.mb-5.rounded-lg.border.border-red-300.bg-red-100.px-4.py-3.text-center.text-sm.text-red-700(role="alert")= error
+
+        form(class="space-y-5" action=`/paciente/citas/${cita.id_cita}/cancelar` method="POST")
+          div
+            label.mb-2.block.text-sm.font-semibold.text-slate-700(for="correo") Correo electrónico
+            input#correo.w-full.rounded-xl.border.border-slate-300.bg-slate-50.px-4.py-3.text-slate-700.outline-none.transition(
+              type="email"
+              name="correo"
+              value=correo
+              autocomplete="email"
+              placeholder="Ingresa tu correo electrónico"
+              required
+              class="focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
+            )
+
+          .mt-6.flex.gap-4.px-2
+            a.flex-1.rounded-xl.bg-gray-400.py-3.text-center.font-semibold.text-black.transition-colors(
+              href="/paciente/dashboard"
+              class="hover:bg-gray-500"
+            ) Cancelar
+
+            button.flex-1.rounded-xl.bg-blue-600.py-3.font-semibold.text-white.transition-colors(
+              type="submit"
+              class="hover:bg-blue-700"
+            ) Enviar Código
