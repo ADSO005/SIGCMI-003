@@ -150,9 +150,6 @@ export const actualizarConfiguracionNotificaciones = async (req, res) => {
 
     let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
     await con.update(data);
-    await con.save();
-
-    //res.json(data);
 
     res.redirect('/paciente/notificaciones?success=1&message=Configuración actualizada correctamente');
 }
