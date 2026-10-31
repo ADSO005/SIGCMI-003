@@ -3,7 +3,8 @@ const router = express.Router();
 
 import {
     obtenerHistorialDiagnosticos,
-    getNotificationSettings
+    listarConfiguracionNotificaciones,
+    actualizarConfiguracionNotificaciones
 } from "../../controllers/paciente/controller.js";
 
 
@@ -90,6 +91,6 @@ router.get(
 );
 
 
-router.get('/notifications', getNotificationSettings);
-
+router.get('/notificaciones', listarConfiguracionNotificaciones);
+router.post('/notificacion', actualizarConfiguracionNotificaciones);
 export default router;
