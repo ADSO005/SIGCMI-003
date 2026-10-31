@@ -13,13 +13,13 @@ html(lang="es")
 
     //- 2. CONTENEDOR PRINCIPAL CON MARGEN IZQUIERDO PARA EL SIDEBAR
     div(class="pl-[314px] [@media(max-width:768px)]:pl-0 transition-all duration-300 flex flex-col min-h-screen")
-      
+
       //- HEADER SUPERIOR
       header(class="bg-white border-b border-slate-200 px-8 py-4 flex justify-between items-center shadow-2xs")
         div
           h1(class="text-2xl font-bold text-slate-800") Portal del Paciente
-          p(class="text-xs text-slate-500 mt-0.5") 
-            span(class="font-medium text-slate-700") 
+          p(class="text-xs text-slate-500 mt-0.5") #{" "}
+            span(class="font-medium text-slate-700") #{" "}
               script.
                 const options = { year: 'numeric', month: 'long', day: 'numeric' };
                 document.write(new Date().toLocaleDateString('es-CO', options));
@@ -28,12 +28,12 @@ html(lang="es")
       main(class="p-6 flex-1 flex flex-col")
         div(class="w-full flex-1 flex flex-col")
           div(class="grid grid-cols-2 gap-6 items-start w-full flex-1")
-            
+
             //- ==========================================
             //- CAJA GRANDE IZQUIERDA: HISTORIAL DE DIAGNÓSTICOS
             //- ==========================================
             div(class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs flex flex-col h-[calc(100vh-140px)]")
-              
+
               .mb-6.shrink-0
                 h2(class="text-2xl font-bold text-slate-900") Historial de Diagnósticos
                 p(class="text-sm text-slate-500 mt-1") Todos tus diagnósticos médicos.
@@ -85,7 +85,7 @@ html(lang="es")
             //- CAJA GRANDE DERECHA: DESPLIEGUE DEL DIAGNÓSTICO
             //- ==========================================
             div(class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs flex flex-col h-[calc(100vh-140px)] overflow-y-auto")
-              
+
               #detalle-diagnostico(class="h-full flex flex-col justify-center items-center text-center")
                 #placeholder-detalle(class="text-slate-400 py-12")
                   div(class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3")
@@ -111,7 +111,7 @@ html(lang="es")
                       p#det-fecha(class="text-xs text-slate-500 font-medium mt-1") 28 / 02 / 2026
                       p#det-medico(class="text-xs text-slate-600 font-medium mt-0.5") Dr. Carlos Perez
                       p(class="text-xs text-slate-500 mt-1 truncate")
-                        span(class="font-semibold text-slate-700") Sintomas: 
+                        span(class="font-semibold text-slate-700") Sintomas:#{" "}
                         span#det-sintomas-val dolor en la garganta...
 
                   //- Signos Vitales (Título perfectamente centrado)
@@ -121,15 +121,15 @@ html(lang="es")
                       div(class="bg-white p-3 rounded-xl border border-slate-300")
                         p(class="text-[11px] text-slate-500 font-medium") Temperatura
                         p#det-temp(class="text-sm font-bold text-slate-800 mt-0.5") 37.2°C
-                      
+
                       div(class="bg-white p-3 rounded-xl border border-slate-300")
                         p(class="text-[11px] text-slate-500 font-medium") Presión Arterial
                         p#det-presion(class="text-sm font-bold text-slate-800 mt-0.5") 120/78 mmHg
-                      
+
                       div(class="bg-white p-3 rounded-xl border border-slate-300")
                         p(class="text-[11px] text-slate-500 font-medium") Frecuencia Cardíaca
                         p#det-frecuencia(class="text-sm font-bold text-slate-800 mt-0.5") 82 bpm
-                      
+
                       div(class="bg-white p-3 rounded-xl border border-slate-300")
                         p(class="text-[11px] text-slate-500 font-medium") Peso
                         p#det-peso(class="text-sm font-bold text-slate-800 mt-0.5") 72 kg

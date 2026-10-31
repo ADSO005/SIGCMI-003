@@ -15,12 +15,6 @@ import ColaNotificacion from "./ColaNotificacion.js";
 import SolicitudWhatsApp from "./SolicitudWhatsApp.js";
 import Token from "./Token.js";
 
-// --- RELACIONES CORRECTAS SEGÚN TU TABLA ---
-Diagnostico.belongsTo(Cita, { foreignKey: 'cita_id' });
-Cita.hasMany(Diagnostico, { foreignKey: 'cita_id' });
-
-Cita.belongsTo(Medico, { foreignKey: 'medico_id' }); // O como esté relacionada la cita con el médico
-Medico.hasMany(Cita, { foreignKey: 'medico_id' });
 export {
     Usuario,
     Rol,
