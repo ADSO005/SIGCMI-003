@@ -3,7 +3,8 @@ const router = express.Router();
 
 import {
     obtenerHistorialDiagnosticos,
-    getNotificationSettings
+    listarConfiguracionNotificaciones,
+    actualizarConfiguracionNotificaciones
 } from "../../controllers/paciente/controller.js";
 
 
