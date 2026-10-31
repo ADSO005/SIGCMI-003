@@ -1,5 +1,7 @@
+import ConfiguracionNotificacion from '../../models/ConfiguracionNotificacion.js';
+
 export const mostrarDashboard = (req, res) => {
-    
+
     const paciente = {
         nombre: 'Juan'
     };
@@ -109,6 +111,46 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
     }
 };
 
-export const getNotificationSettings = (req, res) => {
-    res.render('viewsPaciente/notificationsSetting');
+export const listarConfiguracionNotificaciones = async (req, res) => {
+    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+
+    // Simular que esto vino de BD
+    const configuracionNotificaciones = {
+        correo: con.correo,
+        sms: con.sms,
+        whatsapp: con.whatsapp,
+        recordatorio_24h: con.recordatorio_24h,
+        recordatorio_1h: con.recordatorio_1h,
+        confirmacion_cita: con.confirmacion_cita,
+        cancelacion_cita: con.cancelacion_cita,
+        reprogramacion: con.reprogramacion,
+        nuevo_diagnostico: con.nuevo_diagnostico,
+        success: req.query.success,
+        message: req.query.message
+    };
+
+    res.render(
+        'viewsPaciente/notificationsSetting',
+        configuracionNotificaciones
+    );
 };
+
+export const actualizarConfiguracionNotificaciones = async (req, res) => {
+    const data = {
+        correo: req.body.correo ? true : false,
+        sms: req.body.sms ? true : false,
+        whatsapp: req.body.whatsapp ? true : false,
+        recordatorio_24h: req.body.recordatorio_24h ? true : false,
+        recordatorio_1h: req.body.recordatorio_1h ? true : false,
+        confirmacion_cita: req.body.confirmacion_cita ? true : false,
+        cancelacion_cita: req.body.cancelacion_cita ? true : false,
+        reprogramacion: req.body.reprogramacion ? true : false,
+        nuevo_diagnostico: req.body.nuevo_diagnostico ? true : false
+    };
+
+    let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+    await con.update(data);
+
+    res.redirect('/paciente/notificaciones?success=1&message=Configuración actualizada correctamente');
+}
+
