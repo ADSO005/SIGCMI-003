@@ -13,8 +13,6 @@ const transporter = nodemailer.createTransport({
 /* funcion smtp simulador envios de correos */
 const sendRecoveryEmail = async (usuario) => {
 
-    const recoveryUrl = `http://localhost:3000/auth/reset-password/${usuario.token}`;
-
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,

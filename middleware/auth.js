@@ -34,7 +34,7 @@ const auth = async (req, res, next) => {
 
         next();
 
-    } catch (error) {
+    } catch {
 
         return res.redirect("/auth/login");
 

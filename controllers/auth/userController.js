@@ -537,7 +537,7 @@ const formResetPassword = async (req, res) => {
             titulo: "Nueva contraseña"
         });
 
-    } catch (error) {
+    } catch {
 
         return res.redirect("/auth/recover-password");
 
@@ -604,7 +604,7 @@ const resetPassword = async (req, res) => {
             mensaje: "Tu contraseña fue actualizada correctamente."
         });
 
-    } catch (error) {
+    } catch {
 
         return res.redirect("/auth/recover-password");
 

@@ -1,5 +1,5 @@
 // TOGGLE SIDEBAR (Ajustado)
-function toggleSidebar() {
+window.toggleSidebar = () => {
   const sidebar = document.getElementById("sidebar");
   const main    = document.getElementById("mainContent");
   const toggleBtn = document.getElementById("toggleBtn");
@@ -17,7 +17,7 @@ function toggleSidebar() {
       toggleBtn.style.marginLeft = sidebar.classList.contains("collapsed") ? "0px" : "";
     }
   }
-}
+};
 
 function cerrarSidebarMovil() {
   const sidebar = document.getElementById("sidebar");
@@ -28,7 +28,7 @@ function cerrarSidebarMovil() {
 }
 
 // NAVEGACIÓN ENTRE VISTAS
-function cambiarVista(e, viewId, link) {
+window.cambiarVista = (e, viewId, link) => {
   e.preventDefault();
   document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("preActive"));
   link.classList.add("preActive");
@@ -38,17 +38,17 @@ function cambiarVista(e, viewId, link) {
   if (vistaTarget) vistaTarget.classList.add("active");
   
   if (window.innerWidth <= 768) cerrarSidebarMovil();
-}
+};
 
 // CERRAR SESIÓN
-function cerrarSesion() {
+window.cerrarSesion = () => {
   if (confirm("¿Seguro que deseas cerrar sesión?")) {
     alert("Sesión cerrada. Redirigiendo al login...");
   }
-}
+};
 
 // BOTON INICIAR CONSULTA
-async function iniciarConsulta(id) {
+window.iniciarConsulta = async (id) => {
     try {
         // Obtener el ID numérico de la cita
         const idCita = id.replace("cita", "");
@@ -105,10 +105,10 @@ async function iniciarConsulta(id) {
         console.error("❌ Error al iniciar consulta:", error);
         alert("Ocurrió un error al conectar con el servidor");
     }
-}
+};
 
 // BOTON FINALIZAR CONSULTA
-async function finalizarConsulta(id) {
+window.finalizarConsulta = async (id) => {
     try {
         const idCita = id.replace("cita", "");
 
@@ -162,23 +162,23 @@ async function finalizarConsulta(id) {
         console.error("❌ Error al finalizar consulta:", error);
         alert("Ocurrió un error al conectar con el servidor");
     }
-}
+};
 
 // MODAL GESTIÓN CITAS
-function abrirModal() {
+window.abrirModal = () => {
   const modal = document.getElementById("modalGestionCitas");
   if (modal) {
     modal.classList.add("abierto");
     actualizarSubtitulo();
   }
-}
+};
 
-function cerrarModal() {
+window.cerrarModal = () => {
   const modal = document.getElementById("modalGestionCitas");
   if (modal) modal.classList.remove("abierto");
-}
+};
 
-function filtrarCitas() {
+window.filtrarCitas = () => {
   const inputSearch = document.querySelector(".modal-gc-search");
   const selectEstado = document.querySelector(".modal-gc-select");
   
@@ -205,7 +205,7 @@ function filtrarCitas() {
   }
 
   actualizarSubtitulo(visibles);
-}
+};
 
 function actualizarSubtitulo(n) {
   const total = n !== undefined ? n : document.querySelectorAll(".cita-card").length;
@@ -214,7 +214,7 @@ function actualizarSubtitulo(n) {
 }
 
 // REPROGRAMAR CITA
-function abrirReprogramar(btn) {
+window.abrirReprogramar = (btn) => {
   const card = btn.closest(".cita-card");
   const infoUser = card.querySelector(".cita-info:nth-child(4)");
   
@@ -226,14 +226,14 @@ function abrirReprogramar(btn) {
 
   document.getElementById("modalGestionCitas")?.classList.remove("abierto");
   document.getElementById("modalReprogramar")?.classList.add("abierto");
-}
+};
 
 function cerrarReprogramar() {
   document.getElementById("modalReprogramar")?.classList.remove("abierto");
   document.getElementById("modalGestionCitas")?.classList.add("abierto");
 }
 
-function cerrarReprogramarFuera(event) {
+window.cerrarReprogramarFuera = (event) => {
   if (event.target.id === "modalReprogramar") cerrarReprogramar();
 }
 
@@ -398,9 +398,9 @@ async function abrirModalHorarios({ conservarSemana = false, confirmacion = '', 
   } finally { if (version === versionCargaHorarios) peticionHorarios = null; }
 }
 
-function cambiarSemanaHorarios() {
+window.cambiarSemanaHorarios = () => {
   if (!guardandoHorario) return abrirModalHorarios({ conservarSemana: true });
-}
+};
 
 function cerrarModalHorarios() {
   if (guardandoHorario) return;
@@ -411,9 +411,9 @@ function cerrarModalHorarios() {
   mensajeHorarios('El borrador se descarta al cerrar. Las solicitudes enviadas permanecen guardadas.');
 }
 
-function cerrarModalHorariosFuera(e) {
+window.cerrarModalHorariosFuera = (e) => {
   if (e.target.id === 'modalHorarios') cerrarModalHorarios();
-}
+};
 
 function mostrarDiaActivo(diaId) {
   const dia = obtenerDiaHorario(diaId);
@@ -436,12 +436,12 @@ function mostrarHorario(diaId, inicio, fin) {
   return fila;
 }
 
-function toggleDia(diaId, checkbox) {
+window.toggleDia = (diaId, checkbox) => {
   if (checkbox.disabled) return;
   const dia = obtenerDiaHorario(diaId);
   if (checkbox.checked) { mostrarDiaActivo(diaId); agregarHora(diaId); }
   else { dia.classList.remove('activo'); dia.querySelector('.btn-agregar-hora').style.display = 'none'; dia.querySelector('.dia-horas').replaceChildren(); }
-}
+};
 
 function agregarHora(diaId) {
   if (!horariosCargados || guardandoHorario || solicitudPendienteHorario || semanaConsultadaHorario < lunesActualHorario()) return;
@@ -483,7 +483,7 @@ function recogerHorarios() {
   return franjas;
 }
 
-async function guardarHorarios() {
+window.guardarHorarios = async () => {
   if (guardandoHorario || !horariosCargados || solicitudPendienteHorario) return;
   let semana, franjas;
   try {
@@ -516,7 +516,7 @@ async function guardarHorarios() {
     bloquearEdicionHorarios(!recuperable);
     mensajeHorarios((error.message || 'Error de comunicación.') + (recuperable ? ' Corrige el borrador y vuelve a enviar.' : enviada ? ' La solicitud se guardó; vuelve a consultar la semana.' : ' El borrador se conserva. Vuelve a consultar la semana antes de reintentar; no se puede asegurar el resultado.'), true);
   } finally { guardandoHorario = false; bloquearEdicionHorarios(!horariosCargados); }
-}
+};
 
 // SELECCIONAR PACIENTE DE LA LISTA
 async function seleccionarPaciente(element) {

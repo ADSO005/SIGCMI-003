@@ -356,7 +356,7 @@ function cargarHorariosMedico(horarios) {
                             : "--:--";
 
 
-                    let estadoHTML = "";
+                    let estadoHTML;
 
 
                     if (horario.estado === "Aprobado") {
@@ -849,7 +849,7 @@ function cargarHorariosMedico(horarios) {
                                 ? horario.hora_fin.substring(0, 5)
                                 : "--:--";
 
-                        let estadoHTML = "";
+                        let estadoHTML;
 
                         if (horario.estado === "Aprobado") {
 

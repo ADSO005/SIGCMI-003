@@ -1,4 +1,4 @@
-function toggleSidebar() {
+window.toggleSidebar = () => {
 
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("sidebarOverlay");
@@ -35,14 +35,14 @@ function toggleSidebar() {
     textos.forEach((texto) => {
         texto.classList.toggle("hidden");
     });
-}
+};
 
 
 // ==========================================
 // CERRAR SIDEBAR EN MÓVIL
 // ==========================================
 
-function closeSidebar() {
+window.closeSidebar = () => {
 
     const sidebar =
         document.getElementById("sidebar");
@@ -57,7 +57,7 @@ function closeSidebar() {
     if (overlay) {
         overlay.classList.add("hidden");
     }
-}
+};
 
 
 // ==========================================
