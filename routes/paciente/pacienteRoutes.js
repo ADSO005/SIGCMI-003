@@ -10,7 +10,7 @@ const router = express.Router()
 // ======================================================
 // VISTA: PERFIL DEL PACIENTE (GET /paciente/perfil)
 // ======================================================
-router.get('/perfil', async (req, res) => {
+router.get('/perfil', auth, role(3), async (req, res) => {
     try {
         // Datos de prueba para previsualizar la vista en el navegador
         const pacienteVista = {
@@ -57,12 +57,11 @@ router.post('/perfil/editar', auth, role(3), guardarEdicionPerfil)
 /* PORTAL DEL PACIENTE: GET /paciente/dashboard */
 router.get('/dashboard', auth, role(3), async (req, res) => {
     try {
-        const paciente = await Paciente.findOne({
+        const [paciente] = await Paciente.findOrCreate({
             where: { usuario_id: req.usuario.id_usuario },
+            defaults: { usuario_id: req.usuario.id_usuario },
             include: [{ model: Usuario, attributes: ['nombres', 'apellidos', 'correo'] }]
         })
-
-        if (!paciente) return res.status(404).send('No se encontró el perfil del paciente.')
 
         const citasDB = await Cita.findAll({
             where: { paciente_id: paciente.id_paciente },
@@ -109,7 +108,7 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
             tituloPagina: 'Portal del Paciente',
             fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
             paciente: {
-                nombre: `${paciente.Usuario.nombres} ${paciente.Usuario.apellidos}`,
+                nombre: `${paciente.Usuario?.nombres || req.usuario.nombres} ${paciente.Usuario?.apellidos || req.usuario.apellidos}`,
                 rol: 'Paciente'
             },
             citas,
