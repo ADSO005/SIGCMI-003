@@ -1,17 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    function establecerTexto(id, valor) {
 
-        const elemento = document.getElementById(id);
-
-        if (!elemento) {
-            console.error(`❌ No existe el elemento #${id}`);
-            return;
-        }
-
-        console.log(`✅ Elemento encontrado: #${id}`);
-
-        elemento.textContent = valor ?? "-";
-    }
     // =====================================================
     // ELEMENTOS
     // =====================================================

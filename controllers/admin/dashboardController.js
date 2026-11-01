@@ -57,14 +57,6 @@ export const verDashboard = async (req, res) => {
         const notificacionesHoy = await SolicitudWhatsApp.count();
 
         //=========================================
-        // USUARIO (TEMPORAL)
-        //=========================================
-
-        const usuarios = {
-            nombre: "Administrador"
-        };
-
-        //=========================================
         // DATOS DEL DASHBOARD
         //=========================================
 

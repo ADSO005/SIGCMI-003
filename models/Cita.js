@@ -40,6 +40,16 @@ const Cita = db.define(
             allowNull: false,
         },
 
+        // Sin valores numéricos por defecto: se desconoce la duración y el descanso de las citas antiguas.
+        duracion_minutos: {
+            type: DataTypes.INTEGER, allowNull: true, defaultValue: null,
+            validate: { isInt: true, min: 1, max: 1440 },
+        },
+        descanso_posterior_minutos: {
+            type: DataTypes.INTEGER, allowNull: true, defaultValue: null,
+            validate: { isInt: true, min: 0, max: 1440 },
+        },
+
         motivo_consulta: {
             type: DataTypes.TEXT,
             allowNull: true,

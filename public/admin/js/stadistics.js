@@ -1,6 +1,6 @@
 const ctx = document.getElementById('graficoEstados');
 
-            new Chart(ctx, {
+            new window.Chart(ctx, {
                 type: 'doughnut',
 
                 data: {

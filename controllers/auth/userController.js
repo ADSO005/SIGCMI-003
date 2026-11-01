@@ -79,11 +79,8 @@ const login = async (req, res) => {
 
     const token = generateJWT(usuario);
 
-    console.log("JWT:", token);
 
-    console.log(passwordCorrecta);
 
-    console.log(usuario);
 
     res.cookie("_token", token, {
         httpOnly: true,
@@ -540,7 +537,7 @@ const formResetPassword = async (req, res) => {
             titulo: "Nueva contraseña"
         });
 
-    } catch (error) {
+    } catch {
 
         return res.redirect("/auth/recover-password");
 
@@ -607,7 +604,7 @@ const resetPassword = async (req, res) => {
             mensaje: "Tu contraseña fue actualizada correctamente."
         });
 
-    } catch (error) {
+    } catch {
 
         return res.redirect("/auth/recover-password");
 

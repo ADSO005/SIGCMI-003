@@ -354,8 +354,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const formEditarPaciente =
         document.getElementById("formEditarPaciente");
-    const btnGuardarEditarPaciente =
-        document.getElementById("btnGuardarEditarPaciente");
 
     const botonesEditarPaciente =
         document.querySelectorAll(".btnEditarPaciente");

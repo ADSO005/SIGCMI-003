@@ -1,10 +1,16 @@
-﻿import express from 'express'
+import express from "express";
 import auth from '../../middleware/auth.js'
 import role from '../../middleware/role.js'
 
+import {
+    obtenerHistorialDiagnosticos,
+    listarConfiguracionNotificaciones,
+    actualizarConfiguracionNotificaciones
+} from "../../controllers/paciente/controller.js";
 import { Paciente, Usuario, Cita, Medico, Especialidad, EstadoCita } from '../../models/index.js'
 import { mostrarFormularioCancelacion, solicitarCodigoCancelacion, verificarCodigoCancelacion } from '../../controllers/paciente/cancelAppointment.js'
 import { mostrarEdicionPerfil, guardarEdicionPerfil } from '../../controllers/paciente/profileController.js'
+
 
 const router = express.Router()
 // ======================================================
@@ -119,6 +125,20 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
         res.status(500).send('Error al cargar el dashboard del paciente.')
     }
 })
+
+// ======================================================
+// HISTORIAL DE DIAGNÓSTICOS DEL PACIENTE
+// ======================================================
+
+router.get(
+    "/historial-diagnosticos",
+    // auth,
+    // role(3),
+    obtenerHistorialDiagnosticos
+);
+
+router.get('/notificaciones', listarConfiguracionNotificaciones);
+router.post('/notificacion', actualizarConfiguracionNotificaciones);
 
 // Verificación de identidad antes de cancelar una cita.
 router.get('/citas/:id/cancelar', auth, role(3), mostrarFormularioCancelacion)

@@ -1,12 +1,12 @@
 extends ../layouts/layout
 
 block contenido
-    main(class="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-6")
+    main(class="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-6 [&_button[type=submit]]:bg-[#465DE5] [&_button[type=submit]:hover]:bg-[#3e52cc] [&_button[type=submit]:focus]:ring-[#465DE5]/30 [&_input:focus]:border-[#465DE5] [&_input:focus]:ring-[#465DE5]/10")
 
         .bg-white.rounded-3xl.shadow-2xl.max-w-lg.w-full.overflow-hidden
 
             // Encabezado
-            .p-4.text-center.bg-blue-700
+            .p-4.text-center(class="bg-[#465DE5]")
 
                 h1.text-4xl.font-extrabold.text-white
                     | SIGCMI
@@ -32,7 +32,7 @@ block contenido
                         if mostrarRegistro
                             a(
                                 href="/auth/register"
-                                class="block mt-2 text-blue-600 font-semibold hover:underline"
+                                class="block mt-2 text-[#465DE5] font-semibold hover:underline"
                             )
                                 | ¿Aún no tienes una cuenta? ¡Regístrate aquí!
 
@@ -76,7 +76,7 @@ block contenido
 
                     a(
                         href="/auth/recover-password"
-                        class="text-sm text-blue-600 hover:underline"
+                        class="text-sm text-[#465DE5] hover:underline"
                     )
                         | ¿Olvidaste tu contraseña?
 
@@ -87,7 +87,7 @@ block contenido
 
                         a(
                             href="/auth/register"
-                            class="ml-1 text-blue-600 font-semibold hover:underline"
+                            class="ml-1 text-[#465DE5] font-semibold hover:underline"
                         )
                             | Regístrate
 

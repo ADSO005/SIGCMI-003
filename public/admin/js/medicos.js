@@ -356,7 +356,7 @@ function cargarHorariosMedico(horarios) {
                             : "--:--";
 
 
-                    let estadoHTML = "";
+                    let estadoHTML;
 
 
                     if (horario.estado === "Aprobado") {
@@ -849,7 +849,7 @@ function cargarHorariosMedico(horarios) {
                                 ? horario.hora_fin.substring(0, 5)
                                 : "--:--";
 
-                        let estadoHTML = "";
+                        let estadoHTML;
 
                         if (horario.estado === "Aprobado") {
 
@@ -1307,7 +1307,8 @@ function cargarHorariosMedico(horarios) {
                 console.error("Respuesta del servidor:", contenido);
 
                 throw new Error(
-                    `El servidor respondió con ${respuesta.status} y no devolvió JSON.`
+                    `El servidor respondió con ${respuesta.status} y no devolvió JSON.`,
+                    { cause: error }
                 );
             }
 

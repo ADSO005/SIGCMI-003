@@ -1,0 +1,27 @@
+doctype html
+html(lang='es')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title SIGCMI - Portal Médico
+    link(rel="stylesheet" href="/medico/css/output.css")
+    block styles
+  body.portal-medico(class="bg-[#0f172a] text-white font-[Arial,sans-serif] [&_*]:font-[Arial,sans-serif]")
+    .container(class="relative w-full max-w-none")
+      // Incluye la barra lateral
+      include ../includes/sidebar.pug
+
+      // Contenido dinámico de las vistas
+      block content
+
+    #sidebarOverlay.sidebar-overlay(
+      class="hidden fixed inset-0 z-[999] bg-black/40 opacity-0 transition-opacity duration-300 ease-[ease] [@media(max-width:768px)]:[&.show]:block [@media(max-width:768px)]:[&.show]:opacity-100"
+      onclick='cerrarSidebarMovil()'
+    )
+
+    // Incluye todos los modales
+    include ../includes/modalGestion.pug
+    include ../includes/modalHorarios.pug
+
+    script(src="/medico/js/dashboardMedical.js")
+    block scripts

@@ -35,16 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // UTILIDADES
     // --------------------------------------------------
 
-    function obtenerFechaLocal(fecha) {
-        const partes = fecha.split("-");
-
-        return new Date(
-            Number(partes[0]),
-            Number(partes[1]) - 1,
-            Number(partes[2])
-        );
-    }
-
     function formatearHora(hora) {
         if (!hora) return "";
 

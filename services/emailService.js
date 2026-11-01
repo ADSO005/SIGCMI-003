@@ -29,8 +29,6 @@ const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
 
 const sendRecoveryEmail = async (usuario) => {
 
-    const recoveryUrl = `http://localhost:3000/auth/reset-password/${usuario.token}`;
-
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,

@@ -1,3 +1,5 @@
+import ConfiguracionNotificacion from '../../models/ConfiguracionNotificacion.js';
+
 export const mostrarDashboard = (req, res) => {
     try {
         const paciente = {
@@ -83,5 +85,87 @@ export const mostrarPerfil = (req, res) => {
 
     res.render('viewsPaciente/profile', {
         paciente
-    })
+    });
+};
+
+export const obtenerHistorialDiagnosticos = async (req, res) => {
+    try {
+        // Aquí va tu lógica o los datos de prueba simulados que pusimos antes
+        const diagnosticos = [
+            {
+                id_diagnostico: 1,
+                fecha_diagnostico: '2026-10-15',
+                diagnostico: 'Infección Respiratoria Aguda (Faringitis)',
+                sintomas: 'Dolor de garganta, tos seca, fiebre moderada.',
+                temperatura: '38.5',
+                presion_arterial: '120/80',
+                frecuencia_cardiaca: '88',
+                peso: '70.5',
+                tratamiento: 'Reposo absoluto e hidratación.',
+                prescripcion: 'Ibuprofeno 600mg + Amoxicilina 500mg.',
+                observaciones: 'Amígdalas inflamadas.',
+                Citum: {
+                    Medico: {
+                        Usuario: {
+                            nombres: 'Carlos Alberto',
+                            apellidos: 'Mendoza Ruiz'
+                        }
+                    }
+                }
+            }
+        ];
+
+        return res.render('viewsPaciente/diagnosticHistory', {
+            titulo: 'Historial de Diagnósticos',
+            diagnosticos
+        });
+
+    } catch (error) {
+        console.error("Error al obtener diagnósticos:", error);
+        res.status(500).send("Error en el servidor");
+    }
+};
+
+export const listarConfiguracionNotificaciones = async (req, res) => {
+    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+
+    // Simular que esto vino de BD
+    const configuracionNotificaciones = {
+        correo: con.correo,
+        sms: con.sms,
+        whatsapp: con.whatsapp,
+        recordatorio_24h: con.recordatorio_24h,
+        recordatorio_1h: con.recordatorio_1h,
+        confirmacion_cita: con.confirmacion_cita,
+        cancelacion_cita: con.cancelacion_cita,
+        reprogramacion: con.reprogramacion,
+        nuevo_diagnostico: con.nuevo_diagnostico,
+        success: req.query.success,
+        message: req.query.message
+    };
+
+    res.render(
+        'viewsPaciente/notificationsSetting',
+        configuracionNotificaciones
+    );
+};
+
+export const actualizarConfiguracionNotificaciones = async (req, res) => {
+    const data = {
+        correo: req.body.correo ? true : false,
+        sms: req.body.sms ? true : false,
+        whatsapp: req.body.whatsapp ? true : false,
+        recordatorio_24h: req.body.recordatorio_24h ? true : false,
+        recordatorio_1h: req.body.recordatorio_1h ? true : false,
+        confirmacion_cita: req.body.confirmacion_cita ? true : false,
+        cancelacion_cita: req.body.cancelacion_cita ? true : false,
+        reprogramacion: req.body.reprogramacion ? true : false,
+        nuevo_diagnostico: req.body.nuevo_diagnostico ? true : false
+    };
+
+    let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+    await con.update(data);
+
+    res.redirect('/paciente/notificaciones?success=1&message=Configuración actualizada correctamente');
 }
+

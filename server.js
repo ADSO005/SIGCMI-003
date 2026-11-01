@@ -47,9 +47,7 @@ try {
         console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
     });
 
-    } catch (error) {
-    
-        console.error("❌ Error al conectar la base de datos");
-        console.error(error);
-
+} catch (error) {
+    console.error("Error al conectar la base de datos");
+    console.error(error);
 }

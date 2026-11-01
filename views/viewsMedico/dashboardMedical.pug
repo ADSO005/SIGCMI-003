@@ -1,0 +1,195 @@
+extends layout/main
+
+block content
+  main#mainContent.main(
+    class="min-h-screen w-[calc(100%-314px)] ml-[314px] float-none bg-white px-9 pb-7 [@media(max-width:768px)]:px-5 text-black transition-all duration-300 ease-[ease] [&.collapsed]:w-[calc(100%-80px)] [&.collapsed]:ml-[80px] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:ml-0 [@media(max-width:768px)]:[&.collapsed]:w-full [@media(max-width:768px)]:[&.collapsed]:ml-0"
+  )
+    // VISTA: AGENDA
+    section#agendaView.view.active(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
+      header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
+        div
+          h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
+          span(class="block text-[13px] leading-[18px] text-black") 3 de Abril del 2026
+      section.cards(class="grid grid-cols-4 gap-4 mb-6 [@media(max-width:1024px)]:grid-cols-2 [@media(max-width:480px)]:grid-cols-1")
+        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
+          p Citas Hoy
+          .card-body(class="flex justify-between items-center pr-8")
+            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
+              h2 48
+              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") 2 completadas
+            .card-icon.icono-azul(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
+              img(src='/medico/img/blueCalendar.png' alt='Citas')
+        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
+          p Pacientes Activos
+          .card-body(class="flex justify-between items-center pr-8")
+            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
+              h2 48
+              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") +3 este mes
+            .card-icon.icono-verde(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
+              img(src='/medico/img/usderGreen.png' alt='Pacientes')
+        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
+          p Consultas Esta Semana
+          .card-body(class="flex justify-between items-center pr-8")
+            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
+              h2 48
+              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") Promedio: 9/día
+            .card-icon.icono-morado(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
+              img(src='/medico/img/historyUser.png' alt='Consultas')
+        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
+          p Tiempo Promedio
+          .card-body(class="flex justify-between items-center pr-8")
+            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
+              h2 48
+              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") Por consulta
+            .card-icon.icono-naranja(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
+              img(src='/medico/img/clockUserADMIN.png' alt='Tiempo')
+      section.content(class="grid grid-cols-[minmax(0,2.27fr)_minmax(0,1fr)] items-start gap-4 [@media(max-width:768px)]:grid-cols-1")
+        // AGENDA DEL DÍA
+        .appointments(class="min-w-0 bg-white p-4 rounded-[12px] border border-[#d5d5d5] [@media(min-width:1025px)]:min-h-[460px] [&>h3]:text-black [&>h3]:text-[16px] [&>h3]:font-semibold [&>h3]:mb-3")
+          h3 Mi Agenda de hoy
+
+          if citasHoy && citasHoy.length > 0
+            each cita in citasHoy
+
+              - const estado = cita.Estado ? cita.Estado.nombre : "Sin estado"
+              - const usuarioPaciente = cita.Paciente ? cita.Paciente.Usuario : null
+
+              .appointment(
+                class="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 min-h-[76px] rounded-[14px] border p-3 [&.estado-completada]:bg-[#efefef] [&.estado-completada]:border-[#d5d5d5] [&.estado-encurso]:bg-[#d7f7e4] [&.estado-encurso]:border-[#1bce60] [&.estado-pendiente]:bg-[#f8f8ff] [&.estado-pendiente]:border-[#c4c6ff] [&.estado-completada_.hour]:bg-[#c9c9c9] [&.estado-completada_h4]:text-[#666666] [&.estado-encurso_.hour]:bg-[#1bce60] [&_.state]:text-[12px] [&_.state]:font-normal [&_.state]:leading-4 [&_.state]:px-2 [&_.state]:text-center [&_.state]:min-w-[80px] [&_.state]:whitespace-nowrap [&_.greenState]:bg-[#e2e2e2] [&_.greenState]:text-[#666666] [&_.yellowState]:bg-[#9de8b7] [&_.yellowState]:text-[#287a3b] [&_.greyState]:bg-[#b9bdff] [&_.greyState]:text-[#465DE5] [&_.btn-consulta]:w-full [&_.btn-consulta]:py-2 [&_.btn-consulta]:px-3 [&_.btn-consulta]:border-0 [&_.btn-consulta]:rounded-[10px] [&_.btn-consulta]:text-[13px] [&_.btn-consulta]:leading-[18px] [&_.btn-consulta]:font-semibold [&_.btn-consulta]:text-white [&_.btn-consulta]:cursor-pointer [&_.btn-consulta]:transition-all [&_.btn-consulta]:duration-200 [&_.btn-consulta]:ease-[ease] [&_.btn-consulta:hover]:opacity-85 [&_.btn-iniciar]:bg-[#465DE5] [&_.btn-finalizar]:bg-[#1bce60]"
+                class=`estado-${estado.toLowerCase().replace(" ", "")}`
+                id=`cita${cita.id_cita}`
+              )
+                .left(class="grid min-w-0 grid-cols-[52px_minmax(0,1fr)] items-center gap-x-[10px] gap-y-[10px] [&>div]:contents [&_h4]:text-[13px] [&_h4]:leading-[18px] [&_h4]:font-normal [&_h4]:text-black [&_p]:col-span-2 [&_p]:text-[12px] [&_p]:leading-4 [&_p]:text-[#555555] [&_p]:font-light [&_p]:break-words")
+                  span.hour(class="text-[12px] leading-5 font-semibold text-white bg-[#465DE5] text-center whitespace-nowrap")= cita.hora.substring(0, 5)
+
+                  div
+                    if usuarioPaciente
+                      h4= `${usuarioPaciente.nombres} ${usuarioPaciente.apellidos}`
+                    else
+                      h4 Paciente no disponible
+
+                    p= cita.motivo_consulta || "Sin motivo de consulta"
+
+                .right(class="inline-flex items-center gap-[14px]")
+                  if estado === "Completada"
+                    span.state.greenState= estado
+
+                  else if estado === "En Curso"
+                    span.state.yellowState= estado
+
+                  else if estado === "Pendiente"
+                    span.state.greyState= estado
+
+                  else
+                    span.state= estado
+
+                if estado === "Pendiente"
+                  .btn-full-row(class="col-span-2 w-full")
+                    button.btn-consulta.btn-iniciar(
+                      onclick=`iniciarConsulta('cita${cita.id_cita}')`
+                    ) Iniciar Consulta
+
+                else if estado === "En Curso"
+                  .btn-full-row(class="col-span-2 w-full")
+                    button.btn-consulta.btn-finalizar(
+                      onclick=`finalizarConsulta('cita${cita.id_cita}')`
+                    ) Finalizar Consulta
+
+          else
+            p No tienes citas programadas para hoy.
+        // ACCIONES RÁPIDAS
+        .quick-actions(class="min-w-0 flex flex-col gap-3")
+          .actions(class="bg-white p-4 rounded-[12px] border border-[#d5d5d5] flex flex-col gap-3 [&>h3]:text-black [&>h3]:text-[16px] [&>h3]:font-semibold [&>h3]:mb-0")
+            h3 Acciones Rápidas
+            button.btnActions.btnActionBlue(class="w-full min-h-9 px-3 py-2 text-[13px] leading-[18px] font-semibold border-0 rounded-[10px] text-white cursor-pointer transition-all duration-200 ease-[ease] hover:opacity-85 bg-[#465DE5]" onclick='abrirModal()') Gestionar Citas
+            button.btnActions.btnActionGreen(class="w-full min-h-9 px-3 py-2 text-[13px] leading-[18px] font-semibold border-0 rounded-[10px] text-white cursor-pointer transition-all duration-200 ease-[ease] hover:opacity-85 bg-[#1bce60]" onclick='abrirModalHorarios()') Configurar Horarios
+          .proxima-cita(class="bg-[#465DE5] rounded-[12px] p-3 text-white")
+            .proxima-cita-header(class="flex items-center gap-2 text-[12px] font-semibold text-white mb-2 px-2")
+              img.proxima-icon(class="h-5 w-5 brightness-0 invert" src='/medico/img/Icon.png' alt='Reloj')
+              span Próxima Cita
+            .proxima-detalle(class="rounded-[10px] bg-white/20 px-3 py-3")
+              .proxima-hora(class="text-[20px] font-bold text-white leading-6 mb-1") 11:00 AM
+              .proxima-paciente(class="text-[13px] font-semibold text-white") Ana Rodríguez
+              .proxima-motivo(class="text-[12px] leading-4 font-light text-white mt-1") Medicina interna
+    // fin agendaView
+
+    section#pacientesView.view(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
+      header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
+        div
+          h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
+          span(class="block text-[13px] leading-[18px] text-black") 3 de Abril del 2026
+      .pacientes-layout(class="grid grid-cols-[260px_minmax(0,1fr)] gap-5 h-[calc(100vh-180px)] [@media(max-width:1024px)]:grid-cols-1 [@media(max-width:1024px)]:h-auto")
+        // COLUMNA IZQUIERDA: lista
+        .pacientes-lista(class="min-h-0 self-start max-h-full flex flex-col overflow-y-auto rounded-lg border border-[#e2e2e2] bg-white [&>.sin-pacientes]:p-[15px] [&>.sin-pacientes]:text-center [&>.sin-pacientes]:text-[#666] [&>.sin-pacientes]:text-[14px] [&>p]:p-[14px] [&>p]:text-[13px] [&>p]:text-[#718096] [@media(max-width:1024px)]:max-h-[320px]")
+          .pacientes-search-box(class="m-[14px] flex items-center gap-2 rounded border border-[#cbd0df] px-3 py-2 [&>input]:min-w-0 [&>input]:w-full [&>input]:border-0 [&>input]:outline-none [&>input]:text-[13px] [&>input]:text-[#4a5568] [&>input]:placeholder:text-[#929bb5]")
+            span.search-icon(class="text-[13px] text-[#929bb5]") 🔍
+            input(type='text' placeholder='Buscar paciente...' oninput='filtrarPacientes(this.value)')
+
+          if pacientes && pacientes.length > 0
+            each item in pacientes
+              .paciente-item(
+                class="flex items-center gap-[10px] border-b border-[#eeeeee] px-3 py-[14px] last:border-b-0 cursor-pointer transition-colors duration-200 hover:bg-[#f0f4ff] [&.activo]:bg-[#eef1fd] [&.activo]:border-l-[3px] [&.activo]:border-l-[#465DE5] [&>img]:h-9 [&>img]:w-9 [&>img]:shrink-0 [&>img]:p-1 [&>div]:min-w-0 [&>div]:flex-1 [&>div]:flex [&>div]:flex-col [&>div]:gap-[2px] [&_h4]:text-[13px] [&_h4]:font-semibold [&_h4]:text-[#1a202c] [&_span]:text-[11px] [&_span]:text-[#718096] [&>div>span]:flex [&>div>span]:items-center [&>div>span]:gap-1"
+                data-id=item.paciente.id_paciente
+                onclick='seleccionarPaciente(this)'
+              )
+                img(src='/medico/img/Group 16.png' alt='Paciente')
+                div
+                  h4= `${item.paciente.Usuario.nombres} ${item.paciente.Usuario.apellidos}`
+                  span
+                    img.NegroCalen(class="h-[15px] w-[15px] min-h-[15px] min-w-[15px] object-contain" src='/medico/img/CalendarNegro.png' alt='Imagen Calendario')
+                    |  #{item.cantidadCitas} citas
+                span.paciente-arrow(class="shrink-0 text-[18px]! text-[#a0aec0]!") ›
+
+          else
+            p No hay pacientes registrados.
+        // COLUMNA DERECHA: detalle
+        .paciente-detalle(class="min-w-0 min-h-0 flex flex-col gap-4 overflow-y-auto rounded-lg border border-[#e2e2e2] bg-white p-6 [@media(max-width:768px)]:p-4")
+          .detalle-header(class="flex items-start gap-4 [@media(max-width:768px)]:flex-wrap")
+            img.detalle-avatar(
+              class="h-16 w-16 shrink-0 p-0 object-contain"
+              src='/medico/img/Group 16.png'
+              alt='Paciente'
+            )
+
+            .detalle-info(class="min-w-0 flex-1 [&>h2]:mb-1 [&>h2]:text-[22px] [&>h2]:leading-7 [&>h2]:font-semibold [&>h2]:text-[#171717] [&>p]:mb-[3px] [&>p]:text-[13px] [&>p]:text-[#4a5568] [&_a]:break-words [&_a]:text-[#555] [&_a]:underline")
+              h2#detalleNombre Selecciona un paciente
+
+              p
+                | Email: 
+                a#detalleCorreo(href='#') -
+
+              p
+                | Teléfono: 
+                span#detalleTelefono -
+
+            .detalle-meta(class="self-end text-right [&>p]:mb-[3px] [&>p]:text-[12px] [&>p]:text-[#4a5568] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:text-left")
+              p
+                | Edad: 
+                span#detalleEdad -
+
+              p
+                | Última Visita: 
+                span#detalleUltimaVisita -
+
+          .detalle-badges(class="flex flex-wrap gap-[10px]")
+            span.badge.badge-blue(class="inline-flex items-center gap-1 rounded border border-[#d5d5d5] bg-white px-[14px] py-[6px] text-[12px] font-normal text-[#555] [&>img]:h-[14px] [&>img]:w-[14px] [&>img]:object-contain")
+              img(
+                src='/medico/img/CalendarPaciente.png'
+                alt='Calendario'
+              )
+              |  Citas: 
+              span#detalleCitas 0
+
+            span.badge.badge-purple(class="inline-flex items-center gap-1 rounded border border-[#d5d5d5] bg-white px-[14px] py-[6px] text-[12px] font-normal text-[#555] [&>img]:h-[14px] [&>img]:w-[14px] [&>img]:object-contain")
+              img(
+                src='/medico/img/google-docs 2.png'
+                alt='Diagnósticos'
+              )
+              |  Diagnósticos: 
+              span#detalleDiagnosticos 0
+
+          .historial(class="-mx-6 border-t border-[#dedede] px-6 pt-3 [&>h3]:mb-3 [&>h3]:text-[18px] [&>h3]:font-semibold [&>h3]:text-black [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:px-4")
+            h3 Historial Médico
+
+            #historialPaciente(class="[&>.historial-card]:mb-3 [&>.historial-card]:rounded-[16px] [&>.historial-card]:border [&>.historial-card]:border-[#e2e2e2] [&>.historial-card]:p-3 [&_.historial-card>h4]:mb-1 [&_.historial-card>h4]:text-[14px] [&_.historial-card>h4]:font-medium [&_.historial-card>h4]:text-black [&_.historial-card>p]:mb-1 [&_.historial-card>p]:text-[12px] [&_.historial-card>p]:text-[#666] [&_.historial-card>p]:break-words [&_.historial-card>p.historial-fecha]:mb-[10px] [&_.historial-card>p.historial-fecha]:text-[11px] [&_.historial-card>p.historial-fecha]:text-[#888] [&_strong]:font-medium [&_strong]:text-black [&>p]:text-[13px] [&>p]:text-[#718096]")
+              p Selecciona un paciente para consultar su historial.

@@ -62,7 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     data = JSON.parse(contenido);
                 } catch (error) {
                     throw new Error(
-                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`
+                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`,
+                        { cause: error }
                     );
                 }
 
@@ -240,7 +241,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     data = JSON.parse(contenido);
                 } catch (error) {
                     throw new Error(
-                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`
+                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`,
+                        { cause: error }
                     );
                 }
 

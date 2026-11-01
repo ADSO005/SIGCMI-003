@@ -62,6 +62,11 @@ const Horario = db.define(
             allowNull: true,
         },
 
+        // NULL indica una publicación antigua aún sin clasificar; no se activa automáticamente.
+        solicitud_detalle_id: { type: DataTypes.INTEGER, allowNull: true },
+        vigente: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: null },
+        sustituido_por_solicitud_id: { type: DataTypes.INTEGER, allowNull: true },
+
         fecha_creacion: {
             type: DataTypes.DATE,
             defaultValue: DataTypes.NOW,
@@ -69,6 +74,7 @@ const Horario = db.define(
     },
     {
         tableName: "horarios",
+        indexes: [{ name: "uq_horarios_solicitud_detalle", unique: true, fields: ["solicitud_detalle_id"] }],
         timestamps: false,
         freezeTableName: true,
     }

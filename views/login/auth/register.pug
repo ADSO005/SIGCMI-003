@@ -8,13 +8,14 @@ html(lang="es")
     link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css")
 
   body
+
     mixin formInput(name, label, type, placeholder, icon)
-      .form-group
-        label.form-label(for=name)= label
-          span.form-label__required *
-        .input-wrapper
-          i.input-icon(class=icon)
-          input.form-input(
+      .form-group(class="flex w-full min-w-0 flex-col gap-2")
+        label.form-label(class="text-sm font-medium text-[#1e2559]" for=name)= label
+          span.form-label__required(class="ml-1 text-red-500") *
+        .input-wrapper(class="relative flex items-center")
+          i.input-icon(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]" class=icon)
+          input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]"
             type=type
             id=name
             name=name
@@ -24,49 +25,32 @@ html(lang="es")
         if typeof errors !== 'undefined' && errors && errors[name]
           span.form-error= errors[name].msg
 
-    .auth-page
-      .auth-card
+    .auth-page(class="min-h-screen w-full flex items-start justify-center bg-[linear-gradient(180deg,#e9eefd,#f6f8fe)] md:items-center md:px-6 md:py-10 [&_.form-error]:mt-1 [&_.form-error]:text-sm [&_.form-error]:text-red-500 [&_.form-success]:mt-1 [&_.form-success]:text-sm [&_.form-success]:text-green-600")
+      .auth-card(class="w-full bg-transparent md:max-w-[720px] md:overflow-hidden md:rounded-3xl md:bg-white md:shadow-xl")
         //- ===== HEADER =====
-        header.auth-header
-          h1.auth-header__title SIGCMI
-          p.auth-header__subtitle Sistema Integral de Gestión de Citas Médicas
-          .auth-header__wave
+        header.auth-header(class="relative bg-[linear-gradient(135deg,#4952d8,#3b43bd)] px-6 pt-8 pb-12 text-center text-white md:pt-9 md:pb-14")
+          h1.auth-header__title(class="text-4xl font-semibold tracking-wide md:text-5xl") SIGCMI
+          p.auth-header__subtitle(class="mx-auto mt-2 max-w-md text-lg font-light leading-snug md:max-w-2xl md:text-xl") Sistema Integral de Gestión de Citas Médicas
+          .auth-header__wave(class="absolute bottom-0 left-0 w-full [&>svg]:block [&>svg]:h-8 [&>svg]:w-full [&>svg]:fill-white [@media(max-width:767px)]:[&>svg]:fill-[#e9eefd] md:[&>svg]:h-10")
             svg(viewBox="0 0 500 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg")
               path(d="M0,20 C150,60 350,0 500,25 L500,60 L0,60 Z")
 
-        if error
-          div(
-              id="mensajeError"
-              class="mb-5 rounded-lg bg-red-100 border border-red-300 px-4 py-3 text-red-700 text-sm text-center"
-          )
-              | #{error}
-
-        if mensaje
-          div(
-              id="mensajeExito"
-              class="mb-5 rounded-lg bg-green-100 border border-green-300 px-4 py-3 text-green-700 text-sm text-center"
-          )
-              | #{mensaje}
-
-        script.
-            setTimeout(() => {
-                const error = document.getElementById("mensajeError");
-                const exito = document.getElementById("mensajeExito");
-
-                if (error) error.remove();
-                if (exito) exito.remove();
-            }, 9000);
-
         //- ===== BODY =====
-        .auth-body
-          .form-heading
-            h2.form-title Crear Cuenta
-            p.form-subtitle Regístrate para comenzar a usar SIGCMI
+        .auth-body(class="px-5 pt-5 pb-7 md:px-8 md:pt-6 md:pb-8")
+          .form-heading(class="mb-6 text-center")
+            h2.form-title(class="text-2xl font-semibold text-[#1e2559] md:text-3xl") Registro de Pacientes
+            p.form-subtitle(class="mt-2 text-base text-[#4b5573]") Crea tu cuenta para gestionar tus citas médicas
+
+          if typeof error !== "undefined" && error
+            p#mensajeError.form-error(class="mb-4 rounded-md border border-red-200 bg-red-50 p-3" role="alert")= error
+          - const mensajeRegistro = typeof mensaje !== "undefined" && mensaje ? mensaje : (typeof success !== "undefined" ? success : null)
+          if mensajeRegistro
+            p#mensajeExito.form-success(class="mb-4 rounded-md border border-green-200 bg-green-50 p-3" role="status")= mensajeRegistro
 
           form.register-form(action="/auth/register" method="POST" novalidate=true)
-            .form-grid
+            .form-grid(class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2")
               //- ---------- COLUMNA IZQUIERDA ----------
-              .form-col
+              .form-col(class="flex min-w-0 flex-col gap-4")
                 +formInput('nombres', 'Nombres', 'text', 'Tus nombres', 'fa-solid fa-user')
                 +formInput('apellidos', 'Apellidos', 'text', 'Tus apellidos', 'fa-solid fa-user')
                 +formInput('email', 'Correo Electrónico', 'email', 'Tu correo', 'fa-solid fa-envelope')
@@ -74,24 +58,26 @@ html(lang="es")
                 +formInput('fechaNacimiento', 'Fecha de Nacimiento', 'date', 'dd/mm/aaaa', 'fa-solid fa-calendar-days')
 
               //- ---------- COLUMNA DERECHA ----------
-              .form-col
-                .form-group
-                  .form-row
-                    .form-group.form-group--small
-                      label.form-label(for="tipoDocumento") Tipo de Documento
-                        span.form-label__required *
-                      .input-wrapper
-                        select.form-select#tipoDocumento(name="tipoDocumento")
+              .form-col(class="flex min-w-0 flex-col gap-4")
+                .form-group(class="flex w-full min-w-0 flex-col gap-2")
+                  .form-row(class="flex gap-4")
+                    .form-group.form-group--small(class="flex w-24 shrink-0 flex-col gap-2")
+                      label.form-label(class="text-sm font-medium text-[#1e2559]" for="tipoDocumento") Tipo de Documento
+                        span.form-label__required(class="ml-1 text-red-500") *
+                      .input-wrapper(class="relative flex items-center")
+                        select.form-select#tipoDocumento(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-4 pr-4 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" name="tipoDocumento")
                           option(value="CC" selected) CC
                           option(value="CE") CE
                           option(value="TI") TI
                           option(value="PA") PA
+                        svg(class="pointer-events-none absolute right-[0.9rem] h-4 w-4 fill-[#9aa3c9]" viewBox="0 0 20 20" aria-hidden="true")
+                          path(d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z")
 
-                    .form-group.form-group--grow
-                      label.form-label(for="numeroDocumento" style="height: 40px") Número
-                        span.form-label__required *
-                      .input-wrapper
-                        input.form-input(
+                    .form-group.form-group--grow(class="flex min-w-0 flex-1 flex-col gap-2")
+                      label.form-label(class="text-sm font-medium text-[#1e2559]" for="numeroDocumento" class="h-10") Número
+                        span.form-label__required(class="ml-1 text-red-500") *
+                      .input-wrapper(class="relative flex items-center")
+                        input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]"
                           type="text"
                           inputmode="numeric"
                           id="numeroDocumento"
@@ -104,29 +90,35 @@ html(lang="es")
                 +formInput('departamento', 'Departamento de Residencia', 'text', 'Departamento de Residencia', 'fa-solid fa-location-dot')
                 +formInput('ciudad', 'Ciudad/Municipio de Residencia', 'text', 'Ciudad/Municipio', 'fa-solid fa-location-dot')
 
-                .form-group
-                  label.form-label(for="password") Contraseña
-                    span.form-label__required *
-                  .input-wrapper
-                    i.input-icon.fa-solid.fa-lock
-                    input.form-input(type="password" id="password" name="password" placeholder="••••••••••••")
+                .form-group(class="flex w-full min-w-0 flex-col gap-2")
+                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="password") Contraseña
+                    span.form-label__required(class="ml-1 text-red-500") *
+                  .input-wrapper(class="relative flex items-center")
+                    i.input-icon.fa-solid.fa-lock(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
+                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="password" name="password" placeholder="••••••••••••")
                   if typeof errors !== 'undefined' && errors && errors.password
                     span.form-error= errors.password.msg
 
-                .form-group
-                  label.form-label(for="confirmPassword") Confirmar Contraseña
-                    span.form-label__required *
-                  .input-wrapper
-                    i.input-icon.fa-solid.fa-lock
-                    input.form-input(type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••••••")
+                .form-group(class="flex w-full min-w-0 flex-col gap-2")
+                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="confirmPassword") Confirmar Contraseña
+                    span.form-label__required(class="ml-1 text-red-500") *
+                  .input-wrapper(class="relative flex items-center")
+                    i.input-icon.fa-solid.fa-lock(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
+                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••••••")
                   if typeof errors !== 'undefined' && errors && errors.confirmPassword
                     span.form-error= errors.confirmPassword.msg
 
-            .form-actions
-              button.btn-primary(type="submit") Crear cuenta
-              a.whatsapp-fab(href="https://wa.me/573112222222" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp")
+            .form-actions(class="mt-6 flex items-center justify-center gap-4")
+              button.btn-primary(class="w-full cursor-pointer rounded-full bg-[#4952d8] py-4 text-base font-semibold text-white transition-all duration-250 ease-[ease] hover:-translate-y-[2px] hover:bg-[#3b43bd] active:scale-[0.98] md:w-auto md:px-16" type="submit") Crear cuenta
+              a.whatsapp-fab(class="fixed right-6 bottom-6 z-[999] flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-2xl text-white shadow-lg transition-transform duration-250 hover:scale-[1.08] md:static md:h-12 md:w-12 md:text-xl" href="https://wa.me/573112222222" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp")
                 i.fa-brands.fa-whatsapp
 
-            p.auth-footer
+            p.auth-footer(class="mt-4 pb-6 text-center text-sm text-[#4b5573] md:pb-0")
               | ¿Ya tienes cuenta?
-              a.auth-footer__link(href="/auth/login")  Inicia Sesión
+              a.auth-footer__link(class="font-semibold text-[#4952d8] transition-colors duration-200 hover:text-[#3b43bd] hover:underline" href="/auth/login")  Inicia Sesión
+
+    script.
+      setTimeout(() => {
+        document.getElementById("mensajeError")?.remove();
+        document.getElementById("mensajeExito")?.remove();
+      }, 9000);

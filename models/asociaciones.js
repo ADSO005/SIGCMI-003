@@ -6,6 +6,8 @@ import Medico from "./Medico.js";
 
 import Especialidad from "./Especialidad.js";
 import Horario from "./Horario.js";
+import SolicitudHorario from "./SolicitudHorario.js";
+import SolicitudHorarioDetalle from "./SolicitudHorarioDetalle.js";
 
 import EstadoCita from "./EstadoCita.js";
 import Cita from "./Cita.js";
@@ -322,4 +324,21 @@ export default function asociarModelos() {
     SolicitudWhatsApp.belongsTo(Cita, {
         foreignKey: "cita_id",
     });
+
+    // Las solicitudes semanales conservan el historial; no se eliminan registros relacionados en cascada.
+    const history = { onDelete: 'RESTRICT', onUpdate: 'RESTRICT' };
+    Medico.hasMany(SolicitudHorario, { foreignKey: 'medico_id', as: 'SolicitudesHorarios', ...history });
+    SolicitudHorario.belongsTo(Medico, { foreignKey: 'medico_id', as: 'Medico', ...history });
+    Usuario.hasMany(SolicitudHorario, { foreignKey: 'solicitado_por', as: 'SolicitudesHorariosPresentadas', ...history });
+    SolicitudHorario.belongsTo(Usuario, { foreignKey: 'solicitado_por', as: 'Solicitante', ...history });
+    Usuario.hasMany(SolicitudHorario, { foreignKey: 'decidido_por', as: 'SolicitudesHorariosRevisadas', ...history });
+    SolicitudHorario.belongsTo(Usuario, { foreignKey: 'decidido_por', as: 'Revisor', ...history });
+    SolicitudHorario.hasMany(SolicitudHorario, { foreignKey: 'solicitud_base_id', as: 'Revisiones', ...history });
+    SolicitudHorario.belongsTo(SolicitudHorario, { foreignKey: 'solicitud_base_id', as: 'SolicitudBase', ...history });
+    SolicitudHorario.hasMany(SolicitudHorarioDetalle, { foreignKey: 'solicitud_id', as: 'Detalles', ...history });
+    SolicitudHorarioDetalle.belongsTo(SolicitudHorario, { foreignKey: 'solicitud_id', as: 'Solicitud', ...history });
+    SolicitudHorarioDetalle.hasOne(Horario, { foreignKey: 'solicitud_detalle_id', as: 'Publicacion', ...history });
+    Horario.belongsTo(SolicitudHorarioDetalle, { foreignKey: 'solicitud_detalle_id', as: 'DetalleSolicitud', ...history });
+    SolicitudHorario.hasMany(Horario, { foreignKey: 'sustituido_por_solicitud_id', as: 'PublicacionesSustituidas', ...history });
+    Horario.belongsTo(SolicitudHorario, { foreignKey: 'sustituido_por_solicitud_id', as: 'SustituidaPorSolicitud', ...history });
 }
