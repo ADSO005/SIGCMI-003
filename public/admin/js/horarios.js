@@ -1268,10 +1268,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    if (btnAgregarHorario) {
+    if (btnAgregarHorario && formularioNuevoHorario) {
 
         btnAgregarHorario.addEventListener("click", () => {
 
+            resetearFormularioHorario();
             formularioNuevoHorario.classList.remove("hidden");
 
             document
@@ -1689,7 +1690,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     );
 
                     throw new Error(
-                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`
+                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`,
+                        { cause: error }
                     );
                 }
 
@@ -1764,18 +1766,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    btnAgregarHorarioModal.addEventListener("click", () => {
-
-        // Limpiar cualquier estado anterior
-        resetearFormularioHorario();
-
-        // Mostrar formulario como nuevo horario
-        formularioNuevoHorario.classList.remove("hidden");
-
-        // Enfocar fecha de inicio
-        document
-            .getElementById("horario_fecha_inicio")
-            ?.focus();
-    });
 
 });

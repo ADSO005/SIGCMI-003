@@ -155,7 +155,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 } catch (error) {
 
                     throw new Error(
-                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`
+                        `El servidor respondió con ${respuesta.status} y no devolvió JSON.`,
+                        { cause: error }
                     );
 
                 }
