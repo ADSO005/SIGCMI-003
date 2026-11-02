@@ -116,7 +116,13 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
         ];
 
         return res.render('viewsPaciente/diagnosticHistory', {
-            titulo: 'Historial de Diagnósticos',
+            tituloPagina: 'Historial de Diagnósticos',
+            fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
+            paciente: {
+                nombre: `${req.usuario.nombres} ${req.usuario.apellidos}`,
+                rol: 'Paciente'
+            },
+            activeSection: 'diagnosticos',
             diagnosticos
         });
 
@@ -127,10 +133,13 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
 };
 
 export const listarConfiguracionNotificaciones = async (req, res) => {
-    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 36 } });
 
     // Simular que esto vino de BD
     const configuracionNotificaciones = {
+        tituloPagina: 'Configuración de Notificaciones',
+        fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
+        activeSection: 'notificaciones',
         correo: con.correo,
         sms: con.sms,
         whatsapp: con.whatsapp,
@@ -163,7 +172,7 @@ export const actualizarConfiguracionNotificaciones = async (req, res) => {
         nuevo_diagnostico: req.body.nuevo_diagnostico ? true : false
     };
 
-    let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+    let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 36 } });
     await con.update(data);
 
     res.redirect('/paciente/notificaciones?success=1&message=Configuración actualizada correctamente');

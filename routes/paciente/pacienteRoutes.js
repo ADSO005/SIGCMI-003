@@ -117,6 +117,7 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
                 nombre: `${paciente.Usuario?.nombres || req.usuario.nombres} ${paciente.Usuario?.apellidos || req.usuario.apellidos}`,
                 rol: 'Paciente'
             },
+            activeSection: 'citas',
             citas,
             proximaCita: proximaCitaVista
         })
@@ -132,8 +133,8 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
 
 router.get(
     "/historial-diagnosticos",
-    // auth,
-    // role(3),
+    auth,
+    role(3),
     obtenerHistorialDiagnosticos
 );
 
