@@ -1,45 +1,60 @@
 import ConfiguracionNotificacion from '../../models/ConfiguracionNotificacion.js';
 
 export const mostrarDashboard = (req, res) => {
-
-    const paciente = {
-        nombre: 'Juan'
-    };
-
-    const citas = [
-        {
-            id: 1,
-            fecha: 'Miércoles, 4 de Junio de 2026',
-            hora: '10:00',
-            consultorio: 'Consultorio 101',
-            doctor: 'Dr. Carlos Pérez',
-            estado: 'Confirmada'
-        },
-        {
-            id: 2,
-            fecha: 'Miércoles, 4 de Junio de 2026',
-            hora: '10:00',
-            consultorio: 'Consultorio 101',
-            doctor: 'Dr. Carlos Pérez',
-            estado: 'Pendiente'
-        },
-        {
-            id: 3,
-            fecha: 'Miércoles, 4 de Junio de 2026',
-            hora: '10:00',
-            consultorio: 'Consultorio 101',
-            doctor: 'Dr. Carlos Pérez',
-            estado: 'Completada'
+    try {
+        const paciente = {
+            nombre: 'Juan'
         }
-    ];
 
-    res.render('viewsPaciente/dashboard', {
-        paciente,
-        citas
-    });
-};
+        const citas = [
+            {
+                id: 1,
+                fecha: 'Miércoles, 4 de Junio de 2026',
+                hora: '10:00',
+                consultorio: 'Consultorio 101',
+                doctor: 'Dr. Carlos Pérez',
+                estado: 'Confirmada'
+            },
+            {
+                id: 2,
+                fecha: 'Miércoles, 4 de Junio de 2026',
+                hora: '10:00',
+                consultorio: 'Consultorio 101',
+                doctor: 'Dr. Carlos Pérez',
+                estado: 'Pendiente'
+            },
+            {
+                id: 3,
+                fecha: 'Miércoles, 4 de Junio de 2026',
+                hora: '10:00',
+                consultorio: 'Consultorio 101',
+                doctor: 'Dr. Carlos Pérez',
+                estado: 'Completada'
+            }
+        ]
+
+        // OBJETO PROXIMACITA OBLIGATORIO
+        const proximaCita = {
+            fecha: 'Miércoles, 4 de Junio de 2026',
+            doctor: 'Dr. Carlos Pérez',
+            consultorio: 'Consultorio 101'
+        }
+
+        res.render('viewsPaciente/dashboard', {
+            tituloPagina: 'Portal del Paciente',
+            fechaActual: '3 de Abril del 2026',
+            paciente,
+            citas,
+            proximaCita
+        })
+    } catch (error) {
+        // ESTA LÍNEA TE IMPRIMIRÁ EL DETALLE EN LA TERMINAL / CONSOLA DE NODE
+        console.error('Detalle del error:', error)
+        res.status(500).send('Error al cargar el portal del paciente')
+    }
+}
+
 export const mostrarPerfil = (req, res) => {
-
     const paciente = {
         nombre: 'Juan Esteban Montoya Marin',
 
@@ -66,7 +81,7 @@ export const mostrarPerfil = (req, res) => {
             telefono: 'Ninguna',
             correo: 'usuario@sigcmi.com'
         }
-    };
+    }
 
     res.render('viewsPaciente/profile', {
         paciente
@@ -101,7 +116,13 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
         ];
 
         return res.render('viewsPaciente/diagnosticHistory', {
-            titulo: 'Historial de Diagnósticos',
+            tituloPagina: 'Historial de Diagnósticos',
+            fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
+            paciente: {
+                nombre: `${req.usuario.nombres} ${req.usuario.apellidos}`,
+                rol: 'Paciente'
+            },
+            activeSection: 'diagnosticos',
             diagnosticos
         });
 
@@ -112,10 +133,13 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
 };
 
 export const listarConfiguracionNotificaciones = async (req, res) => {
-    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 8 } });
 
     // Simular que esto vino de BD
     const configuracionNotificaciones = {
+        tituloPagina: 'Configuración de Notificaciones',
+        fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
+        activeSection: 'notificaciones',
         correo: con.correo,
         sms: con.sms,
         whatsapp: con.whatsapp,
@@ -148,7 +172,7 @@ export const actualizarConfiguracionNotificaciones = async (req, res) => {
         nuevo_diagnostico: req.body.nuevo_diagnostico ? true : false
     };
 
-    let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 1 } });
+    let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 8 } });
     await con.update(data);
 
     res.redirect('/paciente/notificaciones?success=1&message=Configuración actualizada correctamente');

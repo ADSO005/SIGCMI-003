@@ -162,41 +162,6 @@ block content
                 p(class="text-slate-500 font-medium") Ciudad/Municipio
                 p(class="font-semibold text-slate-800") #{paciente.ciudad || 'No registrada'}
 
-        // Tarjeta: Contacto de Emergencia
-        div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
-          div(class="flex items-center gap-2 mb-4 text-amber-500 font-semibold text-sm")
-            span 📞
-            span Contacto de Emergencia
-
-          div(class="space-y-3")
-            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
-              span(class="text-indigo-500") 👤
-              div(class="text-xs")
-                p(class="text-slate-500 font-medium") Nombres
-                p(class="font-semibold text-slate-800")
-                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.nombres ? paciente.contactoEmergencia.nombres : '(Nombres)'}
-
-            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
-              span(class="text-indigo-500") 👤
-              div(class="text-xs")
-                p(class="text-slate-500 font-medium") Apellidos
-                p(class="font-semibold text-slate-800")
-                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.apellidos ? paciente.contactoEmergencia.apellidos : '(Apellidos)'}
-
-            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
-              span(class="text-indigo-500") 📞
-              div(class="text-xs")
-                p(class="text-slate-500 font-medium") Teléfono
-                p(class="font-semibold text-slate-800")
-                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.telefono ? paciente.contactoEmergencia.telefono : 'Ninguno'}
-
-            div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
-              span(class="text-indigo-500") ✉
-              div(class="text-xs")
-                p(class="text-slate-500 font-medium") Correo Electrónico
-                p(class="font-semibold text-slate-800")
-                  | #{paciente.contactoEmergencia && paciente.contactoEmergencia.correo ? paciente.contactoEmergencia.correo : 'usuario@sigcmi.com'}
-
         // Tarjeta: Seguridad y Privacidad
         div(class="bg-blue-200 rounded-2xl p-5 text-indigo-950 border border-blue-300")
           h3(class="text-xs font-bold mb-1") Seguridad y Privacidad
