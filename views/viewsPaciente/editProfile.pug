@@ -1,6 +1,8 @@
 extends ./layout
 
 block content
+  form#formCambiarPassword(action="/paciente/perfil/cambiar-password" method="POST")
+
   div(class="min-h-screen bg-blue-50 pb-12 relative")
     // Formulario principal que envuelve toda la vista
     form(id="formEditarPerfil" action="/paciente/perfil/editar" method="POST")
@@ -44,7 +46,7 @@ block content
             div(class="w-24 h-24 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-4xl font-bold mb-4")
               | 👤
             h1(class="text-xl font-bold text-slate-800")
-              | #{paciente.nombres ? (paciente.nombres + ' ' + (paciente.apellidos || '')) : 'Juan Esteban Montoya Marin'}
+              | #{paciente.nombres ? (paciente.nombres + ' ' + (paciente.apellidos || '')) : 'Datos del paciente'}
 
           // Tarjeta: Información Personal
           div(class="bg-white rounded-2xl p-6 shadow-sm border border-blue-100")
@@ -112,13 +114,14 @@ block content
               div(class="flex items-center gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100")
                 span(class="text-indigo-500") 📅
                 div(class="w-full text-xs")
-                  label(for="fechaNacimiento" class="block text-slate-500 font-medium mb-0.5") Fecha de Nacimiento
+                  label(for="fechaNacimiento" class="block text-slate-500 font-medium mb-0.5") Fecha de Nacimiento (solo lectura)
                   input(
                     id="fechaNacimiento"
                     name="fechaNacimiento"
                     type="date"
+                    disabled
                     value=paciente.fechaNacimiento ? String(paciente.fechaNacimiento).slice(0, 10) : ''
-                    class="w-full bg-transparent font-semibold text-slate-800 outline-none"
+                    class="w-full bg-transparent font-semibold text-slate-500 outline-none cursor-not-allowed"
                   )
 
               // Tipo de Documento (Solo Lectura)
@@ -135,38 +138,62 @@ block content
                   p(class="text-slate-500 font-medium") Número de Documento
                   p(class="font-semibold text-slate-600") #{paciente.numeroDocumento || '1234567890'}
 
-            // Formulario de Contraseña Integrado
+            // Sección desplegable para cambiar la contraseña
             div(class="mt-6 pt-4 border-t border-slate-100")
-              h2(class="text-xs font-bold text-slate-700 mb-1") Cambiar Contraseña ▾
-              p(class="text-xs text-slate-400 mb-4")
-                | La contraseña debe tener al menos 6 caracteres e incluir una combinación de números, letras y caracteres especiales(!@#$%).
+              button#btnTogglePassword(
+                type="button"
+                aria-expanded=abrirSeccionPassword ? 'true' : 'false'
+                aria-controls="seccionPassword"
+                class="flex w-full items-center justify-between text-left text-xs font-bold text-slate-700"
+              )
+                span Cambiar contraseña
+                span#iconoTogglePassword(aria-hidden="true")= abrirSeccionPassword ? '▲' : '▼'
 
-              div(class="space-y-3")
+              div#seccionPassword(
+                data-abierta=abrirSeccionPassword ? 'true' : 'false'
+                class=abrirSeccionPassword ? 'mt-4 space-y-3' : 'hidden mt-4 space-y-3'
+              )
+                p(class="text-xs text-slate-400")
+                  | Usa al menos 6 caracteres con letras, números y un carácter especial.
+
                 input(
                   type="password"
                   name="passwordActual"
+                  id="passwordActual"
+                  form="formCambiarPassword"
+                  autocomplete="current-password"
                   placeholder="Contraseña actual*"
                   class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
                 )
                 input(
                   type="password"
                   name="passwordNueva"
+                  id="passwordNueva"
+                  form="formCambiarPassword"
+                  autocomplete="new-password"
                   placeholder="Contraseña nueva*"
                   class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
                 )
                 input(
                   type="password"
                   name="confirmarPassword"
+                  id="confirmarPassword"
+                  form="formCambiarPassword"
+                  autocomplete="new-password"
                   placeholder="Repetir contraseña nueva*"
                   class="w-full bg-blue-50 border border-blue-100 rounded-xl px-4 py-2 text-xs text-slate-700 placeholder-slate-400 outline-none"
                 )
 
+                if errorPassword
+                  p(role="alert" class="text-xs font-medium text-red-600")= errorPassword
+                if mensajePassword
+                  p(role="status" class="text-xs font-medium text-green-700")= mensajePassword
+
                 button(
-                  type="button"
+                  type="submit"
+                  form="formCambiarPassword"
                   class="w-full bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold py-2 rounded-xl transition mt-2 cursor-pointer"
-                ) Cambiar Contraseña
-
-
+                ) Actualizar contraseña
         // ==========================================
         // COLUMNA DERECHA
         // ==========================================
@@ -388,6 +415,23 @@ block content
       const btnConfirmar = document.getElementById('btnConfirmarSubmit');
       const form = document.getElementById('formEditarPerfil');
       const inputPass = document.getElementById('passwordConfirmacion');
+      const btnTogglePassword = document.getElementById('btnTogglePassword');
+      const seccionPassword = document.getElementById('seccionPassword');
+      const iconoTogglePassword = document.getElementById('iconoTogglePassword');
+
+      if (btnTogglePassword && seccionPassword && iconoTogglePassword) {
+        const establecerSeccionPassword = (abierta) => {
+          seccionPassword.classList.toggle('hidden', !abierta);
+          btnTogglePassword.setAttribute('aria-expanded', String(abierta));
+          iconoTogglePassword.textContent = abierta ? '▲' : '▼';
+        };
+
+        btnTogglePassword.addEventListener('click', () => {
+          establecerSeccionPassword(seccionPassword.classList.contains('hidden'));
+        });
+
+        if (seccionPassword.dataset.abierta === 'true') establecerSeccionPassword(true);
+      }
 
       const abrirModal = () => {
         modal.classList.remove('hidden');

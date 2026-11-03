@@ -1,12 +1,21 @@
 import bcrypt from 'bcrypt'
 import { Paciente } from '../../models/index.js'
 
+export const obtenerOCrearPerfilPaciente = async (usuarioId) => {
+    const [paciente] = await Paciente.findOrCreate({
+        where: { usuario_id: usuarioId },
+        defaults: { usuario_id: usuarioId }
+    })
+
+    return paciente
+}
+
 const obtenerDatosFormulario = (usuario, paciente, body = {}) => ({
     nombres: body.nombres ?? usuario.nombres ?? '',
     apellidos: body.apellidos ?? usuario.apellidos ?? '',
     correo: body.correo ?? usuario.correo ?? '',
     telefono: body.telefono ?? usuario.telefono ?? '',
-    fechaNacimiento: body.fechaNacimiento ?? paciente.fecha_nacimiento ?? '',
+    fechaNacimiento: paciente.fecha_nacimiento ?? '',
     tipoDocumento: usuario.tipo_documento ?? '',
     numeroDocumento: usuario.numero_documento ?? '',
     tipoSangre: body.tipoSangre ?? paciente.tipo_sangre ?? '',
@@ -23,16 +32,70 @@ const renderizarFormulario = (req, res, opciones = {}) => {
         pagina: 'Editar Perfil',
         paciente: obtenerDatosFormulario(req.usuario, paciente, opciones.formData),
         mensajeExito: opciones.mensajeExito || null,
+        mensajePassword: opciones.mensajePassword || null,
+        errorPassword: opciones.errorPassword || null,
         errorContrasena: opciones.errorContrasena || null,
-        abrirModal: Boolean(opciones.abrirModal)
+        abrirModal: Boolean(opciones.abrirModal),
+        abrirSeccionPassword: Boolean(opciones.abrirSeccionPassword)
     })
 }
 
+export const cambiarContrasenaPaciente = async (req, res) => {
+    try {
+        const paciente = await obtenerOCrearPerfilPaciente(req.usuario.id_usuario)
+        req.pacientePerfil = paciente
+
+        const renderizarErrorPassword = (status, errorPassword) => {
+            res.status(status)
+            return renderizarFormulario(req, res, { errorPassword, abrirSeccionPassword: true })
+        }
+
+        const passwordActual = String(req.body.passwordActual || '')
+        const passwordNueva = String(req.body.passwordNueva || '')
+        const confirmarPassword = String(req.body.confirmarPassword || '')
+
+        if (!passwordActual || !passwordNueva || !confirmarPassword) {
+            return renderizarErrorPassword(400, 'Completa los tres campos para cambiar la contrase\u00f1a.')
+        }
+
+        const passwordActualCorrecta = await bcrypt.compare(passwordActual, req.usuario.password)
+        if (!passwordActualCorrecta) {
+            return renderizarErrorPassword(401, 'La contrase\u00f1a actual no es correcta.')
+        }
+
+        if (passwordNueva !== confirmarPassword) {
+            return renderizarErrorPassword(400, 'La nueva contrase\u00f1a y su confirmaci\u00f3n no coinciden.')
+        }
+
+        const passwordValida = passwordNueva.length >= 6 &&
+            /[A-Za-z]/.test(passwordNueva) &&
+            /\d/.test(passwordNueva) &&
+            /[^A-Za-z\d]/.test(passwordNueva)
+
+        if (!passwordValida) {
+            return renderizarErrorPassword(400, 'Usa al menos 6 caracteres con letras, n\u00fameros y un car\u00e1cter especial.')
+        }
+
+        if (await bcrypt.compare(passwordNueva, req.usuario.password)) {
+            return renderizarErrorPassword(400, 'La nueva contrase\u00f1a debe ser diferente a la actual.')
+        }
+
+        const salt = await bcrypt.genSalt(10)
+        const passwordHash = await bcrypt.hash(passwordNueva, salt)
+        await req.usuario.update({ password: passwordHash })
+
+        return renderizarFormulario(req, res, {
+            mensajePassword: 'Tu contrase\u00f1a se actualiz\u00f3 correctamente.',
+            abrirSeccionPassword: true
+        })
+    } catch (error) {
+        console.error('Error al cambiar la contrase\u00f1a del paciente:', error)
+        return res.status(500).send('No fue posible actualizar la contrase\u00f1a.')
+    }
+}
 export const mostrarEdicionPerfil = async (req, res) => {
     try {
-        const paciente = await Paciente.findOne({
-            where: { usuario_id: req.usuario.id_usuario }
-        })
+        const paciente = await obtenerOCrearPerfilPaciente(req.usuario.id_usuario)
 
         if (!paciente) return res.status(404).send('No se encontró el perfil del paciente.')
 
@@ -46,9 +109,7 @@ export const mostrarEdicionPerfil = async (req, res) => {
 
 export const guardarEdicionPerfil = async (req, res) => {
     try {
-        const paciente = await Paciente.findOne({
-            where: { usuario_id: req.usuario.id_usuario }
-        })
+        const paciente = await obtenerOCrearPerfilPaciente(req.usuario.id_usuario)
 
         if (!paciente) return res.status(404).send('No se encontró el perfil del paciente.')
 
@@ -87,7 +148,6 @@ export const guardarEdicionPerfil = async (req, res) => {
         await req.usuario.sequelize.transaction(async (transaction) => {
             await req.usuario.update(usuarioActualizado, { transaction })
             await paciente.update({
-                fecha_nacimiento: req.body.fechaNacimiento || null,
                 tipo_sangre: req.body.tipoSangre || null,
                 alergias: String(req.body.alergias || '').trim() || null,
                 condiciones_medicas: String(req.body.condicionesMedicas || '').trim() || null,

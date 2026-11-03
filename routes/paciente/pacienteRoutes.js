@@ -7,9 +7,9 @@ import {
     listarConfiguracionNotificaciones,
     actualizarConfiguracionNotificaciones
 } from "../../controllers/paciente/controller.js";
-import { Paciente, Usuario, Cita, Medico, Especialidad, EstadoCita } from '../../models/index.js'
+import { Usuario, Cita, Medico, Especialidad, EstadoCita } from '../../models/index.js'
 import { mostrarFormularioCancelacion, solicitarCodigoCancelacion, verificarCodigoCancelacion } from '../../controllers/paciente/cancelAppointment.js'
-import { mostrarEdicionPerfil, guardarEdicionPerfil } from '../../controllers/paciente/profileController.js'
+import { mostrarEdicionPerfil, guardarEdicionPerfil, cambiarContrasenaPaciente, obtenerOCrearPerfilPaciente } from '../../controllers/paciente/profileController.js'
 
 
 const router = express.Router()
@@ -18,31 +18,29 @@ const router = express.Router()
 // ======================================================
 router.get('/perfil', auth, role(3), async (req, res) => {
     try {
-        // Datos de prueba para previsualizar la vista en el navegador
-        const pacienteVista = {
-            id: 1,
-            nombre: 'Juan Esteban Montoya Marin',
-            nombres: 'Juan Esteban',
-            apellidos: 'Montoya Marin',
-            correo: 'usuario@sigcmi.com',
-            telefono: '+52 555 123 4567',
-            fechaNacimiento: '1990-05-15',
-            tipoDocumento: 'CC',
-            numeroDocumento: '1234567890',
-            tipoSangre: 'O +',
-            alergias: 'Penicilina',
-            condicionesMedicas: 'Ninguna',
-            direccion: 'Calle 22 #5-14',
-            departamento: 'Risaralda',
-            ciudad: 'Pereira',
-            contactoEmergencia: {
-                nombres: 'MarÃ­a',
-                apellidos: 'GÃ³mez',
-                telefono: '+52 555 987 6543',
-                correo: 'emergencia@sigcmi.com'
-            }
+        const pacienteDB = await obtenerOCrearPerfilPaciente(req.usuario.id_usuario)
+
+        if (!pacienteDB) {
+            return res.status(404).send('No se encontró el perfil del paciente.')
         }
 
+        const pacienteVista = {
+            id: pacienteDB.id_paciente,
+            nombres: req.usuario.nombres,
+            apellidos: req.usuario.apellidos,
+            nombre: `${req.usuario.nombres} ${req.usuario.apellidos}`,
+            correo: req.usuario.correo,
+            telefono: req.usuario.telefono,
+            fechaNacimiento: pacienteDB.fecha_nacimiento,
+            tipoDocumento: req.usuario.tipo_documento,
+            numeroDocumento: req.usuario.numero_documento,
+            tipoSangre: pacienteDB.tipo_sangre,
+            alergias: pacienteDB.alergias,
+            condicionesMedicas: pacienteDB.condiciones_medicas,
+            direccion: pacienteDB.direccion,
+            departamento: pacienteDB.departamento,
+            ciudad: pacienteDB.ciudad
+        }
         res.render('viewsPaciente/profile', {
             tituloPagina: 'Mi Perfil',
             fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
@@ -59,18 +57,21 @@ router.get('/perfil', auth, role(3), async (req, res) => {
 // ======================================================
 router.get('/perfil/editar', auth, role(3), mostrarEdicionPerfil)
 router.post('/perfil/editar', auth, role(3), guardarEdicionPerfil)
+router.post('/perfil/cambiar-password', auth, role(3), cambiarContrasenaPaciente)
 
 /* PORTAL DEL PACIENTE: GET /paciente/dashboard */
 router.get('/dashboard', auth, role(3), async (req, res) => {
     try {
-        const [paciente] = await Paciente.findOrCreate({
-            where: { usuario_id: req.usuario.id_usuario },
-            defaults: { usuario_id: req.usuario.id_usuario },
-            include: [{ model: Usuario, attributes: ['nombres', 'apellidos', 'correo'] }]
-        })
+        const paciente = await obtenerOCrearPerfilPaciente(req.usuario.id_usuario)
+
+        if (!paciente) {
+            return res.status(404).send('No se encontró el perfil del paciente.')
+        }
 
         const citasDB = await Cita.findAll({
             where: { paciente_id: paciente.id_paciente },
+            // UH-012 sigue pendiente en esta base; no seleccionar las columnas opcionales que aún no existen.
+            attributes: ['id_cita', 'paciente_id', 'medico_id', 'estado_id', 'fecha', 'hora'],
             include: [
                 {
                     model: Medico,
@@ -114,7 +115,7 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
             tituloPagina: 'Portal del Paciente',
             fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
             paciente: {
-                nombre: `${paciente.Usuario?.nombres || req.usuario.nombres} ${paciente.Usuario?.apellidos || req.usuario.apellidos}`,
+                nombre: `${req.usuario.nombres} ${req.usuario.apellidos}`,
                 rol: 'Paciente'
             },
             activeSection: 'citas',
