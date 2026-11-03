@@ -13,7 +13,7 @@
     "css:patient": "npx @tailwindcss/cli -i ./public/patient/css/input.css -o ./public/patient/css/output.css --watch",
     "css:medico": "npx @tailwindcss/cli -i ./public/medico/css/input.css -o ./public/medico/css/output.css --watch",
     "dev": "concurrently \"npm run server\" \"npm run css\" \"npm run css:admin\" \"npm run css:patient\" \"npm run css:medico\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No hay pruebas configuradas\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
 
