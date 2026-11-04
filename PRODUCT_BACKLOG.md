@@ -35,6 +35,11 @@ This document contains the initial Product Backlog for the SIGCMI project. The b
 | UH-014 | Doctor | Record Diagnosis | As a **doctor**, I want to record diagnoses and treatments so that I can maintain accurate medical records. | Medium |
 | UH-015 | Doctor | View Patient History | As a **doctor**, I want to view a patient's medical history so that I can make better clinical decisions. | Medium |
 
+### UH-010 Acceptance Criteria
+
+- **UH-010-CA-01:** When an authenticated doctor submits the logout action, the system expires the JWT cookie named `_token`, redirects to the login page, and denies access to protected medical routes until the doctor logs in again.
+
+
 ---
 
 # ⚫ Administrator User Stories

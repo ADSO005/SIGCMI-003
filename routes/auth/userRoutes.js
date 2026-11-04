@@ -35,6 +35,7 @@ router.post("/register", register);
 // ===============================
 
 router.get("/logout", logout);
+router.post("/logout", logout);
 
 // ===============================
 // Recuperar contraseña

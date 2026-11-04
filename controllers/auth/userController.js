@@ -9,6 +9,13 @@ import sendRecoveryEmail from "../../services/emailService.js";
 import generateOTP from "../../helpers/generateOTP.js";
 import generateResetToken from "../../helpers/generateResetToken.js";
 
+const opcionesCookieAutenticacion = {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    path: "/"
+};
+
 /* ruta de la vista principal inicio de sesion */
 const formLogin = (req, res) => {
 
@@ -78,11 +85,7 @@ const login = async (req, res) => {
 
     console.log(usuario);
 
-    res.cookie("_token", token, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax"
-    });
+    res.cookie("_token", token, opcionesCookieAutenticacion);
 
     switch (usuario.rol_id) {
 
@@ -103,7 +106,7 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
 
-    res.clearCookie("_token");
+    res.clearCookie("_token", opcionesCookieAutenticacion);
 
     return res.redirect("/auth/login");
 
