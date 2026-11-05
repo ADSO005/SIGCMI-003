@@ -1,4 +1,15 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+﻿const obtenerLimitesCalendarioCitas = () => {
+    const hoy = new Date()
+    const fechaMinima = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1)
+    const ultimoDiaMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0).getDate()
+    const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 1, Math.min(hoy.getDate(), ultimoDiaMesSiguiente))
+    const fechaLocal = (fecha) => {
+        const desplazada = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000)
+        return desplazada.toISOString().slice(0, 10)
+    }
+    return { min: fechaLocal(fechaMinima), max: fechaLocal(fechaMaxima) }
+}
+document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modalNuevaCita')
     const abrir = document.getElementById('btnNuevaCita')
     const cerrar = document.getElementById('cerrarModalCita')
@@ -8,16 +19,14 @@
 
     if (!modal) return
 
-    const hoyLocal = () => {
-        const ahora = new Date()
-        const local = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000)
-        return local.toISOString().slice(0, 10)
-    }
-
     const abrirModal = () => {
         modal.classList.remove('hidden')
         modal.classList.add('flex')
-        if (campoFecha) campoFecha.min = hoyLocal()
+        if (campoFecha) {
+            const limites = obtenerLimitesCalendarioCitas()
+            campoFecha.min = limites.min
+            campoFecha.max = limites.max
+        }
         cerrar?.focus()
     }
 
@@ -55,12 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!modalReprogramar) return
 
-    const fechaLocalHoy = () => {
-        const ahora = new Date()
-        const fechaLocal = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000)
-        return fechaLocal.toISOString().slice(0, 10)
-    }
-
     const cerrarModalReprogramar = () => {
         modalReprogramar.classList.add('hidden')
         modalReprogramar.classList.remove('flex')
@@ -80,7 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const idCita = new URL(enlaceReprogramar.href).pathname.split('/').pop()
 
         if (campoIdCita) campoIdCita.value = idCita
-        if (campoFechaReprogramar) campoFechaReprogramar.min = fechaLocalHoy()
+        if (campoFechaReprogramar) {
+            const limites = obtenerLimitesCalendarioCitas()
+            campoFechaReprogramar.min = limites.min
+            campoFechaReprogramar.max = limites.max
+        }
 
         modalReprogramar.classList.remove('hidden')
         modalReprogramar.classList.add('flex')
