@@ -70,7 +70,7 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
 
         const citasDB = await Cita.findAll({
             where: { paciente_id: paciente.id_paciente },
-            // UH-012 sigue pendiente en esta base; no seleccionar las columnas opcionales que aún no existen.
+            // El panel solo necesita los datos básicos de la cita.
             attributes: ['id_cita', 'paciente_id', 'medico_id', 'estado_id', 'fecha', 'hora'],
             include: [
                 {
