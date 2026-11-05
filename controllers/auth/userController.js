@@ -208,6 +208,41 @@ const register = async (req, res) => {
 
         }
 
+        const solicitudCorreoExistente = await RegistroPendiente.findOne({
+            where: { correo: email }
+        });
+
+        if (solicitudCorreoExistente) {
+            return res.render("login/auth/register", {
+                titulo: "Crear Cuenta",
+                error: "Ya existe una solicitud de registro pendiente con ese correo. Revisa tu correo de confirmación o contacta al administrador.",
+                formData: req.body
+            });
+        }
+
+        const solicitudDocumentoExistente = await RegistroPendiente.findOne({
+            where: { numero_documento: numeroDocumento }
+        });
+
+        if (solicitudDocumentoExistente) {
+            return res.render("login/auth/register", {
+                titulo: "Crear Cuenta",
+                error: "Ya existe una solicitud de registro pendiente con ese documento. Revisa tu correo de confirmación o contacta al administrador.",
+                formData: req.body
+            });
+        }
+
+        const missingEmailSettings = ["EMAIL_HOST", "EMAIL_PORT", "EMAIL_USER", "EMAIL_PASS", "EMAIL_FROM"]
+            .filter((key) => !process.env[key]?.trim());
+
+        if (missingEmailSettings.length) {
+            return res.status(503).render("login/auth/register", {
+                titulo: "Crear Cuenta",
+                error: "El registro no está disponible porque falta configurar el correo de confirmación. Contacta al administrador.",
+                formData: req.body
+            });
+        }
+
 
         // ===============================
         // ENCRIPTAR CONTRASEÑA
@@ -304,8 +339,24 @@ const register = async (req, res) => {
 
     } catch (error) {
 
-        console.error("❌ Error al registrar usuario:");
-        console.error(error);
+        if (error.name === "SequelizeUniqueConstraintError") {
+            const fields = Object.keys(error.fields || {});
+            const field = fields.includes("correo") ? "correo" : fields.includes("numero_documento") ? "documento" : null;
+
+            if (field) {
+                return res.render("login/auth/register", {
+                    titulo: "Crear Cuenta",
+                    error: field === "correo"
+                        ? "Ya existe un registro con ese correo. Revisa tu solicitud pendiente o inicia sesión."
+                        : "Ya existe un registro con ese documento. Verifica el número e inténtalo de nuevo.",
+                    formData: req.body
+                });
+            }
+        }
+
+        // Sequelize errors may include the password hash, confirmation token and
+        // submitted personal data in their SQL parameters. Log only safe metadata.
+        console.error("Error al registrar usuario:", error.name, error.original?.code || "sin código SQL");
 
         return res.render("login/auth/register", {
 
