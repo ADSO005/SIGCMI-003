@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
-
-
   "scripts": {
+    "db:migrate": "node scripts/migrate.js",
+    "db:migrate:status": "node scripts/migrate.js --status",
+    "test:db": "node --test tests/database.test.js",
     "start": "node server.js",
     "server": "nodemon server.js",
     "css": "npx @tailwindcss/cli -i ./public/auth/css/input.css -o ./public/auth/css/output.css --watch",
@@ -16,18 +17,15 @@
     "test": "echo \"No hay pruebas configuradas\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
-
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ADSO005/SIGCMI-003.git"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
-
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -40,7 +38,6 @@
     "pug": "^3.0.4",
     "sequelize": "^6.37.8"
   },
-
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/cli": "^4.3.3",
@@ -48,7 +45,6 @@
     "eslint": "^10.8.0",
     "globals": "^17.8.0",
     "nodemon": "^3.1.14",
-    "sequelize-cli": "^6.6.5",
     "tailwindcss": "^4.3.3"
   }
 }
