@@ -9,6 +9,30 @@
     }
     return { min: fechaLocal(fechaMinima), max: fechaLocal(fechaMaxima) }
 }
+
+const actualizarHorariosConAnticipacion = (campoFecha, campoHora) => {
+    if (!campoFecha || !campoHora) return
+
+    const horasDisponibles = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00']
+    const fechaSeleccionada = campoFecha.value
+    const limite = Date.now() + 24 * 60 * 60 * 1000
+
+    campoHora.replaceChildren(new Option('Seleccionar hora', ''))
+    if (!fechaSeleccionada) return
+
+    const [anio, mes, dia] = fechaSeleccionada.split('-').map(Number)
+    horasDisponibles.forEach((hora) => {
+        const [horas, minutos] = hora.split(':').map(Number)
+        const fechaHora = new Date(anio, mes - 1, dia, horas, minutos)
+        if (fechaHora.getTime() >= limite && horas <= 17) {
+            campoHora.add(new Option(hora, hora))
+        }
+    })
+
+    if (campoHora.options.length === 1) {
+        campoHora.add(new Option('No hay horarios con 24 horas de anticipación', ''))
+    }
+}
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modalNuevaCita')
     const abrir = document.getElementById('btnNuevaCita')
@@ -16,8 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelar = document.getElementById('cancelarModalCita')
     const formulario = document.getElementById('formNuevaCita')
     const campoFecha = document.getElementById('fechaCita')
+    const campoHora = document.getElementById('horaCita')
 
     if (!modal) return
+
+    campoFecha?.addEventListener('change', () => actualizarHorariosConAnticipacion(campoFecha, campoHora))
 
     const abrirModal = () => {
         modal.classList.remove('hidden')
@@ -61,8 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const campoFechaReprogramar = document.getElementById('fechaReprogramar')
     const botonCerrarReprogramar = document.getElementById('cerrarModalReprogramar')
     const botonCancelarReprogramar = document.getElementById('cancelarModalReprogramar')
+    const campoHoraReprogramar = document.getElementById('horaReprogramar')
 
     if (!modalReprogramar) return
+
+    campoFechaReprogramar?.addEventListener('change', () =>
+        actualizarHorariosConAnticipacion(campoFechaReprogramar, campoHoraReprogramar)
+    )
 
     const cerrarModalReprogramar = () => {
         modalReprogramar.classList.add('hidden')

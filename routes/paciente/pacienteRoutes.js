@@ -139,8 +139,8 @@ router.get(
     obtenerHistorialDiagnosticos
 );
 
-router.get('/notificaciones', listarConfiguracionNotificaciones);
-router.post('/notificacion', actualizarConfiguracionNotificaciones);
+router.get('/notificaciones', auth, role(3), listarConfiguracionNotificaciones);
+router.post('/notificacion', auth, role(3), actualizarConfiguracionNotificaciones);
 
 // Verificación de identidad antes de cancelar una cita.
 router.get('/citas/:id/cancelar', auth, role(3), mostrarFormularioCancelacion)
