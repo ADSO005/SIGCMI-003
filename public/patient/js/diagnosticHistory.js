@@ -3,6 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const placeholder = document.getElementById('placeholder-detalle')
     const content = document.getElementById('contenido-detalle')
     const backButton = document.getElementById('btn-back-mobile')
+    const leftPanel = document.querySelector('#lista-diagnosticos')?.parentElement
+    const grid = leftPanel?.parentElement
+    const rightPanel = grid?.children[1]
 
     if (!cards.length || !placeholder || !content) return
 
@@ -17,12 +20,41 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         content.classList.add('hidden')
         placeholder.classList.remove('hidden')
+        rightPanel?.classList.remove('hidden')
+        grid?.classList.remove('lg:grid-cols-1')
+        grid?.classList.add('lg:grid-cols-2')
+        cards.forEach(setArrowState)
     }
 
-    cards.forEach((card) => {
-        card.addEventListener('click', () => {
+    const setArrowState = (card, collapsed = false) => {
+        const arrow = card.querySelector('svg')?.parentElement
+        const path = arrow?.querySelector('path')
+        if (!arrow || !path) return
+        arrow.classList.toggle('order-first', collapsed)
+        path.setAttribute('d', collapsed
+            ? 'M15.75 4.5L8.25 12l7.5 7.5'
+            : 'M8.25 4.5l7.5 7.5-7.5 7.5')
+    }
+
+    const showDetail = () => {
+        rightPanel?.classList.remove('hidden')
+        grid?.classList.remove('lg:grid-cols-1')
+        grid?.classList.add('lg:grid-cols-2')
+        content.classList.remove('hidden')
+        placeholder.classList.add('hidden')
+    }
+
+    const collapseDetail = () => {
+        rightPanel?.classList.add('hidden')
+        grid?.classList.remove('lg:grid-cols-2')
+        grid?.classList.add('lg:grid-cols-1')
+        cards.forEach((card) => setArrowState(card, card.classList.contains('border-indigo-500')))
+    }
+
+    const selectCard = (card) => {
             cards.forEach((item) => {
                 item.classList.remove('border-indigo-500', 'bg-indigo-50/30', 'shadow-md')
+                setArrowState(item)
             })
             card.classList.add('border-indigo-500', 'bg-indigo-50/30', 'shadow-md')
 
@@ -39,8 +71,25 @@ document.addEventListener('DOMContentLoaded', () => {
             setText('det-prescripcion', card.dataset.prescripcion, 'No registrada')
             setText('det-observaciones', card.dataset.observaciones, 'Sin notas adicionales')
 
-            placeholder.classList.add('hidden')
-            content.classList.remove('hidden')
+            showDetail()
+            setArrowState(card)
+    }
+
+    cards.forEach((card) => {
+        card.addEventListener('click', (event) => {
+            const flecha = event.target.closest('svg')?.parentElement
+            if (flecha && card.contains(flecha)) {
+                event.stopPropagation()
+                if (card.classList.contains('border-indigo-500')) {
+                    if (rightPanel?.classList.contains('hidden')) showDetail()
+                    else collapseDetail()
+                } else {
+                    selectCard(card)
+                }
+                return
+            }
+
+            selectCard(card)
         })
     })
 

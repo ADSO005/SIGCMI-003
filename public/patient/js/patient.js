@@ -1,23 +1,59 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
+﻿const obtenerLimitesCalendarioCitas = () => {
+    const hoy = new Date()
+    const fechaMinima = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() + 1)
+    const ultimoDiaMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 2, 0).getDate()
+    const fechaMaxima = new Date(hoy.getFullYear(), hoy.getMonth() + 1, Math.min(hoy.getDate(), ultimoDiaMesSiguiente))
+    const fechaLocal = (fecha) => {
+        const desplazada = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000)
+        return desplazada.toISOString().slice(0, 10)
+    }
+    return { min: fechaLocal(fechaMinima), max: fechaLocal(fechaMaxima) }
+}
+
+const actualizarHorariosConAnticipacion = (campoFecha, campoHora) => {
+    if (!campoFecha || !campoHora) return
+
+    const horasDisponibles = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00']
+    const fechaSeleccionada = campoFecha.value
+    const limite = Date.now() + 24 * 60 * 60 * 1000
+
+    campoHora.replaceChildren(new Option('Seleccionar hora', ''))
+    if (!fechaSeleccionada) return
+
+    const [anio, mes, dia] = fechaSeleccionada.split('-').map(Number)
+    horasDisponibles.forEach((hora) => {
+        const [horas, minutos] = hora.split(':').map(Number)
+        const fechaHora = new Date(anio, mes - 1, dia, horas, minutos)
+        if (fechaHora.getTime() >= limite && horas <= 17) {
+            campoHora.add(new Option(hora, hora))
+        }
+    })
+
+    if (campoHora.options.length === 1) {
+        campoHora.add(new Option('No hay horarios con 24 horas de anticipación', ''))
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('modalNuevaCita')
     const abrir = document.getElementById('btnNuevaCita')
     const cerrar = document.getElementById('cerrarModalCita')
     const cancelar = document.getElementById('cancelarModalCita')
     const formulario = document.getElementById('formNuevaCita')
     const campoFecha = document.getElementById('fechaCita')
+    const campoHora = document.getElementById('horaCita')
 
     if (!modal) return
 
-    const hoyLocal = () => {
-        const ahora = new Date()
-        const local = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000)
-        return local.toISOString().slice(0, 10)
-    }
+    campoFecha?.addEventListener('change', () => actualizarHorariosConAnticipacion(campoFecha, campoHora))
 
     const abrirModal = () => {
         modal.classList.remove('hidden')
         modal.classList.add('flex')
-        if (campoFecha) campoFecha.min = hoyLocal()
+        if (campoFecha) {
+            const limites = obtenerLimitesCalendarioCitas()
+            campoFecha.min = limites.min
+            campoFecha.max = limites.max
+        }
         cerrar?.focus()
     }
 
@@ -52,14 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const campoFechaReprogramar = document.getElementById('fechaReprogramar')
     const botonCerrarReprogramar = document.getElementById('cerrarModalReprogramar')
     const botonCancelarReprogramar = document.getElementById('cancelarModalReprogramar')
+    const campoHoraReprogramar = document.getElementById('horaReprogramar')
 
     if (!modalReprogramar) return
 
-    const fechaLocalHoy = () => {
-        const ahora = new Date()
-        const fechaLocal = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000)
-        return fechaLocal.toISOString().slice(0, 10)
-    }
+    campoFechaReprogramar?.addEventListener('change', () =>
+        actualizarHorariosConAnticipacion(campoFechaReprogramar, campoHoraReprogramar)
+    )
 
     const cerrarModalReprogramar = () => {
         modalReprogramar.classList.add('hidden')
@@ -80,7 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const idCita = new URL(enlaceReprogramar.href).pathname.split('/').pop()
 
         if (campoIdCita) campoIdCita.value = idCita
-        if (campoFechaReprogramar) campoFechaReprogramar.min = fechaLocalHoy()
+        if (campoFechaReprogramar) {
+            const limites = obtenerLimitesCalendarioCitas()
+            campoFechaReprogramar.min = limites.min
+            campoFechaReprogramar.max = limites.max
+        }
 
         modalReprogramar.classList.remove('hidden')
         modalReprogramar.classList.add('flex')

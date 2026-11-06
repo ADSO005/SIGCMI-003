@@ -133,7 +133,10 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
 };
 
 export const listarConfiguracionNotificaciones = async (req, res) => {
-    const con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 8 } });
+    const [con] = await ConfiguracionNotificacion.findOrCreate({
+        where: { usuario_id: req.usuario.id_usuario },
+        defaults: { usuario_id: req.usuario.id_usuario }
+    });
 
     // Simular que esto vino de BD
     const configuracionNotificaciones = {
@@ -172,7 +175,10 @@ export const actualizarConfiguracionNotificaciones = async (req, res) => {
         nuevo_diagnostico: req.body.nuevo_diagnostico ? true : false
     };
 
-    let con = await ConfiguracionNotificacion.findOne({ where: { usuario_id: 8 } });
+    const [con] = await ConfiguracionNotificacion.findOrCreate({
+        where: { usuario_id: req.usuario.id_usuario },
+        defaults: { usuario_id: req.usuario.id_usuario }
+    });
     await con.update(data);
 
     res.redirect('/paciente/notificaciones?success=1&message=Configuración actualizada correctamente');
