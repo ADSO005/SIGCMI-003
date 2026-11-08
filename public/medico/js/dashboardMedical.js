@@ -236,6 +236,101 @@ const diasHorario = new Set([
 ]);
 let peticionHorarios = null;
 let versionCargaHorarios = 0;
+let scheduleRows = null;
+let selectedWeek = null;
+let scheduleReturnFocus = null;
+const scheduleDayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const scheduleDayKeys = [...diasHorario];
+const scheduleDayMs = 86400000;
+
+// DATEONLY se convierte a un número de día: nunca a medianoche de la zona del equipo.
+function scheduleDay(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error("La vigencia del horario no es válida.");
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(0);
+  date.setUTCHours(0, 0, 0, 0);
+  date.setUTCFullYear(year, month - 1, day);
+  if (year < 1 || date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+    throw new Error("La vigencia del horario no es válida.");
+  }
+  return date.getTime() / scheduleDayMs;
+}
+function scheduleDate(day) { return new Date(day * scheduleDayMs).toISOString().slice(0, 10); }
+function bogotaToday() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+  return scheduleDay(`${values.year}-${values.month}-${values.day}`);
+}
+function scheduleWeekStart(day) { return day - ((day + 3) % 7 + 7) % 7; }
+function formatScheduleDay(day) {
+  return new Intl.DateTimeFormat("es-CO", { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" })
+    .format(new Date(day * scheduleDayMs));
+}
+function appendScheduleText(parent, tag, text, className) {
+  const node = document.createElement(tag);
+  if (text) node.textContent = text;
+  if (className) node.className = className;
+  parent.appendChild(node);
+  return node;
+}
+function renderScheduleWeek() {
+  const calendar = document.getElementById("diasSemanaHorario");
+  const list = document.getElementById("listaHorariosMedico");
+  calendar.replaceChildren();
+  list.replaceChildren();
+  document.getElementById("rangoSemanaHorario").textContent =
+    `${formatScheduleDay(selectedWeek)} – ${formatScheduleDay(selectedWeek + 6)}`;
+  for (const id of ["semanaAnteriorHorario", "semanaSiguienteHorario"]) {
+    document.getElementById(id).disabled = scheduleRows === null;
+  }
+  const today = bogotaToday();
+  let count = 0;
+  for (let index = 0; index < 7; index++) {
+    const day = selectedWeek + index;
+    const date = scheduleDate(day);
+    const rows = (scheduleRows || []).filter(row => row.dia_semana === scheduleDayKeys[index] && row.startDay <= day && day <= row.endDay);
+    const approved = rows.some(row => row.estado === "Aprobado");
+    const cell = appendScheduleText(calendar, "div", "", approved
+      ? "min-w-0 rounded-xl border border-indigo-200 bg-indigo-50 px-1 py-3 text-center text-indigo-800"
+      : "min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-1 py-3 text-center text-slate-600");
+    cell.setAttribute("data-date", date);
+    cell.setAttribute("aria-label", `${scheduleDayNames[index]} ${formatScheduleDay(day)}: ${approved ? "con horarios aprobados" : rows.length ? "asignaciones sin aprobar" : "sin horarios"}${day === today ? ", hoy" : ""}`);
+    if (day === today) {
+      cell.setAttribute("aria-current", "date");
+      cell.classList.add("ring-2", "ring-inset", "ring-[#465DE5]");
+    }
+    appendScheduleText(cell, "span", scheduleDayNames[index].slice(0, 3), "block text-[10px] font-medium sm:text-xs");
+    const number = appendScheduleText(cell, "time", String(new Date(day * scheduleDayMs).getUTCDate()), "mt-1 block text-lg font-bold sm:text-2xl");
+    number.setAttribute("datetime", date);
+    appendScheduleText(cell, "span", approved ? "●" : rows.length ? "○" : "·", approved ? "block text-xs text-[#465DE5]" : "block text-xs text-slate-400");
+    if (!rows.length) continue;
+    const group = appendScheduleText(list, "section", "", "min-w-0 rounded-xl border border-slate-200 p-4");
+    group.setAttribute("data-date", date);
+    appendScheduleText(group, "h3", `${scheduleDayNames[index]} ${formatScheduleDay(day)}`, "text-sm font-semibold text-slate-800");
+    for (const row of rows) {
+      const slot = appendScheduleText(group, "div", "", "mt-3 border-t border-slate-100 pt-3");
+      slot.setAttribute("data-schedule-id", String(row.id_horario));
+      const time = value => value.endsWith(":00") ? value.slice(0, 5) : value;
+      appendScheduleText(slot, "p", `${time(row.startTime)}–${time(row.endTime)}`, "text-base font-bold text-[#465DE5]");
+      appendScheduleText(slot, "span", row.estado, row.estado === "Aprobado"
+        ? "mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-800"
+        : "mt-1 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700");
+      appendScheduleText(slot, "p", `Vigencia: ${formatScheduleDay(row.startDay)} – ${formatScheduleDay(row.endDay)}`, "mt-2 break-words text-xs leading-5 text-slate-600");
+      count++;
+    }
+  }
+  if (scheduleRows !== null) mensajeHorarios(!scheduleRows.length
+    ? "No tienes horarios asignados. Contacta al administrador."
+    : count ? `Horarios cargados correctamente: ${count} ${count === 1 ? "franja en esta semana" : "franjas en esta semana"}. Solo lectura.`
+      : "Esta semana no tiene horarios asignados. Puedes consultar otras semanas.");
+}
+window.cambiarSemanaHorarios = offset => {
+  if (scheduleRows === null || ![-1, 1].includes(offset)) return;
+  selectedWeek += offset * 7;
+  renderScheduleWeek();
+};
 
 function mensajeHorarios(texto, error = false) {
   const mensaje = document.getElementById("estadoCargaHorarios");
@@ -256,7 +351,9 @@ function validarHorario(horario, ids) {
   if (normalizar(horario.hora_inicio) >= normalizar(horario.hora_fin)) {
     throw new Error("La respuesta contiene un rango horario no válido.");
   }
-  return horario;
+  const startDay = scheduleDay(horario.fecha_inicio), endDay = scheduleDay(horario.fecha_fin);
+  if (startDay > endDay) throw new Error("La vigencia del horario está invertida.");
+  return { ...horario, startDay, endDay, startTime: normalizar(horario.hora_inicio), endTime: normalizar(horario.hora_fin) };
 }
 
 window.abrirModalHorarios = async () => {
@@ -266,9 +363,14 @@ window.abrirModalHorarios = async () => {
   const version = ++versionCargaHorarios;
   const peticion = new AbortController();
   peticionHorarios = peticion;
-  lista.replaceChildren();
+  if (!modal.classList.contains("abierto")) scheduleReturnFocus = document.activeElement;
+  scheduleRows = null;
+  selectedWeek = scheduleWeekStart(bogotaToday());
+  renderScheduleWeek();
+  lista.setAttribute("aria-busy", "true");
   mensajeHorarios("Cargando horarios...");
   modal.classList.add("abierto");
+  document.getElementById("cerrarAgendaSemanal").focus();
   try {
     const respuesta = await fetch("/medico/horarios", {
       credentials: "same-origin", cache: "no-store", signal: peticion.signal
@@ -292,32 +394,35 @@ window.abrirModalHorarios = async () => {
     if (!datos || !Array.isArray(datos.horarios)) throw new Error("La respuesta de horarios no es válida.");
     const ids = new Set();
     // Se valida la respuesta completa antes de representar cualquier franja.
-    const horarios = datos.horarios.map(horario => validarHorario(horario, ids));
-    for (const h of horarios) {
-      const fila = document.createElement("p");
-      fila.textContent = h.dia_semana + ": " + h.hora_inicio + " a " + h.hora_fin + " (" + h.estado + ")";
-      lista.appendChild(fila);
-    }
-    mensajeHorarios(horarios.length
-      ? "Horarios asignados por administración. Solo lectura."
-      : "No tienes horarios asignados. Contacta al administrador.");
+    scheduleRows = datos.horarios.map(horario => validarHorario(horario, ids))
+      .sort((a, b) => a.startTime.localeCompare(b.startTime) || a.endTime.localeCompare(b.endTime) || a.id_horario - b.id_horario);
+    renderScheduleWeek();
   } catch (error) {
     if (version !== versionCargaHorarios || error.name === "AbortError") return;
     lista.replaceChildren();
+    scheduleRows = null;
     mensajeHorarios(error instanceof SyntaxError
       ? "El servidor devolvió datos incorrectos. No se cargaron los horarios."
       : error.message || "No se pudieron cargar los horarios.", true);
   } finally {
-    if (version === versionCargaHorarios) peticionHorarios = null;
+    if (version === versionCargaHorarios) {
+      peticionHorarios = null;
+      lista.setAttribute("aria-busy", "false");
+    }
   }
 };
 window.cerrarModalHorarios = () => {
   ++versionCargaHorarios;
   peticionHorarios?.abort();
   peticionHorarios = null;
+  scheduleRows = null;
   document.getElementById("modalHorarios").classList.remove("abierto");
   document.getElementById("listaHorariosMedico").replaceChildren();
+  document.getElementById("listaHorariosMedico").setAttribute("aria-busy", "false");
+  document.getElementById("diasSemanaHorario").replaceChildren();
   mensajeHorarios("");
+  scheduleReturnFocus?.focus();
+  scheduleReturnFocus = null;
 };
 window.cerrarModalHorariosFuera = event => {
   if (event.target.id === "modalHorarios") window.cerrarModalHorarios();
