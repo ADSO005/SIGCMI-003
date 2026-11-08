@@ -42,7 +42,7 @@ after(async () => {
 beforeEach(() => {
     consultas = [];
     perfil = { id_medico: 9 };
-    horarios = [{ id_horario: 1, dia_semana: "Lunes", hora_inicio: "08:00:00", hora_fin: "12:00:00", estado: "Aprobado" }];
+    horarios = [{ id_horario: 1, dia_semana: "Lunes", hora_inicio: "08:00:00", hora_fin: "12:00:00", fecha_inicio: "2026-11-01", fecha_fin: "2026-11-30", estado: "Aprobado" }];
 });
 const request = (path = "/horarios", user = 7, method = "GET") => fetch(base + "/medico" + path, {
     method, redirect: "manual",
@@ -57,6 +57,10 @@ test("GET usa exclusivamente la identidad autenticada y conserva el contrato", a
     assert.equal(typeof body.revision, "string");
     assert.deepEqual(consultas[0][1].where, { usuario_id: 7 });
     assert.deepEqual(consultas[1][1].where, { medico_id: 9 });
+    assert(consultas[1][1].attributes.includes("fecha_inicio"));
+    assert(consultas[1][1].attributes.includes("fecha_fin"));
+    assert.equal(body.horarios[0].fecha_inicio, "2026-11-01");
+    assert.equal(body.horarios[0].fecha_fin, "2026-11-30");
 });
 test("sesión ausente y otros roles se rechazan antes de consultar horarios", async () => {
     const res = await request("/horarios", null);
