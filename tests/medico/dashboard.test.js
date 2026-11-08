@@ -3,22 +3,31 @@ import assert from "node:assert/strict";
 import express from "express";
 import cookieParser from "cookie-parser";
 import jwt from "jsonwebtoken";
+import pug from "pug";
 
 // Se prueba el dashboard real y sus barreras de acceso, sin importar modelos conectados.
-let queries, profileExists, failQuery;
+let queries, profileExists, failQuery, specialty;
 const rows = [
     { id_cita: 1, medico_id: 9, paciente_id: 30, fecha: "2026-11-09", Estado: { nombre: "Completada" }, Paciente: { id_paciente: 30 } },
     { id_cita: 2, medico_id: 10, paciente_id: 31, fecha: "2026-11-09", Estado: { nombre: "Pendiente" }, Paciente: { id_paciente: 31 } }
 ];
 const models = {
     Usuario: { findByPk: async id => ({ id_usuario: id, rol_id: [7, 8].includes(id) ? 2 : id, estado: true }) },
-    Medico: { findOne: async options => { queries.push(["medico", options]); return profileExists ? { id_medico: options.where.usuario_id === 7 ? 9 : 10 } : null; } },
+    Medico: { findOne: async options => {
+        queries.push(["medico", options]);
+        const first = options.where.usuario_id === 7;
+        return profileExists ? {
+            id_medico: first ? 9 : 10,
+            Usuario: first ? { nombres: "Ana", apellidos: "Pérez" } : { nombres: "Luis", apellidos: "Gómez" },
+            Especialidad: specialty ? { nombre: first ? "Cardiología" : "Pediatría" } : null
+        } : null;
+    } },
     Cita: { findAll: async options => {
         queries.push(["citas", options]);
         if (failQuery) throw Error("Fallo de consulta simulado");
         return rows.filter(row => row.medico_id === options.where.medico_id && (!options.where.fecha || row.fecha === options.where.fecha));
     } },
-    Paciente: {}, Diagnostico: {}, Prescripcion: {}, EstadoCita: {}
+    Paciente: {}, Diagnostico: {}, Prescripcion: {}, EstadoCita: {}, Especialidad: {}
 };
 for (const [name, model] of Object.entries(models)) mock.module(new URL(`../../models/${name}.js`, import.meta.url).href, { defaultExport: model });
 mock.module(new URL("../../config/db.js", import.meta.url).href, { defaultExport: new Proxy({}, { get() { throw Error("MySQL no permitido"); } }) });
@@ -34,7 +43,14 @@ before(async () => {
     const app = express();
     app.use(cookieParser());
     // Se inspeccionan las variables que recibiría Pug, sin serializar usuarios al cliente.
-    app.use((req, res, next) => { res.render = (view, data) => res.json({ view, metrics: data.dashboardMetrics }); next(); });
+    app.use((req, res, next) => {
+        res.render = (view, data) => res.json({
+            view, metrics: data.dashboardMetrics, name: data.nombreMedico,
+            specialty: data.especialidadMedico, date: data.fechaDashboard,
+            html: pug.renderFile(`views/${view}.pug`, { ...data, pacientes: [], citasHoy: [] })
+        });
+        next();
+    });
     app.use("/medico", router);
     server = app.listen(0, "127.0.0.1");
     await new Promise(resolve => server.once("listening", resolve));
@@ -47,7 +63,10 @@ after(async () => {
     if (previousSecret === undefined) delete process.env.JWT_SECRET;
     else process.env.JWT_SECRET = previousSecret;
 });
-beforeEach(() => { queries = []; profileExists = true; failQuery = false; });
+beforeEach(() => {
+    queries = []; profileExists = true; failQuery = false; specialty = true;
+    mock.timers.setTime(Date.parse("2026-11-09T17:00:00Z"));
+});
 const request = (user = 7) => fetch(base + "/medico/dashboard?medico_id=10&usuario_id=8", {
     redirect: "manual", headers: user === null ? {} : { cookie: `_token=${jwt.sign({ id: user }, process.env.JWT_SECRET)}` }
 });
@@ -68,6 +87,49 @@ test("cada médico recibe sus métricas con dos consultas de citas, sin aceptar 
     const other = await request(8);
     assert.equal((await other.json()).metrics.todayCompleted, 0);
 });
+test("identidad y especialidad pertenecen al usuario autenticado y se muestran sin datos fijos", async () => {
+    for (const [id, name, specialtyName] of [[7, "Ana Pérez", "Cardiología"], [8, "Luis Gómez", "Pediatría"]]) {
+        const body = await (await request(id)).json();
+        assert.equal(body.name, name);
+        assert.equal(body.specialty, specialtyName);
+        assert(body.html.includes(name));
+        assert(body.html.includes(specialtyName));
+        assert.doesNotMatch(body.html, /montoyajuanes11|Médico General|3 de Abril del 2026/);
+        assert.equal((body.html.match(/data-metric="todayTotal"/g) || []).length, 1);
+    }
+    const profile = queries[0][1];
+    assert.deepEqual(profile.include[0], { model: models.Usuario, attributes: ["nombres", "apellidos"] });
+    assert.deepEqual(profile.include[1], { model: models.Especialidad, attributes: ["nombre"], required: false });
+    assert.equal(queries.length, 6);
+});
+
+test("sin especialidad se conserva el perfil y se muestra un texto neutral", async () => {
+    specialty = false;
+    const body = await (await request()).json();
+    assert.equal(body.specialty, "Especialidad no registrada");
+    assert(body.html.includes("Especialidad no registrada"));
+    assert.equal(body.name, "Ana Pérez");
+});
+
+test("fecha visible, consulta diaria y métricas comparten el instante de Bogotá", async () => {
+    for (const [instant, date, label, total] of [
+        ["2026-11-09T04:59:59Z", "2026-11-08", "8 de noviembre de 2026", 0],
+        ["2026-11-09T05:00:00Z", "2026-11-09", "9 de noviembre de 2026", 1],
+        ["2026-12-01T04:59:59Z", "2026-11-30", "30 de noviembre de 2026", 0],
+        ["2026-12-01T05:00:00Z", "2026-12-01", "1 de diciembre de 2026", 0],
+        ["2027-01-01T04:59:59Z", "2026-12-31", "31 de diciembre de 2026", 0],
+        ["2027-01-01T05:00:00Z", "2027-01-01", "1 de enero de 2027", 0]
+    ]) {
+        queries = [];
+        mock.timers.setTime(Date.parse(instant));
+        const body = await (await request()).json();
+        assert.equal(body.date, label);
+        assert.equal(body.html.split(label).length - 1, 2);
+        assert.equal(queries[2][1].where.fecha, date);
+        assert.equal(body.metrics.todayTotal, total);
+    }
+});
+
 test("sesión ausente y otros roles no llegan a las consultas médicas", async () => {
     const res = await request(null);
     assert.equal(res.status, 302);

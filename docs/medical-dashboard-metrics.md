@@ -7,9 +7,19 @@ No contienen cifras de ejemplo ni calculan estadísticas en el navegador.
 Se mantienen `auth`, `role(2)` y el perfil obtenido de `req.usuario.id_usuario`.
 Ningún identificador enviado por el navegador selecciona al médico consultado.
 
-Esta entrega no conecta ni rediseña «Próxima cita», «Gestionar Citas», el perfil,
-la fecha visible del encabezado ni el flujo de atención. El modal de horarios de
+Esta entrega no conecta ni rediseña «Próxima cita», «Gestionar Citas», la edición
+del perfil ni el flujo de atención. El modal de horarios de
 UH-012 permanece intacto y se documenta en `medical-schedules.md`.
+
+El sidebar muestra nombres y apellidos mediante `Medico.Usuario`, y la
+especialidad mediante `Medico.Especialidad.nombre`. Ambas relaciones se incluyen
+en la consulta existente del perfil, identificado por `req.usuario.id_usuario`,
+sin consultas adicionales ni cambios en asociaciones. La especialidad es opcional:
+si no está registrada se muestra «Especialidad no registrada». Pug escapa estos datos.
+
+Los dos encabezados muestran la fecha en español con `Intl.DateTimeFormat`, zona
+`America/Bogota`, usando el mismo instante `now` capturado para las métricas y
+la consulta diaria. No se modifica la configuración global de fechas.
 
 ## Definición de los indicadores
 
@@ -66,7 +76,10 @@ comprueban valores dinámicos, ceros, progreso y escape. Se incluyen médicos
 distintos, los cinco estados definidos por el proyecto, pacientes repetidos,
 duplicados y límites de día, semana, mes, año y febrero bisiesto en Bogotá.
 
-La regresión médica contiene **49 pruebas aprobadas**. También se verificaron
+La regresión médica contiene **52 pruebas aprobadas**, incluidas identidad de dos
+médicos, especialidad ausente y fecha visible en los cambios de día, mes y año
+de Bogotá. El dashboard completo se compila y renderiza con datos simulados.
+También se verificaron
 sintaxis JavaScript, compilación Pug y ESLint. Las tarjetas se comprueban en Chrome
 con métricas sintéticas, tanto con citas como vacías, a 1672, 1024, 390 y 320 px:
 cuatro, dos o una columna según el ancho; sin desbordamiento horizontal. Tailwind

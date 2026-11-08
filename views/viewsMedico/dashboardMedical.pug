@@ -9,7 +9,7 @@ block content
       header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
-          span(class="block text-[13px] leading-[18px] text-black") 3 de Abril del 2026
+          span(class="block text-[13px] leading-[18px] text-black")= fechaDashboard
       include includes/dashboardMetrics.pug
       section.content(class="grid grid-cols-[minmax(0,2.27fr)_minmax(0,1fr)] items-start gap-4 [@media(max-width:768px)]:grid-cols-1")
         // AGENDA DEL DÍA
@@ -85,7 +85,7 @@ block content
       header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
-          span(class="block text-[13px] leading-[18px] text-black") 3 de Abril del 2026
+          span(class="block text-[13px] leading-[18px] text-black")= fechaDashboard
       .pacientes-layout(class="grid grid-cols-[260px_minmax(0,1fr)] gap-5 h-[calc(100vh-180px)] [@media(max-width:1024px)]:grid-cols-1 [@media(max-width:1024px)]:h-auto")
         // COLUMNA IZQUIERDA: lista
         .pacientes-lista(class="min-h-0 self-start max-h-full flex flex-col overflow-y-auto rounded-lg border border-[#e2e2e2] bg-white [&>.sin-pacientes]:p-[15px] [&>.sin-pacientes]:text-center [&>.sin-pacientes]:text-[#666] [&>.sin-pacientes]:text-[14px] [&>p]:p-[14px] [&>p]:text-[13px] [&>p]:text-[#718096] [@media(max-width:1024px)]:max-h-[320px]")

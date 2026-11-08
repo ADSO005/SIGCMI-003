@@ -5,6 +5,7 @@ import Usuario from "../../models/Usuario.js";
 import Diagnostico from "../../models/Diagnostico.js";
 import Prescripcion from "../../models/Prescripcion.js";
 import EstadoCita from "../../models/EstadoCita.js";
+import Especialidad from "../../models/Especialidad.js";
 import { calculateDashboardMetrics, dashboardPeriods } from "../../services/medico/dashboardMetricsService.js";
 
 const dashboard = async (req, res) => {
@@ -16,7 +17,11 @@ const dashboard = async (req, res) => {
         const medico = await Medico.findOne({
             where: {
                 usuario_id: req.usuario.id_usuario
-            }
+            },
+            include: [
+                { model: Usuario, attributes: ["nombres", "apellidos"] },
+                { model: Especialidad, attributes: ["nombre"], required: false }
+            ]
         });
 
         if (!medico) {
@@ -127,6 +132,11 @@ const dashboard = async (req, res) => {
                 medico,
                 pacientes,
                 citasHoy,
+                nombreMedico: [medico.Usuario?.nombres, medico.Usuario?.apellidos].filter(Boolean).join(" "),
+                especialidadMedico: medico.Especialidad?.nombre?.trim() || "Especialidad no registrada",
+                fechaDashboard: new Intl.DateTimeFormat("es-CO", {
+                    timeZone: "America/Bogota", day: "numeric", month: "long", year: "numeric"
+                }).format(now),
                 dashboardMetrics: calculateDashboardMetrics(citas, medico.id_medico, now)
             }
         );

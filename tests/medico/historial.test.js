@@ -77,7 +77,7 @@ const modelos = {
             ? [{ id_cita: 20, paciente_id: 5, medico_id: 9, Diagnostico: { diagnostico: "Ejemplo", Prescripcions: [] } }]
             : [];
     } },
-    Diagnostico: {}, Prescripcion: {}, EstadoCita: {}
+    Diagnostico: {}, Prescripcion: {}, EstadoCita: {}, Especialidad: {}
 };
 for (const [nombre, modelo] of Object.entries(modelos)) {
     mock.module(new URL(`../../models/${nombre}.js`, import.meta.url).href, { defaultExport: modelo });
