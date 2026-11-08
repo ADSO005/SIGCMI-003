@@ -10,20 +10,38 @@ enviado por el navegador no selecciona al propietario.
 Los pacientes solicitan citas dentro de la disponibilidad permitida. El antiguo
 flujo de solicitudes semanales de horarios por médicos está descartado.
 
-El modal «Mi agenda semanal» es exclusivamente de lectura: encabezado azul,
-indicador de solo lectura, siete celdas de lunes a domingo y tarjetas de franjas.
-Abre en la semana actual de Bogotá. Los botones anterior/siguiente cambian la
-semana sin escribir registros ni repetir el GET. Se pueden consultar semanas
-pasadas y futuras. Al reabrir se recargan los datos desde administración.
+El modal «Mi agenda semanal» es exclusivamente de lectura: encabezado azul
+degradado, calendario mensual a la izquierda y detalle de franjas a la derecha.
+En móvil el calendario aparece arriba del detalle, con una única zona de scroll.
+El cierre está disponible en el encabezado y al pie. Se conserva el contrato GET.
 
-El día actual se distingue con borde y `aria-current="date"`. Un punto azul
-indica franjas aprobadas; los pendientes y rechazados se muestran con su estado
-real, sin marcar disponibilidad aprobada. Los días sin asignaciones son neutros.
+El calendario tiene siete columnas, de lunes a domingo, y seis filas de fechas
+consecutivas para mantener la alineación. Los días de meses adyacentes se muestran
+tenues. El día actual se distingue con borde y `aria-current="date"`; la fecha
+seleccionada tiene fondo azul y `aria-pressed="true"`. Todos los días son botones
+accesibles mediante teclado. Un punto azul indica asignaciones dentro de su
+vigencia, no autorización para reservar. Los estados se muestran en el detalle:
+aprobados con etiqueta verde; pendientes y rechazados con su valor real. Los días
+sin asignaciones son neutros.
+
+Al abrir se calcula la semana actual de Bogotá. Si hoy tiene asignaciones se
+selecciona y se muestran sus franjas; de lo contrario se muestra la semana
+completa. Al seleccionar cualquier fecha se filtra su detalle, incluso si no tiene
+horarios. «Ver semana» recupera el conjunto de días de esa misma semana.
+
+Las flechas mensuales abren el mes anterior/siguiente y la semana que contiene su
+primer día. Las flechas semanales desplazan siete días y sitúan el calendario en
+el mes de ese lunes. Ambas acciones restablecen la vista semanal. Seleccionar un
+día adyacente sincroniza el mes, la semana y el detalle con esa fecha. Se pueden
+consultar períodos pasados y futuros sin escribir registros ni repetir el GET.
+Al reabrir se recargan los datos desde administración.
+
 Las tarjetas muestran horas y vigencia completa. Varias franjas del mismo día
 permanecen separadas, ordenadas por hora inicial, final e identificador; no se
-fusionan ni se completa disponibilidad inexistente.
+fusionan ni se completa disponibilidad inexistente. Si hay más de una franja, se
+identifican por separado y cada una conserva su propia vigencia.
 
-Se informa carga, ausencia total de asignaciones, semana sin horarios, sesión
+Se informa carga, ausencia total de asignaciones, semana o día sin horarios, sesión
 expirada y errores. La navegación está deshabilitada hasta completar la carga.
 Se valida la respuesta completa antes de mostrar franjas. Al cerrar o reabrir se
 aborta la petición anterior y se descartan respuestas tardías, incluso durante la
@@ -92,14 +110,20 @@ La agenda añade cobertura de navegación, tres días asignados, vigencias inclu
 meses, múltiples franjas, cambio de año y fecha de Bogotá. También se comprueban
 respuestas inválidas, estados no aprobados y cierre durante peticiones.
 
-Verificación de esta entrega: **29 pruebas médicas aprobadas**, Pug, sintaxis y
-ESLint correctos. Las 13 pruebas del modal también pasan con `TZ=Pacific/Auckland`
+Verificación de este rediseño: **34 pruebas médicas aprobadas**, Pug, sintaxis y
+ESLint correctos. Las 18 pruebas del modal también pasan con `TZ=Pacific/Auckland`
 y `TZ=America/Los_Angeles`. Se comprobó la generación de las clases Tailwind en una
 salida temporal, sin modificar CSS compilado del repositorio.
 
-Las evidencias históricas de MySQL y
-navegador no se cuentan como verificaciones de esta rama. No se ejecutaron pruebas
-de persistencia ni validación manual en navegador.
+Se verificó en Chrome sin interfaz la presentación a 1280×900, 390×844 y 320×740,
+con fechas fijas y horarios sintéticos: dos columnas en escritorio, apilado en
+móvil, 42 celdas alineadas, selección de día, navegación mensual y cierre, sin
+desbordamiento horizontal y con una sola zona de desplazamiento. Las capturas y
+la página de prueba se generan en una carpeta temporal, fuera del repositorio.
+
+Las evidencias históricas de MySQL y navegador no se cuentan como verificaciones
+de esta rama. No se ejecutaron pruebas de persistencia ni validación manual con
+las asignaciones reales de la base local.
 
 Después de compilar Tailwind desde sus fuentes, comprobar manualmente el modal en
 escritorio y móvil: contraste, foco al abrir/cerrar, navegación, períodos reales y

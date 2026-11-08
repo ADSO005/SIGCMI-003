@@ -238,6 +238,8 @@ let peticionHorarios = null;
 let versionCargaHorarios = 0;
 let scheduleRows = null;
 let selectedWeek = null;
+let selectedScheduleDay = null;
+let displayedScheduleMonth = null;
 let scheduleReturnFocus = null;
 const scheduleDayNames = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 const scheduleDayKeys = [...diasHorario];
@@ -264,6 +266,11 @@ function bogotaToday() {
   return scheduleDay(`${values.year}-${values.month}-${values.day}`);
 }
 function scheduleWeekStart(day) { return day - ((day + 3) % 7 + 7) % 7; }
+function scheduleMonthStart(day, offset = 0) {
+  const date = new Date(day * scheduleDayMs);
+  date.setUTCMonth(date.getUTCMonth() + offset, 1);
+  return date.getTime() / scheduleDayMs;
+}
 function formatScheduleDay(day) {
   return new Intl.DateTimeFormat("es-CO", { timeZone: "UTC", day: "numeric", month: "long", year: "numeric" })
     .format(new Date(day * scheduleDayMs));
@@ -275,60 +282,123 @@ function appendScheduleText(parent, tag, text, className) {
   parent.appendChild(node);
   return node;
 }
-function renderScheduleWeek() {
+function scheduleRowsForDay(day) {
+  const weekday = ((day + 3) % 7 + 7) % 7;
+  return (scheduleRows || []).filter(row => row.dia_semana === scheduleDayKeys[weekday] && row.startDay <= day && day <= row.endDay);
+}
+function renderScheduleMonth() {
   const calendar = document.getElementById("diasSemanaHorario");
-  const list = document.getElementById("listaHorariosMedico");
   calendar.replaceChildren();
-  list.replaceChildren();
-  document.getElementById("rangoSemanaHorario").textContent =
-    `${formatScheduleDay(selectedWeek)} – ${formatScheduleDay(selectedWeek + 6)}`;
-  for (const id of ["semanaAnteriorHorario", "semanaSiguienteHorario"]) {
-    document.getElementById(id).disabled = scheduleRows === null;
-  }
+  document.getElementById("mesHorario").textContent = new Intl.DateTimeFormat("es-CO", {
+    timeZone: "UTC", month: "long", year: "numeric"
+  }).format(new Date(displayedScheduleMonth * scheduleDayMs));
+  const firstDay = scheduleWeekStart(displayedScheduleMonth);
+  const nextMonth = scheduleMonthStart(displayedScheduleMonth, 1);
   const today = bogotaToday();
-  let count = 0;
-  for (let index = 0; index < 7; index++) {
-    const day = selectedWeek + index;
+  // Seis filas estables, con días adyacentes tenues, mantienen las columnas alineadas.
+  for (let index = 0; index < 42; index++) {
+    const day = firstDay + index;
     const date = scheduleDate(day);
-    const rows = (scheduleRows || []).filter(row => row.dia_semana === scheduleDayKeys[index] && row.startDay <= day && day <= row.endDay);
+    const rows = scheduleRowsForDay(day);
     const approved = rows.some(row => row.estado === "Aprobado");
-    const cell = appendScheduleText(calendar, "div", "", approved
-      ? "min-w-0 rounded-xl border border-indigo-200 bg-indigo-50 px-1 py-3 text-center text-indigo-800"
-      : "min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-1 py-3 text-center text-slate-600");
+    const selected = selectedScheduleDay === day;
+    const adjacent = day < displayedScheduleMonth || day >= nextMonth;
+    const weekday = ((day + 3) % 7 + 7) % 7;
+    const cell = appendScheduleText(calendar, "button", "", selected
+      ? "flex min-h-10 min-w-0 flex-col items-center justify-center rounded-lg bg-[#465DE5] text-white shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#465DE5]"
+      : "flex min-h-10 min-w-0 flex-col items-center justify-center rounded-lg hover:bg-indigo-50 focus-visible:outline-2 focus-visible:outline-[#465DE5]");
+    if (!selected) cell.classList.add(adjacent ? "text-slate-400" : "text-slate-700");
+    cell.type = "button";
+    cell.disabled = scheduleRows === null;
+    cell.setAttribute("id", "diaHorario-" + date);
     cell.setAttribute("data-date", date);
-    cell.setAttribute("aria-label", `${scheduleDayNames[index]} ${formatScheduleDay(day)}: ${approved ? "con horarios aprobados" : rows.length ? "asignaciones sin aprobar" : "sin horarios"}${day === today ? ", hoy" : ""}`);
+    cell.setAttribute("data-adjacent", String(adjacent));
+    cell.setAttribute("aria-pressed", String(selected));
+    cell.setAttribute("aria-label", `${scheduleDayNames[weekday]} ${formatScheduleDay(day)}: ${approved ? "con horarios aprobados" : rows.length ? "asignaciones sin aprobar" : "sin horarios"}${day === today ? ", hoy" : ""}`);
+    cell.addEventListener("click", () => window.seleccionarDiaHorario(date));
     if (day === today) {
       cell.setAttribute("aria-current", "date");
-      cell.classList.add("ring-2", "ring-inset", "ring-[#465DE5]");
+      cell.classList.add("ring-1", "ring-inset", "ring-[#465DE5]");
     }
-    appendScheduleText(cell, "span", scheduleDayNames[index].slice(0, 3), "block text-[10px] font-medium sm:text-xs");
-    const number = appendScheduleText(cell, "time", String(new Date(day * scheduleDayMs).getUTCDate()), "mt-1 block text-lg font-bold sm:text-2xl");
+    const number = appendScheduleText(cell, "time", String(new Date(day * scheduleDayMs).getUTCDate()), "text-xs font-medium");
     number.setAttribute("datetime", date);
-    appendScheduleText(cell, "span", approved ? "●" : rows.length ? "○" : "·", approved ? "block text-xs text-[#465DE5]" : "block text-xs text-slate-400");
+    const dot = appendScheduleText(cell, "span", rows.length ? "●" : "·", selected
+      ? "text-[8px] leading-3 text-white"
+      : rows.length ? "text-[8px] leading-3 text-[#465DE5]" : "text-[8px] leading-3 text-slate-300");
+    dot.setAttribute("aria-hidden", "true");
+  }
+}
+function renderScheduleWeek() {
+  renderScheduleMonth();
+  const list = document.getElementById("listaHorariosMedico");
+  list.replaceChildren();
+  const dateParts = day => Object.fromEntries(new Intl.DateTimeFormat("es-CO", {
+    timeZone: "UTC", day: "numeric", month: "short", year: "numeric"
+  }).formatToParts(new Date(day * scheduleDayMs)).map(part => [part.type, part.value]));
+  const start = dateParts(selectedWeek), end = dateParts(selectedWeek + 6);
+  const startLabel = start.month === end.month && start.year === end.year ? start.day
+    : `${start.day} ${start.month}${start.year !== end.year ? " " + start.year : ""}`;
+  document.getElementById("rangoSemanaHorario").textContent = `${startLabel}–${end.day} ${end.month} ${end.year}`;
+  document.getElementById("tituloDetalleHorario").textContent = selectedScheduleDay === null ? "Horarios de la semana" : "Horarios del día";
+  for (const id of ["semanaAnteriorHorario", "semanaSiguienteHorario", "mesAnteriorHorario", "mesSiguienteHorario"]) {
+    document.getElementById(id).disabled = scheduleRows === null;
+  }
+  document.getElementById("vistaSemanaHorario").disabled = scheduleRows === null || selectedScheduleDay === null;
+  let count = 0;
+  const firstDay = selectedScheduleDay ?? selectedWeek;
+  const lastDay = selectedScheduleDay ?? selectedWeek + 6;
+  for (let day = firstDay; day <= lastDay; day++) {
+    const rows = scheduleRowsForDay(day);
     if (!rows.length) continue;
-    const group = appendScheduleText(list, "section", "", "min-w-0 rounded-xl border border-slate-200 p-4");
-    group.setAttribute("data-date", date);
-    appendScheduleText(group, "h3", `${scheduleDayNames[index]} ${formatScheduleDay(day)}`, "text-sm font-semibold text-slate-800");
-    for (const row of rows) {
+    const weekday = ((day + 3) % 7 + 7) % 7;
+    const group = appendScheduleText(list, "section", "", "min-w-0 rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm");
+    group.setAttribute("data-date", scheduleDate(day));
+    appendScheduleText(group, "h3", `${scheduleDayNames[weekday]} ${formatScheduleDay(day)}`, "text-xs font-semibold text-slate-700");
+    for (const [index, row] of rows.entries()) {
       const slot = appendScheduleText(group, "div", "", "mt-3 border-t border-slate-100 pt-3");
       slot.setAttribute("data-schedule-id", String(row.id_horario));
+      slot.setAttribute("aria-label", `Franja ${index + 1} de ${rows.length}`);
       const time = value => value.endsWith(":00") ? value.slice(0, 5) : value;
-      appendScheduleText(slot, "p", `${time(row.startTime)}–${time(row.endTime)}`, "text-base font-bold text-[#465DE5]");
+      appendScheduleText(slot, "p", `${time(row.startTime)}–${time(row.endTime)}`, "text-lg font-semibold text-[#465DE5]");
       appendScheduleText(slot, "span", row.estado, row.estado === "Aprobado"
-        ? "mt-1 inline-block rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-800"
+        ? "mt-1 inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-800"
         : "mt-1 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700");
-      appendScheduleText(slot, "p", `Vigencia: ${formatScheduleDay(row.startDay)} – ${formatScheduleDay(row.endDay)}`, "mt-2 break-words text-xs leading-5 text-slate-600");
+      appendScheduleText(slot, "p", `Vigencia: ${formatScheduleDay(row.startDay)} – ${formatScheduleDay(row.endDay)}`, "mt-2 break-words text-[11px] leading-5 text-slate-500");
+      if (rows.length > 1) appendScheduleText(slot, "p", `Franja ${index + 1} de ${rows.length}`, "mt-1 text-[10px] text-slate-500");
       count++;
     }
   }
   if (scheduleRows !== null) mensajeHorarios(!scheduleRows.length
     ? "No tienes horarios asignados. Contacta al administrador."
-    : count ? `Horarios cargados correctamente: ${count} ${count === 1 ? "franja en esta semana" : "franjas en esta semana"}. Solo lectura.`
-      : "Esta semana no tiene horarios asignados. Puedes consultar otras semanas.");
+    : selectedScheduleDay !== null ? `${formatScheduleDay(selectedScheduleDay)} · ${count ? `${count} ${count === 1 ? "franja asignada" : "franjas asignadas"}` : "Este día no tiene horarios asignados."}`
+      : count ? `${count} ${count === 1 ? "franja asignada esta semana" : "franjas asignadas esta semana"}. Solo lectura.`
+        : "Esta semana no tiene horarios asignados. Puedes consultar otras semanas.");
 }
 window.cambiarSemanaHorarios = offset => {
   if (scheduleRows === null || ![-1, 1].includes(offset)) return;
   selectedWeek += offset * 7;
+  selectedScheduleDay = null;
+  displayedScheduleMonth = scheduleMonthStart(selectedWeek);
+  renderScheduleWeek();
+};
+window.cambiarMesHorarios = offset => {
+  if (scheduleRows === null || ![-1, 1].includes(offset)) return;
+  displayedScheduleMonth = scheduleMonthStart(displayedScheduleMonth, offset);
+  selectedWeek = scheduleWeekStart(displayedScheduleMonth);
+  selectedScheduleDay = null;
+  renderScheduleWeek();
+};
+window.seleccionarDiaHorario = value => {
+  if (scheduleRows === null) return;
+  selectedScheduleDay = scheduleDay(value);
+  selectedWeek = scheduleWeekStart(selectedScheduleDay);
+  displayedScheduleMonth = scheduleMonthStart(selectedScheduleDay);
+  renderScheduleWeek();
+  document.getElementById("diaHorario-" + value)?.focus();
+};
+window.verSemanaHorarios = () => {
+  if (scheduleRows === null) return;
+  selectedScheduleDay = null;
   renderScheduleWeek();
 };
 
@@ -365,7 +435,10 @@ window.abrirModalHorarios = async () => {
   peticionHorarios = peticion;
   if (!modal.classList.contains("abierto")) scheduleReturnFocus = document.activeElement;
   scheduleRows = null;
-  selectedWeek = scheduleWeekStart(bogotaToday());
+  const today = bogotaToday();
+  selectedWeek = scheduleWeekStart(today);
+  selectedScheduleDay = null;
+  displayedScheduleMonth = scheduleMonthStart(today);
   renderScheduleWeek();
   lista.setAttribute("aria-busy", "true");
   mensajeHorarios("Cargando horarios...");
@@ -396,6 +469,7 @@ window.abrirModalHorarios = async () => {
     // Se valida la respuesta completa antes de representar cualquier franja.
     scheduleRows = datos.horarios.map(horario => validarHorario(horario, ids))
       .sort((a, b) => a.startTime.localeCompare(b.startTime) || a.endTime.localeCompare(b.endTime) || a.id_horario - b.id_horario);
+    if (scheduleRowsForDay(today).length) selectedScheduleDay = today;
     renderScheduleWeek();
   } catch (error) {
     if (version !== versionCargaHorarios || error.name === "AbortError") return;
