@@ -40,121 +40,50 @@ window.cambiarVista = (e, viewId, link) => {
   if (window.innerWidth <= 768) cerrarSidebarMovil();
 };
 
-// BOTON INICIAR CONSULTA
-window.iniciarConsulta = async (id) => {
-    try {
-        // Obtener el ID numérico de la cita
-        const idCita = id.replace("cita", "");
-
-        // Enviar la solicitud al servidor
-        const respuesta = await fetch(`/medico/citas/${idCita}/estado`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                estado_id: 2
-            })
-        });
-
-        const resultado = await respuesta.json();
-
-        if (!respuesta.ok) {
-            alert(resultado.mensaje || "No se pudo iniciar la consulta");
-            return;
-        }
-
-        // Actualizar la interfaz después de guardar en MySQL
-        const cita = document.getElementById(id);
-
-        if (!cita) return;
-
-        cita.classList.replace("estado-pendiente", "estado-encurso");
-
-        const state = cita.querySelector(".state");
-
-        if (state) {
-            state.textContent = "En Curso";
-            state.className = "state yellowState";
-        }
-
-        const hour = cita.querySelector(".hour");
-
-        if (hour) {
-            hour.classList.add("hour-encurso");
-        }
-
-        const btn = cita.querySelector(".btn-iniciar");
-
-        if (btn) {
-            btn.textContent = "Finalizar Consulta";
-            btn.className = "btn-consulta btn-finalizar";
-            btn.setAttribute("onclick", `finalizarConsulta('${id}')`);
-        }
-
-        console.log("✅ Consulta iniciada correctamente:", resultado);
-
-    } catch (error) {
-        console.error("❌ Error al iniciar consulta:", error);
-        alert("Ocurrió un error al conectar con el servidor");
+// INICIAR ATENCIÓN: el servidor valida nuevamente propietario, fecha y estado.
+const iniciosPendientes = new Set();
+window.iniciarConsulta = async button => {
+  const id = button.dataset.cita;
+  const estadoId = Number(button.dataset.estadoId);
+  const status = document.getElementById("estadoAtencion");
+  if (button.disabled || iniciosPendientes.has(id)) return;
+  if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(estadoId) || estadoId <= 0) return;
+  iniciosPendientes.add(id);
+  button.disabled = true;
+  const textoOriginal = button.textContent;
+  button.textContent = "Iniciando…";
+  status.hidden = false;
+  status.setAttribute("role", "status");
+  status.textContent = "Iniciando consulta…";
+  let actualizado = false;
+  try {
+    const respuesta = await fetch(`/medico/citas/${id}/estado`, {
+      method: "PATCH", credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estado_id: estadoId })
+    });
+    if (respuesta.redirected || respuesta.status === 401) throw Error("La sesión venció. Inicia sesión nuevamente y vuelve a la agenda.");
+    if (respuesta.status === 403) throw Error("No tienes permiso para iniciar esta consulta.");
+    if (!respuesta.headers.get("content-type")?.includes("application/json")) throw Error("No se recibió una respuesta válida. Recarga la agenda y comprueba tu sesión.");
+    const resultado = await respuesta.json();
+    if (respuesta.status === 409) throw Error("La cita ya no puede iniciarse o cambió de estado. Recarga la agenda para ver su situación actual.");
+    if (!respuesta.ok) throw Error(typeof resultado.mensaje === "string" ? resultado.mensaje : "No se pudo iniciar la consulta. Recarga la agenda e inténtalo nuevamente.");
+    if (resultado.id_cita !== Number(id) || resultado.estado_id !== estadoId) throw Error("No se pudo confirmar el cambio. Recarga la agenda.");
+    window.location.assign(`/medico/dashboard?consulta=${id}#contextoConsulta`);
+    actualizado = true;
+  } catch (error) {
+    status.setAttribute("role", "alert");
+    status.textContent = error instanceof TypeError ? "No se pudo conectar con el servidor. Revisa la conexión e inténtalo nuevamente."
+      : error instanceof SyntaxError ? "La respuesta no es válida. Recarga la agenda."
+        : error.message;
+    status.focus();
+  } finally {
+    if (!actualizado) {
+      iniciosPendientes.delete(id);
+      button.disabled = false;
+      button.textContent = textoOriginal;
     }
-};
-
-// BOTON FINALIZAR CONSULTA
-window.finalizarConsulta = async (id) => {
-    try {
-        const idCita = id.replace("cita", "");
-
-        // Actualizar el estado en MySQL
-        const respuesta = await fetch(`/medico/citas/${idCita}/estado`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                estado_id: 3
-            })
-        });
-
-        const resultado = await respuesta.json();
-
-        if (!respuesta.ok) {
-            alert(resultado.mensaje || "No se pudo finalizar la consulta");
-            return;
-        }
-
-        // Actualizar la interfaz
-        const cita = document.getElementById(id);
-
-        if (!cita) return;
-
-        cita.classList.replace("estado-encurso", "estado-completada");
-
-        const state = cita.querySelector(".state");
-
-        if (state) {
-            state.textContent = "Completada";
-            state.className = "state greenState";
-        }
-
-        const hour = cita.querySelector(".hour");
-
-        if (hour) {
-            hour.classList.remove("hour-encurso");
-        }
-
-        const btnRow = cita.querySelector(".btn-full-row");
-
-        if (btnRow) {
-            btnRow.style.display = "none";
-        }
-
-        console.log("✅ Consulta finalizada correctamente:", resultado);
-
-    } catch (error) {
-        console.error("❌ Error al finalizar consulta:", error);
-        alert("Ocurrió un error al conectar con el servidor");
-    }
+  }
 };
 
 // MODAL DE CONSULTA DE CITAS

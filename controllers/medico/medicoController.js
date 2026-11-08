@@ -6,7 +6,7 @@ import Diagnostico from "../../models/Diagnostico.js";
 import Prescripcion from "../../models/Prescripcion.js";
 import EstadoCita from "../../models/EstadoCita.js";
 import Especialidad from "../../models/Especialidad.js";
-import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday } from "../../services/medico/dashboardMetricsService.js";
+import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday, canStartAppointmentToday } from "../../services/medico/dashboardMetricsService.js";
 
 const dashboard = async (req, res) => {
 
@@ -121,6 +121,24 @@ const dashboard = async (req, res) => {
 
         const pacientes = Array.from(pacientesMap.values());
 
+        const prepararAtencion = cita => ({
+            id_cita: cita.id_cita, fecha: cita.fecha, hora: cita.hora,
+            paciente: [cita.Paciente?.Usuario?.nombres, cita.Paciente?.Usuario?.apellidos].filter(Boolean).join(" ") || "Paciente no disponible",
+            motivo: cita.motivo_consulta?.trim() || "Motivo no registrado",
+            estado: cita.Estado?.nombre || "Sin estado",
+            puedeIniciar: ["Pendiente", "Confirmada"].includes(cita.Estado?.nombre) && canStartAppointmentToday(cita, now)
+        });
+        const agendaHoy = citasHoy.map(prepararAtencion);
+        const consultasAnteriores = citas.filter(cita => cita.Estado?.nombre === "En Curso" && cita.fecha < hoy)
+            .map(prepararAtencion).sort((a, b) => a.fecha.localeCompare(b.fecha) || a.hora.localeCompare(b.hora));
+        const estadoEnCurso = agendaHoy.some(cita => cita.puedeIniciar)
+            ? await EstadoCita.findOne({ where: { nombre: "En Curso" }, attributes: ["id_estado"] }) : null;
+        // El parámetro solo selecciona contexto de las citas propias que siguen En Curso.
+        const consultaId = typeof req.query.consulta === "string" && /^[1-9]\d*$/.test(req.query.consulta)
+            ? Number(req.query.consulta) : NaN;
+        const contextoConsulta = [...agendaHoy, ...consultasAnteriores]
+            .find(cita => cita.id_cita === consultaId && cita.estado === "En Curso");
+
         // El modal recibe solo datos de consulta, sin información clínica adicional.
         const citasAgenda = citas.map(cita => ({
             fecha: cita.fecha,
@@ -141,6 +159,9 @@ const dashboard = async (req, res) => {
                 medico,
                 pacientes,
                 citasHoy,
+                agendaHoy, consultasAnteriores, contextoConsulta,
+                estadoEnCursoId: estadoEnCurso?.id_estado,
+                errorContexto: req.query.consulta !== undefined && !contextoConsulta,
                 citasAgenda,
                 proximaCita: nextAppointmentToday(citasHoy, medico.id_medico, now),
                 nombreMedico: [medico.Usuario?.nombres, medico.Usuario?.apellidos].filter(Boolean).join(" "),
@@ -297,18 +318,7 @@ const actualizarEstadoCita = async (req, res) => {
             if (iniciar) {
                 // Se toma la hora después de obtener el bloqueo, por si la petición tuvo que esperar.
                 const now = new Date();
-                const { today } = dashboardPeriods(now);
-                const partes = new Intl.DateTimeFormat("en-GB", {
-                    timeZone: "America/Bogota", hourCycle: "h23",
-                    hour: "2-digit", minute: "2-digit", second: "2-digit"
-                }).formatToParts(now);
-                const reloj = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
-                const segundosActuales = Number(reloj.hour) * 3600 + Number(reloj.minute) * 60
-                    + Number(reloj.second) + now.getUTCMilliseconds() / 1000;
-                const hora = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d{1,6})?$/.exec(cita.hora);
-                const segundosCita = hora ? Number(hora[1]) * 3600 + Number(hora[2]) * 60
-                    + Number(hora[3]) + Number(hora[4] || 0) : NaN;
-                if (cita.fecha !== today || !Number.isFinite(segundosCita) || segundosCita > segundosActuales) {
+                if (!canStartAppointmentToday(cita, now)) {
                     return { status: 409, mensaje: "Solo puedes iniciar la cita en su fecha de Bogotá y desde la hora programada" };
                 }
             } else {

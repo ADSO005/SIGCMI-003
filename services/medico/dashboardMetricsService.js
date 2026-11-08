@@ -1,5 +1,21 @@
 const dayMs = 86400000;
 
+// Solo evalúa el tiempo; el controlador comprueba también propietario y estado.
+export function canStartAppointmentToday(appointment, now = new Date()) {
+    if (appointment.fecha !== dashboardPeriods(now).today) return false;
+    const partes = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "America/Bogota", hourCycle: "h23",
+        hour: "2-digit", minute: "2-digit", second: "2-digit"
+    }).formatToParts(now);
+    const reloj = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+    const segundosActuales = Number(reloj.hour) * 3600 + Number(reloj.minute) * 60
+        + Number(reloj.second) + now.getUTCMilliseconds() / 1000;
+    const hora = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d{1,6})?$/.exec(appointment.hora);
+    const segundosCita = hora ? Number(hora[1]) * 3600 + Number(hora[2]) * 60
+        + Number(hora[3]) + Number(hora[4] || 0) : NaN;
+    return Number.isFinite(segundosCita) && segundosCita <= segundosActuales;
+}
+
 export function nextAppointmentToday(appointments, doctorId, now = new Date()) {
     const { today } = dashboardPeriods(now);
     const parts = new Intl.DateTimeFormat("en-GB", {

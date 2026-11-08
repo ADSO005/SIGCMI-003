@@ -1,4 +1,4 @@
-# UH-013 — Protección de transiciones: primera etapa
+# UH-013 — Transiciones y contexto de atención
 
 ## Alcance
 
@@ -38,19 +38,44 @@ No se agregan rutas ni se modifica administración, paciente, autenticación,
 modelos o migraciones. Las operaciones administrativas preexistentes conservan
 sus propias reglas: este cambio no resuelve todos los conflictos entre módulos.
 
-## Límites respecto a las siguientes etapas
+## Flujo visual: segunda etapa
+
+«Mi Agenda de hoy» conserva todas las citas de hoy y ofrece «Iniciar Consulta»
+para `Pendiente` y `Confirmada`. El botón solo se habilita si la fecha y hora lo
+permiten, usando `canStartAppointmentToday`, compartida entre el renderizado y
+el endpoint dentro del módulo médico. El servidor vuelve a validar todo al recibir
+el PATCH. Al llegar la hora debe actualizarse la agenda para obtener la elegibilidad
+vigente; no se toma el reloj del navegador como autoridad.
+
+El ID de destino se consulta por nombre `En Curso`, solo cuando hay una cita
+elegible, y se entrega al botón como dato escapado. JavaScript no contiene IDs
+fijos ni cambia localmente estados o métricas. Deshabilita el botón durante el
+envío y bloquea solicitudes duplicadas para esa cita. Si hay éxito, navega al
+dashboard con `?consulta=<id>#contextoConsulta`, recargando desde el servidor las
+métricas, próxima cita y listado. Ante conflicto, sesión vencida, falta de permisos,
+respuesta inválida o error de red, informa con texto seguro y recupera el botón.
+
+Las citas En Curso ofrecen «Continuar consulta», mediante GET y sin transición.
+Se reutiliza la consulta existente de citas propias: aparte de hoy, se muestran
+solo las de fechas anteriores que siguen En Curso, ordenadas por fecha y hora.
+No se agrega toda la agenda histórica ni una consulta adicional de citas.
+El parámetro `consulta` solo recupera contexto de una cita propia En Curso de hoy
+o anterior; las ajenas, inexistentes o en otro estado no exponen su contexto.
+
+El contexto muestra paciente, fecha, hora y motivo. No ofrece formularios ni acción
+de finalización: el registro clínico corresponde a UH-014. «Gestionar Citas» y
+el modal de horarios permanecen sin cambios y son exclusivamente de consulta.
+
+## Límites respecto a UH-014
 
 Esta etapa no crea formularios clínicos ni endpoints para guardar diagnósticos.
 Solo verifica que exista una fila de `Diagnostico` asociada a la cita; la validación
 de su contenido pertenece a UH-014. Sin esa fila no se permite completar.
 No se registran tiempos clínicos reales ni se cambia el promedio de UH-011.
 
-La interfaz diaria todavía envía los IDs numéricos anteriores y no ofrece iniciar
-una cita Confirmada ni recuperar desde la agenda de hoy una cita de días anteriores
-que sigue En Curso. El endpoint permite finalizar esa cita después de medianoche,
-pero la interfaz para continuarla corresponde a la segunda etapa. Antes de usar
-un catálogo con IDs diferentes será necesario adaptar los botones para enviar los
-IDs reales. «Gestionar Citas» conserva exclusivamente la consulta.
+Continuar recupera el contexto, pero no registra atención clínica ni guarda
+diagnósticos o prescripciones. Incluso si ya existe un diagnóstico, la interfaz
+no expone todavía finalizar; el endpoint conserva esa transición protegida.
 
 ## Verificación
 
@@ -60,11 +85,19 @@ catálogo con IDs distintos, transiciones, límites de fecha y hora de Bogotá,
 diagnóstico obligatorio, repetición, concurrencia y reversión ante fallos.
 
 El bloqueo y la reversión se simulan en memoria: no son una prueba de concurrencia
-real de MySQL. La regresión médica completa suma **82 pruebas aprobadas**.
+real de MySQL. La primera etapa registró **82 pruebas aprobadas**.
+La segunda incorpora dos casos de integración del dashboard y cinco pruebas de
+renderizado y JavaScript visual en `tests/medico/atencionVisual.test.cjs`:
+botones, contexto, éxito con recarga, duplicados y errores. La regresión completa
+actual suma **89 pruebas aprobadas**, con datos en memoria y modelos simulados.
+En Chrome se comprobó el dashboard renderizado con datos sintéticos a 1440,
+390 y 320 px: contexto, consultas anteriores, botones habilitados/deshabilitados
+y textos largos sin desbordamiento horizontal. Tailwind se compiló solo en una
+salida temporal, sin incluir CSS generado en el commit.
 También pasan sintaxis JavaScript, compilación y renderizado Pug mediante la
 regresión existente, ESLint y revisión del diff. No se accede a MySQL ni se
 modifican las tres citas de prueba. No se ejecuta `tests/database.test.js`.
 
 ```powershell
-node --experimental-test-module-mocks --test tests/medico/citasEstado.test.js tests/medico/dashboardMetrics.test.js tests/medico/dashboard.test.js tests/medico/dashboardCards.test.cjs tests/medico/citasModal.test.cjs tests/medico/logout.test.js tests/medico/horariosAccess.test.js tests/medico/horariosModal.test.cjs tests/medico/historial.test.js tests/medico/horariosService.test.js
+node --experimental-test-module-mocks --test tests/medico/citasEstado.test.js tests/medico/atencionVisual.test.cjs tests/medico/dashboardMetrics.test.js tests/medico/dashboard.test.js tests/medico/dashboardCards.test.cjs tests/medico/citasModal.test.cjs tests/medico/logout.test.js tests/medico/horariosAccess.test.js tests/medico/horariosModal.test.cjs tests/medico/historial.test.js tests/medico/horariosService.test.js
 ```

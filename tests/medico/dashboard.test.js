@@ -27,7 +27,12 @@ const models = {
         if (failQuery) throw Error("Fallo de consulta simulado");
         return rows.filter(row => row.medico_id === options.where.medico_id && (!options.where.fecha || row.fecha === options.where.fecha));
     } },
-    Paciente: {}, Diagnostico: {}, Prescripcion: {}, EstadoCita: {}, Especialidad: {}
+    EstadoCita: { findOne: async options => {
+        queries.push(["catalogo", options]);
+        assert.deepEqual(options.where, { nombre: "En Curso" });
+        return { id_estado: 222 };
+    } },
+    Paciente: {}, Diagnostico: {}, Prescripcion: {}, Especialidad: {}
 };
 for (const [name, model] of Object.entries(models)) mock.module(new URL(`../../models/${name}.js`, import.meta.url).href, { defaultExport: model });
 mock.module(new URL("../../config/db.js", import.meta.url).href, { defaultExport: new Proxy({}, { get() { throw Error("MySQL no permitido"); } }) });
@@ -47,6 +52,7 @@ before(async () => {
         res.render = (view, data) => res.json({
             view, metrics: data.dashboardMetrics, name: data.nombreMedico,
             specialty: data.especialidadMedico, date: data.fechaDashboard, nextAppointment: data.proximaCita, appointments: data.citasAgenda,
+            care: { today: data.agendaHoy, previous: data.consultasAnteriores, context: data.contextoConsulta, error: data.errorContexto, target: data.estadoEnCursoId },
             html: pug.renderFile(`views/${view}.pug`, { ...data, pacientes: [], citasHoy: [] })
         });
         next();
@@ -68,7 +74,7 @@ beforeEach(() => {
     rows.splice(2);
     mock.timers.setTime(Date.parse("2026-11-09T17:00:00Z"));
 });
-const request = (user = 7) => fetch(base + "/medico/dashboard?medico_id=10&usuario_id=8", {
+const request = (user = 7, query = "") => fetch(base + "/medico/dashboard?medico_id=10&usuario_id=8" + query, {
     redirect: "manual", headers: user === null ? {} : { cookie: `_token=${jwt.sign({ id: user }, process.env.JWT_SECRET)}` }
 });
 
@@ -185,6 +191,43 @@ test("sin citas propias el dashboard entrega una agenda vacía", async () => {
         assert(body.html.includes("No tienes citas registradas."));
     } finally {
         rows[0].medico_id = 9;
+    }
+});
+
+test("agenda visual ofrece iniciar solo pendientes y confirmadas elegibles usando el ID real", async () => {
+    rows.push(
+        { id_cita: 3, medico_id: 9, fecha: "2026-11-09", hora: "13:00:00", Estado: { nombre: "Pendiente" } },
+        { id_cita: 4, medico_id: 9, fecha: "2026-11-09", hora: "09:00:00", Estado: { nombre: "Confirmada" } },
+        { id_cita: 5, medico_id: 9, fecha: "2026-11-09", hora: "09:30:00", Estado: { nombre: "En Curso" } },
+        { id_cita: 6, medico_id: 9, fecha: "2026-11-09", hora: "10:00:00", Estado: { nombre: "Cancelada" } }
+    );
+    const body = await (await request()).json();
+    assert.equal(body.care.target, 222);
+    assert.deepEqual(body.care.today.filter(cita => cita.puedeIniciar).map(cita => cita.id_cita), [4]);
+    assert(body.html.includes('data-estado-id="222"'));
+    assert(body.html.includes('href="/medico/dashboard?consulta=5#contextoConsulta"'));
+    assert(!body.html.includes("Finalizar Consulta"));
+    assert.equal(queries.filter(([tipo]) => tipo === "catalogo").length, 1);
+});
+
+test("recupera contexto propio En Curso anterior sin agregar toda la historia a la agenda diaria", async () => {
+    rows.push(
+        { id_cita: 3, medico_id: 9, fecha: "2026-11-08", hora: "23:00:00", Estado: { nombre: "En Curso" }, motivo_consulta: "Contexto anterior" },
+        { id_cita: 4, medico_id: 9, fecha: "2026-11-08", hora: "20:00:00", Estado: { nombre: "Pendiente" } },
+        { id_cita: 5, medico_id: 10, fecha: "2026-11-08", hora: "21:00:00", Estado: { nombre: "En Curso" } },
+        { id_cita: 6, medico_id: 9, fecha: "2026-11-10", hora: "09:00:00", Estado: { nombre: "Pendiente" } }
+    );
+    const body = await (await request(7, "&consulta=3")).json();
+    assert.deepEqual(body.care.previous.map(cita => cita.id_cita), [3]);
+    assert.deepEqual(body.care.today.map(cita => cita.id_cita), [1]);
+    assert.equal(body.care.context.motivo, "Contexto anterior");
+    assert.equal(body.care.context.estado, "En Curso");
+    assert.equal(body.care.error, false);
+    assert.equal(queries.length, 3);
+    for (const id of [4, 5, 6, "abc", "3&consulta=5"]) {
+        const denied = await (await request(7, "&consulta=" + id)).json();
+        assert.equal(denied.care.context, undefined);
+        assert.equal(denied.care.error, true);
     }
 });
 
