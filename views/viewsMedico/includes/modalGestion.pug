@@ -1,5 +1,6 @@
 //- Agenda de consulta; las citas se filtran por médico en el servidor.
 - const agenda = typeof citasAgenda === "undefined" ? [] : citasAgenda
+- const estadosAgenda = [...new Set(agenda.map(cita => cita.estado).filter(estado => estado !== "Sin estado"))].sort((a, b) => a.localeCompare(b, "es"))
 #modalGestionCitas.modal-overlay(class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/40 p-3 [&.abierto]:flex" onclick="cerrarModalFuera(event)" onkeydown="gestionarTecladoCitas(event)")
   .modal-gc(role="dialog" aria-modal="true" aria-labelledby="tituloGestionCitas" aria-describedby="modalSubtitulo" tabindex="-1" class="flex max-h-[92dvh] w-full max-w-[780px] min-w-0 flex-col overflow-hidden rounded-[14px] bg-white text-slate-800 shadow-xl" onclick="event.stopPropagation()")
     header(class="flex shrink-0 items-center justify-between gap-3 bg-[#465DE5] px-4 py-4 sm:px-6")
@@ -7,6 +8,17 @@
         h2#tituloGestionCitas(class="text-xl font-bold text-white") Gestión de Citas
         p#modalSubtitulo(class="mt-1 text-xs text-white/90" aria-live="polite")= `Total de citas: ${agenda.length}`
       button#cerrarGestionCitas(type="button" aria-label="Cerrar agenda de citas" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-xl text-white hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white" onclick="cerrarModal()") ✕
+    div(class="grid min-w-0 shrink-0 grid-cols-1 items-end gap-3 border-b border-slate-100 bg-slate-50 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] sm:px-6")
+      div(class="min-w-0")
+        label(for="fechaFiltroCitas" class="mb-1 block text-xs font-semibold text-slate-600") Fecha
+        input#fechaFiltroCitas(type="date" class="block min-w-0 w-full max-w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-[#465DE5]" onchange="filtrarCitas()")
+      div(class="min-w-0")
+        label(for="estadoFiltroCitas" class="mb-1 block text-xs font-semibold text-slate-600") Estado
+        select#estadoFiltroCitas(class="block min-w-0 w-full max-w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-[#465DE5]" onchange="filtrarCitas()")
+          option(value="") Todos los estados
+          each estado in estadosAgenda
+            option(value=estado)= estado
+      button(type="button" class="rounded-lg border border-[#465DE5] px-3 py-2 text-sm font-semibold text-[#465DE5] hover:bg-indigo-50" onclick="limpiarFiltrosCitas()") Todas las citas
     #listaCitas(class="grid min-h-0 min-w-0 flex-1 grid-cols-1 content-start gap-3 overflow-y-auto overscroll-contain p-4 sm:grid-cols-2 sm:p-6")
       each cita in agenda
         article.cita-card(data-fecha=cita.fecha data-estado=cita.estado class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 [overflow-wrap:anywhere]")

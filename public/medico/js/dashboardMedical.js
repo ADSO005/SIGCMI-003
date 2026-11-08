@@ -168,6 +168,7 @@ window.abrirModal = () => {
   citaPreviousOverflow = document.body.style.overflow;
   modal.classList.add("abierto");
   document.body.style.overflow = "hidden";
+  window.filtrarCitas();
   document.getElementById("cerrarGestionCitas").focus();
 };
 
@@ -181,6 +182,33 @@ window.cerrarModal = () => {
 
 window.cerrarModalFuera = event => {
   if (event.target.id === "modalGestionCitas") window.cerrarModal();
+};
+
+window.filtrarCitas = () => {
+  const fecha = document.getElementById("fechaFiltroCitas");
+  const estado = document.getElementById("estadoFiltroCitas");
+  const cards = [...document.getElementById("listaCitas").querySelectorAll(".cita-card")];
+  const status = document.getElementById("estadoListaCitas");
+  const subtitulo = document.getElementById("modalSubtitulo");
+  const fechaValida = fecha.validity.valid;
+  let visibles = 0;
+  cards.forEach(card => {
+    card.hidden = !fechaValida || (fecha.value !== "" && card.dataset.fecha !== fecha.value)
+      || (estado.value !== "" && card.dataset.estado !== estado.value);
+    if (!card.hidden) visibles++;
+  });
+  subtitulo.textContent = `Citas: ${visibles} de ${cards.length}`;
+  status.hidden = fechaValida && visibles > 0;
+  status.setAttribute("role", fechaValida ? "status" : "alert");
+  status.textContent = !fechaValida ? "La fecha no es válida. Revisa el filtro o selecciona Todas las citas."
+    : !cards.length ? "No tienes citas registradas."
+      : "No se encontraron citas con los filtros seleccionados";
+};
+
+window.limpiarFiltrosCitas = () => {
+  document.getElementById("fechaFiltroCitas").value = "";
+  document.getElementById("estadoFiltroCitas").value = "";
+  window.filtrarCitas();
 };
 
 window.gestionarTecladoCitas = event => {
