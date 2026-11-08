@@ -467,63 +467,31 @@ function obtenerUltimaVisita(citas) {
 }
 
 function mostrarHistorial(citas) {
-
-  const contenedor =
-    document.getElementById("historialPaciente");
-
-  contenedor.innerHTML = "";
-
-  const citasConDiagnostico = citas.filter(
-    cita => cita.Diagnostico
-  );
-
-  if (citasConDiagnostico.length === 0) {
-
-    contenedor.innerHTML = `
-      <p>Este paciente no tiene diagnósticos registrados.</p>
-    `;
-
+  const contenedor = document.getElementById("historialPaciente");
+  contenedor.replaceChildren();
+  const agregarTexto = (padre, etiqueta, texto, clase) => {
+    const nodo = document.createElement(etiqueta);
+    nodo.textContent = texto;
+    if (clase) nodo.className = clase;
+    padre.appendChild(nodo);
+    return nodo;
+  };
+  const diagnosticadas = citas.filter(cita => cita.Diagnostico);
+  if (!diagnosticadas.length) {
+    agregarTexto(contenedor, "p", "Este paciente no tiene diagnósticos registrados.");
     return;
   }
-
-  citasConDiagnostico.forEach(cita => {
-
+  diagnosticadas.forEach(cita => {
     const diagnostico = cita.Diagnostico;
-
     const card = document.createElement("div");
-
     card.className = "historial-card";
-
-    const fecha = new Date(
-      `${cita.fecha}T00:00:00`
-    ).toLocaleDateString("es-CO");
-
-    card.innerHTML = `
-      <h4>${diagnostico.diagnostico || "Sin diagnóstico"}</h4>
-
-      <p class="historial-fecha">
-        ${fecha}
-      </p>
-
-      <p>
-        <strong>Síntomas:</strong>
-      </p>
-
-      <p>
-        ${diagnostico.sintomas || "No registrados"}
-      </p>
-
-      <p>
-        <strong>Tratamiento:</strong>
-      </p>
-
-      <p>
-        ${diagnostico.tratamiento || "No registrado"}
-      </p>
-    `;
-
+    agregarTexto(card, "h4", diagnostico.diagnostico || "Sin diagnóstico");
+    agregarTexto(card, "p", new Date(cita.fecha + "T00:00:00").toLocaleDateString("es-CO"), "historial-fecha");
+    agregarTexto(agregarTexto(card, "p", ""), "strong", "Síntomas:");
+    agregarTexto(card, "p", diagnostico.sintomas || "No registrados");
+    agregarTexto(agregarTexto(card, "p", ""), "strong", "Tratamiento:");
+    agregarTexto(card, "p", diagnostico.tratamiento || "No registrado");
     contenedor.appendChild(card);
-
   });
 }
 // FILTRAR PACIENTES EN TIEMPO REAL
