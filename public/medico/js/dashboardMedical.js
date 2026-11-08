@@ -230,26 +230,98 @@ window.cerrarReprogramarFuera = (event) => {
   if (event.target.id === "modalReprogramar") cerrarReprogramar();
 }
 
+// MODAL HORARIO
+const diasHorario = new Set([
+  "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"
+]);
+let peticionHorarios = null;
+let versionCargaHorarios = 0;
+
+function mensajeHorarios(texto, error = false) {
+  const mensaje = document.getElementById("estadoCargaHorarios");
+  mensaje.textContent = texto;
+  mensaje.setAttribute("role", error ? "alert" : "status");
+}
+
+function validarHorario(horario, ids) {
+  const horaValida = valor => typeof valor === "string" && /^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(valor);
+  if (!horario || !Number.isSafeInteger(horario.id_horario) || horario.id_horario <= 0 ||
+      ids.has(horario.id_horario) || !diasHorario.has(horario.dia_semana) ||
+      !["Pendiente", "Aprobado", "Rechazado"].includes(horario.estado) ||
+      !horaValida(horario.hora_inicio) || !horaValida(horario.hora_fin)) {
+    throw new Error("La respuesta contiene un horario no válido.");
+  }
+  ids.add(horario.id_horario);
+  const normalizar = hora => hora.length === 5 ? hora + ":00" : hora;
+  if (normalizar(horario.hora_inicio) >= normalizar(horario.hora_fin)) {
+    throw new Error("La respuesta contiene un rango horario no válido.");
+  }
+  return horario;
+}
+
 window.abrirModalHorarios = async () => {
-  const modal = document.getElementById('modalHorarios');
-  const lista = document.getElementById('listaHorariosMedico');
-  modal.classList.add('abierto');
-  lista.textContent = 'Consultando horarios...';
+  const modal = document.getElementById("modalHorarios");
+  const lista = document.getElementById("listaHorariosMedico");
+  peticionHorarios?.abort();
+  const version = ++versionCargaHorarios;
+  const peticion = new AbortController();
+  peticionHorarios = peticion;
+  lista.replaceChildren();
+  mensajeHorarios("Cargando horarios...");
+  modal.classList.add("abierto");
   try {
-    const respuesta = await fetch('/medico/horarios', { credentials: 'same-origin', cache: 'no-store' });
-    if (!respuesta.ok) throw new Error('No se pudieron consultar los horarios.');
+    const respuesta = await fetch("/medico/horarios", {
+      credentials: "same-origin", cache: "no-store", signal: peticion.signal
+    });
+    if (version !== versionCargaHorarios) return;
+    if (respuesta.redirected || respuesta.status === 401) {
+      throw new Error("La sesión ha expirado. Inicia sesión nuevamente para consultar tus horarios.");
+    }
+    if (!respuesta.ok) {
+      const mensajes = {
+        403: "No tienes permiso para consultar estos horarios.",
+        404: "No se encontró tu perfil médico."
+      };
+      throw new Error(mensajes[respuesta.status] || "No se pudieron cargar los horarios. Intenta abrir el modal nuevamente.");
+    }
+    if (!respuesta.headers.get("content-type")?.includes("application/json")) {
+      throw new Error("El servidor no devolvió una respuesta JSON válida.");
+    }
     const datos = await respuesta.json();
-    lista.replaceChildren();
-    for (const h of datos.horarios) {
-      const fila = document.createElement('p');
-      fila.textContent = h.dia_semana + ': ' + h.hora_inicio + ' a ' + h.hora_fin + ' (' + h.estado + ')';
+    if (version !== versionCargaHorarios) return;
+    if (!datos || !Array.isArray(datos.horarios)) throw new Error("La respuesta de horarios no es válida.");
+    const ids = new Set();
+    // Se valida la respuesta completa antes de representar cualquier franja.
+    const horarios = datos.horarios.map(horario => validarHorario(horario, ids));
+    for (const h of horarios) {
+      const fila = document.createElement("p");
+      fila.textContent = h.dia_semana + ": " + h.hora_inicio + " a " + h.hora_fin + " (" + h.estado + ")";
       lista.appendChild(fila);
     }
-    if (!datos.horarios.length) lista.textContent = 'No tienes horarios registrados.';
-  } catch (error) { lista.textContent = error.message; }
+    mensajeHorarios(horarios.length
+      ? "Horarios asignados por administración. Solo lectura."
+      : "No tienes horarios asignados. Contacta al administrador.");
+  } catch (error) {
+    if (version !== versionCargaHorarios || error.name === "AbortError") return;
+    lista.replaceChildren();
+    mensajeHorarios(error instanceof SyntaxError
+      ? "El servidor devolvió datos incorrectos. No se cargaron los horarios."
+      : error.message || "No se pudieron cargar los horarios.", true);
+  } finally {
+    if (version === versionCargaHorarios) peticionHorarios = null;
+  }
 };
-window.cerrarModalHorarios = () => document.getElementById('modalHorarios').classList.remove('abierto');
-window.cerrarModalHorariosFuera = event => { if (event.target.id === 'modalHorarios') window.cerrarModalHorarios(); };
+window.cerrarModalHorarios = () => {
+  ++versionCargaHorarios;
+  peticionHorarios?.abort();
+  peticionHorarios = null;
+  document.getElementById("modalHorarios").classList.remove("abierto");
+  document.getElementById("listaHorariosMedico").replaceChildren();
+  mensajeHorarios("");
+};
+window.cerrarModalHorariosFuera = event => {
+  if (event.target.id === "modalHorarios") window.cerrarModalHorarios();
+};
 
 // SELECCIONAR PACIENTE DE LA LISTA
 async function seleccionarPaciente(element) {
