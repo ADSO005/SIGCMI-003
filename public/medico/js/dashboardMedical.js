@@ -351,20 +351,20 @@ function renderScheduleWeek() {
     const rows = scheduleRowsForDay(day);
     if (!rows.length) continue;
     const weekday = ((day + 3) % 7 + 7) % 7;
-    const group = appendScheduleText(list, "section", "", "min-w-0 rounded-2xl border border-slate-200/70 bg-white px-4 py-3 shadow-sm");
+    const group = appendScheduleText(list, "section", "", "min-w-0 rounded-xl border border-blue-100 bg-white px-4 py-3 shadow-sm");
     group.setAttribute("data-date", scheduleDate(day));
     appendScheduleText(group, "h3", `${scheduleDayNames[weekday]} ${formatScheduleDay(day)}`, "text-xs font-semibold text-slate-700");
     for (const [index, row] of rows.entries()) {
-      const slot = appendScheduleText(group, "div", "", "mt-3 border-t border-slate-100 pt-3");
+      const slot = appendScheduleText(group, "div", "", "mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 border-t border-slate-100 pt-2");
       slot.setAttribute("data-schedule-id", String(row.id_horario));
       slot.setAttribute("aria-label", `Franja ${index + 1} de ${rows.length}`);
       const time = value => value.endsWith(":00") ? value.slice(0, 5) : value;
-      appendScheduleText(slot, "p", `${time(row.startTime)}–${time(row.endTime)}`, "text-lg font-semibold text-[#465DE5]");
+      appendScheduleText(slot, "p", `${time(row.startTime)}–${time(row.endTime)}`, "justify-self-start rounded-lg bg-blue-50 px-2.5 py-1 text-sm font-semibold text-[#2459B8]");
       appendScheduleText(slot, "span", row.estado, row.estado === "Aprobado"
-        ? "mt-1 inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-800"
-        : "mt-1 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700");
-      appendScheduleText(slot, "p", `Vigencia: ${formatScheduleDay(row.startDay)} – ${formatScheduleDay(row.endDay)}`, "mt-2 break-words text-[11px] leading-5 text-slate-500");
-      if (rows.length > 1) appendScheduleText(slot, "p", `Franja ${index + 1} de ${rows.length}`, "mt-1 text-[10px] text-slate-500");
+        ? "rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-800"
+        : "rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700");
+      appendScheduleText(slot, "p", `Vigencia: ${formatScheduleDay(row.startDay)} – ${formatScheduleDay(row.endDay)}`, "col-span-2 mt-1 break-words text-[11px] leading-5 text-slate-500");
+      if (rows.length > 1) appendScheduleText(slot, "p", `Franja ${index + 1} de ${rows.length}`, "col-span-2 text-[10px] text-slate-500");
       count++;
     }
   }
