@@ -127,7 +127,11 @@ Se mantiene el volumen de la consulta existente, sin paginación. Si crece de fo
 considerable, deberá evaluarse una consulta independiente con límites y filtros
 en el servidor, sin cambiar el aislamiento por médico.
 
-## Verificación
+## Verificación automatizada y visual previa
+
+Esta sección conserva los resultados de la implementación anterior. No corresponde
+a las pruebas manuales con MySQL descritas más adelante ni a una nueva ejecución
+de las pruebas durante esta actualización documental.
 
 ```powershell
 node --experimental-test-module-mocks --test tests/medico/dashboardMetrics.test.js tests/medico/dashboard.test.js tests/medico/dashboardCards.test.cjs tests/medico/citasModal.test.cjs tests/medico/logout.test.js tests/medico/horariosAccess.test.js tests/medico/horariosModal.test.cjs tests/medico/historial.test.js tests/medico/horariosService.test.js
@@ -157,8 +161,118 @@ con métricas sintéticas, tanto con citas como vacías, a 1672, 1024, 390 y 320
 cuatro, dos o una columna según el ancho; sin desbordamiento horizontal. Tailwind
 se compila en una salida temporal y su CSS generado no se incluye en los commits.
 
-No se ejecutaron consultas contra MySQL ni pruebas de persistencia. La validación
-manual pendiente es comparar las tarjetas y la agenda con las citas y el catálogo real de la
-base local, después de recompilar Tailwind. Cada integrante mantiene su propia
-base de datos. `tests/database.test.js` queda fuera de esta comprobación porque
-ejecuta migraciones e inserciones.
+Las pruebas automatizadas y visuales anteriores no accedieron a MySQL ni probaron
+persistencia. Cada integrante mantiene su propia base de datos.
+`tests/database.test.js` queda fuera de esta comprobación porque ejecuta
+migraciones e inserciones.
+
+## Evidencia manual con MySQL real: 8 de noviembre de 2026
+
+Fuente: comprobaciones realizadas por el usuario en el navegador y comunicadas
+para este registro. No son pruebas automatizadas ni una nueva ejecución de Codex.
+No se aportaron IDs de citas ni capturas en este reporte; no se inventan esos datos.
+Durante esta actualización documental no se consultó ni modificó MySQL.
+
+Se crearon tres citas desde el panel administrativo en la base local `sigcmi`,
+para el médico **Cristiano Ronaldo** y el paciente **Cristians Marmolejo**:
+
+| Fecha | Hora | Estado | Motivo |
+|---|---|---|---|
+| 9 de noviembre de 2026 | 09:00 | Pendiente | Se comprobó su representación; el texto no fue transcrito en el reporte. |
+| 11 de noviembre de 2026 | 09:00 | Pendiente | Sin motivo registrado. |
+| 13 de noviembre de 2026 | 15:00 | Pendiente | Se comprobó su representación; el texto no fue transcrito en el reporte. |
+
+| N.º | Comprobación manual | Resultado comunicado |
+|---|---|---|
+| 1 | Abrir «Gestionar Citas». | Aparecen las tres citas. |
+| 2 | Revisar el orden del listado. | Orden cronológico: 9, 11 y 13 de noviembre. |
+| 3 | Revisar los datos de las tarjetas. | Paciente, fecha, hora, motivo y estado correctos. |
+| 4 | Revisar la cita del 11 de noviembre. | Muestra «Motivo no registrado». |
+| 5 | Aplicar filtro por fecha. | Funciona. |
+| 6 | Aplicar estado `Pendiente`. | Funciona. |
+| 7 | Combinar fecha 13/11/2026 y estado `Pendiente`. | Muestra una cita. |
+| 8 | Revisar el contador al filtrar. | Cambia de «3 de 3» a «1 de 3». |
+| 9 | Pulsar «Todas las citas». | Limpia los filtros y recupera las tres citas. |
+| 10 | Revisar «Próxima cita» el 8 de noviembre. | Permanece vacía porque las citas son de días futuros. |
+
+Esta evidencia no demuestra todavía los estados `Completada`, `Cancelada`,
+`En Curso` o `Confirmada`, los valores de las tarjetas estadísticas, el caso
+positivo de próxima cita ni el aislamiento entre dos médicos con datos reales.
+
+## Revisión del cumplimiento de UH-011
+
+`PRODUCT_BACKLOG.md` define UH-011 como consultar la agenda de citas para organizar
+la jornada, pero no contiene criterios de aceptación detallados o numerados.
+La siguiente matriz organiza el alcance funcional acordado y la evidencia
+disponible; no añade criterios oficiales al backlog ni declara cerrada la historia.
+
+«Cumplido» significa verificado manualmente para el escenario indicado;
+«parcialmente validado» distingue los casos cubiertos de los pendientes.
+La cobertura automatizada previa no sustituye una comprobación con MySQL real.
+
+| Comportamiento del alcance acordado | Situación | Evidencia y validación pendiente |
+|---|---|---|
+| Consultar citas con paciente, fecha, hora, motivo y estado. | Cumplido para las tres citas pendientes. | Evidencias 1–3; probar otros estados y más de una cita en una misma fecha sigue pendiente. |
+| Ordenar cronológicamente. | Parcialmente validado. | Evidencia 2 confirma fechas distintas; el orden entre distintas horas de una misma fecha solo tiene cobertura automatizada previa. |
+| Mostrar texto neutral cuando falta motivo. | Cumplido. | Evidencia 4. |
+| Filtrar por fecha y estado, combinar, contar y limpiar. | Parcialmente validado. | Evidencias 5–9 cumplen con `Pendiente`; faltan otros estados y filtros sin coincidencias en MySQL real. |
+| Mostrar ausencia de citas y errores de forma clara. | Pendiente de validación manual. | Existen pruebas previas con datos simulados; este reporte no verifica agenda sin registros ni errores. |
+| Próxima cita: solo la siguiente pendiente o confirmada de hoy, con hora futura en Bogotá. | Parcialmente validado. | Evidencia 10 confirma exclusión de días futuros; faltan caso positivo, hora pasada, hora exacta, otros estados y límites de día. |
+| Citas de hoy, completadas, por atender y progreso. | Pendiente de validación manual. | Implementado y cubierto por pruebas previas; no se reportaron valores reales de estas tarjetas. |
+| Pacientes únicos completados del mes y citas no canceladas de la semana. | Pendiente de validación manual. | Faltan completar citas y cancelar una con autorización; comprobar que el paciente repetido cuenta una sola vez. |
+| Promedio de consulta sin duración real: `—`. | Pendiente de validación manual. | Implementado y probado previamente; no se reportó su observación en esta sesión manual. |
+| Acceso exclusivo a citas propias, autenticación y rol médico. | Parcialmente validado. | La ruta y el filtro por médico están implementados y probados con mocks; la sesión reportada tiene un único médico y no demuestra aislamiento entre dos. |
+| Escape seguro de textos y diálogo de solo consulta, accesible y responsive. | Pendiente de validación manual con estos datos reales. | Hay pruebas previas de escape, teclado y Chrome con datos sintéticos; no se atribuyen al reporte manual actual. |
+
+## Próximas pruebas reales recomendadas
+
+Este plan no autoriza ni ejecuta cambios de estado, nuevas citas o nuevos usuarios.
+Cada operación de escritura requiere autorización previa. Se deben anotar los IDs
+reales y los resultados observados, y recargar el dashboard tras cada cambio.
+
+1. **Lunes 9 de noviembre, antes de las 09:00, hora de Bogotá:** con las tres
+   citas todavía pendientes, esperar total de hoy 1, completadas 0, por atender 1,
+   progreso 0 %, pacientes atendidos del mes 0 y consultas de la semana 3.
+   «Próxima cita» debe mostrar 9:00 AM, el paciente y el motivo de esa cita.
+   El promedio debe permanecer en `—`. Son resultados esperados, aún no observados.
+2. **Hora pasada:** después de las 09:00 del lunes, esa cita no debe aparecer
+   como próxima aunque siga pendiente. Las de miércoles y viernes tampoco deben
+   ocupar la tarjeta. No modificar el reloj del sistema para simular el caso.
+3. **Completada, con autorización:** utilizar el flujo existente de la agenda
+   diaria para pasar la cita del lunes de `Pendiente` a `En Curso` y después a
+   `Completada`. Recargar y verificar su estado en el modal. Ese lunes, después
+   de completarla, esperar total 1, completadas 1, por atender 0, progreso 100 %,
+   pacientes del mes 1 y consultas semanales 3. El promedio sigue en `—`.
+   Esto valida la lectura de UH-011, no declara validada toda la atención clínica.
+4. **Cancelada, con autorización:** desde administración, cancelar la cita del
+   viernes indicando el motivo. Recargar, filtrar `Cancelada` y combinar con
+   13/11/2026: debe aparecer una cita. Durante la semana 9–15, el conteo semanal
+   debe bajar de 3 a 2. El viernes, si no hay otras citas, los conteos de hoy
+   deben ser cero porque la cancelada se excluye; debe seguir visible en el modal.
+5. **Paciente único repetido:** si se autoriza completar también la cita del
+   miércoles, el mes debe seguir mostrando 1 paciente, no 2. El paciente actual
+   basta para verificar esta deduplicación. Un segundo paciente sería necesario
+   para demostrar un conteo de 2 o un progreso intermedio en un mismo día;
+   no se registrará sin autorización.
+6. **Casos restantes:** probar una fecha sin coincidencias y los filtros de los
+   nuevos estados. El estado `Confirmada` requiere un mecanismo autorizado de
+   preparación: la creación administrativa actual guarda `Pendiente` y no se
+   identificó un flujo conectado de confirmación. El aislamiento real exige un
+   segundo médico y citas propias, también sujetos a autorización. Las pruebas
+   previas con mocks se conservan como evidencia diferente.
+
+El 8 de noviembre pertenece a la semana 2–8; las tres citas pertenecen a la
+semana 9–15. No deben contarse como citas de la semana actual el día 8. Esta es
+una expectativa para contrastar, no un resultado manual comunicado.
+
+## Mejoras menores separadas de la validación funcional
+
+- **Formato visual de fecha:** el modal muestra `YYYY-MM-DD`. Presentarla como
+  «9 de noviembre de 2026» podría facilitar la lectura, conservando el valor
+  original para filtrar y evitando desplazamientos por zona horaria. Es una
+  mejora de presentación; el formato actual no invalida el filtrado comprobado
+  ni existe un criterio documentado que obligue a cambiarlo.
+- **Trazabilidad de próximas evidencias:** anotar fecha y hora de Bogotá, ID de
+  cita, filtros, resultado esperado y observado. Adjuntar capturas si se dispone
+  de ellas, sin credenciales ni información clínica innecesaria. Este registro
+  no crea evidencias retroactivas ni sustituye los pendientes funcionales.
