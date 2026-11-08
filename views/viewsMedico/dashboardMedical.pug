@@ -76,9 +76,13 @@ block content
               img.proxima-icon(class="h-5 w-5 brightness-0 invert" src='/medico/img/Icon.png' alt='Reloj')
               span Próxima Cita
             .proxima-detalle(class="rounded-[10px] bg-white/20 px-3 py-3")
-              .proxima-hora(class="text-[20px] font-bold text-white leading-6 mb-1") 11:00 AM
-              .proxima-paciente(class="text-[13px] font-semibold text-white") Ana Rodríguez
-              .proxima-motivo(class="text-[12px] leading-4 font-light text-white mt-1") Medicina interna
+              if proximaCita
+                .proxima-hora(class="text-[20px] font-bold text-white leading-6 mb-1")= proximaCita.hora
+                .proxima-paciente(class="text-[13px] font-semibold text-white")= proximaCita.paciente
+                .proxima-motivo(class="text-[12px] leading-4 font-light text-white mt-1")= proximaCita.motivo
+              else
+                p(class="text-[13px] font-semibold text-white") No tienes más citas programadas para hoy
+                p(class="text-[12px] leading-4 font-light text-white mt-1") Tu agenda está libre por el momento
     // fin agendaView
 
     section#pacientesView.view(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")

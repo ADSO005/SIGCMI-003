@@ -1,11 +1,57 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calculateDashboardMetrics, dashboardPeriods } from "../../services/medico/dashboardMetricsService.js";
+import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday } from "../../services/medico/dashboardMetricsService.js";
 
 const now = new Date("2026-11-09T17:00:00Z");
 const appointment = (id, state, extra = {}) => ({
     id_cita: id, medico_id: 9, paciente_id: id, fecha: "2026-11-09",
     estado_id: id * 17, Estado: { nombre: state }, ...extra
+});
+
+test("próxima cita selecciona la menor hora futura propia sin modificar la colección", () => {
+    const rows = [
+        appointment(1, "Pendiente", { hora: "15:00:00" }),
+        appointment(2, "Confirmada", { hora: "13:05:00", motivo_consulta: "Control", Paciente: { Usuario: { nombres: "Luz", apellidos: "Díaz" } } })
+    ];
+    const original = structuredClone(rows);
+    assert.deepEqual(nextAppointmentToday(rows, 9, now), { hora: "1:05 PM", paciente: "Luz Díaz", motivo: "Control" });
+    assert.deepEqual(rows, original);
+    assert.equal(nextAppointmentToday([rows[0]], 9, now).hora, "3:00 PM");
+});
+
+test("próxima cita excluye otros médicos, fechas, estados, horas pasadas y hora exacta", () => {
+    const rows = [
+        ...["Cancelada", "Completada", "En Curso", "Desconocido"].map((state, id) => appointment(id, state, { hora: "14:00:00" })),
+        appointment(10, "Pendiente", { hora: "14:00:00", medico_id: 10 }),
+        appointment(11, "Pendiente", { hora: "14:00:00", fecha: "2026-11-10" }),
+        appointment(12, "Pendiente", { hora: "14:00:00", fecha: "2026-11-08" }),
+        appointment(13, "Pendiente", { hora: "11:59:59" }),
+        appointment(14, "Confirmada", { hora: "12:00:00" }),
+        appointment(15, "Pendiente", { hora: "25:00:00" }),
+        appointment(16, "Pendiente", { hora: null })
+    ];
+    assert.equal(nextAppointmentToday(rows, 9, now), null);
+    assert.equal(nextAppointmentToday([], 9, now), null);
+    assert.equal(nextAppointmentToday([appointment(17, "Pendiente", { hora: "12:00:01" })], 9, now).hora, "12:00 PM");
+});
+
+test("próxima cita usa medianoche de Bogotá en cambios de día, mes y año", () => {
+    for (const [beforeDate, afterDate] of [["2026-11-08", "2026-11-09"], ["2026-11-30", "2026-12-01"], ["2026-12-31", "2027-01-01"]]) {
+        const rows = [
+            appointment(1, "Pendiente", { fecha: beforeDate, hora: "23:59:59", motivo_consulta: "Anterior" }),
+            appointment(2, "Confirmada", { fecha: afterDate, hora: "00:01:00", motivo_consulta: "Nuevo día" })
+        ];
+        assert.equal(nextAppointmentToday(rows, 9, new Date(`${afterDate}T04:59:58Z`)).motivo, "Anterior");
+        assert.equal(nextAppointmentToday(rows, 9, new Date(`${afterDate}T05:00:00Z`)).hora, "12:01 AM");
+    }
+});
+
+test("motivo ausente o vacío utiliza texto neutral sin inventar datos de paciente", () => {
+    for (const motivo_consulta of [undefined, null, "", "   "]) {
+        assert.deepEqual(nextAppointmentToday([appointment(1, "Pendiente", { hora: "14:00:00", motivo_consulta })], 9, now), {
+            hora: "2:00 PM", paciente: "Paciente no disponible", motivo: "Motivo no registrado"
+        });
+    }
 });
 
 test("cero citas produce ceros coherentes, progreso vacío y duración desconocida", () => {

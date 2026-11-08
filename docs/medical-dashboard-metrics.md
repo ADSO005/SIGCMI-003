@@ -7,7 +7,7 @@ No contienen cifras de ejemplo ni calculan estadísticas en el navegador.
 Se mantienen `auth`, `role(2)` y el perfil obtenido de `req.usuario.id_usuario`.
 Ningún identificador enviado por el navegador selecciona al médico consultado.
 
-Esta entrega no conecta ni rediseña «Próxima cita», «Gestionar Citas», la edición
+Esta entrega no conecta ni rediseña «Gestionar Citas», la edición
 del perfil ni el flujo de atención. El modal de horarios de
 UH-012 permanece intacto y se documenta en `medical-schedules.md`.
 
@@ -49,6 +49,25 @@ se modifica el esquema para esta tarjeta.
 
 ## Fechas, consultas y seguridad
 
+### Próxima cita de hoy
+
+`nextAppointmentToday` reutiliza `citasHoy`, sin consultas adicionales. Solo
+considera citas del médico autenticado en la fecha civil actual de Bogotá y con
+estado `Pendiente` o `Confirmada`, reconocido por nombre. Selecciona la menor hora
+estrictamente posterior a la hora actual; excluye la hora exacta, horas pasadas,
+otros días y todos los demás estados. No modifica registros ni transiciones.
+
+La fecha `DATEONLY` se compara como `YYYY-MM-DD`. Las horas `TIME` se validan y
+convierten a segundos civiles para comparar con la hora de `America/Bogota`,
+obtenida con `Intl` a partir del mismo `now` de las métricas. No se interpretan
+horas con la zona del servidor. La selección se recalcula al cargar el dashboard.
+
+La tarjeta conserva su diseño azul y presenta hora de 12 horas, nombre y apellido
+del paciente y motivo, escapados por Pug. Sin motivo muestra «Motivo no registrado»;
+sin relación de paciente muestra «Paciente no disponible». Si no hay cita elegible,
+muestra «No tienes más citas programadas para hoy» y «Tu agenda está libre por el
+momento», sin nombres ni horas de ejemplo.
+
 `dashboardPeriods` obtiene la fecha civil de `America/Bogota`. Calcula semana y
 mes con aritmética UTC sobre esa fecha civil para no depender de la zona del
 servidor. La fecha se captura una vez por carga y también se usa en la consulta
@@ -76,7 +95,9 @@ comprueban valores dinámicos, ceros, progreso y escape. Se incluyen médicos
 distintos, los cinco estados definidos por el proyecto, pacientes repetidos,
 duplicados y límites de día, semana, mes, año y febrero bisiesto en Bogotá.
 
-La regresión médica contiene **52 pruebas aprobadas**, incluidas identidad de dos
+La regresión médica contiene **58 pruebas aprobadas**, incluida selección de la
+próxima cita, exclusiones por propietario, fecha, hora y estado, motivo ausente,
+escape de nombres y motivos y estado vacío. Se conserva la identidad de dos
 médicos, especialidad ausente y fecha visible en los cambios de día, mes y año
 de Bogotá. El dashboard completo se compila y renderiza con datos simulados.
 También se verificaron

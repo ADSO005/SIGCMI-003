@@ -46,7 +46,7 @@ before(async () => {
     app.use((req, res, next) => {
         res.render = (view, data) => res.json({
             view, metrics: data.dashboardMetrics, name: data.nombreMedico,
-            specialty: data.especialidadMedico, date: data.fechaDashboard,
+            specialty: data.especialidadMedico, date: data.fechaDashboard, nextAppointment: data.proximaCita,
             html: pug.renderFile(`views/${view}.pug`, { ...data, pacientes: [], citasHoy: [] })
         });
         next();
@@ -65,6 +65,7 @@ after(async () => {
 });
 beforeEach(() => {
     queries = []; profileExists = true; failQuery = false; specialty = true;
+    rows.splice(2);
     mock.timers.setTime(Date.parse("2026-11-09T17:00:00Z"));
 });
 const request = (user = 7) => fetch(base + "/medico/dashboard?medico_id=10&usuario_id=8", {
@@ -128,6 +129,32 @@ test("fecha visible, consulta diaria y métricas comparten el instante de Bogot�
         assert.equal(queries[2][1].where.fecha, date);
         assert.equal(body.metrics.todayTotal, total);
     }
+});
+
+test("próxima cita reutiliza la consulta diaria y Pug escapa nombres y motivos", async () => {
+    const payload = '<img src=x onerror="alert(1)">';
+    rows.push({ id_cita: 3, medico_id: 9, paciente_id: 32, fecha: "2026-11-09", hora: "13:00:00",
+        Estado: { nombre: "Confirmada" }, Paciente: { Usuario: { nombres: payload, apellidos: "Paciente" } }, motivo_consulta: payload });
+    const body = await (await request()).json();
+    assert.equal(body.nextAppointment.hora, "1:00 PM");
+    assert.equal(body.nextAppointment.paciente, payload + " Paciente");
+    assert.equal(body.nextAppointment.motivo, payload);
+    assert(body.html.includes("&lt;img src=x"));
+    assert(!body.html.includes(payload));
+    assert.equal(queries.length, 3);
+    const card = body.html.slice(body.html.indexOf('class="proxima-cita '), body.html.indexOf('id="pacientesView"'));
+    assert(card.includes("1:00 PM"));
+    assert.doesNotMatch(card, /Ana Rodríguez|Medicina interna|11:00 AM/);
+});
+
+test("sin próxima cita se representa el estado vacío sin nombres ni horas ficticias", async () => {
+    const body = await (await request()).json();
+    assert.equal(body.nextAppointment, null);
+    assert(body.html.includes("No tienes más citas programadas para hoy"));
+    assert(body.html.includes("Tu agenda está libre por el momento"));
+    const card = body.html.slice(body.html.indexOf('class="proxima-cita '), body.html.indexOf('id="pacientesView"'));
+    assert(card.includes("Tu agenda está libre por el momento"));
+    assert.doesNotMatch(card, /Ana Rodríguez|Medicina interna|11:00 AM/);
 });
 
 test("sesión ausente y otros roles no llegan a las consultas médicas", async () => {

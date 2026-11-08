@@ -1,5 +1,35 @@
 const dayMs = 86400000;
 
+export function nextAppointmentToday(appointments, doctorId, now = new Date()) {
+    const { today } = dashboardPeriods(now);
+    const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "America/Bogota", hourCycle: "h23",
+        hour: "2-digit", minute: "2-digit", second: "2-digit"
+    }).formatToParts(now);
+    const clock = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    const currentSeconds = Number(clock.hour) * 3600 + Number(clock.minute) * 60
+        + Number(clock.second) + now.getUTCMilliseconds() / 1000;
+    let next = null, nextSeconds = Infinity;
+    for (const appointment of appointments) {
+        if (appointment.medico_id !== doctorId || appointment.fecha !== today
+            || !["Pendiente", "Confirmada"].includes(appointment.Estado?.nombre)) continue;
+        // TIME es una hora civil; no se convierte a Date ni a la zona del servidor.
+        const time = /^(\d{2}):([0-5]\d)(?::([0-5]\d)(\.\d+)?)?$/.exec(appointment.hora);
+        if (!time || Number(time[1]) > 23) continue;
+        const hour = Number(time[1]), minute = Number(time[2]);
+        const seconds = hour * 3600 + minute * 60 + Number(time[3] || 0) + Number(time[4] || 0);
+        if (seconds <= currentSeconds || seconds >= nextSeconds) continue;
+        nextSeconds = seconds;
+        const patient = appointment.Paciente?.Usuario;
+        next = {
+            hora: `${hour % 12 || 12}:${time[2]} ${hour < 12 ? "AM" : "PM"}`,
+            paciente: [patient?.nombres, patient?.apellidos].filter(Boolean).join(" ") || "Paciente no disponible",
+            motivo: appointment.motivo_consulta?.trim() || "Motivo no registrado"
+        };
+    }
+    return next;
+}
+
 export function dashboardPeriods(now = new Date()) {
     const parts = new Intl.DateTimeFormat("en-CA", {
         timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit"

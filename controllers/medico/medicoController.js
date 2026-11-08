@@ -6,7 +6,7 @@ import Diagnostico from "../../models/Diagnostico.js";
 import Prescripcion from "../../models/Prescripcion.js";
 import EstadoCita from "../../models/EstadoCita.js";
 import Especialidad from "../../models/Especialidad.js";
-import { calculateDashboardMetrics, dashboardPeriods } from "../../services/medico/dashboardMetricsService.js";
+import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday } from "../../services/medico/dashboardMetricsService.js";
 
 const dashboard = async (req, res) => {
 
@@ -132,6 +132,7 @@ const dashboard = async (req, res) => {
                 medico,
                 pacientes,
                 citasHoy,
+                proximaCita: nextAppointmentToday(citasHoy, medico.id_medico, now),
                 nombreMedico: [medico.Usuario?.nombres, medico.Usuario?.apellidos].filter(Boolean).join(" "),
                 especialidadMedico: medico.Especialidad?.nombre?.trim() || "Especialidad no registrada",
                 fechaDashboard: new Intl.DateTimeFormat("es-CO", {
