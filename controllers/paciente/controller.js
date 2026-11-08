@@ -142,6 +142,10 @@ export const listarConfiguracionNotificaciones = async (req, res) => {
     const configuracionNotificaciones = {
         tituloPagina: 'Configuración de Notificaciones',
         fechaActual: new Intl.DateTimeFormat('es-CO', { dateStyle: 'long' }).format(new Date()),
+        paciente: {
+            nombre: `${req.usuario.nombres} ${req.usuario.apellidos}`,
+            rol: 'Paciente'
+        },
         activeSection: 'notificaciones',
         correo: con.correo,
         sms: con.sms,

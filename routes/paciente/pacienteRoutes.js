@@ -9,6 +9,7 @@ import {
 } from "../../controllers/paciente/controller.js";
 import { Usuario, Cita, Medico, Especialidad, EstadoCita } from '../../models/index.js'
 import { mostrarFormularioCancelacion, solicitarCodigoCancelacion, verificarCodigoCancelacion } from '../../controllers/paciente/cancelAppointment.js'
+import { solicitarCodigoCitaPaciente, verificarCodigoCitaPaciente, cancelarCodigoCitaPaciente, listarHorasDisponiblesCitaPaciente } from '../../controllers/paciente/appointmentIdentityController.js'
 import { mostrarEdicionPerfil, guardarEdicionPerfil, cambiarContrasenaPaciente, obtenerOCrearPerfilPaciente } from '../../controllers/paciente/profileController.js'
 
 
@@ -39,7 +40,13 @@ router.get('/perfil', auth, role(3), async (req, res) => {
             condicionesMedicas: pacienteDB.condiciones_medicas,
             direccion: pacienteDB.direccion,
             departamento: pacienteDB.departamento,
-            ciudad: pacienteDB.ciudad
+            ciudad: pacienteDB.ciudad,
+            contactoEmergencia: {
+                nombres: pacienteDB.contacto_emergencia_nombres,
+                apellidos: pacienteDB.contacto_emergencia_apellidos,
+                telefono: pacienteDB.contacto_emergencia_telefono,
+                correo: pacienteDB.contacto_emergencia_correo
+            }
         }
         res.render('viewsPaciente/profile', {
             tituloPagina: 'Mi Perfil',
@@ -91,6 +98,8 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
 
         const citas = citasDB.map((cita) => ({
             id: cita.id_cita,
+            medicoId: cita.medico_id,
+            especialidadId: cita.Medico?.especialidad_id,
             fecha: formatearFecha(cita.fecha),
             hora: String(cita.hora).slice(0, 5),
             consultorio: cita.Medico?.Especialidad?.nombre || 'Consulta médica',
@@ -105,11 +114,23 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
         )
         const proximaCitaVista = proximaCita ? {
             fecha: formatearFecha(proximaCita.fecha),
+            hora: String(proximaCita.hora).slice(0, 5),
             doctor: proximaCita.Medico?.Usuario
                 ? `Dr. ${proximaCita.Medico.Usuario.nombres} ${proximaCita.Medico.Usuario.apellidos}`
                 : 'Médico asignado',
             consultorio: proximaCita.Medico?.Especialidad?.nombre || 'Consulta médica'
         } : null
+
+        const [especialidadesDB, medicosDB] = await Promise.all([
+            Especialidad.findAll({ order: [['nombre', 'ASC']] }),
+            Medico.findAll({
+                include: [
+                    { model: Usuario, attributes: ['nombres', 'apellidos'] },
+                    { model: Especialidad, attributes: ['id_especialidad', 'nombre'] }
+                ],
+                order: [[Usuario, 'nombres', 'ASC']]
+            })
+        ])
 
         res.render('viewsPaciente/dashboard', {
             tituloPagina: 'Portal del Paciente',
@@ -120,7 +141,18 @@ router.get('/dashboard', auth, role(3), async (req, res) => {
             },
             activeSection: 'citas',
             citas,
-            proximaCita: proximaCitaVista
+            proximaCita: proximaCitaVista,
+            especialidades: especialidadesDB.map((especialidad) => ({
+                id: especialidad.id_especialidad,
+                nombre: especialidad.nombre
+            })),
+            medicos: medicosDB.map((medico) => ({
+                id: medico.id_medico,
+                especialidadId: medico.especialidad_id,
+                nombre: medico.Usuario
+                    ? `Dr. ${medico.Usuario.nombres} ${medico.Usuario.apellidos}`
+                    : 'Médico'
+            }))
         })
     } catch (error) {
         console.error('Error al cargar el dashboard del paciente:', error)
@@ -141,6 +173,10 @@ router.get(
 
 router.get('/notificaciones', auth, role(3), listarConfiguracionNotificaciones);
 router.post('/notificacion', auth, role(3), actualizarConfiguracionNotificaciones);
+router.post('/citas/codigo/solicitar', auth, role(3), solicitarCodigoCitaPaciente);
+router.post('/citas/codigo/verificar', auth, role(3), verificarCodigoCitaPaciente);
+router.post('/citas/codigo/cancelar', auth, role(3), cancelarCodigoCitaPaciente);
+router.get('/citas/horarios-disponibles', auth, role(3), listarHorasDisponiblesCitaPaciente);
 
 // Verificación de identidad antes de cancelar una cita.
 router.get('/citas/:id/cancelar', auth, role(3), mostrarFormularioCancelacion)
