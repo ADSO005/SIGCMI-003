@@ -40,13 +40,6 @@ window.cambiarVista = (e, viewId, link) => {
   if (window.innerWidth <= 768) cerrarSidebarMovil();
 };
 
-// CERRAR SESIÓN
-window.cerrarSesion = () => {
-  if (confirm("¿Seguro que deseas cerrar sesión?")) {
-    alert("Sesión cerrada. Redirigiendo al login...");
-  }
-};
-
 // BOTON INICIAR CONSULTA
 window.iniciarConsulta = async (id) => {
     try {
