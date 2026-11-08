@@ -46,15 +46,19 @@ const mostrarFormularioCancelacion = async (req, res) => {
 }
 
 const solicitarCodigoCancelacion = async (req, res) => {
+    let cita = null
+    let correoIngresado = ''
+
     try {
-        const { cita } = await obtenerCitaPaciente(req.params.id, req.usuario.id_usuario)
+        const resultado = await obtenerCitaPaciente(req.params.id, req.usuario.id_usuario)
+        cita = resultado.cita
         if (!cita) return res.status(404).send('No se encontró esta cita para tu cuenta.')
 
         if (!ESTADOS_CANCELABLES.includes(cita.Estado?.nombre)) {
             return res.status(400).send('Esta cita no se puede cancelar por su estado actual.')
         }
 
-        const correoIngresado = String(req.body.correo || '').trim().toLowerCase()
+        correoIngresado = String(req.body.correo || '').trim().toLowerCase()
         const correoRegistrado = String(req.usuario.correo || '').trim().toLowerCase()
         if (!correoIngresado || correoIngresado !== correoRegistrado) {
             return renderCorreo(
@@ -106,8 +110,22 @@ const solicitarCodigoCancelacion = async (req, res) => {
 
         return renderCodigo(res, cita, correoIngresado)
     } catch (error) {
-        console.error('Error al enviar el código de cancelación:', error)
-        return res.status(500).send('No fue posible enviar el código. Inténtalo más tarde.')
+        console.error('Error al enviar el código de cancelación:', {
+            code: error.code,
+            command: error.command,
+            responseCode: error.responseCode,
+            message: error.message
+        })
+
+        if (!cita) return res.status(500).send('No fue posible procesar la solicitud.')
+
+        const mensaje = error.code === 'ETIMEDOUT' || error.code === 'ECONNECTION'
+            ? 'No se pudo conectar con el servidor de correo. Revisa la configuración SMTP y vuelve a intentarlo.'
+            : error.code === 'EAUTH'
+                ? 'El servidor de correo rechazó las credenciales SMTP. Revisa EMAIL_USER y EMAIL_PASS.'
+                : 'No fue posible enviar el código. Revisa la configuración del correo e inténtalo de nuevo.'
+
+        return renderCorreo(res, cita, correoIngresado, mensaje, 503)
     }
 }
 

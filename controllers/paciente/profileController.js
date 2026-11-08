@@ -23,7 +23,13 @@ const obtenerDatosFormulario = (usuario, paciente, body = {}) => ({
     condicionesMedicas: body.condicionesMedicas ?? paciente.condiciones_medicas ?? '',
     direccion: body.direccion ?? paciente.direccion ?? '',
     departamento: body.departamento ?? paciente.departamento ?? '',
-    ciudad: body.ciudad ?? paciente.ciudad ?? ''
+    ciudad: body.ciudad ?? paciente.ciudad ?? '',
+    contactoEmergencia: {
+        nombres: body.contactoNombres ?? paciente.contacto_emergencia_nombres ?? '',
+        apellidos: body.contactoApellidos ?? paciente.contacto_emergencia_apellidos ?? '',
+        telefono: body.contactoTelefono ?? paciente.contacto_emergencia_telefono ?? '',
+        correo: body.contactoCorreo ?? paciente.contacto_emergencia_correo ?? ''
+    }
 })
 
 const renderizarFormulario = (req, res, opciones = {}) => {
@@ -153,7 +159,11 @@ export const guardarEdicionPerfil = async (req, res) => {
                 condiciones_medicas: String(req.body.condicionesMedicas || '').trim() || null,
                 direccion: String(req.body.direccion || '').trim() || null,
                 departamento: String(req.body.departamento || '').trim() || null,
-                ciudad: String(req.body.ciudad || '').trim() || null
+                ciudad: String(req.body.ciudad || '').trim() || null,
+                contacto_emergencia_nombres: String(req.body.contactoNombres || '').trim() || null,
+                contacto_emergencia_apellidos: String(req.body.contactoApellidos || '').trim() || null,
+                contacto_emergencia_telefono: String(req.body.contactoTelefono || '').trim() || null,
+                contacto_emergencia_correo: String(req.body.contactoCorreo || '').trim() || null
             }, { transaction })
         })
 

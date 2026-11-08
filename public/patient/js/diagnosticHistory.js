@@ -27,13 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const setArrowState = (card, collapsed = false) => {
-        const arrow = card.querySelector('svg')?.parentElement
+        const arrow = card.querySelector('.diagnostic-arrow')
         const path = arrow?.querySelector('path')
         if (!arrow || !path) return
-        arrow.classList.toggle('order-first', collapsed)
         path.setAttribute('d', collapsed
             ? 'M15.75 4.5L8.25 12l7.5 7.5'
             : 'M8.25 4.5l7.5 7.5-7.5 7.5')
+        arrow.setAttribute('aria-label', collapsed ? 'Ocultar detalle del diagnóstico' : 'Ver detalle del diagnóstico')
     }
 
     const showDetail = () => {
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rightPanel?.classList.add('hidden')
         grid?.classList.remove('lg:grid-cols-2')
         grid?.classList.add('lg:grid-cols-1')
-        cards.forEach((card) => setArrowState(card, card.classList.contains('border-indigo-500')))
+        cards.forEach((card) => setArrowState(card))
     }
 
     const selectCard = (card) => {
@@ -72,16 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
             setText('det-observaciones', card.dataset.observaciones, 'Sin notas adicionales')
 
             showDetail()
-            setArrowState(card)
+            setArrowState(card, true)
     }
 
     cards.forEach((card) => {
         card.addEventListener('click', (event) => {
-            const flecha = event.target.closest('svg')?.parentElement
+            const flecha = event.target.closest('.diagnostic-arrow')
             if (flecha && card.contains(flecha)) {
                 event.stopPropagation()
                 if (card.classList.contains('border-indigo-500')) {
-                    if (rightPanel?.classList.contains('hidden')) showDetail()
+                    if (rightPanel?.classList.contains('hidden')) {
+                        showDetail()
+                        setArrowState(card, true)
+                    }
                     else collapseDetail()
                 } else {
                     selectCard(card)

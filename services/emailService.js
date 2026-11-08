@@ -1,17 +1,23 @@
 import nodemailer from "nodemailer";
 
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: false,
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 20000,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+const createTransporter = () => {
+    const port = Number(process.env.EMAIL_PORT || 587);
+
+    return nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port,
+        secure: port === 465,
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 20000,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+};
+
+const transporter = createTransporter();
 
 /* funcion smtp simulador envios de correos */
 const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
@@ -27,6 +33,25 @@ const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
         subject: "Código para cancelar tu cita - SIGCMI",
         text: `Hola ${usuario.nombres || ""}. Tu código para confirmar la cancelación de la cita del ${fecha} a las ${hora} es ${codigo}. Vence en 10 minutos.`,
         html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:24px auto;padding:24px;color:#334155"><h2 style="color:#1d4ed8">Confirma la cancelación de tu cita</h2><p>Hola ${usuario.nombres || ""},</p><p>Ingresa este código para confirmar la cancelación de tu cita del ${fecha} a las ${hora}:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1d4ed8">${codigo}</p><p>El código vence en 10 minutos. Si no solicitaste esta cancelación, ignora este mensaje.</p><p style="font-size:13px;color:#64748b">SIGCMI - Sistema Integral de Gestión de Citas Médicas</p></div>`
+    });
+};
+
+const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) => {
+    const fecha = new Intl.DateTimeFormat("es-CO", {
+        dateStyle: "long",
+        timeZone: "America/Bogota"
+    }).format(new Date(`${cita.fecha}T12:00:00`));
+    const hora = String(cita.hora).slice(0, 5);
+    const esReprogramacion = accion === "reprogramacion";
+    const asunto = esReprogramacion ? "Confirma la reprogramación de tu cita" : "Confirma tu nueva cita";
+    const accionTexto = esReprogramacion ? "reprogramar" : "confirmar";
+
+    await transporter.sendMail({
+        from: process.env.EMAIL_FROM,
+        to: usuario.correo,
+        subject: asunto,
+        text: `Hola ${usuario.nombres || ""}. Tu código para ${accionTexto} la cita del ${fecha} a las ${hora} es ${codigo}. Vence en 10 minutos.`,
+        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:24px auto;padding:24px;color:#334155"><h2 style="color:#1d4ed8">${asunto}</h2><p>Hola ${usuario.nombres || ""},</p><p>Ingresa este código para ${accionTexto} la cita del ${fecha} a las ${hora}:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1d4ed8">${codigo}</p><p>El código vence en 10 minutos. Si no solicitaste esta acción, ignora este mensaje.</p><p style="font-size:13px;color:#64748b">SIGCMI - Sistema Integral de Gestión de Citas Médicas</p></div>`
     });
 };
 
@@ -308,5 +333,6 @@ const sendConfirmationEmail = async (registro) => {
 export {
     sendRecoveryEmail,
     sendConfirmationEmail,
-    sendCancellationCodeEmail
+    sendCancellationCodeEmail,
+    sendAppointmentIdentityCodeEmail
 };

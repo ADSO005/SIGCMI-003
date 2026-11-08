@@ -1,0 +1,21 @@
+#modalConfirmarCerrarSesion.fixed.inset-0.z-50.hidden.items-center.justify-center.p-4(
+  class="bg-slate-900/60"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="tituloConfirmarCerrarSesion"
+  aria-describedby="textoConfirmarCerrarSesion"
+)
+  .w-full.max-w-md.rounded-xl.bg-white.p-6.shadow-2xl
+    h2#tituloConfirmarCerrarSesion.text-xl.font-bold.text-slate-800 Confirmar cierre de sesión
+    p#textoConfirmarCerrarSesion.mt-3.text-sm.text-slate-600 ¿Seguro que deseas cerrar tu sesión?
+
+    .mt-6.flex.justify-end.gap-3
+      button#btnCancelarCerrarSesion.rounded-lg.border.border-slate-300.bg-white.px-4.py-2.text-sm.font-medium.text-slate-700.transition(
+        type="button"
+        class="hover:bg-slate-50"
+      ) Cancelar
+
+      button#btnConfirmarCerrarSesion.rounded-lg.bg-red-600.px-4.py-2.text-sm.font-semibold.text-white.transition(
+        type="button"
+        class="hover:bg-red-700"
+      ) Sí, cerrar sesión
