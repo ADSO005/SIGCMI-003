@@ -157,78 +157,48 @@ window.finalizarConsulta = async (id) => {
     }
 };
 
-// MODAL GESTIÓN CITAS
+// MODAL DE CONSULTA DE CITAS
+let citaReturnFocus = null;
+let citaPreviousOverflow = "";
+
 window.abrirModal = () => {
   const modal = document.getElementById("modalGestionCitas");
-  if (modal) {
-    modal.classList.add("abierto");
-    actualizarSubtitulo();
-  }
+  if (!modal || modal.classList.contains("abierto")) return;
+  citaReturnFocus = document.activeElement;
+  citaPreviousOverflow = document.body.style.overflow;
+  modal.classList.add("abierto");
+  document.body.style.overflow = "hidden";
+  document.getElementById("cerrarGestionCitas").focus();
 };
 
 window.cerrarModal = () => {
   const modal = document.getElementById("modalGestionCitas");
-  if (modal) modal.classList.remove("abierto");
+  if (!modal?.classList.contains("abierto")) return;
+  modal.classList.remove("abierto");
+  document.body.style.overflow = citaPreviousOverflow;
+  citaReturnFocus?.focus();
 };
 
-window.filtrarCitas = () => {
-  const inputSearch = document.querySelector(".modal-gc-search");
-  const selectEstado = document.querySelector(".modal-gc-select");
-  
-  const texto  = inputSearch ? inputSearch.value.toLowerCase() : "";
-  const estado = selectEstado ? selectEstado.value : "";
-  let visibles  = 0;
+window.cerrarModalFuera = event => {
+  if (event.target.id === "modalGestionCitas") window.cerrarModal();
+};
 
-  document.querySelectorAll(".cita-card").forEach(card => {
-    const coincide = card.textContent.toLowerCase().includes(texto) &&
-                     (!estado || card.dataset.estado === estado);
-    card.style.display = coincide ? "" : "none";
-    if (coincide) visibles++;
-  });
-
-  const sinRes = document.querySelector(".sin-resultados");
-  if (sinRes) sinRes.remove();
-
-  if (visibles === 0) {
-    const msg = document.createElement("p");
-    msg.className  = "sin-resultados";
-    msg.textContent = "No se encontraron citas.";
-    const lista = document.getElementById("listaCitas");
-    if (lista) lista.appendChild(msg);
+window.gestionarTecladoCitas = event => {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    window.cerrarModal();
+  } else if (event.key === "Tab") {
+    const controls = [...document.getElementById("modalGestionCitas").querySelectorAll("button, input, select")];
+    const first = controls[0], last = controls[controls.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   }
-
-  actualizarSubtitulo(visibles);
 };
-
-function actualizarSubtitulo(n) {
-  const total = n !== undefined ? n : document.querySelectorAll(".cita-card").length;
-  const subtitulo = document.getElementById("modalSubtitulo");
-  if (subtitulo) subtitulo.textContent = `Total de citas ${total}`;
-}
-
-// REPROGRAMAR CITA
-window.abrirReprogramar = (btn) => {
-  const card = btn.closest(".cita-card");
-  const infoUser = card.querySelector(".cita-info:nth-child(4)");
-  
-  if (infoUser) {
-    const nombre = infoUser.textContent.replace("👤","").trim();
-    const lblNombre = document.getElementById("reprogramarNombre");
-    if (lblNombre) lblNombre.textContent = nombre;
-  }
-
-  document.getElementById("modalGestionCitas")?.classList.remove("abierto");
-  document.getElementById("modalReprogramar")?.classList.add("abierto");
-};
-
-function cerrarReprogramar() {
-  document.getElementById("modalReprogramar")?.classList.remove("abierto");
-  document.getElementById("modalGestionCitas")?.classList.add("abierto");
-}
-
-window.cerrarReprogramarFuera = (event) => {
-  if (event.target.id === "modalReprogramar") cerrarReprogramar();
-}
 
 // MODAL HORARIO
 const diasHorario = new Set([

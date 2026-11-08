@@ -8,8 +8,8 @@ import pug from "pug";
 // Se prueba el dashboard real y sus barreras de acceso, sin importar modelos conectados.
 let queries, profileExists, failQuery, specialty;
 const rows = [
-    { id_cita: 1, medico_id: 9, paciente_id: 30, fecha: "2026-11-09", Estado: { nombre: "Completada" }, Paciente: { id_paciente: 30 } },
-    { id_cita: 2, medico_id: 10, paciente_id: 31, fecha: "2026-11-09", Estado: { nombre: "Pendiente" }, Paciente: { id_paciente: 31 } }
+    { id_cita: 1, medico_id: 9, paciente_id: 30, fecha: "2026-11-09", hora: "10:00:00", Estado: { nombre: "Completada" }, Paciente: { id_paciente: 30 } },
+    { id_cita: 2, medico_id: 10, paciente_id: 31, fecha: "2026-11-09", hora: "14:00:00", Estado: { nombre: "Pendiente" }, Paciente: { id_paciente: 31 } }
 ];
 const models = {
     Usuario: { findByPk: async id => ({ id_usuario: id, rol_id: [7, 8].includes(id) ? 2 : id, estado: true }) },
@@ -46,7 +46,7 @@ before(async () => {
     app.use((req, res, next) => {
         res.render = (view, data) => res.json({
             view, metrics: data.dashboardMetrics, name: data.nombreMedico,
-            specialty: data.especialidadMedico, date: data.fechaDashboard, nextAppointment: data.proximaCita,
+            specialty: data.especialidadMedico, date: data.fechaDashboard, nextAppointment: data.proximaCita, appointments: data.citasAgenda,
             html: pug.renderFile(`views/${view}.pug`, { ...data, pacientes: [], citasHoy: [] })
         });
         next();
@@ -155,6 +155,37 @@ test("sin próxima cita se representa el estado vacío sin nombres ni horas fict
     const card = body.html.slice(body.html.indexOf('class="proxima-cita '), body.html.indexOf('id="pacientesView"'));
     assert(card.includes("Tu agenda está libre por el momento"));
     assert.doesNotMatch(card, /Ana Rodríguez|Medicina interna|11:00 AM/);
+});
+
+test("agenda contiene solo citas propias ordenadas y datos mínimos, sin consultas adicionales", async () => {
+    rows.push(
+        { id_cita: 3, medico_id: 9, paciente_id: 32, fecha: "2026-11-08", hora: "09:00:00", Estado: { nombre: "Confirmada" }, motivo_consulta: "Control" },
+        { id_cita: 4, medico_id: 9, paciente_id: 33, fecha: "2026-11-09", hora: "08:00:00", Estado: { nombre: "Cancelada" }, motivo_consulta: "   " }
+    );
+    const body = await (await request()).json();
+    assert.deepEqual(body.appointments.map(cita => [cita.fecha, cita.hora, cita.estado]), [
+        ["2026-11-08", "09:00:00", "Confirmada"], ["2026-11-09", "08:00:00", "Cancelada"], ["2026-11-09", "10:00:00", "Completada"]
+    ]);
+    assert.equal(body.appointments[1].motivo, "Motivo no registrado");
+    assert.deepEqual(Object.keys(body.appointments[0]).sort(), ["estado", "fecha", "hora", "motivo", "paciente"]);
+    assert.equal(queries.length, 3);
+    assert(queries[1][1].attributes.includes("hora"));
+    assert(queries[1][1].attributes.includes("motivo_consulta"));
+    const other = await (await request(8)).json();
+    assert.equal(other.appointments.length, 1);
+    assert.equal(other.appointments[0].estado, "Pendiente");
+    assert.equal(other.appointments[0].hora, "14:00:00");
+});
+
+test("sin citas propias el dashboard entrega una agenda vacía", async () => {
+    rows.push(...rows.splice(0, 2).map(cita => ({ ...cita, medico_id: 10 })));
+    try {
+        const body = await (await request()).json();
+        assert.deepEqual(body.appointments, []);
+        assert(body.html.includes("No tienes citas registradas."));
+    } finally {
+        rows[0].medico_id = 9;
+    }
 });
 
 test("sesión ausente y otros roles no llegan a las consultas médicas", async () => {

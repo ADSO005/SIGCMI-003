@@ -34,7 +34,7 @@ const dashboard = async (req, res) => {
             where: {
                 medico_id: medico.id_medico
             },
-            attributes: ["id_cita", "medico_id", "paciente_id", "fecha"],
+            attributes: ["id_cita", "medico_id", "paciente_id", "fecha", "hora", "motivo_consulta"],
             include: [
                 {
                     model: Paciente,
@@ -121,6 +121,15 @@ const dashboard = async (req, res) => {
 
         const pacientes = Array.from(pacientesMap.values());
 
+        // El modal recibe solo datos de consulta, sin información clínica adicional.
+        const citasAgenda = citas.map(cita => ({
+            fecha: cita.fecha,
+            hora: cita.hora,
+            paciente: [cita.Paciente?.Usuario?.nombres, cita.Paciente?.Usuario?.apellidos].filter(Boolean).join(" ") || "Paciente no disponible",
+            motivo: cita.motivo_consulta?.trim() || "Motivo no registrado",
+            estado: cita.Estado?.nombre || "Sin estado"
+        })).sort((a, b) => a.fecha.localeCompare(b.fecha) || a.hora.localeCompare(b.hora));
+
         console.log("Médico:", medico.id_medico);
         console.log("Pacientes encontrados:", pacientes.length);
         console.log("Citas de hoy:", citasHoy.length);
@@ -132,6 +141,7 @@ const dashboard = async (req, res) => {
                 medico,
                 pacientes,
                 citasHoy,
+                citasAgenda,
                 proximaCita: nextAppointmentToday(citasHoy, medico.id_medico, now),
                 nombreMedico: [medico.Usuario?.nombres, medico.Usuario?.apellidos].filter(Boolean).join(" "),
                 especialidadMedico: medico.Especialidad?.nombre?.trim() || "Especialidad no registrada",
