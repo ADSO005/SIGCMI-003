@@ -10,23 +10,45 @@ enviado por el navegador no selecciona al propietario.
 Los pacientes solicitan citas dentro de la disponibilidad permitida. El antiguo
 flujo de solicitudes semanales de horarios por médicos está descartado.
 
-El modal conserva una presentación de texto, sin controles de edición. Informa
-carga, ausencia de asignaciones, sesión expirada y errores. Valida la respuesta
-completa antes de mostrar franjas. Al cerrar o reabrir aborta la petición anterior
-y descarta respuestas tardías, incluso si ya comenzó la lectura del JSON.
+El modal «Mi agenda semanal» es exclusivamente de lectura: encabezado azul,
+indicador de solo lectura, siete celdas de lunes a domingo y tarjetas de franjas.
+Abre en la semana actual de Bogotá. Los botones anterior/siguiente cambian la
+semana sin escribir registros ni repetir el GET. Se pueden consultar semanas
+pasadas y futuras. Al reabrir se recargan los datos desde administración.
 
-## Limitación de períodos de vigencia
+El día actual se distingue con borde y `aria-current="date"`. Un punto azul
+indica franjas aprobadas; los pendientes y rechazados se muestran con su estado
+real, sin marcar disponibilidad aprobada. Los días sin asignaciones son neutros.
+Las tarjetas muestran horas y vigencia completa. Varias franjas del mismo día
+permanecen separadas, ordenadas por hora inicial, final e identificador; no se
+fusionan ni se completa disponibilidad inexistente.
 
-El modelo vigente `Horario` conserva `fecha_inicio` y `fecha_fin`, pero el GET
-actual no los consulta ni devuelve. El modal muestra día, horas y estado; no
-permite determinar si la asignación corresponde a esta semana, al mes o a un
-período anterior. No se presenta ninguna franja como disponibilidad vigente para
-reservar citas ni se inventan fechas.
+Se informa carga, ausencia total de asignaciones, semana sin horarios, sesión
+expirada y errores. La navegación está deshabilitada hasta completar la carga.
+Se valida la respuesta completa antes de mostrar franjas. Al cerrar o reabrir se
+aborta la petición anterior y se descartan respuestas tardías, incluso durante la
+lectura del JSON. Los datos externos se representan con `textContent`.
 
-Se propone, para una entrega autorizada, ampliar explícitamente la respuesta con
-ambas fechas y mostrar el intervalo inclusivo de cada franja. Antes de filtrar
-períodos vencidos o futuros debe acordarse si la consulta incluye el historial de
-asignaciones. Esta entrega no modifica el contrato, modelos ni MySQL.
+## Contrato GET y períodos de vigencia
+
+`GET /medico/horarios` mantiene `{ horarios, revision }`. Cada horario conserva
+`id_horario`, `dia_semana`, `hora_inicio`, `hora_fin` y `estado`, y añade
+`fecha_inicio` y `fecha_fin` como cadenas `YYYY-MM-DD` de los campos `DATEONLY`
+existentes. Las horas `TIME` admiten `HH:mm:ss` y el cliente también valida
+`HH:mm`. Se mantienen autenticación, rol y filtro de propiedad. No se modifican
+modelos, asociaciones, migraciones ni administración.
+
+Una franja aparece en una fecha solo cuando coincide su día semanal y se cumple
+`fecha_inicio <= fecha <= fecha_fin`, incluyendo ambos extremos. Esto permite
+períodos mensuales, límites a mitad de semana y distintos períodos en una misma
+semana. El GET devuelve todas las asignaciones propias; la visualización aplica
+la vigencia a cada fecha, sin eliminar registros anteriores o futuros.
+
+La fecha actual se obtiene con `Intl.DateTimeFormat` en `America/Bogota`.
+Las fechas civiles se convierten a números de día mediante componentes UTC para
+hacer aritmética, sin interpretarlas como medianoche del equipo. El formato de
+esas fechas utiliza UTC para evitar desplazamientos. Las vigencias ausentes,
+imposibles o invertidas provocan un error de respuesta, nunca horarios inventados.
 
 ## Código y evidencia anteriores
 
@@ -35,7 +57,8 @@ integración se retiraron `crearServicioHorarios`, sus validadores de escritura,
 comparadores de franjas, manejo de conflictos y transacciones de creación,
 actualización y eliminación. No tenían consumidores activos. El servicio conserva
 únicamente `revisionHorarios` y la conversión de registros Sequelize necesaria
-para calcularla; el GET mantiene su respuesta y su filtro por médico autenticado.
+para calcularla; la ampliación del GET conserva los campos anteriores y su filtro
+por médico autenticado.
 
 El CRUD administrativo y sus dependencias permanecen intactos. También se conserva
 `actualizarEstadoCita`: es una operación activa de atención de citas, no de edición
@@ -65,10 +88,22 @@ rechazo de roles y sesiones, ausencia de escritura, errores y respuestas tardía
 La regresión incluye logout e historial clínico seguro. Las pruebas de revisión
 ejecutan la función real con datos en memoria, sin modelos conectados.
 
-Resultado de esta limpieza: **22 pruebas aprobadas**, sintaxis JavaScript,
-compilación Pug y ESLint médicos correctos. Las evidencias históricas de MySQL y
+La agenda añade cobertura de navegación, tres días asignados, vigencias inclusivas,
+meses, múltiples franjas, cambio de año y fecha de Bogotá. También se comprueban
+respuestas inválidas, estados no aprobados y cierre durante peticiones.
+
+Verificación de esta entrega: **29 pruebas médicas aprobadas**, Pug, sintaxis y
+ESLint correctos. Las 13 pruebas del modal también pasan con `TZ=Pacific/Auckland`
+y `TZ=America/Los_Angeles`. Se comprobó la generación de las clases Tailwind en una
+salida temporal, sin modificar CSS compilado del repositorio.
+
+Las evidencias históricas de MySQL y
 navegador no se cuentan como verificaciones de esta rama. No se ejecutaron pruebas
 de persistencia ni validación manual en navegador.
+
+Después de compilar Tailwind desde sus fuentes, comprobar manualmente el modal en
+escritorio y móvil: contraste, foco al abrir/cerrar, navegación, períodos reales y
+ausencia de desbordamiento. El CSS generado no se incluye en estos commits.
 
 No ejecutar `tests/database.test.js` como parte de esta comprobación: aplica
 migraciones e inserta datos. Una prueba con MySQL requiere una base aislada y
