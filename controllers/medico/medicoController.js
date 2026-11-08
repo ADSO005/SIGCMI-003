@@ -257,75 +257,83 @@ const detallePaciente = async (req, res) => {
 };
 
 const actualizarEstadoCita = async (req, res) => {
+    const { id } = req.params;
+    const cuerpo = req.body;
+    const idValido = valor => Number.isInteger(valor) && valor > 0 && valor <= 2147483647;
+    if (!/^[1-9]\d*$/.test(id) || !idValido(Number(id))) {
+        return res.status(400).json({ mensaje: "ID de cita inválido" });
+    }
+    if (!cuerpo || typeof cuerpo !== "object" || Array.isArray(cuerpo)
+        || Object.keys(cuerpo).length !== 1 || !idValido(cuerpo.estado_id)) {
+        return res.status(400).json({ mensaje: "Envía únicamente un estado_id entero positivo" });
+    }
+
     try {
-        const { id } = req.params;
-        const { estado_id } = req.body;
+        const medico = await Medico.findOne({ where: { usuario_id: req.usuario.id_usuario } });
+        if (!medico) return res.status(404).json({ mensaje: "No se encontró el perfil del médico" });
 
-        // Validar el ID de la cita
-        if (!/^[1-9]\d*$/.test(String(id))) {
-            return res.status(400).json({
-                mensaje: "ID de cita inválido"
-            });
+        const destino = await EstadoCita.findByPk(cuerpo.estado_id, { attributes: ["id_estado", "nombre"] });
+        if (!destino || !["En Curso", "Completada"].includes(destino.nombre)) {
+            return res.status(400).json({ mensaje: "Estado de destino no permitido" });
         }
 
-        // Validar el estado solicitado
-        if (![2, 3].includes(estado_id)) {
-            return res.status(400).json({
-                mensaje: "Estado de cita no permitido"
+        // El bloqueo serializa cambios de esta cita y la respuesta se envía después del commit.
+        const resultado = await Cita.sequelize.transaction(async transaction => {
+            const cita = await Cita.findOne({
+                where: { id_cita: Number(id), medico_id: medico.id_medico },
+                attributes: ["id_cita", "estado_id", "fecha", "hora"],
+                transaction, lock: transaction.LOCK.UPDATE
             });
-        }
+            if (!cita) return { status: 404, mensaje: "Cita no encontrada para este médico" };
 
-        // Buscar al médico autenticado
-        const medico = await Medico.findOne({
-            where: {
-                usuario_id: req.usuario.id_usuario
-            }
-        });
-
-        if (!medico) {
-            return res.status(404).json({
-                mensaje: "No se encontró el perfil del médico"
+            const actual = await EstadoCita.findByPk(cita.estado_id, {
+                attributes: ["nombre"], transaction
             });
-        }
+            const iniciar = destino.nombre === "En Curso";
+            const permitida = iniciar ? ["Pendiente", "Confirmada"].includes(actual?.nombre)
+                : actual?.nombre === "En Curso";
+            if (!permitida) return { status: 409, mensaje: "El estado actual no permite esta transición" };
 
-        // Solo permitir las transiciones:
-        // Pendiente (1) -> En Curso (2)
-        // En Curso (2) -> Completada (3)
-        const estadoAnterior = estado_id === 2 ? 1 : 2;
-
-        // Actualizar únicamente si la cita pertenece al médico
-        // y todavía tiene el estado anterior esperado.
-        const [filasActualizadas] = await Cita.update(
-            {
-                estado_id
-            },
-            {
-                where: {
-                    id_cita: id,
-                    medico_id: medico.id_medico,
-                    estado_id: estadoAnterior
+            if (iniciar) {
+                // Se toma la hora después de obtener el bloqueo, por si la petición tuvo que esperar.
+                const now = new Date();
+                const { today } = dashboardPeriods(now);
+                const partes = new Intl.DateTimeFormat("en-GB", {
+                    timeZone: "America/Bogota", hourCycle: "h23",
+                    hour: "2-digit", minute: "2-digit", second: "2-digit"
+                }).formatToParts(now);
+                const reloj = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+                const segundosActuales = Number(reloj.hour) * 3600 + Number(reloj.minute) * 60
+                    + Number(reloj.second) + now.getUTCMilliseconds() / 1000;
+                const hora = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)(\.\d{1,6})?$/.exec(cita.hora);
+                const segundosCita = hora ? Number(hora[1]) * 3600 + Number(hora[2]) * 60
+                    + Number(hora[3]) + Number(hora[4] || 0) : NaN;
+                if (cita.fecha !== today || !Number.isFinite(segundosCita) || segundosCita > segundosActuales) {
+                    return { status: 409, mensaje: "Solo puedes iniciar la cita en su fecha de Bogotá y desde la hora programada" };
                 }
+            } else {
+                // En Curso puede finalizar otro día; el diagnóstico debe existir y conservarse al actualizar.
+                const diagnostico = await Diagnostico.findOne({
+                    where: { cita_id: cita.id_cita }, attributes: ["id_diagnostico"],
+                    transaction, lock: transaction.LOCK.UPDATE
+                });
+                if (!diagnostico) return { status: 409, mensaje: "Debes guardar un diagnóstico antes de finalizar la cita" };
             }
-        );
 
-        if (filasActualizadas === 0) {
-            return res.status(409).json({
-                mensaje: "No se pudo actualizar la cita. Verifica que te pertenezca y que su estado permita este cambio."
+            const [filasActualizadas] = await Cita.update({ estado_id: destino.id_estado }, {
+                where: { id_cita: cita.id_cita, medico_id: medico.id_medico, estado_id: cita.estado_id },
+                transaction
             });
-        }
-
-        return res.json({
-            mensaje: "Estado de la cita actualizado correctamente",
-            id_cita: Number(id),
-            estado_id
+            if (filasActualizadas !== 1) return { status: 409, mensaje: "La cita cambió de estado; recarga la agenda" };
+            return { status: 200, mensaje: "Estado de la cita actualizado correctamente" };
         });
 
+        const respuesta = { mensaje: resultado.mensaje };
+        if (resultado.status === 200) Object.assign(respuesta, { id_cita: Number(id), estado_id: destino.id_estado });
+        return res.status(resultado.status).json(respuesta);
     } catch (error) {
-        console.error("❌ Error al actualizar la cita:", error);
-
-        return res.status(500).json({
-            mensaje: "Error al actualizar el estado de la cita"
-        });
+        console.error("Error al actualizar el estado de la cita:", error);
+        return res.status(500).json({ mensaje: "Error al actualizar el estado de la cita" });
     }
 };
 export {
