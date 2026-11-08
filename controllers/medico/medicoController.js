@@ -5,10 +5,12 @@ import Usuario from "../../models/Usuario.js";
 import Diagnostico from "../../models/Diagnostico.js";
 import Prescripcion from "../../models/Prescripcion.js";
 import EstadoCita from "../../models/EstadoCita.js";
+import { calculateDashboardMetrics, dashboardPeriods } from "../../services/medico/dashboardMetricsService.js";
 
 const dashboard = async (req, res) => {
 
     try {
+        const now = new Date();
 
         // Buscar el perfil médico del usuario que inició sesión
         const medico = await Medico.findOne({
@@ -27,6 +29,7 @@ const dashboard = async (req, res) => {
             where: {
                 medico_id: medico.id_medico
             },
+            attributes: ["id_cita", "medico_id", "paciente_id", "fecha"],
             include: [
                 {
                     model: Paciente,
@@ -42,13 +45,14 @@ const dashboard = async (req, res) => {
                             ]
                         }
                     ]
-                }
+                },
+                { model: EstadoCita, as: "Estado", attributes: ["nombre"] }
             ]
         });
 
 
-        // Obtener la fecha actual en formato YYYY-MM-DD
-const hoy = new Date().toLocaleDateString("en-CA");
+        // Se reutiliza el mismo día de Bogotá para las métricas y la consulta diaria.
+        const { today: hoy } = dashboardPeriods(now);
 
     // Buscar las citas de hoy del médico
     const citasHoy = await Cita.findAll({
@@ -122,7 +126,8 @@ const hoy = new Date().toLocaleDateString("en-CA");
                 usuario: req.usuario,
                 medico,
                 pacientes,
-                citasHoy
+                citasHoy,
+                dashboardMetrics: calculateDashboardMetrics(citas, medico.id_medico, now)
             }
         );
 
