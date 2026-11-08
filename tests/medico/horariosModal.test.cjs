@@ -47,19 +47,23 @@ const response = (data, status = 200) => ({
   headers: { get: () => "application/json" }, json: async () => data
 });
 
-test("todos los estados se representan como texto y solo se realizan lecturas", async () => {
+test("todos los estados conservan sus franjas sin etiquetas visibles y solo se realizan lecturas", async () => {
   const calls = [];
+  const rows = ["Pendiente", "Aprobado", "Rechazado"].map((estado, i) => ({ ...horario, id_horario: i + 1, estado }));
+  const original = structuredClone(rows);
   const f = fixture(async (url, options) => {
     assert.equal(url, "/medico/horarios");
     assert.equal(options.credentials, "same-origin");
     assert.equal(options.cache, "no-store");
     calls.push(options.method || "GET");
-    return response({ horarios: ["Pendiente", "Aprobado", "Rechazado"].map((estado, i) => ({ ...horario, id_horario: i + 1, estado })) });
+    return response({ horarios: rows });
   });
   await f.api.abrirModalHorarios();
   assert.equal(slots(f).length, 3);
   assert(slots(f).every(node => node.children[0].textContent === "08:00–12:00"));
-  assert.deepEqual(slots(f).map(node => node.children[1].textContent).sort(), ["Aprobado", "Pendiente", "Rechazado"]);
+  assert(slots(f).every(node => node.children.every(child => !/Aprobado|Pendiente|Rechazado/.test(child.textContent))));
+  assert(slots(f).every(node => node.children[1].textContent.startsWith("Vigencia:")));
+  assert.deepEqual(rows, original);
   assert.match(f.status.textContent, /franjas asignadas/);
   f.api.cerrarModalHorarios();
   await f.api.abrirModalHorarios();
@@ -210,7 +214,7 @@ test("franjas independientes se ordenan y coexisten períodos distintos en la mi
   f.api.verSemanaHorarios();
   assert.equal(slots(f).length, 3);
   assert.deepEqual(f.list.children[0].children.slice(1).map(slot => slot.children[0].textContent), ["08:00–12:00", "14:00–18:00"]);
-  assert.match(slots(f)[1].children[2].textContent, /9 de noviembre de 2026/);
+  assert.match(slots(f)[1].children[1].textContent, /9 de noviembre de 2026/);
 });
 
 test("Bogotá y el cambio de año no desplazan fechas DATEONLY", async () => {
@@ -227,11 +231,11 @@ test("Bogotá y el cambio de año no desplazan fechas DATEONLY", async () => {
   assert.equal(year.week(), "2027-01-04");
 });
 
-test("pendientes y rechazados se informan sin marcar disponibilidad aprobada", async () => {
+test("un estado rechazado se conserva en el calendario sin etiqueta visible en la tarjeta", async () => {
   const f = fixture(async () => response({ horarios: [{ ...horario, estado: "Rechazado" }] }));
   await f.api.abrirModalHorarios();
   assert.match(cell(f, "2026-11-09").attrs["aria-label"], /asignaciones sin aprobar/);
-  assert.equal(slots(f)[0].children[1].textContent, "Rechazado");
+  assert(slots(f)[0].children.every(node => node.tagName === "p" && !/Rechazado/.test(node.textContent)));
 });
 
 test("mes que comienza en domingo mantiene 42 fechas consecutivas y días adyacentes tenues", async () => {

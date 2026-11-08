@@ -20,9 +20,10 @@ consecutivas para mantener la alineación. Los días de meses adyacentes se mues
 tenues. El día actual se distingue con borde y `aria-current="date"`; la fecha
 seleccionada tiene fondo azul y `aria-pressed="true"`. Todos los días son botones
 accesibles mediante teclado. Un punto azul indica asignaciones dentro de su
-vigencia, no autorización para reservar. Los estados se muestran en el detalle:
-aprobados con etiqueta verde; pendientes y rechazados con su valor real. Los días
-sin asignaciones son neutros.
+vigencia, no autorización para reservar. Las tarjetas no muestran etiquetas de
+estado. Los estados reales se conservan en el GET y en los datos, siguen
+validándose y mantienen su tratamiento en el calendario. Los días sin
+asignaciones son neutros.
 
 Al abrir se calcula la semana actual de Bogotá. Si hoy tiene asignaciones se
 selecciona y se muestran sus franjas; de lo contrario se muestra la semana

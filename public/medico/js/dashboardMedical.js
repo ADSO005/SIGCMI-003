@@ -360,9 +360,6 @@ function renderScheduleWeek() {
       slot.setAttribute("aria-label", `Franja ${index + 1} de ${rows.length}`);
       const time = value => value.endsWith(":00") ? value.slice(0, 5) : value;
       appendScheduleText(slot, "p", `${time(row.startTime)}–${time(row.endTime)}`, "justify-self-start rounded-lg bg-blue-50 px-2.5 py-1 text-sm font-semibold text-[#2459B8]");
-      appendScheduleText(slot, "span", row.estado, row.estado === "Aprobado"
-        ? "rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-800"
-        : "rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700");
       appendScheduleText(slot, "p", `Vigencia: ${formatScheduleDay(row.startDay)} – ${formatScheduleDay(row.endDay)}`, "col-span-2 mt-1 break-words text-[11px] leading-5 text-slate-500");
       if (rows.length > 1) appendScheduleText(slot, "p", `Franja ${index + 1} de ${rows.length}`, "col-span-2 text-[10px] text-slate-500");
       count++;
