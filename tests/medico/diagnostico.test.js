@@ -76,7 +76,7 @@ const modelos = {
             consultas.push("crear");
             if (fallo === "unique") throw Object.assign(Error("SQL sensible"), { name: "SequelizeUniqueConstraintError" });
             assert.equal(registro, null);
-            registro = fila({ ...datos, id_diagnostico: 80 });
+            registro = fila({ ...datos, decision_medicamentos: "Pendiente", version_prescripciones: 0, id_diagnostico: 80 });
             creados++;
             if (fallo === "crear") throw Error("SQL con diagnóstico sensible");
             return registro;
@@ -173,6 +173,10 @@ test("crea tras medianoche, normaliza opcionales y usa fecha del servidor sin ca
     assert.equal(result.diagnostico.notas_adicionales, null);
     assert.equal(result.diagnostico.presion_arterial, "120/80");
     assert.equal(result.diagnostico.peso, "70.50");
+    assert.equal(registro.decision_medicamentos, "Pendiente");
+    assert.equal(registro.version_prescripciones, 0);
+    assert.equal(Object.hasOwn(result.diagnostico, "decision_medicamentos"), false);
+    assert.equal(Object.hasOwn(result.diagnostico, "version_prescripciones"), false);
     assert.equal(cita.fecha, "2026-11-09");
     assert.equal(cita.estado_id, 73);
     assert.equal(consultas.at(-1), "commit");
@@ -181,6 +185,8 @@ test("crea tras medianoche, normaliza opcionales y usa fecha del servidor sin ca
 
 test("editar exige revisión vigente y conserva cita, ID y fecha del registro", async () => {
     const first = await (await request("PUT", body())).json();
+    registro.decision_medicamentos = "Requiere";
+    registro.version_prescripciones = 3;
     const res = await request("PUT", body({ revision: first.revision, diagnostico: "Diagnóstico corregido", notas_adicionales: "Nota" }));
     assert.equal(res.status, 200);
     const result = await res.json();
@@ -191,6 +197,8 @@ test("editar exige revisión vigente y conserva cita, ID y fecha del registro", 
     assert.equal(creados, 1); assert.equal(actualizados, 1);
     assert.equal((await request("PUT", body({ revision: first.revision }))).status, 409);
     assert.equal(registro.diagnostico, "Diagnóstico corregido");
+    assert.equal(registro.decision_medicamentos, "Requiere");
+    assert.equal(registro.version_prescripciones, 3);
 });
 
 test("IDs, diagnóstico y cuerpos inválidos se rechazan sin consultar modelos", async () => {
@@ -203,7 +211,7 @@ test("IDs, diagnóstico y cuerpos inválidos se rechazan sin consultar modelos",
 });
 
 test("rechaza propiedades inesperadas y todos los campos de identidad o estado", async () => {
-    for (const campo of ["cita_id", "medico_id", "paciente_id", "estado_id", "id_diagnostico", "fecha_diagnostico", "prescripciones", "otro"]) {
+    for (const campo of ["cita_id", "medico_id", "paciente_id", "estado_id", "id_diagnostico", "fecha_diagnostico", "decision_medicamentos", "version_prescripciones", "prescripciones", "otro"]) {
         assert.equal((await request("PUT", body({ [campo]: 1 }))).status, 400);
     }
     assert.equal(consultas.length, 0);

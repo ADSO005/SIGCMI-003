@@ -2,10 +2,10 @@
 
 ## Alcance y permisos
 
-Se reutilizan `Diagnostico`, sus asociaciones y el índice único de `cita_id`.
-No hay cambios de modelos, migraciones, autenticación, administración o paciente.
-La segunda etapa añade el formulario médico descrito abajo; las prescripciones
-siguen pendientes.
+Se reutilizan `Diagnostico`, `Prescripcion`, sus asociaciones y el índice único
+de `cita_id`. Una migración incremental agrega a `diagnosticos` la decisión de
+medicamentos y su versión. Se validó en una base MySQL temporal aislada; no se
+aplicó a las bases locales del proyecto. Las asociaciones existentes no cambian.
 
 - `GET /medico/citas/:id/diagnostico`: obtiene el registro y su revisión.
 - `PUT /medico/citas/:id/diagnostico`: crea o reemplaza los campos clínicos.
@@ -61,8 +61,9 @@ Enviar el mismo contenido y revisión vigente conserva la misma revisión.
 
 No es una columna de versión ni un historial de cambios: no registra autores ni
 ediciones anteriores. Si el contenido cambia y vuelve exactamente al original,
-su revisión vuelve a ser la misma. Tampoco incluye las prescripciones de una futura
-etapa. El token no reemplaza autenticación, propiedad ni validación de estado.
+su revisión vuelve a ser la misma. La revisión del diagnóstico no incluye las
+prescripciones; estas utilizan `version_prescripciones`. El token no reemplaza
+autenticación, propiedad ni validación de estado.
 
 ## Campos y validaciones
 
