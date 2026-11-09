@@ -86,6 +86,28 @@ const Usuario = db.define(
             type: DataTypes.DATE,
             allowNull: true,
         },
+
+        codigo_intentos: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
+
+        codigo_ultimo_envio: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        codigo_solicitudes: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
+        },
+
+        codigo_ventana_inicio: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
     },
     {
         tableName: "usuarios",
