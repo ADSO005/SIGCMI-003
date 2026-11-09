@@ -196,91 +196,81 @@ const dashboard = async (req, res) => {
 };
 
 const detallePaciente = async (req, res) => {
-
     try {
-
         const { id } = req.params;
+        if (!/^[1-9]\d*$/.test(id) || Number(id) > 2147483647) {
+            return res.status(400).json({ mensaje: "ID de paciente inválido" });
+        }
 
-        // Buscar el médico que inició sesión
         const medico = await Medico.findOne({
-            where: {
-                usuario_id: req.usuario.id_usuario
-            }
+            where: { usuario_id: req.usuario.id_usuario },
+            attributes: ["id_medico"]
         });
-
         if (!medico) {
-            return res.status(404).json({
-                mensaje: "No se encontró el perfil del médico"
-            });
+            return res.status(404).json({ mensaje: "No se encontró el perfil del médico" });
         }
 
-        // Buscar el paciente
-        const paciente = await Paciente.findByPk(id, {
-            include: [
-                {
-                    model: Usuario,
-                    attributes: [
-                        "nombres",
-                        "apellidos",
-                        "correo",
-                        "telefono"
-                    ]
-                }
-            ]
-        });
-
-        if (!paciente) {
-            return res.status(404).json({
-                mensaje: "Paciente no encontrado"
-            });
-        }
-
-        // Buscar únicamente las citas de este paciente
-        // que pertenecen al médico autenticado
+        // La asociación Diagnostico usa alias y las citas se limitan al médico autenticado.
         const citas = await Cita.findAll({
-            where: {
-                paciente_id: paciente.id_paciente,
-                medico_id: medico.id_medico
-            },
+            where: { paciente_id: Number(id), medico_id: medico.id_medico },
+            attributes: ["id_cita", "fecha", "hora", "motivo_consulta"],
             include: [
                 {
                     model: Diagnostico,
-                    include: [
-                        {
-                            model: Prescripcion
-                        }
-                    ]
+                    as: "Diagnostico",
+                    attributes: ["diagnostico", "sintomas", "tratamiento"],
+                    required: false
+                },
+                {
+                    model: EstadoCita,
+                    as: "Estado",
+                    attributes: ["nombre"],
+                    required: false
                 }
             ],
-            order: [
-                ["fecha", "DESC"]
-            ]
+            order: [["fecha", "DESC"], ["hora", "DESC"]]
         });
 
-        // Seguridad:
-        // el médico no puede consultar un paciente
-        // que nunca ha tenido una cita con él.
         if (citas.length === 0) {
-            return res.status(403).json({
-                mensaje: "No tienes acceso a este paciente"
-            });
+            return res.status(404).json({ mensaje: "Paciente no disponible o sin citas vinculadas a este médico" });
+        }
+
+        const paciente = await Paciente.findByPk(Number(id), {
+            attributes: ["fecha_nacimiento"],
+            include: [{
+                model: Usuario,
+                attributes: ["nombres", "apellidos", "correo", "telefono"]
+            }]
+        });
+        if (!paciente) {
+            return res.status(404).json({ mensaje: "Paciente no disponible o sin citas vinculadas a este médico" });
         }
 
         return res.json({
-            paciente,
-            citas
+            paciente: {
+                fecha_nacimiento: paciente.fecha_nacimiento,
+                Usuario: paciente.Usuario ? {
+                    nombres: paciente.Usuario.nombres,
+                    apellidos: paciente.Usuario.apellidos,
+                    correo: paciente.Usuario.correo,
+                    telefono: paciente.Usuario.telefono
+                } : null
+            },
+            citas: citas.map(cita => ({
+                fecha: cita.fecha,
+                hora: cita.hora,
+                motivo_consulta: cita.motivo_consulta,
+                Estado: cita.Estado ? { nombre: cita.Estado.nombre } : null,
+                Diagnostico: cita.Diagnostico ? {
+                    diagnostico: cita.Diagnostico.diagnostico,
+                    sintomas: cita.Diagnostico.sintomas,
+                    tratamiento: cita.Diagnostico.tratamiento
+                } : null
+            }))
         });
-
     } catch (error) {
-
-        console.error(
-            "❌ Error al obtener paciente:",
-            error
-        );
-
-        return res.status(500).json({
-            mensaje: "Error al obtener el paciente"
-        });
+        console.error("Error al cargar el detalle de paciente del médico");
+        return res.status(500).json({ mensaje: "Error al cargar el paciente" });
     }
 };
 

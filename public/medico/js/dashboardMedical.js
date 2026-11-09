@@ -426,102 +426,90 @@ window.cerrarModalHorariosFuera = event => {
   if (event.target.id === "modalHorarios") window.cerrarModalHorarios();
 };
 
+// Evita que una respuesta lenta reemplace al paciente seleccionado más recientemente.
+let versionCargaPaciente = 0;
+
 // SELECCIONAR PACIENTE DE LA LISTA
 async function seleccionarPaciente(element) {
+  const idPaciente = element?.dataset.id;
+  const versionActual = ++versionCargaPaciente;
 
   document.querySelectorAll(".paciente-item").forEach(item => {
-    item.classList.remove("activo");
+    item.classList.toggle("activo", item === element);
   });
+  limpiarDetallePaciente("Cargando información del paciente…");
 
-  element.classList.add("activo");
-
-  const idPaciente = element.dataset.id;
-
-  if (!idPaciente) {
-    console.error("No se encontró el ID del paciente");
+  if (!idPaciente || !/^[1-9]\d*$/.test(idPaciente)) {
+    mostrarErrorDetallePaciente("No se pudo identificar el paciente seleccionado.");
     return;
   }
 
   try {
-
-    const respuesta = await fetch(
-      `/medico/pacientes/${idPaciente}`
-    );
+    const respuesta = await fetch(`/medico/pacientes/${encodeURIComponent(idPaciente)}`, {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+    if (versionActual !== versionCargaPaciente) return;
 
     if (!respuesta.ok) {
-      throw new Error("No se pudo obtener el paciente");
+      const mensajes = {
+        401: "Tu sesión venció. Inicia sesión nuevamente.",
+        403: "No tienes permiso para consultar este paciente.",
+        404: "El paciente no está disponible o no tiene citas vinculadas a este médico."
+      };
+      throw new Error(mensajes[respuesta.status] || "No se pudo cargar la información del paciente.");
     }
 
     const datos = await respuesta.json();
-
-    const paciente = datos.paciente;
-    const citas = datos.citas;
-    const usuario = paciente.Usuario;
-
-    // -----------------------------
-    // DATOS PERSONALES
-    // -----------------------------
-
-    document.getElementById("detalleNombre").textContent =
-      `${usuario.nombres} ${usuario.apellidos}`;
-
-    const correo = document.getElementById("detalleCorreo");
-
-    correo.textContent = usuario.correo || "No registrado";
-
-    correo.href = usuario.correo
-      ? `mailto:${usuario.correo}`
-      : "#";
-
-    document.getElementById("detalleTelefono").textContent =
-      usuario.telefono || "No registrado";
-
-    // -----------------------------
-    // EDAD
-    // -----------------------------
-
-    document.getElementById("detalleEdad").textContent =
-      calcularEdad(paciente.fecha_nacimiento);
-
-    // -----------------------------
-    // CANTIDAD DE CITAS
-    // -----------------------------
-
-    document.getElementById("detalleCitas").textContent =
-      citas.length;
-
-    // -----------------------------
-    // ÚLTIMA VISITA
-    // -----------------------------
-
-    document.getElementById("detalleUltimaVisita").textContent =
-      obtenerUltimaVisita(citas);
-
-    // -----------------------------
-    // DIAGNÓSTICOS
-    // -----------------------------
-
-    const citasConDiagnostico = citas.filter(
-      cita => cita.Diagnostico
-    );
-
-    document.getElementById("detalleDiagnosticos").textContent =
-      citasConDiagnostico.length;
-
-    // -----------------------------
-    // HISTORIAL
-    // -----------------------------
-
-    mostrarHistorial(citas);
-
+    if (versionActual !== versionCargaPaciente) return;
+    if (!datos?.paciente || !Array.isArray(datos.citas)) {
+      throw new Error("La respuesta del servidor no tiene el formato esperado.");
+    }
+    mostrarDetallePaciente(datos.paciente, datos.citas);
   } catch (error) {
-
-    console.error(
-      "Error al cargar el paciente:",
-      error
-    );
-
+    if (versionActual !== versionCargaPaciente) return;
+    console.error("Error al cargar el detalle del paciente");
+    mostrarErrorDetallePaciente(error.message || "No fue posible conectar con el servidor.");
   }
+}
+
+function limpiarDetallePaciente(mensaje) {
+  document.getElementById("detalleNombre").textContent = mensaje;
+  document.getElementById("detalleCorreo").textContent = "-";
+  document.getElementById("detalleCorreo").removeAttribute("href");
+  document.getElementById("detalleTelefono").textContent = "-";
+  document.getElementById("detalleEdad").textContent = "-";
+  document.getElementById("detalleUltimaVisita").textContent = "-";
+  document.getElementById("detalleCitas").textContent = "0";
+  document.getElementById("detalleDiagnosticos").textContent = "0";
+  document.getElementById("historialPaciente").replaceChildren();
+}
+
+function mostrarErrorDetallePaciente(mensaje) {
+  limpiarDetallePaciente("No se pudo cargar el paciente");
+  const aviso = document.createElement("p");
+  aviso.textContent = mensaje;
+  document.getElementById("historialPaciente").replaceChildren(aviso);
+}
+
+function mostrarDetallePaciente(paciente, citas) {
+  const usuario = paciente.Usuario || {};
+  const nombre = [usuario.nombres, usuario.apellidos].filter(Boolean).join(" ");
+  document.getElementById("detalleNombre").textContent = nombre || "Nombre no registrado";
+
+  const correo = document.getElementById("detalleCorreo");
+  correo.textContent = usuario.correo || "No registrado";
+  if (usuario.correo) correo.href = `mailto:${usuario.correo}`;
+  else correo.removeAttribute("href");
+
+  document.getElementById("detalleTelefono").textContent = usuario.telefono || "No registrado";
+  document.getElementById("detalleEdad").textContent = calcularEdad(paciente.fecha_nacimiento);
+  document.getElementById("detalleCitas").textContent = String(citas.length);
+  document.getElementById("detalleUltimaVisita").textContent = obtenerUltimaVisita(citas);
+
+  const cantidadDiagnosticos = citas.filter(cita => cita.Diagnostico).length;
+  document.getElementById("detalleDiagnosticos").textContent = String(cantidadDiagnosticos);
+  mostrarHistorial(citas);
 }
 
 function calcularEdad(fechaNacimiento) {
@@ -579,24 +567,40 @@ function mostrarHistorial(citas) {
     padre.appendChild(nodo);
     return nodo;
   };
-  const diagnosticadas = citas.filter(cita => cita.Diagnostico);
-  if (!diagnosticadas.length) {
-    agregarTexto(contenedor, "p", "Este paciente no tiene diagnósticos registrados.");
+
+  if (!citas.length) {
+    agregarTexto(contenedor, "p", "No hay citas registradas para este paciente.");
     return;
   }
-  diagnosticadas.forEach(cita => {
-    const diagnostico = cita.Diagnostico;
+
+  citas.forEach(cita => {
     const card = document.createElement("div");
     card.className = "historial-card";
-    agregarTexto(card, "h4", diagnostico.diagnostico || "Sin diagnóstico");
-    agregarTexto(card, "p", new Date(cita.fecha + "T00:00:00").toLocaleDateString("es-CO"), "historial-fecha");
-    agregarTexto(agregarTexto(card, "p", ""), "strong", "Síntomas:");
-    agregarTexto(card, "p", diagnostico.sintomas || "No registrados");
-    agregarTexto(agregarTexto(card, "p", ""), "strong", "Tratamiento:");
-    agregarTexto(card, "p", diagnostico.tratamiento || "No registrado");
+    const fecha = cita.fecha
+      ? new Date(`${cita.fecha}T00:00:00`).toLocaleDateString("es-CO", { timeZone: "America/Bogota" })
+      : "Fecha no registrada";
+    const hora = cita.hora ? String(cita.hora).slice(0, 5) : "Hora no registrada";
+    const estado = cita.Estado?.nombre || "Estado no registrado";
+
+    agregarTexto(card, "h4", `Cita del ${fecha}`);
+    agregarTexto(card, "p", `${hora} · ${estado}`, "historial-fecha");
+    agregarTexto(agregarTexto(card, "p", ""), "strong", "Motivo:");
+    agregarTexto(card, "p", cita.motivo_consulta || "Motivo no registrado");
+
+    if (cita.Diagnostico) {
+      agregarTexto(agregarTexto(card, "p", ""), "strong", "Diagnóstico:");
+      agregarTexto(card, "p", cita.Diagnostico.diagnostico || "No registrado");
+      agregarTexto(agregarTexto(card, "p", ""), "strong", "Síntomas:");
+      agregarTexto(card, "p", cita.Diagnostico.sintomas || "No registrados");
+      agregarTexto(agregarTexto(card, "p", ""), "strong", "Tratamiento:");
+      agregarTexto(card, "p", cita.Diagnostico.tratamiento || "No registrado");
+    } else {
+      agregarTexto(card, "p", "No hay diagnóstico registrado para esta cita.");
+    }
     contenedor.appendChild(card);
   });
 }
+
 // FILTRAR PACIENTES EN TIEMPO REAL
 function filtrarPacientes(query) {
   const texto = query.toLowerCase().trim();
