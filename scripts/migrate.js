@@ -26,8 +26,18 @@ async function main() {
       host: options.host, port: options.port, dialect: 'mysql', logging: false,
     });
     const q = db.getQueryInterface();
-    await q.createTable('SequelizeMeta', { name: { type: DataTypes.STRING, allowNull: false, primaryKey: true } });
-    const applied = new Set((await db.query('SELECT name FROM `SequelizeMeta`', { type: QueryTypes.SELECT })).map(row => row.name));
+    const [metaTable] = await db.query(
+      "SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'SequelizeMeta'",
+      { type: QueryTypes.SELECT }
+    );
+    if (!metaTable && !statusOnly) {
+      await q.createTable('SequelizeMeta', {
+        name: { type: DataTypes.STRING, allowNull: false, primaryKey: true },
+      });
+    }
+    const applied = new Set(metaTable
+      ? (await db.query('SELECT name FROM `SequelizeMeta`', { type: QueryTypes.SELECT })).map(row => row.name)
+      : []);
     const directory = new URL('../migrations/', import.meta.url);
     const files = (await readdir(directory)).filter(name => /^\d+.*\.js$/.test(name)).sort();
     let count = 0;
