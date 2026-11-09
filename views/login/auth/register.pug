@@ -9,6 +9,12 @@ html(lang="es")
 
   body
 
+    - const fechaHoy = new Date()
+    - const anioLimiteNacimiento = fechaHoy.getFullYear() - 18
+    - const mesLimiteNacimiento = fechaHoy.getMonth()
+    - const diaLimiteNacimiento = Math.min(fechaHoy.getDate(), new Date(anioLimiteNacimiento, mesLimiteNacimiento + 1, 0).getDate())
+    - const fechaNacimientoMaxima = `${anioLimiteNacimiento}-${String(mesLimiteNacimiento + 1).padStart(2, '0')}-${String(diaLimiteNacimiento).padStart(2, '0')}`
+
     mixin formInput(name, label, type, placeholder, icon)
       .form-group(class="flex w-full min-w-0 flex-col gap-2")
         label.form-label(class="text-sm font-medium text-[#1e2559]" for=name)= label
@@ -20,6 +26,13 @@ html(lang="es")
             id=name
             name=name
             placeholder=placeholder
+            required=(name === 'nombres' || name === 'apellidos' || name === 'email' || name === 'fechaNacimiento')
+            minlength=(name === 'telefono' ? 10 : (name === 'nombres' || name === 'apellidos' ? 2 : (name === 'email' ? 6 : null)))
+            maxlength=(name === 'telefono' ? 10 : (name === 'nombres' || name === 'apellidos' ? 100 : (name === 'email' ? 150 : null)))
+            max=(name === 'fechaNacimiento' ? fechaNacimientoMaxima : null)
+            pattern=(name === 'telefono' ? '[0-9]{10}' : null)
+            inputmode=(name === 'telefono' ? 'numeric' : null)
+            title=(name === 'telefono' ? 'Ingresa 10 dígitos sin espacios ni código de país.' : null)
             value=(typeof formData !== 'undefined' && formData ? formData[name] : '')
           )
         if typeof errors !== 'undefined' && errors && errors[name]
@@ -43,6 +56,13 @@ html(lang="es")
 
           if typeof error !== "undefined" && error
             p#mensajeError.form-error(class="mb-4 rounded-md border border-red-200 bg-red-50 p-3" role="alert")= error
+          if typeof errors !== 'undefined' && errors && Object.keys(errors).length
+            .form-error(class="mb-4 rounded-md border border-red-200 bg-red-50 p-3" role="alert" aria-live="assertive")
+              p.font-semibold Revisa estos campos antes de continuar:
+              ul.mt-2.list-inside.list-disc
+                each fieldError, fieldName in errors
+                  li
+                    a.underline(href=`#${fieldName}`)= fieldError.msg
           - const mensajeRegistro = typeof mensaje !== "undefined" && mensaje ? mensaje : (typeof success !== "undefined" ? success : null)
           if mensajeRegistro
             p#mensajeExito.form-success(class="mb-4 rounded-md border border-green-200 bg-green-50 p-3" role="status")= mensajeRegistro
@@ -60,42 +80,76 @@ html(lang="es")
               //- ---------- COLUMNA DERECHA ----------
               .form-col(class="flex min-w-0 flex-col gap-4")
                 .form-group(class="flex w-full min-w-0 flex-col gap-2")
-                  .form-row(class="flex gap-4")
-                    .form-group.form-group--small(class="flex w-24 shrink-0 flex-col gap-2")
-                      label.form-label(class="text-sm font-medium text-[#1e2559]" for="tipoDocumento") Tipo de Documento
+                  .form-row(class="flex items-start gap-4")
+                    .form-group.form-group--small(class="flex w-32 shrink-0 flex-col gap-2")
+                      label.form-label(class="whitespace-nowrap text-sm font-medium text-[#1e2559]" for="tipoDocumento") Tipo
                         span.form-label__required(class="ml-1 text-red-500") *
                       .input-wrapper(class="relative flex items-center")
-                        select.form-select#tipoDocumento(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-4 pr-4 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" name="tipoDocumento")
-                          option(value="CC" selected) CC
-                          option(value="CE") CE
-                          option(value="TI") TI
-                          option(value="PA") PA
+                        select.form-select#tipoDocumento(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-4 pr-4 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" name="tipoDocumento" required)
+                          option(value="CC" selected=(typeof formData === 'undefined' || !formData || formData.tipoDocumento === 'CC')) CC
+                          option(value="CE" selected=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'CE')) CE
+                          option(value="PA" selected=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'PA')) PA
                         svg(class="pointer-events-none absolute right-[0.9rem] h-4 w-4 fill-[#9aa3c9]" viewBox="0 0 20 20" aria-hidden="true")
                           path(d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z")
 
                     .form-group.form-group--grow(class="flex min-w-0 flex-1 flex-col gap-2")
-                      label.form-label(class="text-sm font-medium text-[#1e2559]" for="numeroDocumento" class="h-10") Número
+                      label.form-label(class="text-sm font-medium text-[#1e2559]" for="numeroDocumento") Número
                         span.form-label__required(class="ml-1 text-red-500") *
                       .input-wrapper(class="relative flex items-center")
                         input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]"
                           type="text"
-                          inputmode="numeric"
+                          inputmode=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'PA' ? 'text' : 'numeric')
+                          maxlength=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'CE' ? 7 : (typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'PA' ? 30 : 10))
                           id="numeroDocumento"
                           name="numeroDocumento"
-                          placeholder="123456789"
+                          placeholder=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'PA' ? 'Número de pasaporte' : 'Número de documento')
+                          required
+                          aria-invalid=(typeof errors !== 'undefined' && errors && errors.numeroDocumento ? 'true' : 'false')
+                          value=(typeof formData !== 'undefined' && formData ? formData.numeroDocumento : '')
                         )
                   if typeof errors !== 'undefined' && errors && (errors.tipoDocumento || errors.numeroDocumento)
                     span.form-error= (errors.tipoDocumento || errors.numeroDocumento).msg
 
-                +formInput('departamento', 'Departamento de Residencia', 'text', 'Departamento de Residencia', 'fa-solid fa-location-dot')
-                +formInput('ciudad', 'Ciudad/Municipio de Residencia', 'text', 'Ciudad/Municipio', 'fa-solid fa-location-dot')
+                .form-group(class="flex w-full min-w-0 flex-col gap-2")
+                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="departamento") Departamento de Residencia
+                    span.form-label__required(class="ml-1 text-red-500") *
+                  .input-wrapper(class="relative flex items-center")
+                    i.input-icon.fa-solid.fa-location-dot(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
+                    select.form-select#departamento(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-10 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)]" name="departamento" required data-selected=(typeof formData !== 'undefined' && formData ? formData.departamento : '') aria-describedby="departamentoEstado")
+                      option(value="") Cargando departamentos...
+                    svg(class="pointer-events-none absolute right-4 h-4 w-4 fill-[#9aa3c9]" viewBox="0 0 20 20" aria-hidden="true")
+                      path(d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z")
+                  p#departamentoEstado.sr-only(aria-live="polite")
+                  button#reintentarDepartamentos(class="hidden text-left text-xs font-medium text-[#4952d8] underline" type="button") Reintentar carga de departamentos
+                  if typeof errors !== 'undefined' && errors && errors.departamento
+                    span.form-error= errors.departamento.msg
+
+                .form-group(class="flex w-full min-w-0 flex-col gap-2")
+                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="ciudad") Ciudad/Municipio de Residencia
+                    span.form-label__required(class="ml-1 text-red-500") *
+                  .input-wrapper(class="relative flex items-center")
+                    i.input-icon.fa-solid.fa-location-dot(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
+                    select.form-select#ciudad(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-10 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400" name="ciudad" required disabled data-selected=(typeof formData !== 'undefined' && formData ? formData.ciudad : '') aria-describedby="ciudadEstado")
+                      option(value="") Selecciona primero un departamento
+                    svg(class="pointer-events-none absolute right-4 h-4 w-4 fill-[#9aa3c9]" viewBox="0 0 20 20" aria-hidden="true")
+                      path(d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z")
+                  p#ciudadEstado.text-xs.text-slate-500(aria-live="polite")
+                  button#reintentarCiudades(class="hidden text-left text-xs font-medium text-[#4952d8] underline" type="button") Reintentar carga de municipios
+                  if typeof errors !== 'undefined' && errors && errors.ciudad
+                    span.form-error= errors.ciudad.msg
 
                 .form-group(class="flex w-full min-w-0 flex-col gap-2")
                   label.form-label(class="text-sm font-medium text-[#1e2559]" for="password") Contraseña
                     span.form-label__required(class="ml-1 text-red-500") *
                   .input-wrapper(class="relative flex items-center")
                     i.input-icon.fa-solid.fa-lock(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
-                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="password" name="password" placeholder="••••••••••••")
+                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-12 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="password" name="password" placeholder="••••••••••••" autocomplete="new-password" aria-describedby="passwordStrengthText" minlength="8" maxlength="16" required)
+                    button.password-toggle(class="absolute right-3 rounded-md p-1 text-[#687292] transition hover:bg-slate-100 hover:text-[#4952d8] focus:outline-none focus:ring-2 focus:ring-[#4952d8]" type="button" data-password-toggle="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña")
+                      i.fa-solid.fa-eye(aria-hidden="true")
+                  .mt-1.space-y-2#passwordStrength(aria-live="polite")
+                    .h-2.overflow-hidden.rounded-full.bg-slate-200
+                      .h-full.w-0.rounded-full.transition-all.duration-300#passwordStrengthBar
+                    p#passwordStrengthText.sr-only(aria-live="polite") Escribe una contraseña para ver su nivel.
                   if typeof errors !== 'undefined' && errors && errors.password
                     span.form-error= errors.password.msg
 
@@ -104,7 +158,13 @@ html(lang="es")
                     span.form-label__required(class="ml-1 text-red-500") *
                   .input-wrapper(class="relative flex items-center")
                     i.input-icon.fa-solid.fa-lock(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
-                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••••••")
+                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-12 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••••••" autocomplete="new-password" aria-describedby="confirmPasswordMatchText" minlength="8" maxlength="16" required)
+                    button.password-toggle(class="absolute right-3 rounded-md p-1 text-[#687292] transition hover:bg-slate-100 hover:text-[#4952d8] focus:outline-none focus:ring-2 focus:ring-[#4952d8]" type="button" data-password-toggle="confirmPassword" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña")
+                      i.fa-regular.fa-eye(aria-hidden="true")
+                  .mt-1.space-y-2#confirmPasswordMatch(aria-live="polite")
+                    .h-2.overflow-hidden.rounded-full.bg-slate-200
+                      .h-full.w-0.rounded-full.transition-all.duration-300#confirmPasswordMatchBar
+                    p#confirmPasswordMatchText.sr-only(aria-live="polite") Confirma la contraseña para comprobar que coincida.
                   if typeof errors !== 'undefined' && errors && errors.confirmPassword
                     span.form-error= errors.confirmPassword.msg
 
@@ -117,8 +177,4 @@ html(lang="es")
               | ¿Ya tienes cuenta?
               a.auth-footer__link(class="font-semibold text-[#4952d8] transition-colors duration-200 hover:text-[#3b43bd] hover:underline" href="/auth/login")  Inicia Sesión
 
-    script.
-      setTimeout(() => {
-        document.getElementById("mensajeError")?.remove();
-        document.getElementById("mensajeExito")?.remove();
-      }, 9000);
+    script(src="/auth/js/register.js" defer)

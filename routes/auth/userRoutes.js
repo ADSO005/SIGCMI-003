@@ -1,12 +1,10 @@
 import express from "express";
+import { formRegister, register, confirmRegister } from "../../controllers/auth/register.js";
 
 import {
     formLogin,
     login,
     logout,
-    formRegister,
-    register,
-    confirmRegister,
     formRecoverPassword,
     recoverPassword,
     formVerifyOTP,
