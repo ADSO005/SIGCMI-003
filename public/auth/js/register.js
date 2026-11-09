@@ -15,6 +15,25 @@ const registerForm = document.querySelector(".register-form");
 const birthDateInput = document.getElementById("fechaNacimiento");
 const documentTypeSelect = document.getElementById("tipoDocumento");
 const documentNumberInput = document.getElementById("numeroDocumento");
+const personNameInputs = ["nombres", "apellidos"]
+  .map((id) => document.getElementById(id))
+  .filter(Boolean);
+
+const formatPersonName = (value) => value.trim().normalize("NFC")
+  .toLocaleLowerCase("es-CO")
+  .replace(/(^|[\s'-])(\p{L})/gu, (_, separator, letter) => `${separator}${letter.toLocaleUpperCase("es-CO")}`);
+
+const normalizePersonNames = () => {
+  personNameInputs.forEach((input) => {
+    input.value = formatPersonName(input.value);
+  });
+};
+
+personNameInputs.forEach((input) => input.addEventListener("blur", () => {
+  input.value = formatPersonName(input.value);
+}));
+
+registerForm.addEventListener("submit", normalizePersonNames);
 
 // Aplica el formato y el límite adecuados al tipo de documento elegido.
 const validateDocumentNumber = () => {

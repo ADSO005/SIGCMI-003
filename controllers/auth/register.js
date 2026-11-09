@@ -4,6 +4,12 @@ import bcrypt from "bcrypt";
 import generateToken from "../../helpers/generateToken.js";
 import { getPasswordPolicyError } from "../../helpers/passwordPolicy.js";
 import { sendConfirmationEmail } from "../../services/emailService.js";
+import { contieneLenguajeInapropiado } from "../../utils/filtroLenguaje.js";
+
+const normalizePersonName = (value) => typeof value === "string"
+  ? value.trim().normalize("NFC").toLocaleLowerCase("es-CO")
+    .replace(/(^|[\s'-])(\p{L})/gu, (_, separator, letter) => `${separator}${letter.toLocaleUpperCase("es-CO")}`)
+  : "";
 
 // Muestra el formulario para crear una cuenta de paciente.
 const formRegister = (req, res) => {
@@ -18,13 +24,18 @@ const register = async (req, res) => {
       numeroDocumento, departamento, ciudad, password, confirmPassword
     } = req.body;
 
-    const nombresLimpios = typeof nombres === "string" ? nombres.trim() : "";
-    const apellidosLimpios = typeof apellidos === "string" ? apellidos.trim() : "";
+    const nombresLimpios = normalizePersonName(nombres);
+    const apellidosLimpios = normalizePersonName(apellidos);
     const correoLimpio = typeof email === "string" ? email.trim() : "";
     const telefonoLimpio = typeof telefono === "string" ? telefono.trim() : "";
     const tipoDocumentoLimpio = typeof tipoDocumento === "string" ? tipoDocumento.trim() : "";
     const numeroDocumentoLimpio = typeof numeroDocumento === "string" ? numeroDocumento.trim() : "";
     const errors = {};
+    const formData = {
+      ...req.body,
+      nombres: nombresLimpios,
+      apellidos: apellidosLimpios
+    };
 
     const today = new Date();
     const maxBirthYear = today.getFullYear() - 18;
@@ -40,9 +51,13 @@ const register = async (req, res) => {
 
     if (nombresLimpios.length < 2 || nombresLimpios.length > 100) {
       errors.nombres = { msg: "Los nombres deben tener entre 2 y 100 caracteres." };
+    } else if (contieneLenguajeInapropiado(nombresLimpios)) {
+      errors.nombres = { msg: "Los nombres contienen lenguaje no permitido." };
     }
     if (apellidosLimpios.length < 2 || apellidosLimpios.length > 100) {
       errors.apellidos = { msg: "Los apellidos deben tener entre 2 y 100 caracteres." };
+    } else if (contieneLenguajeInapropiado(apellidosLimpios)) {
+      errors.apellidos = { msg: "Los apellidos contienen lenguaje no permitido." };
     }
     if (correoLimpio.length < 6 || correoLimpio.length > 150 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)) {
       errors.email = { msg: "Ingresa un correo válido de entre 6 y 150 caracteres." };
@@ -76,7 +91,7 @@ const register = async (req, res) => {
       return res.render("login/auth/register", {
         titulo: "Crear Cuenta",
         errors,
-        formData: { ...req.body, nombres: nombresLimpios, apellidos: apellidosLimpios, email: correoLimpio, telefono: telefonoLimpio }
+        formData: { ...formData, email: correoLimpio, telefono: telefonoLimpio }
       });
     }
 
@@ -85,7 +100,7 @@ const register = async (req, res) => {
       return res.render("login/auth/register", {
         titulo: "Crear Cuenta",
         errors: { password: { msg: passwordError } },
-        formData: req.body
+        formData
       });
     }
 
@@ -96,7 +111,7 @@ const register = async (req, res) => {
           ...(!String(departamento || "").trim() && { departamento: { msg: "Selecciona un departamento." } }),
           ...(!String(ciudad || "").trim() && { ciudad: { msg: "Selecciona un municipio." } })
         },
-        formData: req.body
+        formData
       });
     }
 
@@ -104,7 +119,7 @@ const register = async (req, res) => {
       return res.render("login/auth/register", {
         titulo: "Crear Cuenta",
         errors: { confirmPassword: { msg: "Las contraseñas no coinciden. Verifica este campo." } },
-        formData: req.body
+        formData
       });
     }
 
@@ -112,7 +127,7 @@ const register = async (req, res) => {
     const renderDuplicateError = (field, msg) => res.render("login/auth/register", {
       titulo: "Crear Cuenta",
       errors: { [field]: { msg } },
-      formData: req.body
+      formData
     });
 
     if (await Usuario.findOne({ where: { correo: correoLimpio } })) {
@@ -134,7 +149,7 @@ const register = async (req, res) => {
       return res.status(503).render("login/auth/register", {
         titulo: "Crear Cuenta",
         error: "El registro no está disponible porque falta configurar el correo de confirmación. Contacta al administrador.",
-        formData: req.body
+        formData
       });
     }
 
@@ -177,7 +192,11 @@ const register = async (req, res) => {
                 : "Ya existe un registro con ese documento. Verifica el número e inténtalo de nuevo."
             }
           },
-          formData: req.body
+          formData: {
+            ...req.body,
+            nombres: normalizePersonName(req.body?.nombres),
+            apellidos: normalizePersonName(req.body?.apellidos)
+          }
         });
       }
     }
@@ -186,7 +205,11 @@ const register = async (req, res) => {
     return res.render("login/auth/register", {
       titulo: "Crear Cuenta",
       error: "Ocurrió un error al crear la cuenta.",
-      formData: req.body
+      formData: {
+        ...req.body,
+        nombres: normalizePersonName(req.body?.nombres),
+        apellidos: normalizePersonName(req.body?.apellidos)
+      }
     });
   }
 };
