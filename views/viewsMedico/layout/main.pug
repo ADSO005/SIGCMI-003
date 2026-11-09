@@ -22,6 +22,8 @@ html(lang='es')
     // Incluye todos los modales
     include ../includes/modalGestion.pug
     include ../includes/modalHorarios.pug
+    if typeof contextoConsulta !== "undefined" && contextoConsulta
+      include ../includes/modalAtencion.pug
 
     script(src="/medico/js/dashboardMedical.js")
     script(src="/medico/js/diagnosticoMedical.js")

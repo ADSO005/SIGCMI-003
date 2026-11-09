@@ -24,18 +24,17 @@ test("botones según estado y elegibilidad, sin finalizar ni formularios clínic
     assert.doesNotMatch(enabled + terminal, /Finalizar|finalizarConsulta|<form|<textarea|Guardar|Prescribir/);
 });
 
-test("contexto y consultas anteriores se presentan con escape y formulario sin finalización", () => {
+test("agenda compacta conserva consultas anteriores sin campos clínicos ni finalización", () => {
     const payload = '<img src=x onerror="alert(1)">';
     const previous = { ...cita, estado: "En Curso", fecha: "2026-11-08", paciente: payload, motivo: payload };
     const html = render({ consultasAnteriores: [previous], contextoConsulta: previous });
     assert.match(html, /Consultas en curso de días anteriores/);
-    assert.match(html, /id="contextoConsulta"/);
     assert.match(html, /2026-11-08/);
     assert.match(html, /Continuar consulta/);
     assert.match(html, /&lt;img/);
     assert(!html.includes(payload));
-    assert.equal((html.match(/<form/g) || []).length, 1);
-    assert.match(html, /id="formDiagnostico"/);
+    assert.doesNotMatch(html, /<form|<input|<textarea|id="contextoConsulta"/);
+    assert.match(html, /onclick="abrirAtencion\(event\)"/);
     assert.doesNotMatch(html, /Finalizar Consulta|finalizarConsulta|Prescribir/);
     assert.match(render({ errorContexto: true }), /No se encontró una consulta/);
     assert.match(render({ agendaHoy: [cita], estadoEnCursoId: null }), /disabled="disabled"/);

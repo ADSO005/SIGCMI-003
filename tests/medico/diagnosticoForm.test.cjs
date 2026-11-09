@@ -20,26 +20,40 @@ class Element {
     setCustomValidity(value) { this.validationMessage = value; }
     reportValidity() { this.reported = true; return !this.validationMessage; }
     focus() { this.focused = true; }
+    showModal() { this.open = true; }
+    close() { this.open = false; }
+    matches() { return this.disabled; }
+    getClientRects() { return [{}]; }
     set innerHTML(value) { throw Error("HTML no permitido: " + value); }
 }
 function fixture(fetch) {
     const ids = ["formDiagnostico", "camposDiagnostico", "guardarDiagnostico", "mensajeDiagnostico", "reintentarDiagnostico",
-        "consultarVersionDiagnostico", "versionRecienteDiagnostico", "detalleVersionDiagnostico", "ocultarVersionDiagnostico", "cargarVersionDiagnostico"];
+        "consultarVersionDiagnostico", "versionRecienteDiagnostico", "detalleVersionDiagnostico", "ocultarVersionDiagnostico", "cargarVersionDiagnostico",
+        "modalAtencion", "cerrarAtencionSuperior", "cerrarAtencion", "estadoGuardadoDiagnostico", "cuerpoAtencion"];
     const elements = Object.fromEntries(ids.map(id => [id, new Element(id)]));
     const campos = Object.fromEntries(nombres.map(nombre => [nombre, Object.assign(new Element(nombre), { dataset: { label: nombre } })]));
     const form = elements.formDiagnostico;
     form.dataset.cita = "20";
     form.elements = { namedItem: name => campos[name] };
     const events = {}, calls = [];
+    const trigger = new Element("continuarConsulta");
+    const document = { activeElement: trigger, body: { style: { overflow: "auto" } }, querySelector: () => trigger,
+        listeners: {}, addEventListener(name, callback) { this.listeners[name] = callback; },
+        getElementById: id => elements[id], createElement: tag => new Element(tag) };
+    for (const node of [...Object.values(elements), ...Object.values(campos), trigger]) {
+        node.focus = () => { node.focused = true; document.activeElement = node; };
+    }
+    elements.modalAtencion.querySelectorAll = () => [elements.cerrarAtencionSuperior, elements.cerrarAtencion, elements.guardarDiagnostico];
+    elements.modalAtencion.contains = node => Object.values(elements).includes(node) || Object.values(campos).includes(node);
     let confirmacion = true;
     const context = { TextEncoder, TypeError, SyntaxError,
         window: { addEventListener: (name, cb) => { events[name] = cb; }, confirm: () => confirmacion },
-        document: { getElementById: id => elements[id], createElement: tag => new Element(tag) },
+        document,
         fetch: async (...args) => { calls.push(args); return fetch(...args); }
     };
     vm.createContext(context);
     vm.runInContext(fs.readFileSync("public/medico/js/diagnosticoMedical.js", "utf8"), context);
-    return { elements, campos, calls, events,
+    return { elements, campos, calls, events, document, trigger, api: context.window,
         ready: () => new Promise(resolve => setImmediate(resolve)),
         submit: () => form.listeners.submit({ preventDefault() {} }),
         click: id => elements[id].listeners.click(),
@@ -48,8 +62,8 @@ function fixture(fetch) {
     };
 }
 
-test("Pug presenta campos etiquetados, unidades y diagnóstico obligatorio solo en contexto En Curso", () => {
-    const html = pug.renderFile("views/viewsMedico/includes/diagnosticoForm.pug", { contextoConsulta: { id_cita: 20 } });
+test("Pug presenta modal independiente, campos etiquetados, unidades y diagnóstico obligatorio", () => {
+    const html = pug.renderFile("views/viewsMedico/includes/modalAtencion.pug", { contextoConsulta: { id_cita: 20, paciente: "Paciente", fecha: "2026-11-09", hora: "09:00:00", motivo: "Control" } });
     for (const nombre of nombres) {
         assert(html.includes(`name="${nombre}"`));
         assert(html.includes(`for="diagnostico-${nombre}"`));
@@ -58,6 +72,9 @@ test("Pug presenta campos etiquetados, unidades y diagnóstico obligatorio solo 
     assert.match(html, /name="diagnostico"[^>]*required/);
     assert.match(html, /id="camposDiagnostico"[^>]*disabled/);
     assert.match(html, /Guardar diagnóstico/);
+    assert.match(html, /<dialog[^>]*id="modalAtencion"/);
+    assert.match(html, /aria-modal="true"/);
+    assert.match(html, /form="formDiagnostico"/);
     assert.doesNotMatch(html, /Finalizar|Prescrip|innerHTML/);
 });
 
@@ -204,6 +221,7 @@ test("carga fallida permite reintentar y un estado no editable bloquea el formul
     await f.ready();
     assert.equal(f.elements.guardarDiagnostico.disabled, true);
     assert.equal(f.elements.reintentarDiagnostico.hidden, false);
+    assert.equal(f.elements.estadoGuardadoDiagnostico.textContent, "Diagnóstico no disponible");
     await f.click("reintentarDiagnostico");
     assert.equal(f.elements.guardarDiagnostico.disabled, false);
     let reads = 0;
@@ -214,6 +232,7 @@ test("carga fallida permite reintentar y un estado no editable bloquea el formul
     await denied.submit();
     await denied.click("consultarVersionDiagnostico");
     assert.equal(denied.elements.camposDiagnostico.disabled, true);
+    assert.equal(denied.elements.estadoGuardadoDiagnostico.textContent, "Consulta no editable");
     assert.equal(denied.campos.diagnostico.value, "Datos que deben conservarse tras cambio de estado");
 });
 
@@ -230,4 +249,70 @@ test("HTML clínico se asigna a value y textContent; aviso de salida protege cam
     let prevented = false;
     f.events.beforeunload({ preventDefault() { prevented = true; } });
     assert.equal(prevented, true);
+});
+
+test("modal abre, restaura foco y scroll al cerrar y vuelve a consultar al reabrir", async () => {
+    const f = fixture(async () => response({ diagnostico: registro(), revision: hash }));
+    await f.ready();
+    assert.equal(f.elements.modalAtencion.open, true);
+    assert.equal(f.document.body.style.overflow, "hidden");
+    assert.equal(f.elements.cerrarAtencionSuperior.focused, true);
+    assert.equal(f.elements.estadoGuardadoDiagnostico.textContent, "Diagnóstico guardado");
+    f.elements.guardarDiagnostico.focus();
+    f.document.listeners.keydown({ key: "Tab", shiftKey: false, preventDefault() {} });
+    assert.equal(f.document.activeElement, f.elements.cerrarAtencionSuperior);
+    f.document.listeners.keydown({ key: "Tab", shiftKey: true, preventDefault() {} });
+    assert.equal(f.document.activeElement, f.elements.guardarDiagnostico);
+    f.edit("diagnostico", "Cambio temporal");
+    f.edit("diagnostico", "Registro existente");
+    f.confirm(false);
+    f.click("cerrarAtencion");
+    assert.equal(f.elements.modalAtencion.open, false);
+    assert.equal(f.document.body.style.overflow, "auto");
+    assert.equal(f.trigger.focused, true);
+    f.api.abrirAtencion({ preventDefault() {}, currentTarget: f.trigger });
+    await f.ready();
+    assert.equal(f.elements.modalAtencion.open, true);
+    assert.equal(f.calls.length, 2);
+});
+
+test("botones y Escape solicitan confirmación antes de descartar cambios", async () => {
+    const f = fixture(async () => response());
+    await f.ready();
+    f.edit("diagnostico", "Cambios pendientes");
+    assert.equal(f.elements.estadoGuardadoDiagnostico.textContent, "Cambios sin guardar");
+    f.confirm(false);
+    f.click("cerrarAtencionSuperior");
+    assert.equal(f.elements.modalAtencion.open, true);
+    let prevented = false;
+    f.elements.modalAtencion.listeners.cancel({ preventDefault() { prevented = true; } });
+    assert.equal(prevented, true);
+    assert.equal(f.elements.modalAtencion.open, true);
+    assert.equal(f.campos.diagnostico.value, "Cambios pendientes");
+    f.confirm(true);
+    f.elements.modalAtencion.listeners.cancel({ preventDefault() {} });
+    assert.equal(f.elements.modalAtencion.open, false);
+    assert.equal(f.campos.diagnostico.value, "");
+});
+
+test("no se cierra durante PUT y una carga tardía no modifica un modal cerrado", async () => {
+    let terminar;
+    const f = fixture(async (url, options) => !options.method ? response() : new Promise(resolve => { terminar = resolve; }));
+    await f.ready();
+    f.edit("diagnostico", "Registro");
+    const saving = f.submit();
+    f.document.listeners.keydown({ key: "Escape", preventDefault() {}, stopPropagation() {} });
+    assert.equal(f.elements.modalAtencion.open, true);
+    assert.equal(f.elements.cerrarAtencion.disabled, true);
+    terminar(response({ diagnostico: registro(), revision: hash }));
+    await saving;
+    f.click("cerrarAtencion");
+    assert.equal(f.elements.modalAtencion.open, false);
+    let responder;
+    const slow = fixture(() => new Promise(resolve => { responder = resolve; }));
+    slow.click("cerrarAtencion");
+    responder(response({ diagnostico: registro(), revision: hash }));
+    await slow.ready();
+    assert.equal(slow.campos.diagnostico.value, "");
+    assert.equal(slow.elements.camposDiagnostico.disabled, true);
 });

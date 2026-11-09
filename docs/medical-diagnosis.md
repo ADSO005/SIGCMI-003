@@ -114,13 +114,26 @@ Guardar y finalizar son dos operaciones separadas: si falla finalizar, el regist
 guardado permanece y la cita sigue En Curso. No se habilita el botón de finalizar.
 No se resuelven aquí las reglas administrativas preexistentes entre módulos.
 
-## Formulario desde «Continuar consulta»: etapa 2
+## Modal desde «Continuar consulta»: interfaz de etapa 2
 
-El contexto autorizado En Curso contiene el formulario, con paciente, fecha, hora,
-motivo y estado de solo lectura. También funciona con consultas de días anteriores.
+El contexto autorizado En Curso abre un modal independiente de atención médica,
+con paciente, fecha, hora, motivo y estado de solo lectura. También funciona con
+consultas de días anteriores. «Mi Agenda de hoy» conserva solo tarjetas compactas;
+no contiene campos clínicos. El diálogo está fuera del contenido normal del dashboard.
 Incluye cinco signos vitales opcionales, síntomas, diagnóstico obligatorio,
 tratamiento y notas. Los campos tienen etiquetas y unidades; no hay prescripciones
 ni botón de finalización. «Gestionar Citas» permanece exclusivamente de consulta.
+
+Se utiliza `dialog.showModal()` con fondo oscuro, encabezado azul y el patrón visual
+del modal de horarios: ancho máximo de 960 px, altura máxima de 92dvh, cuerpo con
+desplazamiento y acciones visibles en el pie. El encabezado distingue carga,
+diagnóstico guardado, ausencia de registro, cambios sin guardar y conflicto.
+Guardar se asocia al formulario desde el pie; Cerrar aparece allí y en el encabezado.
+
+El enlace continúa recuperando el contexto con el GET existente del dashboard.
+Al cargarlo se abre el modal; el enlace de esa cita permite reabrirlo sin navegar.
+Cada apertura vuelve a consultar el diagnóstico. No se agregan endpoints ni se
+modifican validaciones del backend o del formulario.
 
 Al abrir se consulta GET con `no-store`. La edición permanece deshabilitada hasta
 recibir todos los campos y una revisión válida. Sin registro, se habilita vacío
@@ -144,7 +157,16 @@ ya no está En Curso, se conserva el contenido local pero se bloquea la edición
 
 Los textos se asignan a `value` y `textContent`, nunca a `innerHTML`. Los errores
 se anuncian con `role=alert`, hay foco en el campo inválido y aviso de salida con
-cambios sin guardar. Los datos locales están solo en memoria: no se guardan en
+cambios sin guardar. El cierre por botones, Escape o fondo pide confirmación si
+los valores difieren de los cargados o guardados. Cancelar conserva los datos y
+mantiene abierto el modal; confirmar descarta solo cambios locales. Si no hay
+cambios pendientes, el cierre es inmediato. No se cierra mientras un PUT está
+en curso. Un GET tardío se ignora si el modal ya se cerró o se abrió nuevamente.
+Al cerrar se restaura el foco en «Continuar consulta» y el desplazamiento previo.
+El fondo queda inerte por el diálogo nativo; Tab y Shift+Tab recorren sus controles
+visibles y Escape respeta el cierre seguro.
+
+Los datos locales están solo en memoria: no se guardan en
 almacenamiento del navegador, y salir tras confirmar puede descartarlos. Una
 pérdida de conexión no demuestra si un PUT llegó a confirmarse: se puede consultar
 la versión reciente antes de reintentar; la revisión del backend sigue protegiendo
@@ -162,14 +184,19 @@ Los mocks de logout y horarios solo se adaptan a los nuevos imports de rutas.
 La etapa backend registró **107 pruebas aprobadas**. La segunda etapa incorpora
 diez pruebas en `tests/medico/diagnosticoForm.test.cjs`: carga, creación, edición,
 opcionales, validación, duplicados, conflictos, errores, bloqueo y texto seguro.
-La regresión completa actual suma **117 pruebas aprobadas**. Pasan sintaxis JavaScript,
+El formulario inicial registró **117 pruebas aprobadas**. El traslado a modal
+añade tres casos de cierre seguro, foco, reapertura, bloqueo durante PUT y carga
+tardía; la regresión actual suma **120 pruebas aprobadas**. Pasan sintaxis JavaScript,
 ESLint y las pruebas existentes de compilación y renderizado Pug. No se accede a
 MySQL, no se modifican las tres citas ni se ejecuta `tests/database.test.js`.
 La concurrencia simulada no equivale a verificar bloqueos o rollback en MySQL real.
-En Chrome se verificaron nueve escenarios con GET/PUT simulados: formulario sin
-registro, con registro y con conflicto, a 1440, 390 y 320 px. Pasaron teclado,
-envío único, bloqueo durante la solicitud, revisión, consulta segura de otra versión
-y ausencia de desbordamiento horizontal. El CSS se compiló solo en una carpeta
+En Chrome se verificaron nueve escenarios del modal con GET/PUT simulados: sin
+registro, con registro y con conflicto, a 1440, 390 y 320 px. Pasaron apertura y
+reapertura, cierre normal, confirmación, Escape durante cambios y PUT, ciclo de
+foco, fondo inerte, guardado, revisión y conservación de datos. La agenda no tiene
+campos clínicos en su flujo y conserva su tamaño compacto. El modal queda dentro
+del viewport, con desplazamiento interno y sin desbordamiento horizontal.
+El CSS se compiló solo en una carpeta
 temporal. No son pruebas de escritura contra MySQL real.
 
 ```powershell

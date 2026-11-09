@@ -62,13 +62,14 @@ No se agrega toda la agenda histórica ni una consulta adicional de citas.
 El parámetro `consulta` solo recupera contexto de una cita propia En Curso de hoy
 o anterior; las ajenas, inexistentes o en otro estado no exponen su contexto.
 
-El contexto muestra paciente, fecha, hora y motivo, y contiene el formulario de
-diagnóstico de UH-014. No ofrece acción de finalización. «Gestionar Citas» y
+El contexto muestra paciente, fecha, hora y motivo en un modal independiente de
+atención médica que contiene el formulario de diagnóstico de UH-014. La agenda
+permanece compacta, sin campos clínicos incrustados. No ofrece acción de finalización. «Gestionar Citas» y
 el modal de horarios permanecen sin cambios y son exclusivamente de consulta.
 
 ## Límites respecto a UH-014
 
-UH-014 incorpora el backend y formulario de guardado y revisión documentados
+UH-014 incorpora el backend y modal de guardado y revisión documentados
 en [medical-diagnosis.md](medical-diagnosis.md).
 Finalizar exige una fila de `Diagnostico` asociada con texto de diagnóstico válido;
 una fila vacía no permite completar. Los campos opcionales no son obligatorios.

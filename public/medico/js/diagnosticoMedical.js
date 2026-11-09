@@ -7,9 +7,15 @@
   const fieldset = elemento("camposDiagnostico"), guardar = elemento("guardarDiagnostico");
   const mensaje = elemento("mensajeDiagnostico"), reintentar = elemento("reintentarDiagnostico");
   const consultar = elemento("consultarVersionDiagnostico"), panel = elemento("versionRecienteDiagnostico");
+  const modal = elemento("modalAtencion"), cerrarSuperior = elemento("cerrarAtencionSuperior"), cerrarInferior = elemento("cerrarAtencion");
+  const estadoGuardado = elemento("estadoGuardadoDiagnostico");
   const url = `/medico/citas/${form.dataset.cita}/diagnostico`;
   let revision = null, reciente = null, cargado = false, cargando = false, guardando = false;
   let conflicto = false, bloqueado = false, cambios = false;
+  let persistido = false, versionCarga = 0, focoAnterior = null, overflowAnterior = "";
+  let valoresGuardados = "";
+
+  const contenidoFormulario = () => JSON.stringify(nombres.map(nombre => campos[nombre].value));
 
   function avisar(texto, error = false) {
     mensaje.textContent = texto;
@@ -21,6 +27,11 @@
     guardar.textContent = guardando ? "Guardando…" : "Guardar diagnóstico";
     consultar.disabled = cargando || guardando;
     reintentar.disabled = cargando || guardando;
+    cerrarSuperior.disabled = guardando;
+    cerrarInferior.disabled = guardando;
+    estadoGuardado.textContent = guardando ? "Guardando diagnóstico…" : bloqueado ? "Consulta no editable" : conflicto ? "Conflicto pendiente de revisión"
+      : cambios ? "Cambios sin guardar" : !cargado ? (cargando ? "Cargando diagnóstico…" : "Diagnóstico no disponible")
+        : persistido ? "Diagnóstico guardado" : "Sin diagnóstico guardado";
   }
   function cargarCampos(datos) {
     nombres.forEach(nombre => {
@@ -30,6 +41,8 @@
     });
     revision = datos.revision;
     cambios = false;
+    valoresGuardados = contenidoFormulario();
+    persistido = typeof datos.diagnostico?.diagnostico === "string" && !!datos.diagnostico.diagnostico.trim();
   }
   async function leerRespuesta(respuesta) {
     if (respuesta.redirected || respuesta.status === 401) {
@@ -72,13 +85,16 @@
   }
   async function cargar(versionReciente = false) {
     if (cargando || guardando) return;
+    const version = versionCarga;
     cargando = true;
     if (versionReciente) { reciente = null; panel.hidden = true; }
     actualizarControles();
     avisar(versionReciente ? "Consultando la versión más reciente sin cambiar tu formulario…" : "Cargando diagnóstico…");
     try {
       const respuesta = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+      if (version !== versionCarga) return;
       const datos = await leerRespuesta(respuesta);
+      if (version !== versionCarga) return;
       if (respuesta.status === 409) bloqueado = true;
       if (!respuesta.ok) throw Error(typeof datos?.mensaje === "string" ? datos.mensaje : "No se pudo consultar el diagnóstico.");
       if (!respuestaValida(datos)) throw Error("La respuesta del diagnóstico está incompleta. No se ha modificado el formulario.");
@@ -93,10 +109,13 @@
         avisar(datos.diagnostico ? "Diagnóstico cargado. Puedes editarlo mientras la cita siga En Curso." : "Todavía no hay diagnóstico. Completa el campo obligatorio para guardarlo.");
       }
     } catch (error) {
+      if (version !== versionCarga) return;
       avisar(errorPeticion(error), true);
       reintentar.hidden = cargado || bloqueado;
       mensaje.focus();
-    } finally { cargando = false; actualizarControles(); }
+    } finally {
+      if (version === versionCarga) { cargando = false; actualizarControles(); }
+    }
   }
   function validarCampos() {
     const escalas = { temperatura: [4, 1], altura: [4, 2], peso: [5, 2] };
@@ -155,9 +174,10 @@
   }
   form.addEventListener("submit", enviar);
   form.addEventListener("input", event => {
-    cambios = true;
+    cambios = contenidoFormulario() !== valoresGuardados;
     event.target.setCustomValidity?.("");
     event.target.removeAttribute("aria-invalid");
+    actualizarControles();
   });
   reintentar.addEventListener("click", () => cargar());
   consultar.addEventListener("click", () => cargar(true));
@@ -173,5 +193,54 @@
   window.addEventListener("beforeunload", event => {
     if (cambios || guardando) { event.preventDefault(); event.returnValue = ""; }
   });
-  cargar();
+  function abrir(event) {
+    event?.preventDefault();
+    if (modal.open) return;
+    focoAnterior = event?.currentTarget || document.querySelector(`[data-continuar-cita="${form.dataset.cita}"]`) || document.activeElement;
+    overflowAnterior = document.body.style.overflow;
+    modal.showModal(); // El diálogo nativo mantiene el foco dentro y deja inerte el fondo.
+    document.body.style.overflow = "hidden";
+    elemento("cuerpoAtencion").scrollTop = 0;
+    cerrarSuperior.focus();
+    cargar();
+  }
+  function cerrar() {
+    if (!modal.open) return;
+    if (guardando) { avisar("Espera a que termine el guardado antes de cerrar."); return; }
+    if (cambios && !window.confirm("Tienes cambios sin guardar. ¿Deseas descartarlos y cerrar la atención médica?")) return;
+    // Una respuesta GET tardía no debe modificar un formulario cerrado o recién abierto.
+    versionCarga++;
+    cargando = false; cargado = false; cambios = false; persistido = false;
+    conflicto = false; bloqueado = false; reciente = null; revision = null;
+    nombres.forEach(nombre => { campos[nombre].value = ""; campos[nombre].setCustomValidity(""); campos[nombre].removeAttribute("aria-invalid"); });
+    valoresGuardados = contenidoFormulario();
+    panel.hidden = true; consultar.hidden = true; reintentar.hidden = true;
+    actualizarControles();
+    modal.close();
+    document.body.style.overflow = overflowAnterior;
+    focoAnterior?.focus();
+  }
+  window.abrirAtencion = abrir;
+  cerrarSuperior.addEventListener("click", cerrar);
+  cerrarInferior.addEventListener("click", cerrar);
+  modal.addEventListener("cancel", event => { event.preventDefault(); cerrar(); });
+  modal.addEventListener("click", event => { if (event.target === modal) cerrar(); });
+  document.addEventListener("keydown", event => {
+    if (!modal.open) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      cerrar();
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const controles = [...modal.querySelectorAll("button, input, textarea, select, a[href], [tabindex]:not([tabindex='-1'])")]
+      .filter(control => !control.matches(":disabled") && control.getClientRects().length);
+    if (!controles.length) { event.preventDefault(); modal.focus(); return; }
+    const primero = controles[0], ultimo = controles[controles.length - 1];
+    if (!modal.contains(document.activeElement)) { event.preventDefault(); primero.focus(); }
+    else if (event.shiftKey && document.activeElement === primero) { event.preventDefault(); ultimo.focus(); }
+    else if (!event.shiftKey && document.activeElement === ultimo) { event.preventDefault(); primero.focus(); }
+  });
+  abrir();
 })();

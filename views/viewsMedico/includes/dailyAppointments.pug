@@ -6,7 +6,8 @@ mixin tarjetaAtencion(cita)
     h4(class="mt-2 text-sm font-semibold text-slate-900")= cita.paciente
     p(class="mt-1 text-xs text-slate-600 whitespace-pre-wrap")= cita.motivo
     if cita.estado === "En Curso"
-      a(class="mt-3 block rounded-lg bg-[#465DE5] px-3 py-2 text-center text-sm font-semibold text-white" href=`/medico/dashboard?consulta=${cita.id_cita}#contextoConsulta`) Continuar consulta
+      - const seleccionada = typeof contextoConsulta !== "undefined" && contextoConsulta && contextoConsulta.id_cita === cita.id_cita
+      a(data-continuar-cita=cita.id_cita onclick=seleccionada ? "abrirAtencion(event)" : undefined class="mt-3 block rounded-lg bg-[#465DE5] px-3 py-2 text-center text-sm font-semibold text-white" href=`/medico/dashboard?consulta=${cita.id_cita}#contextoConsulta`) Continuar consulta
     else if ["Pendiente", "Confirmada"].includes(cita.estado)
       button.btn-iniciar(type="button" data-cita=cita.id_cita data-estado-id=estadoEnCursoId disabled=!cita.puedeIniciar || !estadoEnCursoId onclick="iniciarConsulta(this)" class="mt-3 w-full rounded-lg bg-[#465DE5] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50") Iniciar Consulta
       if !cita.puedeIniciar
@@ -21,14 +22,6 @@ mixin tarjetaAtencion(cita)
   p#estadoAtencion(hidden role="status" aria-live="polite" tabindex="-1" class="mb-3 rounded-lg bg-indigo-50 p-3 text-sm text-slate-800 [overflow-wrap:anywhere]")
   if errorContexto
     p(role="alert" class="mb-3 text-sm text-rose-700") No se encontró una consulta en curso para este médico. Actualiza la agenda.
-  if contextoConsulta
-    section#contextoConsulta(tabindex="-1" aria-labelledby="tituloContextoConsulta" class="mb-4 min-w-0 rounded-xl border border-indigo-200 bg-indigo-50 p-4 [overflow-wrap:anywhere]")
-      h4#tituloContextoConsulta(class="font-semibold text-slate-900") Consulta en curso
-      p(class="mt-2 text-sm font-semibold text-slate-800")= contextoConsulta.paciente
-      p(class="mt-1 text-sm text-slate-700")= `${contextoConsulta.fecha} · ${contextoConsulta.hora.slice(0, 5)}`
-      p(class="mt-2 text-sm text-slate-700 whitespace-pre-wrap")= contextoConsulta.motivo
-      p(class="mt-1 text-sm text-emerald-800") Estado: En Curso
-      include diagnosticoForm.pug
   if agendaHoy && agendaHoy.length
     each cita in agendaHoy
       +tarjetaAtencion(cita)
