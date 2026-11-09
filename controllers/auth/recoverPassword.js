@@ -61,27 +61,27 @@ const recoverPassword = async (req, res) => {
         await usuario.save({ transaction });
     });
 
-    if (!usuario) {
-        return res.render("login/auth/recover-password", {
-            titulo: "Recuperar contraseña",
-            error: "No existe una cuenta con ese correo."
-        });
-    }
+    const mensaje = "Si existe una cuenta asociada a ese correo, recibir\u00e1s un c\u00f3digo de verificaci\u00f3n. Revisa tu bandeja de entrada.";
 
-    if (errorLimite) {
-        return res.status(429).render("login/auth/verify-otp", {
-            titulo: "Verificar código",
+    if (!usuario || errorLimite) {
+        return res.render("login/auth/verify-otp", {
+            titulo: "Verificar c\u00f3digo",
             correo,
-            error: errorLimite
+            mensaje
         });
     }
 
-    await sendRecoveryEmail(usuario);
+    void sendRecoveryEmail(usuario).catch((error) => {
+        // Registra el fallo sin cambiar la respuesta visible para el solicitante.
+        console.error("No se pudo enviar el correo de recuperacion:", error.message);
+    });
 
     return res.render("login/auth/verify-otp", {
-        titulo: "Verificar código",
-        correo
+        titulo: "Verificar c\u00f3digo",
+        correo,
+        mensaje
     });
+
 };
 
 export { formRecoverPassword, recoverPassword };

@@ -77,6 +77,11 @@ const Usuario = db.define(
             allowNull: true,
         },
 
+        token_reset: {
+            type: DataTypes.STRING(36),
+            allowNull: true,
+        },
+
         codigo: {
             type: DataTypes.STRING(6),
             allowNull: true,

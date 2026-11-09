@@ -21,7 +21,7 @@ const formResetPassword = async (req, res) => {
             process.env.JWT_SECRET
         );
 
-        if (decoded.tipo !== "password-reset") {
+        if (decoded.tipo !== "password-reset" || !decoded.jti) {
 
             return res.redirect("/auth/recover-password");
 
@@ -29,7 +29,7 @@ const formResetPassword = async (req, res) => {
 
         const usuario = await Usuario.findByPk(decoded.id);
 
-        if (!usuario) {
+        if (!usuario || usuario.token_reset !== decoded.jti) {
 
             return res.redirect("/auth/recover-password");
 
@@ -66,7 +66,7 @@ const resetPassword = async (req, res) => {
             process.env.JWT_SECRET
         );
 
-        if (decoded.tipo !== "password-reset") {
+        if (decoded.tipo !== "password-reset" || !decoded.jti) {
 
             return res.redirect("/auth/recover-password");
 
@@ -74,7 +74,7 @@ const resetPassword = async (req, res) => {
 
         const usuario = await Usuario.findByPk(decoded.id);
 
-        if (!usuario) {
+        if (!usuario || usuario.token_reset !== decoded.jti) {
 
             return res.redirect("/auth/recover-password");
 
@@ -99,14 +99,26 @@ const resetPassword = async (req, res) => {
 
         }
 
-        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, await bcrypt.genSalt(10));
+        const [tokenConsumido] = await Usuario.update(
+            {
+                password: passwordHash,
+                token_reset: null,
+                codigo: null,
+                codigo_expira: null,
+                codigo_intentos: 0
+            },
+            {
+                where: {
+                    id_usuario: usuario.id_usuario,
+                    token_reset: decoded.jti
+                }
+            }
+        );
 
-        usuario.password = await bcrypt.hash(password, salt);
-
-        usuario.codigo = null;
-        usuario.codigo_expira = null;
-
-        await usuario.save();
+        if (tokenConsumido !== 1) {
+            return res.redirect("/auth/recover-password");
+        }
 
         res.clearCookie("_reset_token");
 

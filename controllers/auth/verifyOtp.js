@@ -1,4 +1,5 @@
 import Usuario from "../../models/Usuario.js";
+import { randomUUID } from "node:crypto";
 import generateResetToken from "../../helpers/generateResetToken.js";
 import { Op } from "sequelize";
 
@@ -22,7 +23,7 @@ const verifyOTP = async (req, res) => {
 
         return res.status(400).render("login/auth/verify-otp", {
             ...datosVista,
-            error: "El código ingresado no es válido."
+            error: "El código no es válido o expiró. Solicita uno nuevo."
         });
 
     }
@@ -37,7 +38,7 @@ const verifyOTP = async (req, res) => {
 
         return res.status(400).render("login/auth/verify-otp", {
             ...datosVista,
-            error: "El código ha expirado. Solicita uno nuevo."
+            error: "El código no es válido o expiró. Solicita uno nuevo."
         });
 
     }
@@ -46,9 +47,8 @@ const verifyOTP = async (req, res) => {
         // Incremento atómico para que peticiones simultáneas no evadan el límite.
         await usuario.increment("codigo_intentos");
         await usuario.reload();
-        const intentosRestantes = Math.max(0, 5 - Number(usuario.codigo_intentos || 0));
 
-        if (intentosRestantes === 0) {
+        if (Number(usuario.codigo_intentos || 0) >= 5) {
             await Usuario.update(
                 { codigo: null, codigo_expira: null },
                 { where: { id_usuario: usuario.id_usuario, codigo: usuario.codigo } }
@@ -57,9 +57,7 @@ const verifyOTP = async (req, res) => {
 
         return res.status(400).render("login/auth/verify-otp", {
             ...datosVista,
-            error: intentosRestantes === 0
-                ? "Se agotaron los intentos. Solicita un código nuevo."
-                : `El código no es válido. Te quedan ${intentosRestantes} intentos.`
+            error: "El código no es válido o expiró. Solicita uno nuevo."
         });
     }
 
@@ -78,11 +76,16 @@ const verifyOTP = async (req, res) => {
     if (codigoConsumido !== 1) {
         return res.status(400).render("login/auth/verify-otp", {
             ...datosVista,
-            error: "El código ya fue utilizado o expiró. Solicita uno nuevo."
+            error: "El código no es válido o expiró. Solicita uno nuevo."
         });
     }
 
-    const resetToken = generateResetToken(usuario);
+    const tokenReset = randomUUID();
+    const resetToken = generateResetToken(usuario, tokenReset);
+    await Usuario.update(
+        { token_reset: tokenReset },
+        { where: { id_usuario: usuario.id_usuario } }
+    );
 
     res.cookie("_reset_token", resetToken, {
         httpOnly: true,
