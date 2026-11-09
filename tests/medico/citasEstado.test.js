@@ -221,7 +221,7 @@ test("En Curso sin diagnóstico no finaliza ni antes ni después de medianoche",
 });
 
 test("En Curso con diagnóstico persistido finaliza incluso después de medianoche", async () => {
-    diagnostico = { id_diagnostico: 81 };
+    diagnostico = { id_diagnostico: 81, diagnostico: "Diagnóstico de prueba" };
     for (const now of ["2026-11-09T15:00:00Z", "2026-11-10T05:01:00Z"]) {
         cita.estado_id = 22;
         mock.timers.setTime(Date.parse(now));
@@ -248,10 +248,20 @@ test("solicitudes repetidas y concurrentes aplican una sola transición", async 
     assert.deepEqual(responses.map(res => res.status).sort(), [200, 409]);
     assert.equal(cambios, 1);
     assert.equal((await request()).status, 409);
-    diagnostico = { id_diagnostico: 81 };
+    diagnostico = { id_diagnostico: 81, diagnostico: "Diagnóstico de prueba" };
     const end = await Promise.all([request({ estado_id: 33 }), request({ estado_id: 33 })]);
     assert.deepEqual(end.map(res => res.status).sort(), [200, 409]);
     assert.equal(cambios, 2);
+});
+
+test("una fila de diagnóstico vacía o inválida no permite finalizar", async () => {
+    cita.estado_id = 22;
+    for (const texto of [null, "", "   ", 123, "x".repeat(65536)]) {
+        diagnostico = { id_diagnostico: 81, diagnostico: texto };
+        assert.equal((await request({ estado_id: 33 })).status, 409);
+        assert.equal(cita.estado_id, 22);
+    }
+    assert.equal(cambios, 0);
 });
 
 test("el UPDATE conserva el estado anterior como condición adicional", async () => {

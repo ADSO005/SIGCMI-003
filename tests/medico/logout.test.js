@@ -29,6 +29,9 @@ mock.module(new URL("../../services/emailService.js", import.meta.url).href, {
 });
 // Los manejadores médicos se sustituyen: solo interesa comprobar su barrera de sesión.
 const paginaMedica = (req, res) => res.sendStatus(200);
+mock.module(new URL("../../controllers/medico/diagnosticoController.js", import.meta.url).href, {
+    namedExports: { obtenerDiagnostico: paginaMedica, guardarDiagnostico: paginaMedica }
+});
 mock.module(new URL("../../controllers/medico/medicoController.js", import.meta.url).href, {
     namedExports: { dashboard: paginaMedica, detallePaciente: paginaMedica, actualizarEstadoCita: paginaMedica }
 });

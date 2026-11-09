@@ -68,9 +68,10 @@ el modal de horarios permanecen sin cambios y son exclusivamente de consulta.
 
 ## Límites respecto a UH-014
 
-Esta etapa no crea formularios clínicos ni endpoints para guardar diagnósticos.
-Solo verifica que exista una fila de `Diagnostico` asociada a la cita; la validación
-de su contenido pertenece a UH-014. Sin esa fila no se permite completar.
+La interfaz sigue sin formularios clínicos. UH-014 incorpora el backend de guardado
+y revisión documentado en [medical-diagnosis.md](medical-diagnosis.md).
+Finalizar exige una fila de `Diagnostico` asociada con texto de diagnóstico válido;
+una fila vacía no permite completar. Los campos opcionales no son obligatorios.
 No se registran tiempos clínicos reales ni se cambia el promedio de UH-011.
 
 Continuar recupera el contexto, pero no registra atención clínica ni guarda

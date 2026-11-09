@@ -19,6 +19,9 @@ mock.module(new URL("../../config/db.js", import.meta.url).href, {
 });
 // No se ejercitan otras funcionalidades médicas en esta entrega.
 const otroControlador = () => { throw Error("Endpoint fuera del alcance"); };
+mock.module(new URL("../../controllers/medico/diagnosticoController.js", import.meta.url).href, {
+    namedExports: { obtenerDiagnostico() { throw Error("Fuera de alcance"); }, guardarDiagnostico() { throw Error("Fuera de alcance"); } }
+});
 mock.module(new URL("../../controllers/medico/medicoController.js", import.meta.url).href, {
     namedExports: { dashboard: otroControlador, detallePaciente: otroControlador, actualizarEstadoCita: otroControlador }
 });

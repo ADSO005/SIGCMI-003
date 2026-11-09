@@ -7,6 +7,7 @@ import Prescripcion from "../../models/Prescripcion.js";
 import EstadoCita from "../../models/EstadoCita.js";
 import Especialidad from "../../models/Especialidad.js";
 import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday, canStartAppointmentToday } from "../../services/medico/dashboardMetricsService.js";
+import { textoDiagnosticoValido } from "../../services/medico/diagnosticoService.js";
 
 const dashboard = async (req, res) => {
 
@@ -324,10 +325,10 @@ const actualizarEstadoCita = async (req, res) => {
             } else {
                 // En Curso puede finalizar otro día; el diagnóstico debe existir y conservarse al actualizar.
                 const diagnostico = await Diagnostico.findOne({
-                    where: { cita_id: cita.id_cita }, attributes: ["id_diagnostico"],
-                    transaction, lock: transaction.LOCK.UPDATE
+                    where: { cita_id: cita.id_cita }, attributes: ["id_diagnostico", "diagnostico"],
+                    transaction, lock: transaction.LOCK.UPDATE, logging: false
                 });
-                if (!diagnostico) return { status: 409, mensaje: "Debes guardar un diagnóstico antes de finalizar la cita" };
+                if (!textoDiagnosticoValido(diagnostico?.diagnostico)) return { status: 409, mensaje: "Debes guardar un diagnóstico válido antes de finalizar la cita" };
             }
 
             const [filasActualizadas] = await Cita.update({ estado_id: destino.id_estado }, {
@@ -341,8 +342,8 @@ const actualizarEstadoCita = async (req, res) => {
         const respuesta = { mensaje: resultado.mensaje };
         if (resultado.status === 200) Object.assign(respuesta, { id_cita: Number(id), estado_id: destino.id_estado });
         return res.status(resultado.status).json(respuesta);
-    } catch (error) {
-        console.error("Error al actualizar el estado de la cita:", error);
+    } catch {
+        console.error("Error al actualizar el estado de la cita");
         return res.status(500).json({ mensaje: "Error al actualizar el estado de la cita" });
     }
 };
