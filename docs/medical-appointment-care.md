@@ -64,8 +64,20 @@ o anterior; las ajenas, inexistentes o en otro estado no exponen su contexto.
 
 El contexto muestra paciente, fecha, hora y motivo en un modal independiente de
 atención médica que contiene el formulario de diagnóstico de UH-014. La agenda
-permanece compacta, sin campos clínicos incrustados. No ofrece acción de finalización. «Gestionar Citas» y
-el modal de horarios permanecen sin cambios y son exclusivamente de consulta.
+permanece compacta, sin campos clínicos incrustados. «Gestionar Citas» y el modal
+de horarios permanecen sin cambios y son exclusivamente de consulta.
+
+En el modal se separan «Guardar borrador» y «Finalizar consulta». Guardar crea o
+edita el registro real de `Diagnostico`, conserva la revisión y no cambia el estado.
+El botón de finalizar solo se habilita si hay un borrador guardado sin cambios
+locales pendientes; pide confirmación y usa el ID consultado por el nombre
+`Completada`. El servidor vuelve a validar propiedad, estado y diagnóstico dentro
+de la transacción del PATCH existente. Tras el éxito, el dashboard se recarga y
+verifica que la cita propia esté Completada antes de mostrar el aviso. El PUT de
+diagnóstico solo acepta citas En Curso, por lo que completar la cita bloquea las
+ediciones posteriores también en servidor. Un conflicto conserva el contenido y
+bloquea la edición hasta revisar el estado. Las prescripciones siguen fuera de
+esta entrega y no se les aplica un flujo de escritura.
 
 ## Límites respecto a UH-014
 
@@ -76,8 +88,7 @@ una fila vacía no permite completar. Los campos opcionales no son obligatorios.
 No se registran tiempos clínicos reales ni se cambia el promedio de UH-011.
 
 Continuar recupera el contexto y el formulario de diagnóstico; las prescripciones
-siguen pendientes. Incluso si ya existe un diagnóstico, la interfaz
-no expone todavía finalizar; el endpoint conserva esa transición protegida.
+siguen pendientes. El formulario permite guardar un borrador y, después de guardarlo, finalizar consulta. \nLa finalización conserva las validaciones del endpoint y bloquea la edición posterior del diagnóstico al dejar de estar En Curso.
 
 ## Verificación
 

@@ -20,6 +20,8 @@ mixin tarjetaAtencion(cita)
     h3(class="text-base font-semibold text-black") Mi Agenda de hoy
     a(href="/medico/dashboard" class="text-xs text-[#465DE5] underline") Actualizar agenda
   p#estadoAtencion(hidden role="status" aria-live="polite" tabindex="-1" class="mb-3 rounded-lg bg-indigo-50 p-3 text-sm text-slate-800 [overflow-wrap:anywhere]")
+  if citaFinalizada
+    p(role="status" class="mb-3 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800") La cita figura como Completada. El diagnóstico ya no se puede editar.
   if errorContexto
     p(role="alert" class="mb-3 text-sm text-rose-700") No se encontró una consulta en curso para este médico. Actualiza la agenda.
   if agendaHoy && agendaHoy.length

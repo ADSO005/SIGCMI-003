@@ -29,8 +29,8 @@ const models = {
     } },
     EstadoCita: { findOne: async options => {
         queries.push(["catalogo", options]);
-        assert.deepEqual(options.where, { nombre: "En Curso" });
-        return { id_estado: 222 };
+        assert(["En Curso", "Completada"].includes(options.where.nombre));
+        return { id_estado: options.where.nombre === "Completada" ? 333 : 222 };
     } },
     Paciente: {}, Diagnostico: {}, Prescripcion: {}, Especialidad: {}
 };
@@ -52,7 +52,7 @@ before(async () => {
         res.render = (view, data) => res.json({
             view, metrics: data.dashboardMetrics, name: data.nombreMedico,
             specialty: data.especialidadMedico, date: data.fechaDashboard, nextAppointment: data.proximaCita, appointments: data.citasAgenda,
-            care: { today: data.agendaHoy, previous: data.consultasAnteriores, context: data.contextoConsulta, error: data.errorContexto, target: data.estadoEnCursoId },
+            care: { today: data.agendaHoy, previous: data.consultasAnteriores, context: data.contextoConsulta, error: data.errorContexto, target: data.estadoEnCursoId, completion: data.estadoCompletadaId, finalized: data.citaFinalizada },
             html: pug.renderFile(`views/${view}.pug`, { ...data, pacientes: [], citasHoy: [] })
         });
         next();
@@ -183,6 +183,20 @@ test("agenda contiene solo citas propias ordenadas y datos mínimos, sin consult
     assert.equal(other.appointments[0].hora, "14:00:00");
 });
 
+test("contexto propio En Curso recibe el estado Completada del catálogo y el aviso solo valida citas propias completadas", async () => {
+    rows.push({ id_cita: 3, medico_id: 9, paciente_id: 32, fecha: "2026-11-09", hora: "08:00:00",
+        Estado: { nombre: "En Curso" }, Paciente: { Usuario: { nombres: "Ana", apellidos: "Prueba" } }, motivo_consulta: "Control" });
+    const context = await (await request(7, "&consulta=3")).json();
+    assert.equal(context.care.context.id_cita, 3);
+    assert.equal(context.care.completion, 333);
+    assert(queries.some(([type, options]) => type === "catalogo" && options.where.nombre === "Completada"));
+    const finalized = await (await request(7, "&citaFinalizada=1")).json();
+    assert.equal(finalized.care.finalized, true);
+    assert.match(finalized.html, /La cita figura como Completada/);
+    const foreign = await (await request(8, "&citaFinalizada=1")).json();
+    assert.equal(foreign.care.finalized, false);
+});
+
 test("sin citas propias el dashboard entrega una agenda vacía", async () => {
     rows.push(...rows.splice(0, 2).map(cita => ({ ...cita, medico_id: 10 })));
     try {
@@ -223,7 +237,7 @@ test("recupera contexto propio En Curso anterior sin agregar toda la historia a 
     assert.equal(body.care.context.motivo, "Contexto anterior");
     assert.equal(body.care.context.estado, "En Curso");
     assert.equal(body.care.error, false);
-    assert.equal(queries.length, 3);
+    assert.equal(queries.length, 4);
     for (const id of [4, 5, 6, "abc", "3&consulta=5"]) {
         const denied = await (await request(7, "&consulta=" + id)).json();
         assert.equal(denied.care.context, undefined);

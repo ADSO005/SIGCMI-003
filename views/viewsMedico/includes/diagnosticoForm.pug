@@ -6,7 +6,7 @@ mixin campoDiagnostico(nombre, etiqueta, largo=false, requerido=false)
     else
       input(id=`diagnostico-${nombre}` name=nombre data-label=etiqueta type="text" inputmode=nombre === "frecuencia_cardiaca" ? "numeric" : nombre === "presion_arterial" ? "text" : "decimal" maxlength=nombre === "presion_arterial" ? "20" : undefined placeholder=nombre === "presion_arterial" ? "120/80" : undefined class="block min-w-0 w-full rounded-lg border border-slate-300 bg-white p-2 text-sm text-slate-900 focus:border-[#465DE5]")
 
-form#formDiagnostico(data-cita=contextoConsulta.id_cita novalidate class="mt-4 min-w-0")
+form#formDiagnostico(data-cita=contextoConsulta.id_cita data-estado-completada=estadoCompletadaId novalidate class="mt-4 min-w-0")
   p#mensajeDiagnostico(role="status" aria-live="polite" tabindex="-1" class="mb-3 text-sm text-slate-700 [overflow-wrap:anywhere]") Cargando diagnóstico…
   button#reintentarDiagnostico(type="button" hidden class="mb-3 rounded-lg border border-[#465DE5] px-3 py-2 text-sm text-[#465DE5]") Reintentar carga
   fieldset#camposDiagnostico(disabled class="min-w-0 space-y-4")

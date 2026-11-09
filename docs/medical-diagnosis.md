@@ -107,12 +107,15 @@ genérico. Las operaciones del diagnóstico desactivan el logging SQL localmente
 sin cambiar la configuración compartida. Los conflictos no devuelven el contenido
 de otro guardado.
 
-Guardar no modifica el estado de la cita. Finalizar sigue usando exclusivamente
-`PATCH /medico/citas/:id/estado` y requiere `En Curso` y un diagnóstico persistido
-con texto no vacío y dentro del límite. Una fila clínica vacía ya no basta.
-Guardar y finalizar son dos operaciones separadas: si falla finalizar, el registro
-guardado permanece y la cita sigue En Curso. No se habilita el botón de finalizar.
-No se resuelven aquí las reglas administrativas preexistentes entre módulos.
+«Guardar borrador» no modifica el estado de la cita. «Finalizar consulta» usa
+exclusivamente `PATCH /medico/citas/:id/estado` y requiere `En Curso` y un diagnóstico
+persistido con texto no vacío y dentro del límite. Una fila clínica vacía ya no
+basta. Guardar y finalizar son dos operaciones separadas: si falla finalizar,
+el registro guardado permanece y la cita sigue En Curso. El servidor rechaza el
+PUT del diagnóstico cuando la cita ya está Completada, lo que bloquea la edición
+incluso si se intenta omitir la interfaz. No se implementan escrituras de
+prescripciones en esta etapa. Tampoco se resuelven aquí las reglas administrativas
+preexistentes entre módulos.
 
 ## Modal desde «Continuar consulta»: interfaz de etapa 2
 
@@ -121,8 +124,8 @@ con paciente, fecha, hora, motivo y estado de solo lectura. También funciona co
 consultas de días anteriores. «Mi Agenda de hoy» conserva solo tarjetas compactas;
 no contiene campos clínicos. El diálogo está fuera del contenido normal del dashboard.
 Incluye cinco signos vitales opcionales, síntomas, diagnóstico obligatorio,
-tratamiento y notas. Los campos tienen etiquetas y unidades; no hay prescripciones
-ni botón de finalización. «Gestionar Citas» permanece exclusivamente de consulta.
+tratamiento y notas. Los campos tienen etiquetas y unidades; no hay prescripciones.
+«Gestionar Citas» permanece exclusivamente de consulta.
 
 Se utiliza `dialog.showModal()` con fondo oscuro, encabezado azul y el patrón visual
 del modal de horarios: ancho máximo de 960 px, altura máxima de 92dvh, cuerpo con
@@ -145,7 +148,9 @@ sin imponer rangos clínicos nuevos. PUT envía siempre los nueve campos clínic
 y la revisión, incluso cuando los opcionales son `null`. Durante la petición se
 bloquean campos y Guardar para evitar duplicados y cambios mientras espera.
 Una respuesta correcta actualiza los valores normalizados y la revisión para
-la siguiente edición, sin cambiar el estado de la cita.
+la siguiente edición, sin cambiar el estado de la cita. El encabezado muestra
+«Sin borrador guardado» o «Borrador guardado»; tras guardar se confirma «Borrador
+guardado. Puedes continuar la atención».
 
 Ante errores HTTP, de red o validación, los valores escritos permanecen. Un 409
 no actualiza la revisión ni sobrescribe: deshabilita Guardar y ofrece consultar
@@ -182,11 +187,11 @@ concurrencia, rollback, errores sin texto clínico y guardado seguido de finaliz
 Los mocks de logout y horarios solo se adaptan a los nuevos imports de rutas.
 
 La etapa backend registró **107 pruebas aprobadas**. La segunda etapa incorpora
-diez pruebas en `tests/medico/diagnosticoForm.test.cjs`: carga, creación, edición,
+diecisiete pruebas en `tests/medico/diagnosticoForm.test.cjs`: carga, creación, edición,
 opcionales, validación, duplicados, conflictos, errores, bloqueo y texto seguro.
 El formulario inicial registró **117 pruebas aprobadas**. El traslado a modal
 añade tres casos de cierre seguro, foco, reapertura, bloqueo durante PUT y carga
-tardía; la regresión actual suma **120 pruebas aprobadas**. Pasan sintaxis JavaScript,
+tardía; la regresión actual suma **125 pruebas aprobadas**. Pasan sintaxis JavaScript,
 ESLint y las pruebas existentes de compilación y renderizado Pug. No se accede a
 MySQL, no se modifican las tres citas ni se ejecuta `tests/database.test.js`.
 La concurrencia simulada no equivale a verificar bloqueos o rollback en MySQL real.

@@ -8,9 +8,10 @@
   const mensaje = elemento("mensajeDiagnostico"), reintentar = elemento("reintentarDiagnostico");
   const consultar = elemento("consultarVersionDiagnostico"), panel = elemento("versionRecienteDiagnostico");
   const modal = elemento("modalAtencion"), cerrarSuperior = elemento("cerrarAtencionSuperior"), cerrarInferior = elemento("cerrarAtencion");
+  const finalizar = elemento("finalizarConsulta");
   const estadoGuardado = elemento("estadoGuardadoDiagnostico");
   const url = `/medico/citas/${form.dataset.cita}/diagnostico`;
-  let revision = null, reciente = null, cargado = false, cargando = false, guardando = false;
+  let revision = null, reciente = null, cargado = false, cargando = false, guardando = false, finalizando = false;
   let conflicto = false, bloqueado = false, cambios = false;
   let persistido = false, versionCarga = 0, focoAnterior = null, overflowAnterior = "";
   let valoresGuardados = "";
@@ -22,16 +23,20 @@
     mensaje.setAttribute("role", error ? "alert" : "status");
   }
   function actualizarControles() {
-    fieldset.disabled = !cargado || guardando || bloqueado;
-    guardar.disabled = !cargado || cargando || guardando || conflicto || bloqueado;
-    guardar.textContent = guardando ? "Guardando…" : "Guardar diagnóstico";
-    consultar.disabled = cargando || guardando;
-    reintentar.disabled = cargando || guardando;
-    cerrarSuperior.disabled = guardando;
-    cerrarInferior.disabled = guardando;
-    estadoGuardado.textContent = guardando ? "Guardando diagnóstico…" : bloqueado ? "Consulta no editable" : conflicto ? "Conflicto pendiente de revisión"
-      : cambios ? "Cambios sin guardar" : !cargado ? (cargando ? "Cargando diagnóstico…" : "Diagnóstico no disponible")
-        : persistido ? "Diagnóstico guardado" : "Sin diagnóstico guardado";
+    fieldset.disabled = !cargado || guardando || finalizando || bloqueado;
+    guardar.disabled = !cargado || cargando || guardando || finalizando || conflicto || bloqueado;
+    guardar.textContent = guardando ? "Guardando…" : "Guardar borrador";
+    const estadoCompletadaId = Number(form.dataset.estadoCompletada);
+    finalizar.disabled = !cargado || !persistido || cambios || cargando || guardando || finalizando || conflicto || bloqueado
+      || !Number.isSafeInteger(estadoCompletadaId) || estadoCompletadaId <= 0;
+    finalizar.textContent = finalizando ? "Finalizando…" : "Finalizar consulta";
+    consultar.disabled = cargando || guardando || finalizando;
+    reintentar.disabled = cargando || guardando || finalizando;
+    cerrarSuperior.disabled = guardando || finalizando;
+    cerrarInferior.disabled = guardando || finalizando;
+    estadoGuardado.textContent = guardando ? "Guardando borrador…" : finalizando ? "Finalizando consulta…" : bloqueado ? "Consulta no editable" : conflicto ? "Conflicto pendiente de revisión"
+      : cambios ? "Cambios sin guardar" : !cargado ? (cargando ? "Cargando borrador…" : "Borrador no disponible")
+        : persistido ? "Borrador guardado" : "Sin borrador guardado";
   }
   function cargarCampos(datos) {
     nombres.forEach(nombre => {
@@ -84,7 +89,7 @@
         : error.message;
   }
   async function cargar(versionReciente = false) {
-    if (cargando || guardando) return;
+    if (cargando || guardando || finalizando) return;
     const version = versionCarga;
     cargando = true;
     if (versionReciente) { reciente = null; panel.hidden = true; }
@@ -106,7 +111,7 @@
         cargarCampos(datos);
         cargado = true; bloqueado = false;
         reintentar.hidden = true;
-        avisar(datos.diagnostico ? "Diagnóstico cargado. Puedes editarlo mientras la cita siga En Curso." : "Todavía no hay diagnóstico. Completa el campo obligatorio para guardarlo.");
+        avisar(datos.diagnostico ? "Borrador cargado. Puedes editarlo mientras la cita siga En Curso." : "Todavía no hay borrador. Completa el campo obligatorio para guardarlo.");
       }
     } catch (error) {
       if (version !== versionCarga) return;
@@ -147,12 +152,12 @@
   }
   async function enviar(event) {
     event.preventDefault();
-    if (!cargado || cargando || guardando || conflicto || bloqueado || !validarCampos()) return;
+    if (!cargado || cargando || guardando || finalizando || conflicto || bloqueado || !validarCampos()) return;
     const cuerpo = { revision };
     nombres.forEach(nombre => { cuerpo[nombre] = campos[nombre].value.trim() ? campos[nombre].value : null; });
     guardando = true;
     actualizarControles();
-    avisar("Guardando diagnóstico…");
+    avisar("Guardando borrador…");
     try {
       const respuesta = await fetch(url, { method: "PUT", credentials: "same-origin",
         headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
@@ -165,14 +170,47 @@
       if (!respuestaValida(datos) || !datos.diagnostico) throw Error("No se pudo confirmar el guardado. Tus datos se conservan; consulta la versión más reciente.");
       cargarCampos(datos);
       consultar.hidden = true; panel.hidden = true; reciente = null;
-      avisar("Diagnóstico guardado correctamente. Puedes continuar editándolo.");
+      avisar("Borrador guardado. Puedes continuar la atención");
     } catch (error) {
       avisar(errorPeticion(error), true);
       consultar.hidden = false;
       mensaje.focus();
     } finally { guardando = false; actualizarControles(); }
   }
+  async function finalizarAtencion() {
+    const estadoId = Number(finalizar.dataset.estadoId);
+    if (finalizar.disabled || finalizando || !persistido || cambios || !Number.isSafeInteger(estadoId) || estadoId <= 0) return;
+    if (!window.confirm("Al finalizar, el diagnóstico quedará bloqueado para edición. ¿Deseas finalizar la consulta?")) return;
+    finalizando = true;
+    actualizarControles();
+    avisar("Finalizando consulta…");
+    try {
+      const respuesta = await fetch(`/medico/citas/${form.dataset.cita}/estado`, {
+        method: "PATCH", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado_id: estadoId })
+      });
+      if (respuesta.redirected || respuesta.status === 401) throw Error("La sesión venció. Verifica el estado de la consulta antes de continuar.");
+      if (respuesta.status === 403) throw Error("No tienes permiso para finalizar esta consulta.");
+      if (!respuesta.headers.get("content-type")?.includes("application/json")) throw Error("Respuesta no válida. Comprueba el estado de la consulta antes de reintentar.");
+      const datos = await respuesta.json();
+      if (respuesta.status === 409) {
+        bloqueado = true;
+        throw Error(typeof datos?.mensaje === "string" ? datos.mensaje : "La consulta cambió de estado. Actualiza la agenda.");
+      }
+      if (!respuesta.ok) throw Error(typeof datos?.mensaje === "string" ? datos.mensaje : "No se pudo finalizar la consulta.");
+      if (datos.id_cita !== Number(form.dataset.cita) || datos.estado_id !== estadoId) throw Error("No se pudo confirmar el cambio. Actualiza la agenda.");
+      window.location.assign(`/medico/dashboard?citaFinalizada=${form.dataset.cita}#agendaView`);
+    } catch (error) {
+      avisar(errorPeticion(error), true);
+      mensaje.focus();
+    } finally {
+      finalizando = false;
+      actualizarControles();
+    }
+  }
   form.addEventListener("submit", enviar);
+  finalizar.addEventListener("click", finalizarAtencion);
   form.addEventListener("input", event => {
     cambios = contenidoFormulario() !== valoresGuardados;
     event.target.setCustomValidity?.("");
@@ -206,11 +244,11 @@
   }
   function cerrar() {
     if (!modal.open) return;
-    if (guardando) { avisar("Espera a que termine el guardado antes de cerrar."); return; }
+    if (guardando || finalizando) { avisar("Espera a que termine la solicitud antes de cerrar."); return; }
     if (cambios && !window.confirm("Tienes cambios sin guardar. ¿Deseas descartarlos y cerrar la atención médica?")) return;
     // Una respuesta GET tardía no debe modificar un formulario cerrado o recién abierto.
     versionCarga++;
-    cargando = false; cargado = false; cambios = false; persistido = false;
+    cargando = false; cargado = false; cambios = false; persistido = false; finalizando = false;
     conflicto = false; bloqueado = false; reciente = null; revision = null;
     nombres.forEach(nombre => { campos[nombre].value = ""; campos[nombre].setCustomValidity(""); campos[nombre].removeAttribute("aria-invalid"); });
     valoresGuardados = contenidoFormulario();

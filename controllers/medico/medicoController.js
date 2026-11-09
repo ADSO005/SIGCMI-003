@@ -139,6 +139,8 @@ const dashboard = async (req, res) => {
             ? Number(req.query.consulta) : NaN;
         const contextoConsulta = [...agendaHoy, ...consultasAnteriores]
             .find(cita => cita.id_cita === consultaId && cita.estado === "En Curso");
+        const estadoCompletada = contextoConsulta
+            ? await EstadoCita.findOne({ where: { nombre: "Completada" }, attributes: ["id_estado"] }) : null;
 
         // El modal recibe solo datos de consulta, sin información clínica adicional.
         const citasAgenda = citas.map(cita => ({
@@ -162,6 +164,9 @@ const dashboard = async (req, res) => {
                 citasHoy,
                 agendaHoy, consultasAnteriores, contextoConsulta,
                 estadoEnCursoId: estadoEnCurso?.id_estado,
+                estadoCompletadaId: estadoCompletada?.id_estado,
+                citaFinalizada: typeof req.query.citaFinalizada === "string"
+                    && citas.some(cita => String(cita.id_cita) === req.query.citaFinalizada && cita.Estado?.nombre === "Completada"),
                 errorContexto: req.query.consulta !== undefined && !contextoConsulta,
                 citasAgenda,
                 proximaCita: nextAppointmentToday(citasHoy, medico.id_medico, now),
