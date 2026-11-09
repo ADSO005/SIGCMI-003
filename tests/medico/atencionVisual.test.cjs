@@ -24,7 +24,7 @@ test("botones según estado y elegibilidad, sin finalizar ni formularios clínic
     assert.doesNotMatch(enabled + terminal, /Finalizar|finalizarConsulta|<form|<textarea|Guardar|Prescribir/);
 });
 
-test("contexto y consultas anteriores se presentan con escape y sin acciones de escritura", () => {
+test("contexto y consultas anteriores se presentan con escape y formulario sin finalización", () => {
     const payload = '<img src=x onerror="alert(1)">';
     const previous = { ...cita, estado: "En Curso", fecha: "2026-11-08", paciente: payload, motivo: payload };
     const html = render({ consultasAnteriores: [previous], contextoConsulta: previous });
@@ -34,7 +34,9 @@ test("contexto y consultas anteriores se presentan con escape y sin acciones de 
     assert.match(html, /Continuar consulta/);
     assert.match(html, /&lt;img/);
     assert(!html.includes(payload));
-    assert.doesNotMatch(html, /<button|<form|<input|<textarea/);
+    assert.equal((html.match(/<form/g) || []).length, 1);
+    assert.match(html, /id="formDiagnostico"/);
+    assert.doesNotMatch(html, /Finalizar Consulta|finalizarConsulta|Prescribir/);
     assert.match(render({ errorContexto: true }), /No se encontró una consulta/);
     assert.match(render({ agendaHoy: [cita], estadoEnCursoId: null }), /disabled="disabled"/);
 });

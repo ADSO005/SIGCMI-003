@@ -1,10 +1,11 @@
-# UH-014 — Guardado y edición de diagnóstico: etapa 1
+# UH-014 — Registro y edición de diagnóstico
 
 ## Alcance y permisos
 
 Se reutilizan `Diagnostico`, sus asociaciones y el índice único de `cita_id`.
 No hay cambios de modelos, migraciones, autenticación, administración o paciente.
-No se incluyen interfaz ni prescripciones.
+La segunda etapa añade el formulario médico descrito abajo; las prescripciones
+siguen pendientes.
 
 - `GET /medico/citas/:id/diagnostico`: obtiene el registro y su revisión.
 - `PUT /medico/citas/:id/diagnostico`: crea o reemplaza los campos clínicos.
@@ -28,7 +29,7 @@ por el cliente. Las prescripciones también se rechazan como campo inesperado.
 3. La respuesta 201 contiene el registro y una revisión SHA-256 de 64 caracteres.
 4. Para editar, enviar esa revisión y los campos clínicos completos. Devuelve 200
    con el contenido persistido y la revisión resultante.
-5. Si otro guardado cambió el contenido, responde 409. La interfaz futura deberá
+5. Si otro guardado cambió el contenido, responde 409. La interfaz debe
    consultar de nuevo y permitir revisar los cambios; no reintentar sobrescribiendo
    automáticamente la revisión nueva.
 
@@ -48,7 +49,7 @@ Ejemplo de primer guardado, solo como contrato; no se ejecutó contra MySQL:
 ```
 
 PUT reemplaza los campos clínicos: los opcionales omitidos o vacíos pasan a `null`.
-La futura interfaz debe conservar y enviar lo que quiera mantener. No debe copiar
+La interfaz conserva y envía lo que quiera mantener. No debe copiar
 el objeto de respuesta completo al cuerpo: sus IDs y fecha son de solo lectura.
 
 La revisión se calcula con los campos clínicos, ID, cita y fecha del registro,
@@ -87,7 +88,7 @@ no se ha ampliado para aceptar varios textos muy grandes en una sola solicitud.
 
 `fecha_diagnostico` se asigna con `new Date()` del servidor al crear, siguiendo la
 convención existente de Sequelize. Representa un instante y la respuesta lo entrega
-en ISO; la interfaz futura deberá presentarlo en `America/Bogota`. No se altera la
+en ISO; al presentar este instante debe usarse `America/Bogota`. No se altera la
 fecha al editar ni se sustituye la fecha programada de la cita.
 
 ## Transacciones, respuestas y finalización
@@ -113,6 +114,42 @@ Guardar y finalizar son dos operaciones separadas: si falla finalizar, el regist
 guardado permanece y la cita sigue En Curso. No se habilita el botón de finalizar.
 No se resuelven aquí las reglas administrativas preexistentes entre módulos.
 
+## Formulario desde «Continuar consulta»: etapa 2
+
+El contexto autorizado En Curso contiene el formulario, con paciente, fecha, hora,
+motivo y estado de solo lectura. También funciona con consultas de días anteriores.
+Incluye cinco signos vitales opcionales, síntomas, diagnóstico obligatorio,
+tratamiento y notas. Los campos tienen etiquetas y unidades; no hay prescripciones
+ni botón de finalización. «Gestionar Citas» permanece exclusivamente de consulta.
+
+Al abrir se consulta GET con `no-store`. La edición permanece deshabilitada hasta
+recibir todos los campos y una revisión válida. Sin registro, se habilita vacío
+con revisión `null`. Si falla la carga inicial, se informa y permite reintentar.
+Un estado no editable, cita no disponible o permiso inválido bloquean la edición.
+
+Guardar valida diagnóstico, bytes UTF-8, precisión decimal, entero y presión,
+sin imponer rangos clínicos nuevos. PUT envía siempre los nueve campos clínicos
+y la revisión, incluso cuando los opcionales son `null`. Durante la petición se
+bloquean campos y Guardar para evitar duplicados y cambios mientras espera.
+Una respuesta correcta actualiza los valores normalizados y la revisión para
+la siguiente edición, sin cambiar el estado de la cita.
+
+Ante errores HTTP, de red o validación, los valores escritos permanecen. Un 409
+no actualiza la revisión ni sobrescribe: deshabilita Guardar y ofrece consultar
+la versión reciente. Esta se presenta aparte, como texto de solo lectura. El
+médico puede ocultarla conservando sus datos o pulsar «Reemplazar mi formulario
+con esta versión»; solo se reemplazan campos y revisión después de confirmar.
+No se realiza una mezcla automática. Si la consulta reciente detecta que la cita
+ya no está En Curso, se conserva el contenido local pero se bloquea la edición.
+
+Los textos se asignan a `value` y `textContent`, nunca a `innerHTML`. Los errores
+se anuncian con `role=alert`, hay foco en el campo inválido y aviso de salida con
+cambios sin guardar. Los datos locales están solo en memoria: no se guardan en
+almacenamiento del navegador, y salir tras confirmar puede descartarlos. Una
+pérdida de conexión no demuestra si un PUT llegó a confirmarse: se puede consultar
+la versión reciente antes de reintentar; la revisión del backend sigue protegiendo
+contra sobrescrituras y duplicados.
+
 ## Verificación y pendientes
 
 `tests/medico/diagnostico.test.js` contiene 17 pruebas con rutas y middleware reales,
@@ -122,16 +159,25 @@ concurrencia, rollback, errores sin texto clínico y guardado seguido de finaliz
 `citasEstado.test.js` incorpora el rechazo de diagnósticos vacíos al finalizar.
 Los mocks de logout y horarios solo se adaptan a los nuevos imports de rutas.
 
-La regresión completa suma **107 pruebas aprobadas**. Pasan sintaxis JavaScript,
+La etapa backend registró **107 pruebas aprobadas**. La segunda etapa incorpora
+diez pruebas en `tests/medico/diagnosticoForm.test.cjs`: carga, creación, edición,
+opcionales, validación, duplicados, conflictos, errores, bloqueo y texto seguro.
+La regresión completa actual suma **117 pruebas aprobadas**. Pasan sintaxis JavaScript,
 ESLint y las pruebas existentes de compilación y renderizado Pug. No se accede a
 MySQL, no se modifican las tres citas ni se ejecuta `tests/database.test.js`.
 La concurrencia simulada no equivale a verificar bloqueos o rollback en MySQL real.
+En Chrome se verificaron nueve escenarios con GET/PUT simulados: formulario sin
+registro, con registro y con conflicto, a 1440, 390 y 320 px. Pasaron teclado,
+envío único, bloqueo durante la solicitud, revisión, consulta segura de otra versión
+y ausencia de desbordamiento horizontal. El CSS se compiló solo en una carpeta
+temporal. No son pruebas de escritura contra MySQL real.
 
 ```powershell
-node --experimental-test-module-mocks --test tests/medico/diagnostico.test.js tests/medico/citasEstado.test.js tests/medico/atencionVisual.test.cjs tests/medico/dashboardMetrics.test.js tests/medico/dashboard.test.js tests/medico/dashboardCards.test.cjs tests/medico/citasModal.test.cjs tests/medico/logout.test.js tests/medico/horariosAccess.test.js tests/medico/horariosModal.test.cjs tests/medico/historial.test.js tests/medico/horariosService.test.js
+node --experimental-test-module-mocks --test tests/medico/diagnosticoForm.test.cjs tests/medico/diagnostico.test.js tests/medico/citasEstado.test.js tests/medico/atencionVisual.test.cjs tests/medico/dashboardMetrics.test.js tests/medico/dashboard.test.js tests/medico/dashboardCards.test.cjs tests/medico/citasModal.test.cjs tests/medico/logout.test.js tests/medico/horariosAccess.test.js tests/medico/horariosModal.test.cjs tests/medico/historial.test.js tests/medico/horariosService.test.js
 ```
 
-Quedan pendientes la interfaz, las prescripciones y pruebas autorizadas sobre
-MySQL real. La historia no incluye trazabilidad de versiones. Los registros
+Quedan pendientes las prescripciones, habilitar la finalización visual en una
+etapa autorizada y pruebas autorizadas sobre MySQL real.
+La historia no incluye trazabilidad de versiones. Los registros
 persistidos siguen siendo visibles según las consultas existentes de historial
 y administración; no se implementa un borrador privado.

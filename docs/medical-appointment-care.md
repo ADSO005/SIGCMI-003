@@ -62,20 +62,20 @@ No se agrega toda la agenda histórica ni una consulta adicional de citas.
 El parámetro `consulta` solo recupera contexto de una cita propia En Curso de hoy
 o anterior; las ajenas, inexistentes o en otro estado no exponen su contexto.
 
-El contexto muestra paciente, fecha, hora y motivo. No ofrece formularios ni acción
-de finalización: el registro clínico corresponde a UH-014. «Gestionar Citas» y
+El contexto muestra paciente, fecha, hora y motivo, y contiene el formulario de
+diagnóstico de UH-014. No ofrece acción de finalización. «Gestionar Citas» y
 el modal de horarios permanecen sin cambios y son exclusivamente de consulta.
 
 ## Límites respecto a UH-014
 
-La interfaz sigue sin formularios clínicos. UH-014 incorpora el backend de guardado
-y revisión documentado en [medical-diagnosis.md](medical-diagnosis.md).
+UH-014 incorpora el backend y formulario de guardado y revisión documentados
+en [medical-diagnosis.md](medical-diagnosis.md).
 Finalizar exige una fila de `Diagnostico` asociada con texto de diagnóstico válido;
 una fila vacía no permite completar. Los campos opcionales no son obligatorios.
 No se registran tiempos clínicos reales ni se cambia el promedio de UH-011.
 
-Continuar recupera el contexto, pero no registra atención clínica ni guarda
-diagnósticos o prescripciones. Incluso si ya existe un diagnóstico, la interfaz
+Continuar recupera el contexto y el formulario de diagnóstico; las prescripciones
+siguen pendientes. Incluso si ya existe un diagnóstico, la interfaz
 no expone todavía finalizar; el endpoint conserva esa transición protegida.
 
 ## Verificación
@@ -90,7 +90,8 @@ real de MySQL. La primera etapa registró **82 pruebas aprobadas**.
 La segunda incorpora dos casos de integración del dashboard y cinco pruebas de
 renderizado y JavaScript visual en `tests/medico/atencionVisual.test.cjs`:
 botones, contexto, éxito con recarga, duplicados y errores. La regresión completa
-actual suma **89 pruebas aprobadas**, con datos en memoria y modelos simulados.
+de esa etapa sumó **89 pruebas aprobadas**, con datos en memoria y modelos simulados.
+La regresión posterior de UH-014 se detalla en `medical-diagnosis.md`.
 En Chrome se comprobó el dashboard renderizado con datos sintéticos a 1440,
 390 y 320 px: contexto, consultas anteriores, botones habilitados/deshabilitados
 y textos largos sin desbordamiento horizontal. Tailwind se compiló solo en una
