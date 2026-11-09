@@ -8,6 +8,7 @@ import EstadoCita from "../../models/EstadoCita.js";
 import Especialidad from "../../models/Especialidad.js";
 import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday, canStartAppointmentToday } from "../../services/medico/dashboardMetricsService.js";
 import { textoDiagnosticoValido } from "../../services/medico/diagnosticoService.js";
+import { medicamentoPersistidoValido } from "../../services/medico/prescripcionesService.js";
 
 const dashboard = async (req, res) => {
 
@@ -330,10 +331,27 @@ const actualizarEstadoCita = async (req, res) => {
             } else {
                 // En Curso puede finalizar otro día; el diagnóstico debe existir y conservarse al actualizar.
                 const diagnostico = await Diagnostico.findOne({
-                    where: { cita_id: cita.id_cita }, attributes: ["id_diagnostico", "diagnostico"],
+                    where: { cita_id: cita.id_cita }, attributes: ["id_diagnostico", "diagnostico", "decision_medicamentos"],
                     transaction, lock: transaction.LOCK.UPDATE, logging: false
                 });
                 if (!textoDiagnosticoValido(diagnostico?.diagnostico)) return { status: 409, mensaje: "Debes guardar un diagnóstico válido antes de finalizar la cita" };
+
+                // El orden cita → diagnóstico → prescripciones es compartido con el guardado de medicamentos.
+                if (!["Requiere", "No requiere"].includes(diagnostico.decision_medicamentos)) {
+                    return { status: 409, mensaje: "Debes registrar la decisión de medicamentos antes de finalizar la cita" };
+                }
+                const prescripciones = await Prescripcion.findAll({
+                    where: { diagnostico_id: diagnostico.id_diagnostico },
+                    attributes: ["id_prescripcion", "nombre_medicamento", "dosis", "frecuencia", "duracion"],
+                    transaction, lock: transaction.LOCK.UPDATE, logging: false
+                });
+                if (diagnostico.decision_medicamentos === "Requiere"
+                    && !prescripciones.some(medicamentoPersistidoValido)) {
+                    return { status: 409, mensaje: "Debes tener al menos un medicamento válido guardado antes de finalizar la cita" };
+                }
+                if (diagnostico.decision_medicamentos === "No requiere" && prescripciones.length > 0) {
+                    return { status: 409, mensaje: "La decisión No requiere no puede tener medicamentos registrados" };
+                }
             }
 
             const [filasActualizadas] = await Cita.update({ estado_id: destino.id_estado }, {

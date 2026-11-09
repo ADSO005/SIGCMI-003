@@ -109,14 +109,46 @@ sin cambiar la configuración compartida. Los conflictos no devuelven el conteni
 de otro guardado.
 
 «Guardar borrador» no modifica el estado de la cita. «Finalizar consulta» usa
-exclusivamente `PATCH /medico/citas/:id/estado` y requiere `En Curso` y un diagnóstico
-persistido con texto no vacío y dentro del límite. Una fila clínica vacía ya no
-basta. Guardar y finalizar son dos operaciones separadas: si falla finalizar,
-el registro guardado permanece y la cita sigue En Curso. El servidor rechaza el
-PUT del diagnóstico cuando la cita ya está Completada, lo que bloquea la edición
-incluso si se intenta omitir la interfaz. No se implementan escrituras de
-prescripciones en esta etapa. Tampoco se resuelven aquí las reglas administrativas
-preexistentes entre módulos.
+exclusivamente `PATCH /medico/citas/:id/estado`. Requiere `En Curso`, un diagnóstico
+persistido válido y una decisión de medicamentos distinta de `Pendiente`. Si la
+decisión es `Requiere`, debe existir al menos una prescripción válida; si es `No
+requiere`, no debe existir ninguna. Si falla la finalización, los registros
+guardados permanecen y la cita sigue `En Curso`. El servidor rechaza la edición
+del diagnóstico cuando la cita ya está Completada, incluso si se omite la interfaz.
+
+## Decisión de medicamentos y prescripciones
+
+`GET /medico/citas/:id/medicamentos` y `PUT /medico/citas/:id/medicamentos` usan
+`auth` y `role(2)`. El servidor identifica al médico desde la sesión y restringe
+ambas operaciones a citas de su propiedad. Se requiere un diagnóstico guardado
+con texto válido. GET permite consultar la decisión, la versión y las
+prescripciones; no modifica registros.
+
+PUT solo guarda mientras la cita esté `En Curso`. El cuerpo contiene exactamente
+`decision_medicamentos`, `version_prescripciones` y `medicamentos`. La decisión
+acepta `Requiere` o `No requiere`; `Pendiente` se conserva como valor inicial,
+pero no se acepta como decisión guardada. Cada medicamento requiere
+`nombre_medicamento`, `dosis`, `frecuencia` y `duracion`, respetando los límites
+de sus columnas.
+
+Para `Requiere`, la operación debe dejar al menos una prescripción válida. Se
+pueden agregar medicamentos sin reemplazar los existentes. Para `No requiere`,
+la lista enviada debe estar vacía y no debe haber prescripciones guardadas; si
+ya existen, el servidor responde con conflicto y no las elimina. No hay rutas
+para editar o eliminar medicamentos individuales.
+
+El cliente envía la versión que obtuvo con GET. El servidor bloquea la cita y
+el diagnóstico dentro de una transacción, comprueba la versión y realiza en esa
+misma transacción la actualización de decisión/versión y la inserción de nuevos
+medicamentos. Cada guardado exitoso incrementa `version_prescripciones` una vez.
+Una versión desactualizada devuelve HTTP 409 antes de modificar registros; un
+reintento con esa versión no vuelve a insertar los medicamentos. Si falla una
+inserción, la transacción revierte la actualización de la decisión y la versión.
+
+El guardado de medicamentos y la finalización siguen el mismo orden de bloqueo:
+cita, diagnóstico y prescripciones. Así, una finalización concurrente espera el
+guardado o, si completa primero, el guardado posterior encuentra que la cita ya
+no está `En Curso` y responde con conflicto.
 
 ## Modal desde «Continuar consulta»: interfaz de etapa 2
 
@@ -125,7 +157,9 @@ con paciente, fecha, hora, motivo y estado de solo lectura. También funciona co
 consultas de días anteriores. «Mi Agenda de hoy» conserva solo tarjetas compactas;
 no contiene campos clínicos. El diálogo está fuera del contenido normal del dashboard.
 Incluye cinco signos vitales opcionales, síntomas, diagnóstico obligatorio,
-tratamiento y notas. Los campos tienen etiquetas y unidades; no hay prescripciones.
+tratamiento y notas. Los campos tienen etiquetas y unidades. Las operaciones de
+medicamentos se describen en la sección de API; este modal conserva el formulario
+de diagnóstico.
 «Gestionar Citas» permanece exclusivamente de consulta.
 
 Se utiliza `dialog.showModal()` con fondo oscuro, encabezado azul y el patrón visual
@@ -180,6 +214,10 @@ contra sobrescrituras y duplicados.
 
 ## Verificación y pendientes
 
+Los resultados numéricos que siguen corresponden a validaciones anteriores de
+diagnóstico e interfaz; no verifican los endpoints de medicamentos ni la nueva
+condición de finalización.
+
 `tests/medico/diagnostico.test.js` contiene 17 pruebas con rutas y middleware reales,
 modelos simulados y transacciones/bloqueos en memoria. Se prueban permisos, propiedad,
 estados con IDs distintos, validaciones, creación, edición, revisión, reenvíos,
@@ -209,8 +247,8 @@ temporal. No son pruebas de escritura contra MySQL real.
 node --experimental-test-module-mocks --test tests/medico/diagnosticoForm.test.cjs tests/medico/diagnostico.test.js tests/medico/citasEstado.test.js tests/medico/atencionVisual.test.cjs tests/medico/dashboardMetrics.test.js tests/medico/dashboard.test.js tests/medico/dashboardCards.test.cjs tests/medico/citasModal.test.cjs tests/medico/logout.test.js tests/medico/horariosAccess.test.js tests/medico/horariosModal.test.cjs tests/medico/historial.test.js tests/medico/horariosService.test.js
 ```
 
-Quedan pendientes las prescripciones, habilitar la finalización visual en una
-etapa autorizada y pruebas autorizadas sobre MySQL real.
-La historia no incluye trazabilidad de versiones. Los registros
+Los endpoints de prescripciones y la validación para finalizar están descritos
+arriba. La versión controla actualizaciones concurrentes de la lista, pero no es
+un historial de cambios ni identifica autores. Los registros
 persistidos siguen siendo visibles según las consultas existentes de historial
 y administración; no se implementa un borrador privado.
