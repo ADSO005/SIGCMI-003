@@ -27,7 +27,7 @@ export const listarHorarios = async (req, res) => {
 
         const horarios = await Horario.findAll({
             where: { medico_id: medico.id_medico },
-            attributes: ["id_horario", "dia_semana", "hora_inicio", "hora_fin", "estado", "aprobado_por", "fecha_creacion"],
+            attributes: ["id_horario", "dia_semana", "hora_inicio", "hora_fin", "fecha_inicio", "fecha_fin", "estado", "aprobado_por", "fecha_creacion"],
             order: [
                 [fn("FIELD", col("dia_semana"), ...diasSemana), "ASC"],
                 ["hora_inicio", "ASC"],
@@ -36,7 +36,10 @@ export const listarHorarios = async (req, res) => {
         });
 
         return res.json({
-            horarios: horarios.map(h => { const { id_horario, dia_semana, hora_inicio, hora_fin, estado } = h; return { id_horario, dia_semana, hora_inicio, hora_fin, estado }; }),
+            horarios: horarios.map(h => {
+                const { id_horario, dia_semana, hora_inicio, hora_fin, fecha_inicio, fecha_fin, estado } = h;
+                return { id_horario, dia_semana, hora_inicio, hora_fin, fecha_inicio, fecha_fin, estado };
+            }),
             revision: revisionHorarios(horarios)
         });
     } catch (error) {
