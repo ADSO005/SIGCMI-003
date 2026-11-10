@@ -16,6 +16,26 @@ const Diagnostico = db.define(
             unique: true,
         },
 
+        decision_medicamentos: {
+            type: DataTypes.ENUM("Pendiente", "Requiere", "No requiere"),
+            allowNull: false,
+            defaultValue: "Pendiente",
+            validate: {
+                isIn: [["Pendiente", "Requiere", "No requiere"]],
+            },
+        },
+
+        version_prescripciones: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+            defaultValue: 0,
+            validate: {
+                isInt: true,
+                min: 0,
+                max: 4294967295,
+            },
+        },
+
         temperatura: {
             type: DataTypes.DECIMAL(4, 1),
             allowNull: true,

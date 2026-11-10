@@ -9,94 +9,10 @@ block content
       header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
-          span(class="block text-[13px] leading-[18px] text-black") 3 de Abril del 2026
-      section.cards(class="grid grid-cols-4 gap-4 mb-6 [@media(max-width:1024px)]:grid-cols-2 [@media(max-width:480px)]:grid-cols-1")
-        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
-          p Citas Hoy
-          .card-body(class="flex justify-between items-center pr-8")
-            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
-              h2 48
-              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") 2 completadas
-            .card-icon.icono-azul(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
-              img(src='/medico/img/blueCalendar.png' alt='Citas')
-        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
-          p Pacientes Activos
-          .card-body(class="flex justify-between items-center pr-8")
-            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
-              h2 48
-              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") +3 este mes
-            .card-icon.icono-verde(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
-              img(src='/medico/img/usderGreen.png' alt='Pacientes')
-        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
-          p Consultas Esta Semana
-          .card-body(class="flex justify-between items-center pr-8")
-            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
-              h2 48
-              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") Promedio: 9/día
-            .card-icon.icono-morado(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
-              img(src='/medico/img/historyUser.png' alt='Consultas')
-        .card(class="relative min-w-0 min-h-[94px] border border-[#d5d5d5] bg-white px-4 py-3 rounded-[10px] [&>p]:text-black [&>p]:text-[13px] [&>p]:leading-[18px] [&>p]:mb-0 [&>p]:ml-0")
-          p Tiempo Promedio
-          .card-body(class="flex justify-between items-center pr-8")
-            .card-left(class="[&>h2]:text-[30px] [&>h2]:font-bold [&>h2]:text-black [&>h2]:leading-8")
-              h2 48
-              span.card-sub(class="mt-[2px] block text-[12px] leading-4 text-black") Por consulta
-            .card-icon.icono-naranja(class="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center shrink-0 [&>img]:h-full [&>img]:w-full [&>img]:object-contain")
-              img(src='/medico/img/clockUserADMIN.png' alt='Tiempo')
+          span(class="block text-[13px] leading-[18px] text-black")= fechaDashboard
+      include includes/dashboardMetrics.pug
       section.content(class="grid grid-cols-[minmax(0,2.27fr)_minmax(0,1fr)] items-start gap-4 [@media(max-width:768px)]:grid-cols-1")
-        // AGENDA DEL DÍA
-        .appointments(class="min-w-0 bg-white p-4 rounded-[12px] border border-[#d5d5d5] [@media(min-width:1025px)]:min-h-[460px] [&>h3]:text-black [&>h3]:text-[16px] [&>h3]:font-semibold [&>h3]:mb-3")
-          h3 Mi Agenda de hoy
-
-          if citasHoy && citasHoy.length > 0
-            each cita in citasHoy
-
-              - const estado = cita.Estado ? cita.Estado.nombre : "Sin estado"
-              - const usuarioPaciente = cita.Paciente ? cita.Paciente.Usuario : null
-
-              .appointment(
-                class="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 min-h-[76px] rounded-[14px] border p-3 [&.estado-completada]:bg-[#efefef] [&.estado-completada]:border-[#d5d5d5] [&.estado-encurso]:bg-[#d7f7e4] [&.estado-encurso]:border-[#1bce60] [&.estado-pendiente]:bg-[#f8f8ff] [&.estado-pendiente]:border-[#c4c6ff] [&.estado-completada_.hour]:bg-[#c9c9c9] [&.estado-completada_h4]:text-[#666666] [&.estado-encurso_.hour]:bg-[#1bce60] [&_.state]:text-[12px] [&_.state]:font-normal [&_.state]:leading-4 [&_.state]:px-2 [&_.state]:text-center [&_.state]:min-w-[80px] [&_.state]:whitespace-nowrap [&_.greenState]:bg-[#e2e2e2] [&_.greenState]:text-[#666666] [&_.yellowState]:bg-[#9de8b7] [&_.yellowState]:text-[#287a3b] [&_.greyState]:bg-[#b9bdff] [&_.greyState]:text-[#465DE5] [&_.btn-consulta]:w-full [&_.btn-consulta]:py-2 [&_.btn-consulta]:px-3 [&_.btn-consulta]:border-0 [&_.btn-consulta]:rounded-[10px] [&_.btn-consulta]:text-[13px] [&_.btn-consulta]:leading-[18px] [&_.btn-consulta]:font-semibold [&_.btn-consulta]:text-white [&_.btn-consulta]:cursor-pointer [&_.btn-consulta]:transition-all [&_.btn-consulta]:duration-200 [&_.btn-consulta]:ease-[ease] [&_.btn-consulta:hover]:opacity-85 [&_.btn-iniciar]:bg-[#465DE5] [&_.btn-finalizar]:bg-[#1bce60]"
-                class=`estado-${estado.toLowerCase().replace(" ", "")}`
-                id=`cita${cita.id_cita}`
-              )
-                .left(class="grid min-w-0 grid-cols-[52px_minmax(0,1fr)] items-center gap-x-[10px] gap-y-[10px] [&>div]:contents [&_h4]:text-[13px] [&_h4]:leading-[18px] [&_h4]:font-normal [&_h4]:text-black [&_p]:col-span-2 [&_p]:text-[12px] [&_p]:leading-4 [&_p]:text-[#555555] [&_p]:font-light [&_p]:break-words")
-                  span.hour(class="text-[12px] leading-5 font-semibold text-white bg-[#465DE5] text-center whitespace-nowrap")= cita.hora.substring(0, 5)
-
-                  div
-                    if usuarioPaciente
-                      h4= `${usuarioPaciente.nombres} ${usuarioPaciente.apellidos}`
-                    else
-                      h4 Paciente no disponible
-
-                    p= cita.motivo_consulta || "Sin motivo de consulta"
-
-                .right(class="inline-flex items-center gap-[14px]")
-                  if estado === "Completada"
-                    span.state.greenState= estado
-
-                  else if estado === "En Curso"
-                    span.state.yellowState= estado
-
-                  else if estado === "Pendiente"
-                    span.state.greyState= estado
-
-                  else
-                    span.state= estado
-
-                if estado === "Pendiente"
-                  .btn-full-row(class="col-span-2 w-full")
-                    button.btn-consulta.btn-iniciar(
-                      onclick=`iniciarConsulta('cita${cita.id_cita}')`
-                    ) Iniciar Consulta
-
-                else if estado === "En Curso"
-                  .btn-full-row(class="col-span-2 w-full")
-                    button.btn-consulta.btn-finalizar(
-                      onclick=`finalizarConsulta('cita${cita.id_cita}')`
-                    ) Finalizar Consulta
-
-          else
-            p No tienes citas programadas para hoy.
+        include includes/dailyAppointments.pug
         // ACCIONES RÁPIDAS
         .quick-actions(class="min-w-0 flex flex-col gap-3")
           .actions(class="bg-white p-4 rounded-[12px] border border-[#d5d5d5] flex flex-col gap-3 [&>h3]:text-black [&>h3]:text-[16px] [&>h3]:font-semibold [&>h3]:mb-0")
@@ -108,16 +24,20 @@ block content
               img.proxima-icon(class="h-5 w-5 brightness-0 invert" src='/medico/img/Icon.png' alt='Reloj')
               span Próxima Cita
             .proxima-detalle(class="rounded-[10px] bg-white/20 px-3 py-3")
-              .proxima-hora(class="text-[20px] font-bold text-white leading-6 mb-1") 11:00 AM
-              .proxima-paciente(class="text-[13px] font-semibold text-white") Ana Rodríguez
-              .proxima-motivo(class="text-[12px] leading-4 font-light text-white mt-1") Medicina interna
+              if proximaCita
+                .proxima-hora(class="text-[20px] font-bold text-white leading-6 mb-1")= proximaCita.hora
+                .proxima-paciente(class="text-[13px] font-semibold text-white")= proximaCita.paciente
+                .proxima-motivo(class="text-[12px] leading-4 font-light text-white mt-1")= proximaCita.motivo
+              else
+                p(class="text-[13px] font-semibold text-white") No tienes más citas programadas para hoy
+                p(class="text-[12px] leading-4 font-light text-white mt-1") Tu agenda está libre por el momento
     // fin agendaView
 
     section#pacientesView.view(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
       header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
-          span(class="block text-[13px] leading-[18px] text-black") 3 de Abril del 2026
+          span(class="block text-[13px] leading-[18px] text-black")= fechaDashboard
       .pacientes-layout(class="grid grid-cols-[260px_minmax(0,1fr)] gap-5 h-[calc(100vh-180px)] [@media(max-width:1024px)]:grid-cols-1 [@media(max-width:1024px)]:h-auto")
         // COLUMNA IZQUIERDA: lista
         .pacientes-lista(class="min-h-0 self-start max-h-full flex flex-col overflow-y-auto rounded-lg border border-[#e2e2e2] bg-white [&>.sin-pacientes]:p-[15px] [&>.sin-pacientes]:text-center [&>.sin-pacientes]:text-[#666] [&>.sin-pacientes]:text-[14px] [&>p]:p-[14px] [&>p]:text-[13px] [&>p]:text-[#718096] [@media(max-width:1024px)]:max-h-[320px]")
