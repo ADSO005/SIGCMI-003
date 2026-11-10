@@ -10,11 +10,29 @@
   const modal = elemento("modalAtencion"), cerrarSuperior = elemento("cerrarAtencionSuperior"), cerrarInferior = elemento("cerrarAtencion");
   const finalizar = elemento("finalizarConsulta");
   const estadoGuardado = elemento("estadoGuardadoDiagnostico");
+  const camposMedicamentos = elemento("camposMedicamentos");
+  const estadoMedicamentos = elemento("estadoMedicamentos");
+  const decisionRequiere = elemento("decisionRequiere"), decisionNoRequiere = elemento("decisionNoRequiere");
+  const listaGuardados = elemento("medicamentosGuardados"), listaPendientes = elemento("medicamentosPendientes");
+  const guardarMedicamentos = elemento("guardarMedicamentos"), revisarMedicamentos = elemento("revisarMedicamentos");
+  const confirmarRevisionMedicamentos = elemento("confirmarRevisionMedicamentos");
+  const formularioNuevoMedicamento = elemento("formNuevoMedicamento");
+  const camposNuevoMedicamento = {
+    nombre_medicamento: elemento("nuevoNombreMedicamento"),
+    dosis: elemento("nuevaDosisMedicamento"),
+    frecuencia: elemento("nuevaFrecuenciaMedicamento"),
+    duracion: elemento("nuevaDuracionMedicamento")
+  };
   const url = `/medico/citas/${form.dataset.cita}/diagnostico`;
   let revision = null, reciente = null, cargado = false, cargando = false, guardando = false, finalizando = false;
   let conflicto = false, bloqueado = false, cambios = false;
   let persistido = false, versionCarga = 0, focoAnterior = null, overflowAnterior = "";
   let valoresGuardados = "";
+  let decisionPersistida = "Pendiente", decisionSeleccionada = "";
+  let versionPrescripciones = null, medicamentosGuardados = [], medicamentosPendientes = [];
+  let medicamentosCargados = false, cargandoMedicamentos = false, guardandoMedicamentos = false, conflictoMedicamentos = false;
+  let errorCargaMedicamentos = "";
+  let medicamentosRevisados = false;
 
   const contenidoFormulario = () => JSON.stringify(nombres.map(nombre => campos[nombre].value));
 
@@ -23,20 +41,265 @@
     mensaje.setAttribute("role", error ? "alert" : "status");
   }
   function actualizarControles() {
-    fieldset.disabled = !cargado || guardando || finalizando || bloqueado;
+    fieldset.disabled = !cargado || guardando || guardandoMedicamentos || finalizando || bloqueado;
     guardar.disabled = !cargado || cargando || guardando || finalizando || conflicto || bloqueado;
     guardar.textContent = guardando ? "Guardando…" : "Guardar borrador";
     const estadoCompletadaId = Number(form.dataset.estadoCompletada);
-    finalizar.disabled = !cargado || !persistido || cambios || cargando || guardando || finalizando || conflicto || bloqueado
+    const decisionCompleta = decisionPersistida === "No requiere"
+      ? medicamentosGuardados.length === 0
+      : decisionPersistida === "Requiere" && medicamentosGuardados.length > 0;
+    const medicamentosListos = medicamentosCargados && !guardandoMedicamentos
+      && !conflictoMedicamentos && !medicamentosPendientes.length && !hayCambiosDecision();
+    finalizar.disabled = !cargado || !persistido || !decisionCompleta || !medicamentosListos
+      || cambios || cargando || guardando || finalizando || conflicto || bloqueado
       || !Number.isSafeInteger(estadoCompletadaId) || estadoCompletadaId <= 0;
     finalizar.textContent = finalizando ? "Finalizando…" : "Finalizar consulta";
     consultar.disabled = cargando || guardando || finalizando;
     reintentar.disabled = cargando || guardando || finalizando;
     cerrarSuperior.disabled = guardando || finalizando;
     cerrarInferior.disabled = guardando || finalizando;
+    camposMedicamentos.disabled = !medicamentosCargados || !persistido || bloqueado || guardandoMedicamentos || guardando || finalizando;
+    guardarMedicamentos.disabled = !medicamentosCargados || !persistido || !decisionSeleccionada
+      || guardandoMedicamentos || guardando || finalizando || bloqueado || conflictoMedicamentos
+      || (decisionSeleccionada === "Requiere" && !medicamentosPendientes.length && !medicamentosGuardados.some(medicamentoValido));
+    revisarMedicamentos.disabled = guardandoMedicamentos || guardando || finalizando;
+    confirmarRevisionMedicamentos.disabled = guardandoMedicamentos || guardando || finalizando || !medicamentosRevisados;
+    formularioNuevoMedicamento.hidden = decisionSeleccionada !== "Requiere" || !medicamentosCargados;
+    decisionRequiere.checked = decisionSeleccionada === "Requiere";
+    decisionNoRequiere.checked = decisionSeleccionada === "No requiere";
+    decisionNoRequiere.disabled = medicamentosGuardados.length > 0 || medicamentosPendientes.length > 0;
+    elemento("ayudaDecisionMedicamentos").textContent = decisionPersistida === "Pendiente"
+      ? "La decisión permanece Pendiente hasta que la guardes."
+      : decisionNoRequiere.disabled
+        ? "Ya hay medicamentos agregados; no se puede cambiar la decisión a No requiere."
+        : "Decisión guardada: " + decisionPersistida + ".";
+    renderizarMedicamentos();
+    actualizarEstadoMedicamentos();
     estadoGuardado.textContent = guardando ? "Guardando borrador…" : finalizando ? "Finalizando consulta…" : bloqueado ? "Consulta no editable" : conflicto ? "Conflicto pendiente de revisión"
       : cambios ? "Cambios sin guardar" : !cargado ? (cargando ? "Cargando borrador…" : "Borrador no disponible")
         : persistido ? "Borrador guardado" : "Sin borrador guardado";
+  }
+  function hayCambiosDecision() {
+    return decisionSeleccionada !== "" && decisionSeleccionada !== decisionPersistida;
+  }
+  function medicamentoValido(medicamento) {
+    return ["nombre_medicamento", "dosis", "frecuencia", "duracion"]
+      .every(campo => typeof medicamento?.[campo] === "string" && medicamento[campo].trim());
+  }
+  function actualizarEstadoMedicamentos() {
+    if (!persistido) {
+      estadoMedicamentos.textContent = "Guarda primero un diagnóstico válido para registrar la decisión sobre medicamentos.";
+    } else if (cargandoMedicamentos) {
+      estadoMedicamentos.textContent = "Consultando la decisión y los medicamentos guardados…";
+    } else if (!medicamentosCargados && errorCargaMedicamentos) {
+      estadoMedicamentos.textContent = errorCargaMedicamentos + " La selección se habilitará cuando se pueda consultar el estado actual.";
+    } else if (!medicamentosCargados) {
+      estadoMedicamentos.textContent = "No se ha podido consultar todavía la decisión de medicamentos.";
+    } else if (guardandoMedicamentos) {
+      estadoMedicamentos.textContent = "Guardando la decisión y los medicamentos…";
+    } else if (conflictoMedicamentos && !medicamentosRevisados) {
+      estadoMedicamentos.textContent = "La información cambió en otra sesión. Consulta el estado actual y revísalo antes de volver a guardar.";
+    } else if (conflictoMedicamentos) {
+      estadoMedicamentos.textContent = "Revisa la lista guardada. Tus medicamentos nuevos siguen pendientes; el guardado no se reenvió.";
+    } else if (decisionPersistida === "Pendiente") {
+      estadoMedicamentos.textContent = "Decisión Pendiente. Selecciona una opción y guárdala antes de finalizar la consulta.";
+    } else if (hayCambiosDecision() || medicamentosPendientes.length) {
+      estadoMedicamentos.textContent = "Tienes cambios sin guardar. La consulta no se podrá finalizar hasta guardarlos.";
+    } else if (decisionPersistida === "No requiere") {
+      estadoMedicamentos.textContent = "Decisión guardada: No requiere medicamentos.";
+    } else {
+      estadoMedicamentos.textContent = "Decisión guardada: Requiere medicamentos. " + medicamentosGuardados.length + " medicamento(s) registrados.";
+    }
+  }
+  function renderizarMedicamentos() {
+    listaGuardados.replaceChildren();
+    listaPendientes.replaceChildren();
+    elemento("sinMedicamentosGuardados").hidden = medicamentosGuardados.length > 0;
+    medicamentosGuardados.forEach(medicamento => agregarTarjetaMedicamento(listaGuardados, medicamento, false));
+    medicamentosPendientes.forEach((medicamento, indice) => agregarTarjetaMedicamento(listaPendientes, medicamento, true, indice));
+  }
+  function agregarTarjetaMedicamento(lista, medicamento, pendiente, indice) {
+    const tarjeta = document.createElement("li");
+    tarjeta.className = "min-w-0 rounded-lg border border-slate-200 bg-white p-3 text-sm text-slate-700 [overflow-wrap:anywhere]";
+    const nombre = document.createElement("p");
+    nombre.className = "font-semibold text-slate-900";
+    nombre.textContent = medicamento.nombre_medicamento;
+    tarjeta.appendChild(nombre);
+    const detalle = document.createElement("p");
+    detalle.className = "mt-1 whitespace-pre-wrap";
+    detalle.textContent = "Dosis: " + medicamento.dosis + " · Frecuencia: " + medicamento.frecuencia + " · Duración: " + medicamento.duracion;
+    tarjeta.appendChild(detalle);
+    if (pendiente) {
+      const quitar = document.createElement("button");
+      quitar.type = "button";
+      quitar.className = "mt-2 rounded border border-slate-300 px-2 py-1 text-xs font-semibold text-slate-700";
+      quitar.textContent = "Quitar de pendientes";
+      quitar.addEventListener("click", () => {
+        medicamentosPendientes.splice(indice, 1);
+        actualizarControles();
+      });
+      tarjeta.appendChild(quitar);
+    } else {
+      const etiqueta = document.createElement("span");
+      etiqueta.className = "mt-2 inline-block text-xs text-emerald-800";
+      etiqueta.textContent = "Guardado · solo lectura";
+      tarjeta.appendChild(etiqueta);
+    }
+    lista.appendChild(tarjeta);
+  }
+  function medicamentosRespuestaValida(datos) {
+    const decisionValida = ["Pendiente", "Requiere", "No requiere"].includes(datos?.decision_medicamentos);
+    const cantidadesValidas = datos?.decision_medicamentos === "Pendiente"
+      ? datos.medicamentos?.length === 0
+      : datos?.decision_medicamentos === "No requiere"
+        ? datos.medicamentos?.length === 0
+        : datos?.decision_medicamentos === "Requiere" && datos.medicamentos?.length > 0;
+    return decisionValida && cantidadesValidas
+      && Number.isSafeInteger(datos.version_prescripciones) && datos.version_prescripciones >= 0
+      && Array.isArray(datos.medicamentos) && datos.medicamentos.every(medicamentoValido);
+  }
+  async function cargarMedicamentos(opciones = {}) {
+    const version = versionCarga;
+    if (cargandoMedicamentos) return false;
+    if (!persistido) {
+      medicamentosCargados = false;
+      actualizarControles();
+      return false;
+    }
+    cargandoMedicamentos = true;
+    errorCargaMedicamentos = "";
+    actualizarControles();
+    try {
+      const respuesta = await fetch("/medico/citas/" + form.dataset.cita + "/medicamentos", {
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+      if (version !== versionCarga) return false;
+      if (respuesta.redirected || respuesta.status === 401) {
+        bloqueado = true;
+        throw Error("La sesión venció. Inicia sesión nuevamente.");
+      }
+      if (!respuesta.headers.get("content-type")?.includes("application/json")) {
+        throw Error("No se pudo consultar el estado de los medicamentos.");
+      }
+      const datos = await respuesta.json();
+      if (version !== versionCarga) return false;
+      if (!respuesta.ok) throw Error(typeof datos?.mensaje === "string" ? datos.mensaje : "No se pudo consultar el estado de los medicamentos.");
+      if (!Number.isSafeInteger(datos.id_diagnostico) || datos.id_diagnostico <= 0) {
+        throw Error("La respuesta de medicamentos no es válida.");
+      }
+      if (!medicamentosRespuestaValida(datos)) throw Error("La respuesta de medicamentos está incompleta.");
+
+      decisionPersistida = datos.decision_medicamentos;
+      versionPrescripciones = datos.version_prescripciones;
+      medicamentosGuardados = datos.medicamentos;
+      medicamentosCargados = true;
+      if (opciones.conflicto) {
+        // Se actualiza la versión del servidor, pero nunca se reenvía el formulario automáticamente.
+        decisionSeleccionada = decisionPersistida === "Pendiente" ? "" : decisionPersistida;
+        medicamentosRevisados = true;
+        revisarMedicamentos.hidden = true;
+        confirmarRevisionMedicamentos.hidden = false;
+      } else if (!opciones.conservarDecision) {
+        decisionSeleccionada = decisionPersistida === "Pendiente" ? "" : decisionPersistida;
+      }
+      return true;
+    } catch (error) {
+      if (version !== versionCarga) return false;
+      errorCargaMedicamentos = errorPeticion(error);
+      if (!opciones.conflicto) medicamentosCargados = false;
+      return false;
+    } finally {
+      if (version === versionCarga) {
+        cargandoMedicamentos = false;
+        actualizarControles();
+      }
+    }
+  }
+  function agregarMedicamentoPendiente() {
+    for (const [campo, input] of Object.entries(camposNuevoMedicamento)) {
+      const valor = input.value.trim();
+      if (!valor || valor.length > Number(input.maxLength)) {
+        input.setCustomValidity(!valor ? "Este campo es obligatorio." : "El valor supera el límite permitido.");
+        input.setAttribute("aria-invalid", "true");
+        input.reportValidity();
+        return;
+      }
+      input.setCustomValidity("");
+      input.removeAttribute("aria-invalid");
+    }
+    medicamentosPendientes.push({
+      nombre_medicamento: camposNuevoMedicamento.nombre_medicamento.value.trim(),
+      dosis: camposNuevoMedicamento.dosis.value.trim(),
+      frecuencia: camposNuevoMedicamento.frecuencia.value.trim(),
+      duracion: camposNuevoMedicamento.duracion.value.trim()
+    });
+    Object.values(camposNuevoMedicamento).forEach(input => { input.value = ""; });
+    actualizarControles();
+    camposNuevoMedicamento.nombre_medicamento.focus();
+  }
+  async function guardarDecisionMedicamentos() {
+    if (guardarMedicamentos.disabled || guardandoMedicamentos) return;
+    if (decisionSeleccionada === "Requiere" && !medicamentosPendientes.length
+      && !medicamentosGuardados.some(medicamentoValido)) {
+      estadoMedicamentos.textContent = "Agrega al menos un medicamento para guardar la decisión Requiere.";
+      return;
+    }
+    if (decisionSeleccionada === "No requiere" && medicamentosGuardados.length) {
+      estadoMedicamentos.textContent = "Ya existen medicamentos guardados; no se puede registrar No requiere.";
+      return;
+    }
+    guardandoMedicamentos = true;
+    actualizarControles();
+    try {
+      const respuesta = await fetch("/medico/citas/" + form.dataset.cita + "/medicamentos", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          decision_medicamentos: decisionSeleccionada,
+          version_prescripciones: versionPrescripciones,
+          medicamentos: decisionSeleccionada === "Requiere" ? medicamentosPendientes : []
+        })
+      });
+      if (respuesta.redirected || respuesta.status === 401) {
+        bloqueado = true;
+        throw Error("La sesión venció. Los medicamentos no se reenviaron.");
+      }
+      if (!respuesta.headers.get("content-type")?.includes("application/json")) {
+        throw Error("Respuesta no válida. Verifica el estado actual antes de volver a guardar.");
+      }
+      const datos = await respuesta.json();
+      if (respuesta.status === 409) {
+        conflictoMedicamentos = true;
+        medicamentosRevisados = false;
+        revisarMedicamentos.hidden = false;
+        confirmarRevisionMedicamentos.hidden = true;
+        await cargarMedicamentos({ conflicto: true, conservarDecision: true });
+        conflictoMedicamentos = true;
+        estadoMedicamentos.textContent = "Conflicto 409: se consultó el estado actual. Revísalo antes de decidir si vuelves a guardar; no hubo reenvío automático.";
+        throw Error(typeof datos?.mensaje === "string" ? datos.mensaje : "La información cambió en otra sesión.");
+      }
+      if (!respuesta.ok) throw Error(typeof datos?.mensaje === "string" ? datos.mensaje : "No se pudieron guardar los medicamentos.");
+      if (!medicamentosRespuestaValida(datos)) throw Error("No se pudo confirmar el guardado. Consulta el estado actual antes de reintentar.");
+      decisionPersistida = datos.decision_medicamentos;
+      decisionSeleccionada = datos.decision_medicamentos;
+      versionPrescripciones = datos.version_prescripciones;
+      medicamentosGuardados = datos.medicamentos;
+      medicamentosPendientes = [];
+      medicamentosCargados = true;
+      conflictoMedicamentos = false;
+      medicamentosRevisados = false;
+      revisarMedicamentos.hidden = true;
+      confirmarRevisionMedicamentos.hidden = true;
+      estadoMedicamentos.textContent = "Decisión y medicamentos guardados. La cita continúa En Curso.";
+    } catch (error) {
+      if (!conflictoMedicamentos) estadoMedicamentos.textContent = errorPeticion(error);
+      else estadoMedicamentos.textContent = "Conflicto 409: revisa el estado actual. Tus medicamentos nuevos siguen pendientes y no se reenviaron.";
+    } finally {
+      guardandoMedicamentos = false;
+      actualizarControles();
+    }
   }
   function cargarCampos(datos) {
     nombres.forEach(nombre => {
@@ -112,6 +375,11 @@
         cargado = true; bloqueado = false;
         reintentar.hidden = true;
         avisar(datos.diagnostico ? "Borrador cargado. Puedes editarlo mientras la cita siga En Curso." : "Todavía no hay borrador. Completa el campo obligatorio para guardarlo.");
+        if (persistido) await cargarMedicamentos();
+        else {
+          medicamentosCargados = false;
+          estadoMedicamentos.textContent = "Guarda primero un diagnóstico válido para registrar la decisión sobre medicamentos.";
+        }
       }
     } catch (error) {
       if (version !== versionCarga) return;
@@ -171,6 +439,7 @@
       cargarCampos(datos);
       consultar.hidden = true; panel.hidden = true; reciente = null;
       avisar("Borrador guardado. Puedes continuar la atención");
+      await cargarMedicamentos();
     } catch (error) {
       avisar(errorPeticion(error), true);
       consultar.hidden = false;
@@ -211,7 +480,36 @@
   }
   form.addEventListener("submit", enviar);
   finalizar.addEventListener("click", finalizarAtencion);
+  guardarMedicamentos.addEventListener("click", guardarDecisionMedicamentos);
+  elemento("agregarMedicamento").addEventListener("click", agregarMedicamentoPendiente);
+  [decisionRequiere, decisionNoRequiere].forEach(opcion => opcion.addEventListener("change", () => {
+    if (opcion.checked) decisionSeleccionada = opcion.value;
+    actualizarControles();
+  }));
+  revisarMedicamentos.addEventListener("click", async () => {
+    revisarMedicamentos.disabled = true;
+    estadoMedicamentos.textContent = "Consultando el estado actual; no se guardarán cambios.";
+    const consultado = await cargarMedicamentos({ conflicto: true, conservarDecision: true });
+    if (!consultado) {
+      medicamentosRevisados = false;
+      confirmarRevisionMedicamentos.hidden = true;
+      estadoMedicamentos.textContent = "No se pudo consultar el estado actual. Tus datos pendientes se conservaron; reintenta la consulta.";
+      revisarMedicamentos.hidden = false;
+    }
+    actualizarControles();
+  });
+  confirmarRevisionMedicamentos.addEventListener("click", () => {
+    if (!medicamentosRevisados) return;
+    conflictoMedicamentos = false;
+    medicamentosRevisados = false;
+    confirmarRevisionMedicamentos.hidden = true;
+    revisarMedicamentos.hidden = true;
+    estadoMedicamentos.textContent = "Estado actual revisado. Revisa tu decisión y los medicamentos pendientes antes de guardar.";
+    actualizarControles();
+  });
   form.addEventListener("input", event => {
+    // La selección de los radios se procesa en change; no restablecerla antes.
+    if (event.target.name === "decision_medicamentos") return;
     cambios = contenidoFormulario() !== valoresGuardados;
     event.target.setCustomValidity?.("");
     event.target.removeAttribute("aria-invalid");
@@ -229,7 +527,10 @@
     avisar("Se cargó la versión consultada. Revisa los campos antes de editar y guardar.");
   });
   window.addEventListener("beforeunload", event => {
-    if (cambios || guardando) { event.preventDefault(); event.returnValue = ""; }
+    if (cambios || guardando || medicamentosPendientes.length || hayCambiosDecision() || guardandoMedicamentos) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
   });
   function abrir(event) {
     event?.preventDefault();
@@ -244,13 +545,21 @@
   }
   function cerrar() {
     if (!modal.open) return;
-    if (guardando || finalizando) { avisar("Espera a que termine la solicitud antes de cerrar."); return; }
-    if (cambios && !window.confirm("Tienes cambios sin guardar. ¿Deseas descartarlos y cerrar la atención médica?")) return;
+    if (guardando || guardandoMedicamentos || finalizando) { avisar("Espera a que termine la solicitud antes de cerrar."); return; }
+    const medicamentoEnEdicion = Object.values(camposNuevoMedicamento).some(input => input.value.trim());
+    if ((cambios || medicamentosPendientes.length || hayCambiosDecision() || medicamentoEnEdicion)
+      && !window.confirm("Tienes cambios sin guardar. ¿Deseas descartarlos y cerrar la atención médica?")) return;
     // Una respuesta GET tardía no debe modificar un formulario cerrado o recién abierto.
     versionCarga++;
     cargando = false; cargado = false; cambios = false; persistido = false; finalizando = false;
     conflicto = false; bloqueado = false; reciente = null; revision = null;
     nombres.forEach(nombre => { campos[nombre].value = ""; campos[nombre].setCustomValidity(""); campos[nombre].removeAttribute("aria-invalid"); });
+    Object.values(camposNuevoMedicamento).forEach(input => { input.value = ""; input.setCustomValidity(""); input.removeAttribute("aria-invalid"); });
+    decisionPersistida = "Pendiente"; decisionSeleccionada = ""; versionPrescripciones = null;
+    medicamentosGuardados = []; medicamentosPendientes = []; medicamentosCargados = false;
+    cargandoMedicamentos = false; guardandoMedicamentos = false; conflictoMedicamentos = false; medicamentosRevisados = false;
+    errorCargaMedicamentos = "";
+    revisarMedicamentos.hidden = true; confirmarRevisionMedicamentos.hidden = true;
     valoresGuardados = contenidoFormulario();
     panel.hidden = true; consultar.hidden = true; reintentar.hidden = true;
     actualizarControles();
