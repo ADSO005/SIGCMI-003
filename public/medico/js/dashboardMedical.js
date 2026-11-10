@@ -594,11 +594,46 @@ function mostrarHistorial(citas) {
       agregarTexto(card, "p", cita.Diagnostico.sintomas || "No registrados");
       agregarTexto(agregarTexto(card, "p", ""), "strong", "Tratamiento:");
       agregarTexto(card, "p", cita.Diagnostico.tratamiento || "No registrado");
+      agregarMedicamentosHistorial(card, cita.Diagnostico, agregarTexto);
     } else {
       agregarTexto(card, "p", "No hay diagnóstico registrado para esta cita.");
     }
     contenedor.appendChild(card);
   });
+}
+
+function agregarMedicamentosHistorial(card, diagnostico, agregarTexto) {
+  agregarTexto(agregarTexto(card, "p", ""), "strong", "Medicamentos:");
+  if (diagnostico.decision_medicamentos === "No requiere") {
+    agregarTexto(card, "p", "No requiere medicamentos");
+    return;
+  }
+  if (diagnostico.decision_medicamentos === "Pendiente") {
+    agregarTexto(card, "p", "Decisión de medicamentos pendiente");
+    return;
+  }
+  if (diagnostico.decision_medicamentos !== "Requiere") {
+    agregarTexto(card, "p", "Decisión de medicamentos no disponible");
+    return;
+  }
+
+  const medicamentos = Array.isArray(diagnostico.medicamentos) ? diagnostico.medicamentos : [];
+  if (!medicamentos.length) {
+    agregarTexto(card, "p", "No hay medicamentos registrados.");
+    return;
+  }
+
+  const lista = document.createElement("ul");
+  lista.className = "mb-2 list-disc space-y-1 pl-5 text-[12px] text-[#666] [overflow-wrap:anywhere]";
+  medicamentos.forEach(medicamento => {
+    const item = document.createElement("li");
+    item.textContent = (medicamento.nombre_medicamento || "Medicamento sin nombre")
+      + " — Dosis: " + (medicamento.dosis || "No registrada")
+      + " · Frecuencia: " + (medicamento.frecuencia || "No registrada")
+      + " · Duración: " + (medicamento.duracion || "No registrada");
+    lista.appendChild(item);
+  });
+  card.appendChild(lista);
 }
 
 // FILTRAR PACIENTES EN TIEMPO REAL

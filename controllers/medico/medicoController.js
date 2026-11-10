@@ -218,7 +218,13 @@ const detallePaciente = async (req, res) => {
                 {
                     model: Diagnostico,
                     as: "Diagnostico",
-                    attributes: ["diagnostico", "sintomas", "tratamiento"],
+                    attributes: ["diagnostico", "sintomas", "tratamiento", "decision_medicamentos"],
+                    include: [{
+                        model: Prescripcion,
+                        as: "Prescripcions",
+                        attributes: ["nombre_medicamento", "dosis", "frecuencia", "duracion"],
+                        required: false
+                    }],
                     required: false
                 },
                 {
@@ -264,7 +270,14 @@ const detallePaciente = async (req, res) => {
                 Diagnostico: cita.Diagnostico ? {
                     diagnostico: cita.Diagnostico.diagnostico,
                     sintomas: cita.Diagnostico.sintomas,
-                    tratamiento: cita.Diagnostico.tratamiento
+                    tratamiento: cita.Diagnostico.tratamiento,
+                    decision_medicamentos: cita.Diagnostico.decision_medicamentos,
+                    medicamentos: (cita.Diagnostico.Prescripcions || []).map(medicamento => ({
+                        nombre_medicamento: medicamento.nombre_medicamento,
+                        dosis: medicamento.dosis,
+                        frecuencia: medicamento.frecuencia,
+                        duracion: medicamento.duracion
+                    }))
                 } : null
             }))
         });
