@@ -49,7 +49,16 @@ async function seed() {
 
         console.log(`Base seleccionada: ${db.getDatabaseName()}`);
 
-        const passwordHash = await bcrypt.hash("Prueba123*", 10);
+        // La contraseña se obtiene de las variables del entorno.
+        const seedPassword = process.env.SEED_PASSWORD;
+
+        if (!seedPassword) {
+            throw new Error(
+                "Falta configurar SEED_PASSWORD en las variables de Railway."
+            );
+        }
+
+        const passwordHash = await bcrypt.hash(seedPassword, 10);
 
         // Si una operación falla, se revierten todos los cambios del seeder.
         const resultados = await db.transaction(async (transaction) => {
@@ -130,7 +139,9 @@ async function seed() {
 
         console.table(resultados);
         console.log("Seeder completado.");
-        console.log("Contraseña de los usuarios nuevos: Prueba123*");
+        console.log(
+            "Los usuarios nuevos usan la contraseña configurada en SEED_PASSWORD."
+        );
     } catch (error) {
         console.error("No se completó el seeder:", error.message);
         process.exitCode = 1;

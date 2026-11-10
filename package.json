@@ -6,7 +6,7 @@
   "scripts": {
     "db:migrate": "node scripts/migrate.js",
     "db:migrate:status": "node scripts/migrate.js --status",
-    "db:seed": "node --env-file=.env scripts/seedLocalUsers.js",
+    "db:seed": "node scripts/seedLocalUsers.js",
     "test:db": "node --test tests/database.test.js",
     "start": "node server.js",
     "server": "nodemon server.js",
