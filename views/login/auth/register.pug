@@ -1,3 +1,4 @@
+//- Formulario de registro de pacientes con validación y selección de ubicación.
 doctype html
 html(lang="es")
   head
@@ -15,6 +16,7 @@ html(lang="es")
     - const diaLimiteNacimiento = Math.min(fechaHoy.getDate(), new Date(anioLimiteNacimiento, mesLimiteNacimiento + 1, 0).getDate())
     - const fechaNacimientoMaxima = `${anioLimiteNacimiento}-${String(mesLimiteNacimiento + 1).padStart(2, '0')}-${String(diaLimiteNacimiento).padStart(2, '0')}`
 
+    //- Reutiliza la estructura común de etiqueta, campo y mensaje de error.
     mixin formInput(name, label, type, placeholder, icon)
       .form-group(class="flex w-full min-w-0 flex-col gap-2")
         label.form-label(class="text-sm font-medium text-[#1e2559]" for=name)= label
@@ -29,6 +31,7 @@ html(lang="es")
             required=(name === 'nombres' || name === 'apellidos' || name === 'email' || name === 'fechaNacimiento')
             minlength=(name === 'telefono' ? 10 : (name === 'nombres' || name === 'apellidos' ? 2 : (name === 'email' ? 6 : null)))
             maxlength=(name === 'telefono' ? 10 : (name === 'nombres' || name === 'apellidos' ? 100 : (name === 'email' ? 150 : null)))
+            autocapitalize=(name === 'nombres' || name === 'apellidos' ? 'words' : null)
             max=(name === 'fechaNacimiento' ? fechaNacimientoMaxima : null)
             pattern=(name === 'telefono' ? '[0-9]{10}' : null)
             inputmode=(name === 'telefono' ? 'numeric' : null)

@@ -15,7 +15,27 @@ const registerForm = document.querySelector(".register-form");
 const birthDateInput = document.getElementById("fechaNacimiento");
 const documentTypeSelect = document.getElementById("tipoDocumento");
 const documentNumberInput = document.getElementById("numeroDocumento");
+const personNameInputs = ["nombres", "apellidos"]
+  .map((id) => document.getElementById(id))
+  .filter(Boolean);
 
+const formatPersonName = (value) => value.trim().normalize("NFC")
+  .toLocaleLowerCase("es-CO")
+  .replace(/(^|[\s'-])(\p{L})/gu, (_, separator, letter) => `${separator}${letter.toLocaleUpperCase("es-CO")}`);
+
+const normalizePersonNames = () => {
+  personNameInputs.forEach((input) => {
+    input.value = formatPersonName(input.value);
+  });
+};
+
+personNameInputs.forEach((input) => input.addEventListener("blur", () => {
+  input.value = formatPersonName(input.value);
+}));
+
+registerForm.addEventListener("submit", normalizePersonNames);
+
+// Aplica el formato y el límite adecuados al tipo de documento elegido.
 const validateDocumentNumber = () => {
   const documentType = documentTypeSelect.value;
   const maxLength = documentType === "CC" ? 10 : documentType === "CE" ? 7 : 30;
@@ -37,6 +57,7 @@ documentTypeSelect.addEventListener("change", validateDocumentNumber);
 documentNumberInput.addEventListener("input", validateDocumentNumber);
 validateDocumentNumber();
 
+// Impide enviar una fecha que no cumpla la edad mínima del registro.
 const validateBirthDate = () => {
   const isAdultDate = birthDateInput.value && birthDateInput.value <= birthDateInput.max;
   birthDateInput.setCustomValidity(isAdultDate ? "" : "Debes tener al menos 18 años para crear una cuenta.");
@@ -51,6 +72,7 @@ registerForm.addEventListener("submit", (event) => {
   if (!registerForm.reportValidity()) event.preventDefault();
 });
 
+// Lleva el foco al campo asociado cuando se selecciona un error del resumen.
 document.querySelectorAll('.form-error a[href^="#"]').forEach((link) => {
   link.addEventListener("click", () => {
     const target = document.querySelector(link.getAttribute("href"));
@@ -63,6 +85,7 @@ if (firstErrorLink) {
   document.querySelector(firstErrorLink.getAttribute("href"))?.focus();
 }
 
+// Actualiza la validez y el indicador visual de seguridad de la contraseña.
 const updatePasswordFeedback = () => {
   const password = passwordInput.value;
   const rules = {
@@ -85,6 +108,7 @@ const updatePasswordFeedback = () => {
   updatePasswordMatch();
 };
 
+// Comprueba que la contraseña y su confirmación coincidan.
 const updatePasswordMatch = () => {
   const confirmation = confirmPasswordInput.value;
   const matches = confirmation.length > 0 && confirmation === passwordInput.value;
@@ -102,10 +126,12 @@ const updatePasswordMatch = () => {
 
 let cityRequestNumber = 0;
 
+// Reemplaza las opciones de un desplegable por un mensaje de estado.
 const setSelectMessage = (select, message) => {
   select.replaceChildren(new Option(message, ""));
 };
 
+// Consulta y carga los municipios disponibles para el departamento elegido.
 const loadCities = async (departmentId, selectedCity = "") => {
   const requestNumber = ++cityRequestNumber;
   citySelect.disabled = true;
@@ -139,7 +165,6 @@ const loadCities = async (departmentId, selectedCity = "") => {
     orderedCities.forEach((city) => citySelect.add(new Option(city.name, city.name)));
     citySelect.disabled = false;
     if (selectedCity) citySelect.value = selectedCity;
-    cityStatus.textContent = `${orderedCities.length} municipios disponibles.`;
     retryCitiesButton.classList.add("hidden");
   } catch {
     if (requestNumber !== cityRequestNumber) return;
@@ -150,6 +175,7 @@ const loadCities = async (departmentId, selectedCity = "") => {
   }
 };
 
+// Consulta los departamentos y restaura las selecciones previas si existen.
 const loadDepartments = async () => {
   const selectedDepartment = departmentSelect.dataset.selected;
   departmentSelect.disabled = true;
@@ -210,6 +236,7 @@ passwordInput.addEventListener("input", updatePasswordFeedback);
 confirmPasswordInput.addEventListener("input", updatePasswordMatch);
 loadDepartments();
 
+// Permite mostrar u ocultar los campos de contraseña.
 document.querySelectorAll("[data-password-toggle]").forEach((button) => {
   button.addEventListener("click", () => {
     const input = document.getElementById(button.dataset.passwordToggle);
@@ -227,6 +254,7 @@ document.querySelectorAll("[data-password-toggle]").forEach((button) => {
 
 updatePasswordFeedback();
 
+// Oculta los mensajes de resultado del registro después de unos segundos.
 setTimeout(() => {
   document.getElementById("mensajeError")?.remove();
   document.getElementById("mensajeExito")?.remove();
