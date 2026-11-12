@@ -1,0 +1,68 @@
+//- ==========================================
+//- REGISTRO UNIFICADO DE USUARIOS
+//- Un solo formulario para Administrador, Médico y Paciente.
+//- Las secciones por rol se muestran según el rol elegido.
+//- ==========================================
+
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        title SIGCMI - Registrar Usuario
+        link(rel="stylesheet" href="/css/output.css")
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-white text-slate-800")
+
+        //- Mixins de campos y encabezados
+        include includes/mixins.pug
+
+        div(class="flex min-h-screen")
+
+            include ../components/sidebar.pug
+            include ../components/sidebarOverlay.pug
+
+            main(class="flex-1 px-4 md:px-8 xl:px-10 py-6")
+
+                //- Encabezado
+                div(
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-slate-200"
+                )
+                    div
+                        h2(class="text-3xl font-bold text-slate-900")
+                            = rolFijo ? "Registrar Paciente" : "Registrar Usuario"
+
+                        - const subtitulo = rolFijo ? "Registra un nuevo paciente en el sistema SIGCMI." : "Registra un administrador, médico o paciente en el sistema SIGCMI."
+                        p(class="text-slate-500 mt-1")= subtitulo
+
+                    a(
+                        href="/admin/usuarios"
+                        class="inline-flex items-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                    )
+                        i(class="fa-solid fa-arrow-left")
+                        | Volver
+
+                //- Formulario
+                div(class="max-w-6xl mx-auto mt-8")
+
+                    form(
+                        action="/admin/usuarios/nuevo"
+                        method="POST"
+                        id="formUsuario"
+                        class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8"
+                    )
+
+                        include includes/selectorRol.pug
+                        include includes/datosPersonales.pug
+                        include includes/contacto.pug
+                        include includes/datosPaciente.pug
+                        include includes/datosMedico.pug
+                        include includes/seguridad.pug
+                        include includes/acciones.pug
+
+        script(src="/admin/js/toggleSidebar.js")
+        script(src="/admin/js/registrarUsuario.js")
