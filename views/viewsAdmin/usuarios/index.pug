@@ -116,6 +116,7 @@ html(lang="es")
                             div(class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center")
                                 i(class="fa-solid fa-user-plus text-xl")
 
+                    
 
                 //- ==========================================
                 //- TABLA
@@ -158,6 +159,13 @@ html(lang="es")
                                         option(value=rol)
                                             | #{rol}
 
+                                a(
+                                    href="/admin/pacientes/nuevo"
+                                    class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-lg transition"
+                                )
+                                    i(class="fa-solid fa-user-plus")
+                                    | Registrar Usuario
+                
                     div(class="overflow-x-auto")
 
                         table(class="w-full min-w-[900px]")
