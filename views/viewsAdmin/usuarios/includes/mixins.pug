@@ -1,0 +1,66 @@
+//- ==========================================
+//- MIXINS DE CAMPOS DEL FORMULARIO DE USUARIO
+//- ==========================================
+
+- const claseCampo = "w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+- const claseEtiqueta = "block text-sm font-semibold text-slate-700 mb-2"
+
+//- Campo de texto o número. attrs: requerido, full, minlength, maxlength, min, max, placeholder
+mixin campoTexto(name, etiqueta, tipo, attrs)
+    - const a = attrs || {}
+    div(class=a.full ? "md:col-span-2" : null)
+        label(for=name class=claseEtiqueta)
+            = etiqueta
+            if a.requerido
+                |  *
+        input(
+            type=tipo
+            id=name
+            name=name
+            required=a.requerido
+            minlength=a.minlength
+            maxlength=a.maxlength
+            min=a.min
+            max=a.max
+            placeholder=a.placeholder
+            class=claseCampo
+        )
+
+//- Lista desplegable. opciones: [{ value, label }]. attrs: requerido, full
+mixin campoSelect(name, etiqueta, opciones, attrs)
+    - const a = attrs || {}
+    div(class=a.full ? "md:col-span-2" : null)
+        label(for=name class=claseEtiqueta)
+            = etiqueta
+            if a.requerido
+                |  *
+        select(
+            id=name
+            name=name
+            required=a.requerido
+            class=claseCampo + " bg-white"
+        )
+            each opcion in opciones
+                option(value=opcion.value)= opcion.label
+
+//- Área de texto. attrs: full, rows, placeholder
+mixin campoTextarea(name, etiqueta, attrs)
+    - const a = attrs || {}
+    div(class=a.full ? "md:col-span-2" : null)
+        label(for=name class=claseEtiqueta)= etiqueta
+        textarea(
+            id=name
+            name=name
+            rows=a.rows || 3
+            placeholder=a.placeholder
+            class=claseCampo + " resize-none"
+        )
+
+//- Encabezado de sección con icono
+mixin encabezadoSeccion(icono, colorFondo, colorIcono, titulo, descripcion)
+    div(class="flex items-center gap-3 mb-6")
+        div(class=`w-10 h-10 rounded-lg ${colorFondo} flex items-center justify-center`)
+            i(class=`${icono} ${colorIcono}`)
+        div
+            h3(class="text-xl font-bold text-slate-800")= titulo
+            p(class="text-sm text-slate-500")= descripcion
