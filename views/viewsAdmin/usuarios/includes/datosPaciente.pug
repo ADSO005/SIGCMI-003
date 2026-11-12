@@ -1,0 +1,29 @@
+//- ==========================================
+//- DATOS DE PACIENTE (solo rol 3)
+//- Los campos de esta sección se deshabilitan por JS cuando el rol no es paciente.
+//- ==========================================
+
+div#seccion-paciente(data-rol="3" class="hidden mb-10")
+
+    +encabezadoSeccion("fa-solid fa-heart-pulse", "bg-red-100", "text-red-600", "Datos del paciente", "Información de residencia y médica")
+
+    div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+        +campoTexto("fecha_nacimiento", "Fecha de nacimiento", "date")
+
+        +campoSelect("tipo_sangre", "Tipo de sangre", [
+            { value: "", label: "Seleccione" },
+            { value: "O+", label: "O+" },
+            { value: "O-", label: "O-" },
+            { value: "A+", label: "A+" },
+            { value: "A-", label: "A-" },
+            { value: "B+", label: "B+" },
+            { value: "B-", label: "B-" },
+            { value: "AB+", label: "AB+" },
+            { value: "AB-", label: "AB-" }
+        ])
+
+        +campoTexto("departamento", "Departamento", "text", { maxlength: 100, placeholder: "Ej: Caldas" })
+        +campoTexto("ciudad", "Ciudad", "text", { maxlength: 100, placeholder: "Ej: Manizales" })
+        +campoTexto("direccion", "Dirección", "text", { full: true, maxlength: 150, placeholder: "Dirección de residencia" })
+        +campoTextarea("alergias", "Alergias", { full: true, placeholder: "Indique las alergias conocidas" })
+        +campoTextarea("condiciones_medicas", "Condiciones médicas", { full: true, placeholder: "Indique enfermedades o condiciones médicas relevantes" })
