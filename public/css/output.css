@@ -3036,8 +3036,8 @@
       display: none;
     }
   }
-  @media (width >= 1440px) {
-    .min-\[1440px\]\:grid-cols-4 {
+  @media (width >= 1200px) {
+    .min-\[1200px\]\:grid-cols-4 {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
