@@ -1,0 +1,10 @@
+//- ==========================================
+//- CONTACTO (todos los roles)
+//- ==========================================
+
+div(class="mb-10")
+    +encabezadoSeccion("fa-solid fa-address-book", "bg-emerald-100", "text-emerald-600", "Información de contacto", "Correo y teléfono de contacto")
+
+    div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+        +campoTexto("correo", "Correo electrónico", "email", { requerido: true, maxlength: 150, placeholder: "usuario@correo.com" })
+        +campoTexto("telefono", "Teléfono", "tel", { maxlength: 20, placeholder: "3001234567" })

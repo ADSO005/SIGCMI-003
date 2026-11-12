@@ -1,0 +1,18 @@
+//- ==========================================
+//- SELECTOR DE ROL
+//- Si la ruta fija el rol (p. ej. /pacientes/nuevo) se envía como campo oculto.
+//- ==========================================
+
+div(class="mb-10")
+    +encabezadoSeccion("fa-solid fa-user-tag", "bg-indigo-100", "text-indigo-600", "Tipo de usuario", "Selecciona el rol para mostrar los campos necesarios")
+
+    if rolFijo
+        input#rol_id(type="hidden" name="rol_id" value=rolFijo)
+    else
+        div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+            +campoSelect("rol_id", "Rol", [
+                { value: "", label: "Seleccione un rol" },
+                { value: "1", label: "Administrador" },
+                { value: "2", label: "Médico" },
+                { value: "3", label: "Paciente" }
+            ], { requerido: true })
