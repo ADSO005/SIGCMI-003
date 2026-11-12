@@ -13,7 +13,13 @@ import {
     cambiarEstadoUsuario
 } from "../../controllers/admin/usuariosController.js";
 
-//APARTADO CREAR CITA
+import {
+    mostrarFormularioUsuario,
+    registrarUsuario,
+    fijarRol,
+    ROLES
+} from "../../controllers/admin/registrarUsuarioController.js";
+
 import {
     mostrarFormularioNuevaCita,
     obtenerHorasDisponibles,
@@ -26,8 +32,6 @@ import {
 
 //APARTADO CREAR UN PACIENTE
 import {
-    mostrarFormularioPaciente,
-    registrarPaciente,
     listarPacientes,
     obtenerPaciente,
     actualizarPaciente
@@ -100,6 +104,20 @@ router.get(
 );
 
 router.get(
+    "/usuarios/nuevo",
+    auth,
+    role(1),
+    mostrarFormularioUsuario
+);
+
+router.post(
+    "/usuarios/nuevo",
+    auth,
+    role(1),
+    registrarUsuario
+);
+
+router.get(
     "/usuarios/:id",
     auth,
     role(1),
@@ -130,14 +148,16 @@ router.get(
     "/pacientes/nuevo",
     auth,
     role(1),
-    mostrarFormularioPaciente
+    fijarRol(ROLES.PACIENTE),
+    mostrarFormularioUsuario
 );
 
 router.post(
     "/pacientes/nuevo",
     auth,
     role(1),
-    registrarPaciente
+    fijarRol(ROLES.PACIENTE),
+    registrarUsuario
 );
 
 // Listar pacientes
