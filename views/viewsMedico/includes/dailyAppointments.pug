@@ -1,24 +1,31 @@
 mixin tarjetaAtencion(cita)
-  article.appointment(id=`cita${cita.id_cita}` class="mb-3 min-w-0 rounded-[14px] border border-slate-200 bg-slate-50 p-3 [overflow-wrap:anywhere]")
+  article.appointment(id=`cita${cita.id_cita}` class="mb-3 min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_3px_12px_rgba(15,35,80,0.05)] [overflow-wrap:anywhere]")
     div(class="flex flex-wrap items-center justify-between gap-2")
-      time(datetime=`${cita.fecha}T${cita.hora}` class="text-sm font-semibold text-[#465DE5]")= `${cita.fecha} · ${cita.hora.slice(0, 5)}`
+      time(datetime=`${cita.fecha}T${cita.hora}` class="rounded-lg bg-blue-50 px-2.5 py-1.5 text-sm font-semibold text-[#315bd7]")= `${cita.fecha} · ${cita.hora.slice(0, 5)}`
       span.state(class=cita.estado === "En Curso" ? "rounded-full bg-emerald-100 px-2 py-1 text-xs text-emerald-800" : "rounded-full bg-indigo-100 px-2 py-1 text-xs text-indigo-800")= cita.estado
-    h4(class="mt-2 text-sm font-semibold text-slate-900")= cita.paciente
+    h4(class="mt-3 text-base font-semibold text-[#10285e]")= cita.paciente
     p(class="mt-1 text-xs text-slate-600 whitespace-pre-wrap")= cita.motivo
     if cita.estado === "En Curso"
       - const seleccionada = typeof contextoConsulta !== "undefined" && contextoConsulta && contextoConsulta.id_cita === cita.id_cita
-      a(data-continuar-cita=cita.id_cita onclick=seleccionada ? "abrirAtencion(event)" : undefined class="mt-3 block rounded-lg bg-[#465DE5] px-3 py-2 text-center text-sm font-semibold text-white" href=`/medico/dashboard?consulta=${cita.id_cita}#contextoConsulta`) Continuar consulta
+      a(data-continuar-cita=cita.id_cita onclick=seleccionada ? "abrirAtencion(event)" : undefined class="mt-3 block rounded-xl bg-[#315bd7] px-3 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" href=`/medico/dashboard?consulta=${cita.id_cita}#contextoConsulta`) Continuar consulta
     else if ["Pendiente", "Confirmada"].includes(cita.estado)
-      button.btn-iniciar(type="button" data-cita=cita.id_cita data-estado-id=estadoEnCursoId disabled=!cita.puedeIniciar || !estadoEnCursoId onclick="iniciarConsulta(this)" class="mt-3 w-full rounded-lg bg-[#465DE5] px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50") Iniciar Consulta
+      button.btn-iniciar(type="button" data-cita=cita.id_cita data-estado-id=estadoEnCursoId disabled=!cita.puedeIniciar || !estadoEnCursoId onclick="iniciarConsulta(this)" class="mt-3 w-full rounded-xl bg-[#315bd7] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50") Iniciar Consulta
       if !cita.puedeIniciar
         p(class="mt-2 text-xs text-slate-600") Disponible desde la hora programada, únicamente en esta fecha.
       else if !estadoEnCursoId
         p(role="alert" class="mt-2 text-xs text-rose-700") No es posible iniciar consultas en este momento.
 
-.appointments(class="min-w-0 rounded-[12px] border border-[#d5d5d5] bg-white p-4")
-  div(class="mb-3 flex flex-wrap items-center justify-between gap-2")
-    h3(class="text-base font-semibold text-black") Mi Agenda de hoy
-    a(href="/medico/dashboard" class="text-xs text-[#465DE5] underline") Actualizar agenda
+.appointments(class="min-w-0 overflow-hidden rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm [@media(max-width:768px)]:p-4")
+  div(class="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4")
+    h3(class="flex items-center gap-3 text-xl font-bold text-[#10285e]")
+      svg(class="h-7 w-7 shrink-0 text-[#315bd7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+        rect(x="3" y="5" width="18" height="16" rx="2")
+        path(d="M7 3v4M17 3v4M3 10h18")
+      | Mi Agenda de hoy
+    a(href="/medico/dashboard" class="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-[#315bd7] underline-offset-4 hover:bg-blue-50 hover:underline focus-visible:outline-2 focus-visible:outline-blue-600")
+      svg(class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+        path(d="M20 7v5h-5M4 17v-5h5M5.6 9a7 7 0 0 1 12-2L20 12M4 12l2.4 5a7 7 0 0 0 12-2")
+      | Actualizar agenda
   p#estadoAtencion(hidden role="status" aria-live="polite" tabindex="-1" class="mb-3 rounded-lg bg-indigo-50 p-3 text-sm text-slate-800 [overflow-wrap:anywhere]")
   if citaFinalizada
     p(role="status" class="mb-3 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800") La cita figura como Completada. El diagnóstico ya no se puede editar.
@@ -28,7 +35,19 @@ mixin tarjetaAtencion(cita)
     each cita in agendaHoy
       +tarjetaAtencion(cita)
   else
-    p(class="text-sm text-slate-600") No tienes citas programadas para hoy.
+    .empty-agenda(class="flex min-h-[320px] flex-col items-center justify-center px-4 py-7 text-center")
+      svg(class="mb-5 h-44 w-52 max-w-full text-[#6f91ed]" viewBox="0 0 220 180" fill="none" role="img" aria-label="Calendario sin citas")
+        ellipse(cx="110" cy="159" rx="82" ry="10" fill="#dbeafe")
+        path(d="M45 56a12 12 0 0 1 12-12h105a12 12 0 0 1 12 12v83H45V56Z" fill="#dce8ff")
+        path(d="M45 62a12 12 0 0 1 12-12h105a12 12 0 0 1 12 12v77H45V62Z" fill="white" stroke="#9bb6f5" stroke-width="3")
+        path(d="M45 65a12 12 0 0 1 12-12h105a12 12 0 0 1 12 12v13H45V65Z" fill="#4c73dc")
+        path(d="M72 42V31M147 42V31" stroke="#315bd7" stroke-width="8" stroke-linecap="round")
+        path(d="M66 93h16v14H66zM93 93h16v14H93zM120 93h16v14h-16zM66 116h16v14H66zM93 116h16v14H93z" fill="#c8d9fb")
+        circle(cx="137" cy="122" r="17" fill="#25b985")
+        path(d="m130 122 5 5 10-11" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round")
+        path(d="M184 38l8-9M196 50l11-2M176 25l2-11" stroke="#55cbbb" stroke-width="4" stroke-linecap="round")
+      p(class="text-lg font-bold text-[#10285e]") No tienes citas programadas para hoy.
+      p(class="mt-2 text-sm text-slate-500") Tu agenda está libre por el momento.
   if consultasAnteriores && consultasAnteriores.length
     h3(class="mb-3 mt-5 text-base font-semibold text-black") Consultas en curso de días anteriores
     each cita in consultasAnteriores

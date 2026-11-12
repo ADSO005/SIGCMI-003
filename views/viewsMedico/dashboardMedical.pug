@@ -2,53 +2,63 @@ extends layout/main
 
 block content
   main#mainContent.main(
-    class="min-h-screen w-[calc(100%-314px)] ml-[314px] float-none bg-white px-9 pb-7 [@media(max-width:768px)]:px-5 text-black transition-all duration-300 ease-[ease] [&.collapsed]:w-[calc(100%-80px)] [&.collapsed]:ml-[80px] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:ml-0 [@media(max-width:768px)]:[&.collapsed]:w-full [@media(max-width:768px)]:[&.collapsed]:ml-0"
+    class="min-h-screen w-[calc(100%-290px)] ml-[290px] float-none bg-[#f4f8ff] px-8 pb-8 text-slate-900 transition-all duration-300 ease-[ease] [&.collapsed]:w-[calc(100%-80px)] [&.collapsed]:ml-[80px] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:ml-0 [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&.collapsed]:w-full [@media(max-width:768px)]:[&.collapsed]:ml-0"
   )
     // VISTA: AGENDA
     section#agendaView.view.active(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
-      header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
+      header(class="-mx-8 mb-7 flex min-h-[112px] items-center justify-between gap-4 border-b border-blue-100 bg-white px-8 py-5 [&_h1]:text-[#10285e] [&_h1]:text-3xl [&_h1]:leading-9 [&_h1]:tracking-tight [&_h1]:font-bold [&_span]:text-sm [&_span]:text-slate-500 [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:min-h-[90px] [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&_h1]:text-2xl")
+        button(type="button" aria-label="Abrir menú" class="mr-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#315bd7] min-[769px]:hidden" onclick="toggleSidebar()")
+          svg(class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+            path(d="M4 6h16M4 12h16M4 18h16")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
           span(class="block text-[13px] leading-[18px] text-black")= fechaDashboard
       include includes/dashboardMetrics.pug
-      section.content(class="grid grid-cols-[minmax(0,2.27fr)_minmax(0,1fr)] items-start gap-4 [@media(max-width:768px)]:grid-cols-1")
+      section.content(class="grid grid-cols-[minmax(0,1.8fr)_minmax(270px,1fr)] items-start gap-5 [@media(max-width:1024px)]:grid-cols-1")
         include includes/dailyAppointments.pug
         // ACCIONES RÁPIDAS
-        .quick-actions(class="min-w-0 flex flex-col gap-3")
-          .actions(class="bg-white p-4 rounded-[12px] border border-[#d5d5d5] flex flex-col gap-3 [&>h3]:text-black [&>h3]:text-[16px] [&>h3]:font-semibold [&>h3]:mb-0")
+        .quick-actions(class="min-w-0 flex flex-col gap-5")
+          .actions(class="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm flex flex-col gap-3 [&>h3]:text-[#10285e] [&>h3]:text-lg [&>h3]:font-bold [&>h3]:mb-1")
             h3 Acciones Rápidas
-            button.btnActions.btnActionBlue(class="w-full min-h-9 px-3 py-2 text-[13px] leading-[18px] font-semibold border-0 rounded-[10px] text-white cursor-pointer transition-all duration-200 ease-[ease] hover:opacity-85 bg-[#465DE5]" onclick='abrirModal()') Gestionar Citas
-            button.btnActions.btnActionGreen(class="w-full min-h-9 px-3 py-2 text-[13px] leading-[18px] font-semibold border-0 rounded-[10px] text-white cursor-pointer transition-all duration-200 ease-[ease] hover:opacity-85 bg-[#1bce60]" onclick='abrirModalHorarios()') Consultar Horarios
-          .proxima-cita(class="bg-[#465DE5] rounded-[12px] p-3 text-white")
-            .proxima-cita-header(class="flex items-center gap-2 text-[12px] font-semibold text-white mb-2 px-2")
-              img.proxima-icon(class="h-5 w-5 brightness-0 invert" src='/medico/img/Icon.png' alt='Reloj')
+            button.btnActions.btnActionBlue(type="button" class="group flex min-h-[54px] w-full items-center justify-between rounded-xl border-0 bg-gradient-to-r from-[#315bd7] to-[#4969e8] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" onclick='abrirModal()')
+              span Gestionar Citas
+              span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
+            button.btnActions.btnActionGreen(type="button" class="group flex min-h-[54px] w-full items-center justify-between rounded-xl border-0 bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700" onclick='abrirModalHorarios()')
+              span Consultar Horarios
+              span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
+          .proxima-cita(class="rounded-[20px] border border-blue-100 bg-gradient-to-br from-blue-50 to-cyan-50 p-5 text-[#10285e] shadow-sm")
+            .proxima-cita-header(class="mb-3 flex items-center gap-2 text-base font-bold")
+              img.proxima-icon(class="h-6 w-6" src='/medico/img/Icon.png' alt='')
               span Próxima Cita
-            .proxima-detalle(class="rounded-[10px] bg-white/20 px-3 py-3")
+            .proxima-detalle(class="rounded-[14px] border border-white/80 bg-white/75 px-4 py-4 [&>p]:text-slate-800")
               if proximaCita
-                .proxima-hora(class="text-[20px] font-bold text-white leading-6 mb-1")= proximaCita.hora
-                .proxima-paciente(class="text-[13px] font-semibold text-white")= proximaCita.paciente
-                .proxima-motivo(class="text-[12px] leading-4 font-light text-white mt-1")= proximaCita.motivo
+                .proxima-hora(class="mb-1 text-xl font-bold leading-6 text-[#315bd7]")= proximaCita.hora
+                .proxima-paciente(class="text-sm font-semibold text-slate-800")= proximaCita.paciente
+                .proxima-motivo(class="mt-1 text-xs leading-4 text-slate-600")= proximaCita.motivo
               else
                 p(class="text-[13px] font-semibold text-white") No tienes más citas programadas para hoy
                 p(class="text-[12px] leading-4 font-light text-white mt-1") Tu agenda está libre por el momento
     // fin agendaView
 
     section#pacientesView.view(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
-      header(class="-mx-9 mb-12 flex min-h-[72px] items-center border-b border-[#d5d5d5] bg-white px-[18px] py-3 shadow-[0_4px_4px_rgba(0,0,0,0.18)] [@media(max-width:768px)]:-mx-5")
+      header(class="-mx-8 mb-7 flex min-h-[112px] items-center justify-between gap-4 border-b border-blue-100 bg-white px-8 py-5 [&_h1]:text-[#10285e] [&_h1]:text-3xl [&_h1]:leading-9 [&_h1]:tracking-tight [&_h1]:font-bold [&_span]:text-sm [&_span]:text-slate-500 [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:min-h-[90px] [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&_h1]:text-2xl")
+        button(type="button" aria-label="Abrir menú" class="mr-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#315bd7] min-[769px]:hidden" onclick="toggleSidebar()")
+          svg(class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+            path(d="M4 6h16M4 12h16M4 18h16")
         div
           h1(class="text-[26px] leading-[30px] font-bold text-black [@media(max-width:768px)]:text-[24px]") Portal Médico
           span(class="block text-[13px] leading-[18px] text-black")= fechaDashboard
-      .pacientes-layout(class="grid grid-cols-[260px_minmax(0,1fr)] gap-5 h-[calc(100vh-180px)] [@media(max-width:1024px)]:grid-cols-1 [@media(max-width:1024px)]:h-auto")
+      .pacientes-layout(class="grid min-h-[560px] grid-cols-[minmax(260px,300px)_minmax(0,1fr)] items-start gap-5 [@media(max-width:1024px)]:min-h-0 [@media(max-width:1024px)]:grid-cols-1 [@media(max-width:1024px)]:gap-4")
         // COLUMNA IZQUIERDA: lista
-        .pacientes-lista(class="min-h-0 self-start max-h-full flex flex-col overflow-y-auto rounded-lg border border-[#e2e2e2] bg-white [&>.sin-pacientes]:p-[15px] [&>.sin-pacientes]:text-center [&>.sin-pacientes]:text-[#666] [&>.sin-pacientes]:text-[14px] [&>p]:p-[14px] [&>p]:text-[13px] [&>p]:text-[#718096] [@media(max-width:1024px)]:max-h-[320px]")
-          .pacientes-search-box(class="m-[14px] flex items-center gap-2 rounded border border-[#cbd0df] px-3 py-2 [&>input]:min-w-0 [&>input]:w-full [&>input]:border-0 [&>input]:outline-none [&>input]:text-[13px] [&>input]:text-[#4a5568] [&>input]:placeholder:text-[#929bb5]")
+        .pacientes-lista(class="min-h-0 self-start max-h-[calc(100vh-220px)] flex flex-col overflow-y-auto rounded-[22px] border border-slate-200 bg-white p-3 shadow-sm [&>.sin-pacientes]:p-4 [&>.sin-pacientes]:text-center [&>.sin-pacientes]:text-slate-500 [&>.sin-pacientes]:text-sm [&>p]:p-4 [&>p]:text-sm [&>p]:text-slate-500 [@media(max-width:1024px)]:max-h-[320px]")
+          .pacientes-search-box(class="mb-3 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 [&>input]:min-w-0 [&>input]:w-full [&>input]:border-0 [&>input]:bg-transparent [&>input]:outline-none [&>input]:text-sm [&>input]:text-slate-700 [&>input]:placeholder:text-slate-400")
             span.search-icon(class="text-[13px] text-[#929bb5]") 🔍
             input(type='text' placeholder='Buscar paciente...' oninput='filtrarPacientes(this.value)')
 
           if pacientes && pacientes.length > 0
             each item in pacientes
               .paciente-item(
-                class="flex items-center gap-[10px] border-b border-[#eeeeee] px-3 py-[14px] last:border-b-0 cursor-pointer transition-colors duration-200 hover:bg-[#f0f4ff] [&.activo]:bg-[#eef1fd] [&.activo]:border-l-[3px] [&.activo]:border-l-[#465DE5] [&>img]:h-9 [&>img]:w-9 [&>img]:shrink-0 [&>img]:p-1 [&>div]:min-w-0 [&>div]:flex-1 [&>div]:flex [&>div]:flex-col [&>div]:gap-[2px] [&_h4]:text-[13px] [&_h4]:font-semibold [&_h4]:text-[#1a202c] [&_span]:text-[11px] [&_span]:text-[#718096] [&>div>span]:flex [&>div>span]:items-center [&>div>span]:gap-1"
+                class="flex items-center gap-3 rounded-xl border-b border-slate-100 px-3 py-3 last:border-0 cursor-pointer transition-colors duration-200 hover:bg-blue-50 [&.activo]:bg-blue-50 [&.activo]:ring-1 [&.activo]:ring-blue-200 [&>img]:h-10 [&>img]:w-10 [&>img]:shrink-0 [&>img]:rounded-full [&>img]:bg-blue-100 [&>img]:p-2 [&>div]:min-w-0 [&>div]:flex-1 [&>div]:flex [&>div]:flex-col [&>div]:gap-1 [&_h4]:text-sm [&_h4]:font-semibold [&_h4]:text-[#10285e] [&_span]:text-xs [&_span]:text-slate-500 [&>div>span]:flex [&>div>span]:items-center [&>div>span]:gap-1"
                 data-id=item.paciente.id_paciente
                 onclick='seleccionarPaciente(this)'
               )
@@ -63,15 +73,15 @@ block content
           else
             p No hay pacientes registrados.
         // COLUMNA DERECHA: detalle
-        .paciente-detalle(class="min-w-0 min-h-0 flex flex-col gap-4 overflow-y-auto rounded-lg border border-[#e2e2e2] bg-white p-6 [@media(max-width:768px)]:p-4")
-          .detalle-header(class="flex items-start gap-4 [@media(max-width:768px)]:flex-wrap")
+        .paciente-detalle(class="min-w-0 min-h-[560px] flex flex-col overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm [@media(max-width:1024px)]:min-h-[420px] [@media(max-width:768px)]:min-h-[360px]")
+          .detalle-header(class="flex flex-wrap items-center gap-4 border-b border-slate-100 bg-gradient-to-r from-white to-blue-50/70 p-6 [@media(max-width:768px)]:p-4")
             img.detalle-avatar(
-              class="h-16 w-16 shrink-0 p-0 object-contain"
+              class="h-16 w-16 shrink-0 rounded-full bg-blue-100 p-3 object-contain"
               src='/medico/img/Group 16.png'
               alt='Paciente'
             )
 
-            .detalle-info(class="min-w-0 flex-1 [&>h2]:mb-1 [&>h2]:text-[22px] [&>h2]:leading-7 [&>h2]:font-semibold [&>h2]:text-[#171717] [&>p]:mb-[3px] [&>p]:text-[13px] [&>p]:text-[#4a5568] [&_a]:break-words [&_a]:text-[#555] [&_a]:underline")
+            .detalle-info(class="min-w-0 flex-1 [&>h2]:mb-2 [&>h2]:text-2xl [&>h2]:leading-7 [&>h2]:font-bold [&>h2]:text-[#10285e] [&>p]:mb-1 [&>p]:text-sm [&>p]:text-slate-600 [&_a]:break-words [&_a]:text-[#315bd7] [&_a]:underline")
               h2#detalleNombre Selecciona un paciente
 
               p
@@ -82,7 +92,7 @@ block content
                 | Teléfono: 
                 span#detalleTelefono -
 
-            .detalle-meta(class="self-end text-right [&>p]:mb-[3px] [&>p]:text-[12px] [&>p]:text-[#4a5568] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:text-left")
+            .detalle-meta(class="ml-auto self-end text-right [&>p]:mb-1 [&>p]:text-xs [&>p]:text-slate-500 [@media(max-width:768px)]:ml-0 [@media(max-width:768px)]:w-full [@media(max-width:768px)]:text-left")
               p
                 | Edad: 
                 span#detalleEdad -
@@ -91,8 +101,8 @@ block content
                 | Última Visita: 
                 span#detalleUltimaVisita -
 
-          .detalle-badges(class="flex flex-wrap gap-[10px]")
-            span.badge.badge-blue(class="inline-flex items-center gap-1 rounded border border-[#d5d5d5] bg-white px-[14px] py-[6px] text-[12px] font-normal text-[#555] [&>img]:h-[14px] [&>img]:w-[14px] [&>img]:object-contain")
+          .detalle-badges(class="flex flex-wrap gap-3 px-6 py-4 [@media(max-width:768px)]:px-4")
+            span.badge.badge-blue(class="inline-flex items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-sm font-medium text-slate-700 [&>img]:h-4 [&>img]:w-4 [&>img]:object-contain")
               img(
                 src='/medico/img/CalendarPaciente.png'
                 alt='Calendario'
@@ -100,7 +110,7 @@ block content
               |  Citas: 
               span#detalleCitas 0
 
-            span.badge.badge-purple(class="inline-flex items-center gap-1 rounded border border-[#d5d5d5] bg-white px-[14px] py-[6px] text-[12px] font-normal text-[#555] [&>img]:h-[14px] [&>img]:w-[14px] [&>img]:object-contain")
+            span.badge.badge-purple(class="inline-flex items-center gap-2 rounded-xl border border-violet-100 bg-violet-50 px-3 py-2 text-sm font-medium text-slate-700 [&>img]:h-4 [&>img]:w-4 [&>img]:object-contain")
               img(
                 src='/medico/img/google-docs 2.png'
                 alt='Diagnósticos'
@@ -108,8 +118,8 @@ block content
               |  Diagnósticos: 
               span#detalleDiagnosticos 0
 
-          .historial(class="-mx-6 border-t border-[#dedede] px-6 pt-3 [&>h3]:mb-3 [&>h3]:text-[18px] [&>h3]:font-semibold [&>h3]:text-black [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:px-4")
+          .historial(class="min-h-0 flex-1 overflow-y-auto border-t border-slate-100 px-6 py-5 [&_h3]:mb-4 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-[#10285e] [@media(max-width:768px)]:px-4")
             h3 Historial Médico
 
-            #historialPaciente(class="[&>.historial-card]:mb-3 [&>.historial-card]:rounded-[16px] [&>.historial-card]:border [&>.historial-card]:border-[#e2e2e2] [&>.historial-card]:p-3 [&_.historial-card>h4]:mb-1 [&_.historial-card>h4]:text-[14px] [&_.historial-card>h4]:font-medium [&_.historial-card>h4]:text-black [&_.historial-card>p]:mb-1 [&_.historial-card>p]:text-[12px] [&_.historial-card>p]:text-[#666] [&_.historial-card>p]:break-words [&_.historial-card>p.historial-fecha]:mb-[10px] [&_.historial-card>p.historial-fecha]:text-[11px] [&_.historial-card>p.historial-fecha]:text-[#888] [&_strong]:font-medium [&_strong]:text-black [&>p]:text-[13px] [&>p]:text-[#718096]")
+            #historialPaciente(class="space-y-3 [&>.historial-card]:rounded-2xl [&>.historial-card]:border [&>.historial-card]:border-slate-200 [&>.historial-card]:bg-white [&>.historial-card]:p-4 [&>.historial-card]:shadow-[0_3px_12px_rgba(15,35,80,0.04)] [&_.historial-card>h4]:mb-2 [&_.historial-card>h4]:text-base [&_.historial-card>h4]:font-bold [&_.historial-card>h4]:text-[#10285e] [&_.historial-card>p]:mb-1 [&_.historial-card>p]:text-sm [&_.historial-card>p]:leading-6 [&_.historial-card>p]:text-slate-600 [&_.historial-card>p]:break-words [&_.historial-card>p.historial-fecha]:mb-3 [&_.historial-card>p.historial-fecha]:inline-flex [&_.historial-card>p.historial-fecha]:rounded-full [&_.historial-card>p.historial-fecha]:bg-blue-50 [&_.historial-card>p.historial-fecha]:px-3 [&_.historial-card>p.historial-fecha]:py-1 [&_.historial-card>p.historial-fecha]:text-xs [&_.historial-card>p.historial-fecha]:font-semibold [&_.historial-card>p.historial-fecha]:text-[#315bd7] [&_.historial-card>ul]:mt-2 [&_strong]:font-semibold [&_strong]:text-slate-800 [&>p]:rounded-xl [&>p]:bg-slate-50 [&>p]:p-4 [&>p]:text-sm [&>p]:text-slate-500 [&>p]:break-words")
               p Selecciona un paciente para consultar su historial.
