@@ -8,14 +8,14 @@ import { verDashboard } from "../../controllers/admin/dashboardController.js";
 //APARTADO USUARIOS
 import {
     listarUsuarios,
-    obtenerUsuario,
-    actualizarUsuario,
     cambiarEstadoUsuario
 } from "../../controllers/admin/usuariosController.js";
 
 import {
     mostrarFormularioUsuario,
     registrarUsuario,
+    mostrarFormularioEditarUsuario,
+    actualizarUsuarioCompleto,
     fijarRol,
     ROLES
 } from "../../controllers/admin/registrarUsuarioController.js";
@@ -33,15 +33,13 @@ import {
 //APARTADO CREAR UN PACIENTE
 import {
     listarPacientes,
-    obtenerPaciente,
-    actualizarPaciente
+    obtenerPaciente
 } from "../../controllers/admin/pacientesController.js";
 
 //APARTADO MEDICOS
 import {
     listarMedicos,
     obtenerMedico,
-    actualizarMedico,
     crearHorariosMedico
 } from "../../controllers/admin/medicosController.js";
 
@@ -118,17 +116,17 @@ router.post(
 );
 
 router.get(
-    "/usuarios/:id",
+    "/usuarios/:id/editar",
     auth,
     role(1),
-    obtenerUsuario
+    mostrarFormularioEditarUsuario
 );
 
-router.put(
-    "/usuarios/:id",
+router.post(
+    "/usuarios/:id/editar",
     auth,
     role(1),
-    actualizarUsuario
+    actualizarUsuarioCompleto
 );
 
 router.patch(
@@ -176,13 +174,6 @@ router.get(
     obtenerPaciente
 );
 
-// Actualizar paciente
-router.put(
-    "/pacientes/:id",
-    auth,
-    role(1),
-    actualizarPaciente
-);
 
 
 // ===============================
@@ -203,12 +194,6 @@ router.get(
     obtenerMedico
 );
 
-router.put(
-    "/medicos/:id",
-    auth,
-    role(1),
-    actualizarMedico
-);
 
 
 router.post(
