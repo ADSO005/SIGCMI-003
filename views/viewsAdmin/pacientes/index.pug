@@ -193,19 +193,11 @@ html(lang="es")
                                 // FILTRO
                                 select(
                                     id="filtroEstadoPaciente"
-                                    class="w-full sm:w-40 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                    class="w-full sm:w-50 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                                 )
                                     option(value="") Todos los estados
                                     option(value="activo") Activos
                                     option(value="inactivo") Inactivos
-
-                                // REGISTRAR
-                                a(
-                                    href="/admin/pacientes/nuevo"
-                                    class="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2.5 rounded-lg transition"
-                                )
-                                    i(class="fa-solid fa-user-plus")
-                                    | Registrar paciente
 
                     // ==================================
                     // TABLA RESPONSIVE
@@ -285,7 +277,7 @@ html(lang="es")
                                                         ) #{paciente.nombre}
 
                                                         p(
-                                                            class="text-xs text-slate-500"
+                                                            class="text-xs text-slate-500" hidden
                                                         ) ID: #{paciente.id}
 
                                             // DOCUMENTO
