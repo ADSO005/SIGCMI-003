@@ -351,9 +351,10 @@ html(lang="es")
                                                     )
                                                         i(class="fa-solid fa-eye")
 
-                                                    button.btnEditarPaciente(
-                                                        type="button"
-                                                        data-id=paciente.id
+                                                    a(
+                                                        href=`/admin/usuarios/${paciente.usuarioId}/editar?volver=pacientes`
+                                                        class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                                                        title="Editar paciente"
                                                     )
                                                         i(class="fa-solid fa-pen-to-square")
 
@@ -398,7 +399,6 @@ html(lang="es")
 
 
         include ../components/modals/verPaciente.pug
-        include ../components/modals/editarPaciente.pug
         // ==========================================
         // JAVASCRIPT
         // ==========================================
