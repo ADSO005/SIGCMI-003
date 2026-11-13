@@ -34,13 +34,13 @@ html(lang="es")
                 )
                     div
                         h2(class="text-3xl font-bold text-slate-900")
-                            = rolFijo ? "Registrar Paciente" : "Registrar Usuario"
+                            = modoEdicion ? "Editar Usuario" : (rolFijo ? "Registrar Paciente" : "Registrar Usuario")
 
-                        - const subtitulo = rolFijo ? "Registra un nuevo paciente en el sistema SIGCMI." : "Registra un administrador, médico o paciente en el sistema SIGCMI."
+                        - const subtitulo = modoEdicion ? "Actualiza los datos del usuario. Si cambias su rol, se crean o actualizan sus datos de paciente o médico." : (rolFijo ? "Registra un nuevo paciente en el sistema SIGCMI." : "Registra un administrador, médico o paciente en el sistema SIGCMI.")
                         p(class="text-slate-500 mt-1")= subtitulo
 
                     a(
-                        href="/admin/usuarios"
+                        href=`/admin/${volver}`
                         class="inline-flex items-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
                     )
                         i(class="fa-solid fa-arrow-left")
@@ -49,12 +49,18 @@ html(lang="es")
                 //- Formulario
                 div(class="max-w-6xl mx-auto mt-8")
 
+                    if error
+                        div(class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm")
+                            = error
+
                     form(
-                        action="/admin/usuarios/nuevo"
+                        action=accion
                         method="POST"
                         id="formUsuario"
                         class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8"
                     )
+                        if modoEdicion
+                            input(type="hidden" name="volver" value=volver)
 
                         include includes/selectorRol.pug
                         include includes/datosPersonales.pug

@@ -19,12 +19,13 @@ div#seccion-medico(data-rol="2" class="hidden mb-10")
             )
                 option(value="") Seleccione una especialidad
                 each especialidad in (especialidades || [])
-                    option(value=especialidad.id_especialidad)= especialidad.nombre
+                    - const marcada = String(especialidad.id_especialidad) === String(valores.especialidad_id ?? "")
+                    option(value=especialidad.id_especialidad selected=marcada)= especialidad.nombre
             if !especialidades || !especialidades.length
                 p(class="mt-2 text-sm text-amber-600")
                     | No hay especialidades registradas.
                     |
                     a(href="/admin/especialidades" class="underline") Crear especialidad
 
-        +campoTexto("cedula_profesional", "Tarjeta o cédula profesional", "text", { requerido: true, maxlength: 50, placeholder: "Ingrese el número" })
-        +campoTexto("anios_experiencia", "Años de experiencia", "number", { min: 0, max: 60, placeholder: "Ej. 5" })
+        +campoTexto("cedula_profesional", "Tarjeta o cédula profesional", "text", { requerido: true, maxlength: 50, placeholder: "Ingrese el número", valor: valores.cedula_profesional })
+        +campoTexto("anios_experiencia", "Años de experiencia", "number", { min: 0, max: 60, placeholder: "Ej. 5", valor: valores.anios_experiencia })

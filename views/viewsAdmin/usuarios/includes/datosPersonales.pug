@@ -6,8 +6,8 @@ div(class="mb-10")
     +encabezadoSeccion("fa-solid fa-user", "bg-indigo-100", "text-indigo-600", "Información personal", "Datos básicos del usuario")
 
     div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
-        +campoTexto("nombres", "Nombres", "text", { requerido: true, minlength: 2, maxlength: 100, placeholder: "Ingrese los nombres" })
-        +campoTexto("apellidos", "Apellidos", "text", { requerido: true, minlength: 2, maxlength: 100, placeholder: "Ingrese los apellidos" })
+        +campoTexto("nombres", "Nombres", "text", { requerido: true, minlength: 2, maxlength: 100, placeholder: "Ingrese los nombres", valor: valores.nombres })
+        +campoTexto("apellidos", "Apellidos", "text", { requerido: true, minlength: 2, maxlength: 100, placeholder: "Ingrese los apellidos", valor: valores.apellidos })
 
         +campoSelect("tipo_documento", "Tipo de documento", [
             { value: "", label: "Seleccione" },
@@ -15,6 +15,6 @@ div(class="mb-10")
             { value: "TI", label: "Tarjeta de identidad" },
             { value: "CE", label: "Cédula de extranjería" },
             { value: "PP", label: "Pasaporte" }
-        ], { requerido: true })
+        ], { requerido: true, valor: valores.tipo_documento })
 
-        +campoTexto("numero_documento", "Número de documento", "text", { requerido: true, maxlength: 30, placeholder: "Ingrese el número" })
+        +campoTexto("numero_documento", "Número de documento", "text", { requerido: true, maxlength: 30, placeholder: "Ingrese el número", valor: valores.numero_documento })

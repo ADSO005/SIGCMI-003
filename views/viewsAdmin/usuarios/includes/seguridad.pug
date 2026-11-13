@@ -1,10 +1,11 @@
 //- ==========================================
 //- SEGURIDAD (todos los roles)
+//- En edición la contraseña es opcional: si queda vacía no se cambia.
 //- ==========================================
 
 div(class="mb-8")
-    +encabezadoSeccion("fa-solid fa-lock", "bg-amber-100", "text-amber-600", "Seguridad", "Credenciales iniciales del usuario")
+    +encabezadoSeccion("fa-solid fa-lock", "bg-amber-100", "text-amber-600", "Seguridad", modoEdicion ? "Deja estos campos vacíos si no deseas cambiar la contraseña" : "Credenciales iniciales del usuario")
 
     div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
-        +campoTexto("password", "Contraseña", "password", { requerido: true, minlength: 8, maxlength: 255, placeholder: "Mínimo 8 caracteres" })
-        +campoTexto("confirmPassword", "Confirmar contraseña", "password", { requerido: true, minlength: 8, maxlength: 255, placeholder: "Repita la contraseña" })
+        +campoTexto("password", "Contraseña", "password", { requerido: !modoEdicion, minlength: 8, maxlength: 255, placeholder: modoEdicion ? "Nueva contraseña (opcional)" : "Mínimo 8 caracteres" })
+        +campoTexto("confirmPassword", "Confirmar contraseña", "password", { requerido: !modoEdicion, minlength: 8, maxlength: 255, placeholder: "Repita la contraseña" })
