@@ -442,9 +442,8 @@ html(lang="es")
 
                                                     // Editar
 
-                                                    button.btnEditarMedico(
-                                                        type="button"
-                                                        data-id=medico.id
+                                                    a(
+                                                        href=`/admin/usuarios/${medico.usuarioId}/editar?volver=medicos`
                                                         title="Editar médico"
                                                         class="w-9 h-9 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition flex items-center justify-center"
                                                     )
@@ -530,7 +529,6 @@ html(lang="es")
                 // =================================================
 
                 include ../components/modals/verMedico.pug
-                include ../components/modals/editarMedico.pug
                 include ../components/modals/horariosMedico.pug
             // =================================================
             // SCRIPTS
