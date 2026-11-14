@@ -1,0 +1,9 @@
+//- ==========================================
+//- FONDO OSCURO DEL MENÚ EN MÓVIL
+//- Lo muestra/oculta toggleSidebar.js (clase "hidden")
+//- ==========================================
+
+div#sidebarOverlay(
+    onclick="closeSidebar()"
+    class="fixed inset-0 z-[999] hidden bg-black/40 [@media(min-width:769px)]:!hidden"
+)

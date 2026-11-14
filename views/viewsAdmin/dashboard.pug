@@ -2,78 +2,112 @@ doctype html
 html(lang="es")
     head
         meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
         title SIGCMI - Dashboard
         link(rel="stylesheet" href="/css/output.css")
         link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css")
-    body(class="bg-white text-slate-800")
+
+    body(class="bg-[#f4f8ff] text-slate-900 font-[Arial,sans-serif]")
 
         div(class="flex min-h-screen")
 
             //- ============ SIDEBAR ============
             include components/sidebar.pug
 
-            //- ============ OVERLAY ============
+            //- ============ OVERLAY (móvil) ============
             include components/sidebarOverlay.pug
+
             //- ============ CONTENIDO ============
             main(
                 id="mainContent"
-                class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6"
+                class="flex-1 min-w-0 px-4 pb-8 md:px-8 xl:px-10"
             )
 
-                //- Botón para abrir sidebar en móvil
-                div(class="md:hidden mb-4")
+                //- ENCABEZADO
+                header(class="-mx-4 mb-7 flex min-h-[112px] items-center justify-between gap-4 border-b border-blue-100 bg-white px-4 py-5 md:-mx-8 md:px-8 xl:-mx-10 xl:px-10")
 
-                    button(
-                        type="button"
-                        onclick="toggleSidebar()"
-                        class="p-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
-                        aria-label="Abrir menú"
+                    div(class="flex items-center gap-3")
+
+                        button(
+                            type="button"
+                            aria-label="Abrir menú"
+                            onclick="toggleSidebar()"
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#315bd7] md:hidden"
+                        )
+                            i(class="fa-solid fa-bars")
+
+                        div
+                            h1(class="text-[26px] leading-[30px] font-bold text-black") Portal Administrativo
+                            span(class="block text-sm text-slate-500")= new Date().toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+
+                    a(
+                        href="/admin/pacientes/nuevo"
+                        class="hidden items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 sm:inline-flex"
                     )
-                        i(class="fa-solid fa-bars text-xl")
+                        i(class="fa-solid fa-user-plus")
+                        | Registrar Paciente
 
-                div(class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-200")
-
-                // Tarjetas
+                //- TARJETAS
                 include components/statsCards
 
-                div(class="grid grid-cols-1 xl:grid-cols-3 gap-8 mt-6")
-                    div(class="xl:col-span-2")
+                div(class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3")
+
+                    div(class="min-w-0 xl:col-span-2")
                         include components/appointmentsTable
 
+                    //- ACCIONES RÁPIDAS
+                    div(class="flex min-w-0 flex-col gap-5")
 
-                    div
-                        h3(class="text-2xl font-bold mb-4") Acciones Rápidas
+                        div(class="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm")
+                            h3(class="mb-4 text-lg font-bold text-[#10285e]") Acciones Rápidas
 
-                        div(class="space-y-3")
-                            button(
-                                type="button"
-                                class="btnNuevaCita w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl"
-                            ) + Nueva Cita
-                            a(href="/admin/pacientes/nuevo" class="block w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl text-center") + Registrar Paciente
-                            button(type="button" class="w-full bg-fuchsia-500 hover:bg-fuchsia-600 text-white font-bold py-4 rounded-xl") Gestionar Citas
-                            button(type="button" class="w-full bg-violet-800 hover:bg-violet-900 text-white font-bold py-4 rounded-xl") Ver Metricas
-                            button(type="button" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-4 rounded-xl") Ver Calendario
-                            button(type="button" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl") Enviar Recordatorios
+                            div(class="flex flex-col gap-3")
 
-                            div(class="bg-slate-50 rounded-xl px-5 py-4 mt-2")
-                                p(class="font-bold")
-                                    | WhatsApp
-                                    span(class="text-emerald-600")  Activo
-                                p(class="text-slate-500 text-sm")= `${stats.notificacionesHoy} notificaciones enviadas hoy`
+                                button(
+                                    type="button"
+                                    class="btnNuevaCita group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-[#315bd7] to-[#4969e8] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
+                                )
+                                    span Nueva Cita
+                                    span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
-                    // ===============================
-                    // Gráfico de Estados
-                    // ===============================
+                                a(
+                                    href="/admin/citas"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                )
+                                    span Gestionar Citas
+                                    span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
-                div(class="bg-white rounded-2xl  p-6 mt-6 w-1/2 mx-auto")
+                                a(
+                                    href="/admin/calendario"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                )
+                                    span Ver Calendario
+                                    span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
-                    h3(class="text-xl font-bold mb-5 flex items-center gap-2")
-                        i(class="fa-solid fa-chart-pie text-indigo-600")
+                                a(
+                                    href="/admin/horarios"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                )
+                                    span Consultar Horarios
+                                    span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
+
+                        div(class="rounded-[20px] border border-emerald-100 bg-gradient-to-br from-white to-emerald-50 p-5 shadow-sm")
+                            div(class="flex items-center gap-3")
+                                span(class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600")
+                                    i(class="fa-brands fa-whatsapp text-lg")
+                                div
+                                    p(class="font-bold text-slate-900") WhatsApp
+                                    p(class="text-xs text-emerald-600") Activo
+                            p(class="mt-4 text-sm text-slate-600")= `${stats.notificacionesHoy} notificaciones enviadas hoy`
+
+                //- GRÁFICO DE ESTADOS
+                div(class="mt-6 rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm xl:w-1/2")
+                    h3(class="mb-5 flex items-center gap-2 text-lg font-bold text-[#10285e]")
+                        i(class="fa-solid fa-chart-pie text-[#315bd7]")
                         | Estado de las Citas
                     canvas(id="graficoEstados" height="260")
-        
 
-        // COMPONENTES
+        //- COMPONENTES
         include components/modals/nuevaCita.pug
 
         script(src="/admin/js/nuevaCita.js")
@@ -83,4 +117,3 @@ html(lang="es")
         script(src="/admin/js/stadistics.js")
 
         script(src="/admin/js/toggleSidebar.js")
-            

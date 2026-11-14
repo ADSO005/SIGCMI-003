@@ -1,37 +1,18 @@
-.appointments-card
-    div(class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 py-8")
+//- ==========================================
+//- TARJETAS DE RESUMEN (estilo dashboard médico)
+//- ==========================================
 
-        div(class="flex items-center justify-between")
-            div
-                p(class="text-slate-500 mb-2") Citas Hoy
-                p(class="text-3xl md:text-4xl font-bold")= stats.citasHoy
-            div(class="w-14 h-14 rounded-xl bg-blue-600 flex items-center justify-center")
-                svg(xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
-                    path(stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z")
+mixin tarjetaResumen(titulo, valor, detalle, icono, claseIcono, claseBorde)
+    article(class=`min-w-0 rounded-[22px] border ${claseBorde} bg-gradient-to-br from-white to-slate-50 p-5 shadow-sm`)
+        div(class="flex items-start gap-3")
+            div(class=`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${claseIcono}`)
+                i(class=`fa-solid ${icono} text-lg`)
+            h3(class="min-w-0 text-base font-semibold leading-6 text-slate-950")= titulo
+        p(class="mt-6 text-5xl font-bold leading-none tracking-tight text-slate-950")= valor
+        p(class="mt-3 text-sm leading-5 text-slate-600")= detalle
 
-        div(class="flex items-center justify-between")
-            div
-                p(class="text-slate-500 mb-2") Pacientes Activos
-                p(class="text-3xl md:text-4xl font-bold")= stats.pacientesActivos
-            div(class="w-14 h-14 rounded-xl bg-emerald-500 flex items-center justify-center")
-                svg(xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
-                    path(stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 100-8 4 4 0 000 8zm6 4v-2a4 4 0 00-3-3.87M9 8a4 4 0 11-8 0 4 4 0 018 0z")
-
-        div(class="flex items-center justify-between")
-            div
-                p(class="text-slate-500 mb-2") Médicos Disponibles
-                p(class="text-3xl md:text-4xl font-bold")= stats.medicosDisponibles
-            div(class="w-14 h-14 rounded-xl bg-fuchsia-500 flex items-center justify-center")
-                svg(xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
-                    path(stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z")
-
-        div(class="flex items-center justify-between")
-            div
-                p(class="text-slate-500 mb-2") Tiempo Promedio Espera
-                p(class="text-3xl md:text-4xl font-bold")
-                    = stats.tiempoEspera
-                    |  min
-                p(class="text-slate-500") Por consulta
-            div(class="w-14 h-14 rounded-xl bg-orange-500 flex items-center justify-center")
-                svg(xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2")
-                    path(stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z")
+section(aria-label="Resumen de citas" class="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1200px]:grid-cols-4")
+    +tarjetaResumen("Citas Hoy", stats.citasHoy, "Programadas para hoy", "fa-calendar-check", "bg-blue-100/80 text-[#315bd7]", "border-blue-200")
+    +tarjetaResumen("Pacientes Activos", stats.pacientesActivos, "Pacientes con cuenta activa", "fa-users", "bg-emerald-100/80 text-emerald-600", "border-emerald-100")
+    +tarjetaResumen("Médicos Disponibles", stats.medicosDisponibles, "Médicos activos en el sistema", "fa-user-doctor", "bg-violet-100/80 text-violet-600", "border-violet-100")
+    +tarjetaResumen("Tiempo Promedio Espera", `${stats.tiempoEspera} min`, "Por consulta", "fa-clock", "bg-amber-100/80 text-amber-600", "border-amber-100")
