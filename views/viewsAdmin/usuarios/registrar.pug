@@ -70,5 +70,28 @@ html(lang="es")
                         include includes/seguridad.pug
                         include includes/acciones.pug
 
+        //- Alerta de validación (se abre sola cuando el servidor devuelve un error)
+        dialog#alertaError(
+            role="alertdialog"
+            aria-labelledby="alertaErrorTitulo"
+            class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
+        )
+            div(class="p-6")
+                div(class="flex items-start gap-4")
+                    span(class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600")
+                        i(class="fa-solid fa-triangle-exclamation")
+                    div
+                        h2#alertaErrorTitulo(class="text-lg font-bold text-slate-900") No se pudo guardar
+                        p#alertaErrorTexto(class="mt-1 text-sm text-slate-600")= error || ""
+                div(class="mt-6 flex justify-end")
+                    button(
+                        type="button"
+                        onclick="document.getElementById('alertaError').close()"
+                        class="rounded-lg bg-indigo-600 px-5 py-2 font-semibold text-white hover:bg-indigo-700"
+                    ) Entendido
+        if error
+            script.
+                document.getElementById('alertaError').showModal();
+
         script(src="/admin/js/toggleSidebar.js")
         script(src="/admin/js/registrarUsuario.js")

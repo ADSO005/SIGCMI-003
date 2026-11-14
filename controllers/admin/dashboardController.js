@@ -1,3 +1,4 @@
+import { fn, col } from "sequelize";
 import {
     Usuario,
     Paciente,
@@ -127,6 +128,32 @@ export const verDashboard = async (req, res) => {
         });
 
         //=========================================
+        // GRÁFICO: TOTAL DE CITAS POR ESTADO
+        //=========================================
+
+        const conteoPorEstado = await Cita.findAll({
+            attributes: ["estado_id", [fn("COUNT", col("id_cita")), "total"]],
+            group: ["estado_id"],
+            raw: true
+        });
+
+        const totales = new Map(conteoPorEstado.map((fila) => [fila.estado_id, Number(fila.total)]));
+
+        const coloresEstado = {
+            Pendiente: "#3B82F6",
+            Confirmada: "#8B5CF6",
+            "En Curso": "#F59E0B",
+            Completada: "#10B981",
+            Cancelada: "#EF4444"
+        };
+
+        const graficoEstados = estados.map((estado) => ({
+            nombre: estado.nombre,
+            total: totales.get(estado.id_estado) ?? 0,
+            color: coloresEstado[estado.nombre] ?? "#94A3B8"
+        }));
+
+        //=========================================
         // RENDER
         //=========================================
 
@@ -138,7 +165,8 @@ export const verDashboard = async (req, res) => {
             pacientes,
             especialidades,
             medicos,
-            estados
+            estados,
+            graficoEstados
         });
 
     } catch (error) {

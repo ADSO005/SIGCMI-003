@@ -40,13 +40,6 @@ html(lang="es")
                             h1(class="text-[26px] leading-[30px] font-bold text-black") Portal Administrativo
                             span(class="block text-sm text-slate-500")= new Date().toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
 
-                    a(
-                        href="/admin/pacientes/nuevo"
-                        class="hidden items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 sm:inline-flex"
-                    )
-                        i(class="fa-solid fa-user-plus")
-                        | Registrar Paciente
-
                 //- TARJETAS
                 include components/statsCards
 
@@ -62,6 +55,13 @@ html(lang="es")
                             h3(class="mb-4 text-lg font-bold text-[#10285e]") Acciones Rápidas
 
                             div(class="flex flex-col gap-3")
+
+                                a(
+                                    href="/admin/usuarios/nuevo"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                )
+                                    span Registrar Usuario
+                                    span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
                                 button(
                                     type="button"
@@ -100,17 +100,29 @@ html(lang="es")
                                     p(class="text-xs text-emerald-600") Activo
                             p(class="mt-4 text-sm text-slate-600")= `${stats.notificacionesHoy} notificaciones enviadas hoy`
 
-                //- GRÁFICO DE ESTADOS
-                div(class="mt-6 rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm xl:w-1/2")
-                    h3(class="mb-5 flex items-center gap-2 text-lg font-bold text-[#10285e]")
+        //- GRÁFICO DE ESTADOS (se abre con el botón de Acciones Rápidas)
+        dialog#modalGrafico(class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-[22px] bg-white p-0 shadow-2xl backdrop:bg-slate-950/60")
+            div(class="p-6")
+                div(class="mb-5 flex items-center justify-between")
+                    h3(class="flex items-center gap-2 text-lg font-bold text-[#10285e]")
                         i(class="fa-solid fa-chart-pie text-[#315bd7]")
                         | Estado de las Citas
-                    canvas(id="graficoEstados" height="260")
+                    button(
+                        type="button"
+                        aria-label="Cerrar"
+                        onclick="document.getElementById('modalGrafico').close()"
+                        class="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    )
+                        i(class="fa-solid fa-xmark")
+                canvas(id="graficoEstados" height="260" data-estados=JSON.stringify(graficoEstados))
 
         //- COMPONENTES
         include components/modals/nuevaCita.pug
+        include components/modals/verCita.pug
 
         script(src="/admin/js/nuevaCita.js")
+
+        script(src="/admin/js/verCitaDashboard.js")
 
         script(src="https://cdn.jsdelivr.net/npm/chart.js")
 

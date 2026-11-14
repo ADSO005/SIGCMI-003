@@ -30,6 +30,25 @@ export const fijarRol = (rol) => (req, res, next) => {
 // MOSTRAR FORMULARIO
 // =====================================================
 
+const renderFormularioRegistro = async (req, res, valores, { error = null, status = 200 } = {}) => {
+    const especialidades = await Especialidad.findAll({
+        attributes: ["id_especialidad", "nombre"],
+        order: [["nombre", "ASC"]]
+    });
+
+    return res.status(status).render("viewsAdmin/usuarios/registrar", {
+        titulo: "Registrar Usuario",
+        usuarios: req.usuario,
+        especialidades,
+        rolFijo: req.rolFijo ?? null,
+        modoEdicion: false,
+        accion: req.originalUrl.split("?")[0],
+        volver: "usuarios",
+        valores,
+        error
+    });
+};
+
 export const mostrarFormularioUsuario = async (req, res) => {
     try {
         const especialidades = await Especialidad.findAll({
@@ -72,36 +91,38 @@ export const registrarUsuario = async (req, res) => {
     const telefono = texto(body.telefono);
     const { password, confirmPassword } = body;
 
+    // Vuelve a mostrar el formulario con los datos ingresados y el mensaje en una alerta
+    const fallar = (mensaje, status = 400) =>
+        renderFormularioRegistro(req, res, { ...body, password: "", confirmPassword: "" }, { error: mensaje, status });
+
     try {
 
         // 1. Rol válido
         if (!Object.values(ROLES).includes(rol)) {
-            return res.status(400).send("Selecciona un rol válido.");
+            return fallar("Selecciona un rol válido.");
         }
 
         // 2. Campos comunes obligatorios
         if (!nombres || !apellidos || !tipoDocumento || !numeroDocumento || !correo || !password || !confirmPassword) {
-            return res.status(400).send("Todos los campos obligatorios deben estar completos.");
+            return fallar("Todos los campos obligatorios deben estar completos.");
         }
 
         // 3. Contraseñas
         if (password !== confirmPassword) {
-            return res.status(400).send("Las contraseñas no coinciden.");
+            return fallar("Las contraseñas no coinciden.");
         }
 
         if (!esPasswordSegura(password)) {
-            return res.status(400).send(
-                "La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."
-            );
+            return fallar("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.");
         }
 
         // 4. Correo y documento
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
-            return res.status(400).send("El correo electrónico no es válido.");
+            return fallar("El correo electrónico no es válido.");
         }
 
         if (!/^[0-9A-Za-z-]+$/.test(numeroDocumento)) {
-            return res.status(400).send("El número de documento contiene caracteres no permitidos.");
+            return fallar("El número de documento contiene caracteres no permitidos.");
         }
 
         // 5. Datos específicos del médico
@@ -115,24 +136,24 @@ export const registrarUsuario = async (req, res) => {
                 : Number(body.anios_experiencia);
 
             if (!Number.isInteger(especialidadId) || especialidadId <= 0) {
-                return res.status(400).send("Selecciona una especialidad.");
+                return fallar("Selecciona una especialidad.");
             }
 
             if (!cedula) {
-                return res.status(400).send("La tarjeta o cédula profesional es obligatoria.");
+                return fallar("La tarjeta o cédula profesional es obligatoria.");
             }
 
             if (aniosExperiencia !== null && (!Number.isInteger(aniosExperiencia) || aniosExperiencia < 0 || aniosExperiencia > 60)) {
-                return res.status(400).send("Los años de experiencia deben ser un número entre 0 y 60.");
+                return fallar("Los años de experiencia deben ser un número entre 0 y 60.");
             }
 
             const especialidad = await Especialidad.findByPk(especialidadId);
             if (!especialidad) {
-                return res.status(400).send("La especialidad seleccionada no existe.");
+                return fallar("La especialidad seleccionada no existe.");
             }
 
             if (await Medico.findOne({ where: { cedula_profesional: cedula } })) {
-                return res.status(409).send("Ya existe un médico registrado con esa cédula profesional.");
+                return fallar("Ya existe un médico registrado con esa cédula profesional.", 409);
             }
 
             datosMedico = {
@@ -144,11 +165,11 @@ export const registrarUsuario = async (req, res) => {
 
         // 6. Duplicados
         if (await Usuario.findOne({ where: { correo } })) {
-            return res.status(409).send("Ya existe un usuario registrado con ese correo.");
+            return fallar("Ya existe un usuario registrado con ese correo.", 409);
         }
 
         if (await Usuario.findOne({ where: { numero_documento: numeroDocumento } })) {
-            return res.status(409).send("Ya existe un usuario registrado con ese número de documento.");
+            return fallar("Ya existe un usuario registrado con ese número de documento.", 409);
         }
 
         // 7. Crear usuario y perfil en una sola transacción
@@ -210,7 +231,7 @@ export const registrarUsuario = async (req, res) => {
 
     } catch (error) {
         console.error("Error al registrar usuario:", error);
-        return res.status(500).send("Error interno al registrar el usuario.");
+        return fallar("Error interno al registrar el usuario.", 500);
     }
 };
 
