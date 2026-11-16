@@ -6,7 +6,7 @@ import Diagnostico from "../../models/Diagnostico.js";
 import Prescripcion from "../../models/Prescripcion.js";
 import EstadoCita from "../../models/EstadoCita.js";
 import Especialidad from "../../models/Especialidad.js";
-import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday, canStartAppointmentToday } from "../../services/medico/dashboardMetricsService.js";
+import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday, canStartAppointmentToday, consultaSupera24Horas } from "../../services/medico/dashboardMetricsService.js";
 import { textoDiagnosticoValido } from "../../services/medico/diagnosticoService.js";
 import { medicamentoPersistidoValido } from "../../services/medico/prescripcionesService.js";
 
@@ -36,7 +36,7 @@ const dashboard = async (req, res) => {
             where: {
                 medico_id: medico.id_medico
             },
-            attributes: ["id_cita", "medico_id", "paciente_id", "fecha", "hora", "motivo_consulta"],
+            attributes: ["id_cita", "medico_id", "paciente_id", "fecha", "hora", "motivo_consulta", "fecha_inicio_atencion"],
             include: [
                 {
                     model: Paciente,
@@ -128,6 +128,8 @@ const dashboard = async (req, res) => {
             paciente: [cita.Paciente?.Usuario?.nombres, cita.Paciente?.Usuario?.apellidos].filter(Boolean).join(" ") || "Paciente no disponible",
             motivo: cita.motivo_consulta?.trim() || "Motivo no registrado",
             estado: cita.Estado?.nombre || "Sin estado",
+            supera24Horas: consultaSupera24Horas(cita, now),
+            inicioNoRegistrado: cita.Estado?.nombre === "En Curso" && !cita.fecha_inicio_atencion,
             puedeIniciar: ["Pendiente", "Confirmada"].includes(cita.Estado?.nombre) && canStartAppointmentToday(cita, now)
         });
         const agendaHoy = citasHoy.map(prepararAtencion);
@@ -142,6 +144,8 @@ const dashboard = async (req, res) => {
             .find(cita => cita.id_cita === consultaId && cita.estado === "En Curso");
         const estadoCompletada = contextoConsulta
             ? await EstadoCita.findOne({ where: { nombre: "Completada" }, attributes: ["id_estado"] }) : null;
+        const estadoCierre = citas.some(cita => cita.Estado?.nombre === "En Curso")
+            ? await EstadoCita.findOne({ where: { nombre: "Cerrada sin finalizar" }, attributes: ["id_estado"] }) : null;
 
         // El modal recibe solo datos de consulta, sin información clínica adicional.
         const citasAgenda = citas.map(cita => ({
@@ -166,8 +170,11 @@ const dashboard = async (req, res) => {
                 agendaHoy, consultasAnteriores, contextoConsulta,
                 estadoEnCursoId: estadoEnCurso?.id_estado,
                 estadoCompletadaId: estadoCompletada?.id_estado,
+                estadoCierreId: estadoCierre?.id_estado,
                 citaFinalizada: typeof req.query.citaFinalizada === "string"
                     && citas.some(cita => String(cita.id_cita) === req.query.citaFinalizada && cita.Estado?.nombre === "Completada"),
+                citaCerrada: typeof req.query.citaCerrada === "string"
+                    && citas.some(cita => String(cita.id_cita) === req.query.citaCerrada && cita.Estado?.nombre === "Cerrada sin finalizar"),
                 errorContexto: req.query.consulta !== undefined && !contextoConsulta,
                 citasAgenda,
                 proximaCita: nextAppointmentToday(citasHoy, medico.id_medico, now),
@@ -295,8 +302,15 @@ const actualizarEstadoCita = async (req, res) => {
         return res.status(400).json({ mensaje: "ID de cita inválido" });
     }
     if (!cuerpo || typeof cuerpo !== "object" || Array.isArray(cuerpo)
-        || Object.keys(cuerpo).length !== 1 || !idValido(cuerpo.estado_id)) {
-        return res.status(400).json({ mensaje: "Envía únicamente un estado_id entero positivo" });
+        || !Object.hasOwn(cuerpo, "estado_id")
+        || Object.keys(cuerpo).some(campo => !["estado_id", "motivo_cierre"].includes(campo))
+        || !idValido(cuerpo.estado_id)) {
+        return res.status(400).json({ mensaje: "Envía estado_id y, solo para cerrar sin finalizar, motivo_cierre" });
+    }
+    const incluyeMotivoCierre = Object.hasOwn(cuerpo, "motivo_cierre");
+    if (incluyeMotivoCierre && (typeof cuerpo.motivo_cierre !== "string"
+        || !cuerpo.motivo_cierre.trim() || [...cuerpo.motivo_cierre.trim()].length > 2000)) {
+        return res.status(400).json({ mensaje: "El motivo de cierre es obligatorio y no debe superar 2000 caracteres" });
     }
 
     try {
@@ -304,15 +318,19 @@ const actualizarEstadoCita = async (req, res) => {
         if (!medico) return res.status(404).json({ mensaje: "No se encontró el perfil del médico" });
 
         const destino = await EstadoCita.findByPk(cuerpo.estado_id, { attributes: ["id_estado", "nombre"] });
-        if (!destino || !["En Curso", "Completada"].includes(destino.nombre)) {
+        if (!destino || !["En Curso", "Completada", "Cerrada sin finalizar"].includes(destino.nombre)) {
             return res.status(400).json({ mensaje: "Estado de destino no permitido" });
+        }
+        const cerrarSinFinalizar = destino.nombre === "Cerrada sin finalizar";
+        if (incluyeMotivoCierre !== cerrarSinFinalizar) {
+            return res.status(400).json({ mensaje: "Envía un motivo únicamente al cerrar una consulta sin finalizar" });
         }
 
         // El bloqueo serializa cambios de esta cita y la respuesta se envía después del commit.
         const resultado = await Cita.sequelize.transaction(async transaction => {
             const cita = await Cita.findOne({
                 where: { id_cita: Number(id), medico_id: medico.id_medico },
-                attributes: ["id_cita", "estado_id", "fecha", "hora"],
+                attributes: ["id_cita", "estado_id", "fecha", "hora", "fecha_inicio_atencion"],
                 transaction, lock: transaction.LOCK.UPDATE
             });
             if (!cita) return { status: 404, mensaje: "Cita no encontrada para este médico" };
@@ -321,17 +339,20 @@ const actualizarEstadoCita = async (req, res) => {
                 attributes: ["nombre"], transaction
             });
             const iniciar = destino.nombre === "En Curso";
+            const completar = destino.nombre === "Completada";
             const permitida = iniciar ? ["Pendiente", "Confirmada"].includes(actual?.nombre)
-                : actual?.nombre === "En Curso";
+                : (completar || cerrarSinFinalizar) && actual?.nombre === "En Curso";
             if (!permitida) return { status: 409, mensaje: "El estado actual no permite esta transición" };
 
+            const actualizacion = { estado_id: destino.id_estado };
             if (iniciar) {
                 // Se toma la hora después de obtener el bloqueo, por si la petición tuvo que esperar.
                 const now = new Date();
                 if (!canStartAppointmentToday(cita, now)) {
                     return { status: 409, mensaje: "Solo puedes iniciar la cita en su fecha de Bogotá y desde la hora programada" };
                 }
-            } else {
+                actualizacion.fecha_inicio_atencion = cita.fecha_inicio_atencion || now;
+            } else if (completar) {
                 // En Curso puede finalizar otro día; el diagnóstico debe existir y conservarse al actualizar.
                 const diagnostico = await Diagnostico.findOne({
                     where: { cita_id: cita.id_cita }, attributes: ["id_diagnostico", "diagnostico", "decision_medicamentos"],
@@ -355,9 +376,20 @@ const actualizarEstadoCita = async (req, res) => {
                 if (diagnostico.decision_medicamentos === "No requiere" && prescripciones.length > 0) {
                     return { status: 409, mensaje: "La decisión No requiere no puede tener medicamentos registrados" };
                 }
+            } else {
+                const ahora = new Date();
+                if (!consultaSupera24Horas({
+                    fecha_inicio_atencion: cita.fecha_inicio_atencion,
+                    Estado: { nombre: actual?.nombre }
+                }, ahora)) {
+                    return { status: 409, mensaje: "Solo puedes cerrar sin finalizar una consulta En Curso que lleve más de 24 horas y tenga su inicio real registrado" };
+                }
+                actualizacion.fecha_cierre_sin_finalizar = new Date();
+                actualizacion.motivo_cierre_sin_finalizar = cuerpo.motivo_cierre.trim();
+                actualizacion.cerrada_por_medico_id = medico.id_medico;
             }
 
-            const [filasActualizadas] = await Cita.update({ estado_id: destino.id_estado }, {
+            const [filasActualizadas] = await Cita.update(actualizacion, {
                 where: { id_cita: cita.id_cita, medico_id: medico.id_medico, estado_id: cita.estado_id },
                 transaction
             });

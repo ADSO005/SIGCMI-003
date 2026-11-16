@@ -86,6 +86,104 @@ window.iniciarConsulta = async button => {
   }
 };
 
+// El cierre conserva la consulta y registra el motivo antes de bloquearla.
+let cierreConsultaReturnFocus = null;
+let cierreConsultaEnviando = false;
+const modalCierreConsulta = document.getElementById("modalCierreConsulta");
+const formularioCierreConsulta = document.getElementById("formCierreConsulta");
+
+window.abrirModalCierreConsulta = button => {
+  if (!modalCierreConsulta || modalCierreConsulta.open || !button) return;
+  const idCita = button.dataset.cita;
+  const estadoId = Number(button.dataset.estadoId);
+  if (!/^[1-9]\d*$/.test(idCita || "") || !Number.isSafeInteger(estadoId) || estadoId <= 0) return;
+
+  cierreConsultaReturnFocus = button;
+  formularioCierreConsulta.dataset.cita = idCita;
+  formularioCierreConsulta.dataset.estadoId = String(estadoId);
+  formularioCierreConsulta.reset();
+  const estado = document.getElementById("estadoCierreConsulta");
+  estado.textContent = "El motivo es obligatorio. La consulta no se finalizará.";
+  estado.hidden = false;
+  document.getElementById("errorCierreConsulta").hidden = true;
+  modalCierreConsulta.showModal();
+  document.getElementById("motivoCierreConsulta").focus();
+};
+
+function cerrarModalCierreConsulta() {
+  if (cierreConsultaEnviando || !modalCierreConsulta?.open) return;
+  modalCierreConsulta.close();
+}
+
+document.getElementById("cerrarModalCierreConsulta")?.addEventListener("click", cerrarModalCierreConsulta);
+document.getElementById("cancelarCierreConsulta")?.addEventListener("click", cerrarModalCierreConsulta);
+modalCierreConsulta?.addEventListener("cancel", event => {
+  if (cierreConsultaEnviando) event.preventDefault();
+});
+modalCierreConsulta?.addEventListener("close", () => {
+  cierreConsultaReturnFocus?.focus();
+  cierreConsultaReturnFocus = null;
+});
+
+formularioCierreConsulta?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (cierreConsultaEnviando) return;
+
+  const idCita = formularioCierreConsulta.dataset.cita;
+  const estadoId = Number(formularioCierreConsulta.dataset.estadoId);
+  const motivo = document.getElementById("motivoCierreConsulta").value.trim();
+  const estado = document.getElementById("estadoCierreConsulta");
+  const error = document.getElementById("errorCierreConsulta");
+  const botonConfirmar = document.getElementById("confirmarCierreConsulta");
+  const botonCancelar = document.getElementById("cancelarCierreConsulta");
+  const botonCerrar = document.getElementById("cerrarModalCierreConsulta");
+
+  if (!motivo || [...motivo].length > 2000) {
+    error.textContent = "Escribe un motivo de hasta 2000 caracteres.";
+    error.hidden = false;
+    document.getElementById("motivoCierreConsulta").focus();
+    return;
+  }
+
+  cierreConsultaEnviando = true;
+  botonConfirmar.disabled = true;
+  botonCancelar.disabled = true;
+  botonCerrar.disabled = true;
+  estado.textContent = "Registrando el cierre…";
+  error.hidden = true;
+  try {
+    const respuesta = await fetch(`/medico/citas/${encodeURIComponent(idCita)}/estado`, {
+      method: "PATCH",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estado_id: estadoId, motivo_cierre: motivo })
+    });
+    if (respuesta.redirected || respuesta.status === 401) throw Error("La sesión venció. Inicia sesión nuevamente.");
+    if (!respuesta.headers.get("content-type")?.includes("application/json")) {
+      throw Error("No se recibió una respuesta válida. Comprueba tu sesión e inténtalo de nuevo.");
+    }
+    const resultado = await respuesta.json();
+    if (respuesta.status === 409) throw Error(resultado.mensaje || "La consulta cambió de estado. Actualiza la agenda.");
+    if (!respuesta.ok) throw Error(resultado.mensaje || "No se pudo cerrar la consulta.");
+    if (resultado.id_cita !== Number(idCita) || resultado.estado_id !== estadoId) {
+      throw Error("No se pudo confirmar el cierre. Actualiza la agenda.");
+    }
+    window.location.assign(`/medico/dashboard?citaCerrada=${encodeURIComponent(idCita)}#agendaView`);
+  } catch (errorCierre) {
+    estado.textContent = "No se cerró la consulta. Corrige el problema e inténtalo nuevamente.";
+    error.textContent = errorCierre instanceof TypeError
+      ? "No fue posible conectar con el servidor. Revisa la conexión."
+      : errorCierre.message || "No se pudo cerrar la consulta.";
+    error.hidden = false;
+    error.focus();
+  } finally {
+    cierreConsultaEnviando = false;
+    botonConfirmar.disabled = false;
+    botonCancelar.disabled = false;
+    botonCerrar.disabled = false;
+  }
+});
+
 // MODAL DE CONSULTA DE CITAS
 let citaReturnFocus = null;
 let citaPreviousOverflow = "";

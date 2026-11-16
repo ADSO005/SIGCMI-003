@@ -7,7 +7,20 @@ mixin tarjetaAtencion(cita)
     p(class="mt-1 text-xs text-slate-600 whitespace-pre-wrap")= cita.motivo
     if cita.estado === "En Curso"
       - const seleccionada = typeof contextoConsulta !== "undefined" && contextoConsulta && contextoConsulta.id_cita === cita.id_cita
-      a(data-continuar-cita=cita.id_cita onclick=seleccionada ? "abrirAtencion(event)" : undefined class="mt-3 block rounded-xl bg-[#315bd7] px-3 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" href=`/medico/dashboard?consulta=${cita.id_cita}#contextoConsulta`) Continuar consulta
+      if cita.supera24Horas
+        p(role="alert" class="mt-3 rounded-lg border border-slate-200 bg-indigo-50 p-3 text-sm font-semibold text-slate-800") Esta consulta lleva más de 24 horas abierta.
+      else if cita.inicioNoRegistrado
+        p(role="status" class="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-600") No se registró la hora real de inicio; no es posible calcular cuánto lleva abierta.
+      div(class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2")
+        a(data-continuar-cita=cita.id_cita onclick=seleccionada ? "abrirAtencion(event)" : undefined class="block rounded-xl bg-[#315bd7] px-3 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" href=`/medico/dashboard?consulta=${cita.id_cita}#contextoConsulta`)
+          if cita.supera24Horas
+            | Reanudar consulta
+          else
+            | Continuar consulta
+        if cita.supera24Horas && estadoCierreId
+          button(type="button" data-cita=cita.id_cita data-estado-id=estadoCierreId onclick="abrirModalCierreConsulta(this)" class="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700") Cerrar sin finalizar
+        else if cita.supera24Horas
+          p(role="alert" class="text-xs text-rose-700 sm:col-span-2") No se pudo cargar el estado de cierre. Actualiza la agenda.
     else if ["Pendiente", "Confirmada"].includes(cita.estado)
       button.btn-iniciar(type="button" data-cita=cita.id_cita data-estado-id=estadoEnCursoId disabled=!cita.puedeIniciar || !estadoEnCursoId onclick="iniciarConsulta(this)" class="mt-3 w-full rounded-xl bg-[#315bd7] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50") Iniciar Consulta
       if !cita.puedeIniciar
@@ -29,6 +42,8 @@ mixin tarjetaAtencion(cita)
   p#estadoAtencion(hidden role="status" aria-live="polite" tabindex="-1" class="mb-3 rounded-lg bg-indigo-50 p-3 text-sm text-slate-800 [overflow-wrap:anywhere]")
   if citaFinalizada
     p(role="status" class="mb-3 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800") La cita figura como Completada. El diagnóstico ya no se puede editar.
+  if citaCerrada
+    p(role="status" class="mb-3 rounded-lg bg-indigo-50 p-3 text-sm text-slate-800") La consulta se cerró sin finalizar. Se conservaron los datos clínicos existentes y ya no se pueden modificar.
   if errorContexto
     p(role="alert" class="mb-3 text-sm text-rose-700") No se encontró una consulta en curso para este médico. Actualiza la agenda.
   if agendaHoy && agendaHoy.length

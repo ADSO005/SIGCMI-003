@@ -1,4 +1,17 @@
 const dayMs = 86400000;
+const limiteConsultaAbiertaMs = 24 * 60 * 60 * 1000;
+
+// Compara marcas de tiempo reales; las citas antiguas sin inicio quedan sin alerta.
+export function consultaSupera24Horas(cita, ahora = new Date()) {
+    if (cita?.Estado?.nombre !== "En Curso" || !cita.fecha_inicio_atencion
+        || !(ahora instanceof Date) || !Number.isFinite(ahora.getTime())) return false;
+    const valorInicio = cita.fecha_inicio_atencion;
+    const inicio = valorInicio instanceof Date
+        ? valorInicio.getTime()
+        : typeof valorInicio === "string" && /(?:Z|[+-]\d{2}:\d{2})$/i.test(valorInicio)
+            ? Date.parse(valorInicio) : NaN;
+    return Number.isFinite(inicio) && ahora.getTime() - inicio > limiteConsultaAbiertaMs;
+}
 
 // Solo evalúa el tiempo; el controlador comprueba también propietario y estado.
 export function canStartAppointmentToday(appointment, now = new Date()) {
@@ -71,7 +84,7 @@ export function dashboardPeriods(now = new Date()) {
 export function calculateDashboardMetrics(appointments, doctorId, now = new Date()) {
     const periods = dashboardPeriods(now);
     const seen = new Set(), patients = new Set();
-    let todayTotal = 0, todayCompleted = 0, weeklyAppointments = 0;
+    let todayTotal = 0, todayCompleted = 0, todayRemaining = 0, weeklyAppointments = 0;
     for (const appointment of appointments) {
         // El controlador filtra en SQL; esta comprobación conserva también el aislamiento del cálculo.
         if (appointment.medico_id !== doctorId || seen.has(appointment.id_cita)) continue;
@@ -82,6 +95,7 @@ export function calculateDashboardMetrics(appointments, doctorId, now = new Date
         if (date === periods.today) {
             todayTotal++;
             if (state === "Completada") todayCompleted++;
+            else if (["Pendiente", "Confirmada", "En Curso"].includes(state)) todayRemaining++;
         }
         if (date >= periods.weekStart && date <= periods.weekEnd) weeklyAppointments++;
         if (state === "Completada" && date >= periods.monthStart && date <= periods.monthEnd) {
@@ -91,8 +105,8 @@ export function calculateDashboardMetrics(appointments, doctorId, now = new Date
     return {
         todayTotal,
         todayCompleted,
-        // En Curso y cualquier estado no cancelado ni completado siguen por atender.
-        todayRemaining: todayTotal - todayCompleted,
+        // Solo las citas abiertas siguen pendientes de atención.
+        todayRemaining,
         progressPercent: todayTotal ? Math.round(todayCompleted * 100 / todayTotal) : 0,
         monthlyPatients: patients.size,
         weeklyAppointments,
