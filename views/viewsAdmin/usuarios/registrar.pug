@@ -1,0 +1,97 @@
+//- ==========================================
+//- REGISTRO UNIFICADO DE USUARIOS
+//- Un solo formulario para Administrador, Médico y Paciente.
+//- Las secciones por rol se muestran según el rol elegido.
+//- ==========================================
+
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        title SIGCMI - Registrar Usuario
+        link(rel="stylesheet" href="/css/output.css")
+        link(
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        )
+
+    body(class="bg-white text-slate-800")
+
+        //- Mixins de campos y encabezados
+        include includes/mixins.pug
+
+        div(class="flex min-h-screen")
+
+            include ../components/sidebar.pug
+            include ../components/sidebarOverlay.pug
+
+            main(class="flex-1 px-4 md:px-8 xl:px-10 py-6")
+
+                //- Encabezado
+                div(
+                    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-slate-200"
+                )
+                    div
+                        h2(class="text-3xl font-bold text-slate-900")
+                            = modoEdicion ? "Editar Usuario" : (rolFijo ? "Registrar Paciente" : "Registrar Usuario")
+
+                        - const subtitulo = modoEdicion ? "Actualiza los datos del usuario. Si cambias su rol, se crean o actualizan sus datos de paciente o médico." : (rolFijo ? "Registra un nuevo paciente en el sistema SIGCMI." : "Registra un administrador, médico o paciente en el sistema SIGCMI.")
+                        p(class="text-slate-500 mt-1")= subtitulo
+
+                    a(
+                        href=`/admin/${volver}`
+                        class="inline-flex items-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                    )
+                        i(class="fa-solid fa-arrow-left")
+                        | Volver
+
+                //- Formulario
+                div(class="max-w-6xl mx-auto mt-8")
+
+                    if error
+                        div(class="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm")
+                            = error
+
+                    form(
+                        action=accion
+                        method="POST"
+                        id="formUsuario"
+                        class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8"
+                    )
+                        if modoEdicion
+                            input(type="hidden" name="volver" value=volver)
+
+                        include includes/selectorRol.pug
+                        include includes/datosPersonales.pug
+                        include includes/contacto.pug
+                        include includes/datosPaciente.pug
+                        include includes/datosMedico.pug
+                        include includes/seguridad.pug
+                        include includes/acciones.pug
+
+        //- Alerta de validación (se abre sola cuando el servidor devuelve un error)
+        dialog#alertaError(
+            role="alertdialog"
+            aria-labelledby="alertaErrorTitulo"
+            class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
+        )
+            div(class="p-6")
+                div(class="flex items-start gap-4")
+                    span(class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600")
+                        i(class="fa-solid fa-triangle-exclamation")
+                    div
+                        h2#alertaErrorTitulo(class="text-lg font-bold text-slate-900") No se pudo guardar
+                        p#alertaErrorTexto(class="mt-1 text-sm text-slate-600")= error || ""
+                div(class="mt-6 flex justify-end")
+                    button(
+                        type="button"
+                        onclick="document.getElementById('alertaError').close()"
+                        class="rounded-lg bg-indigo-600 px-5 py-2 font-semibold text-white hover:bg-indigo-700"
+                    ) Entendido
+        if error
+            script.
+                document.getElementById('alertaError').showModal();
+
+        script(src="/admin/js/toggleSidebar.js")
+        script(src="/admin/js/registrarUsuario.js")
