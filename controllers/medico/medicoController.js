@@ -36,7 +36,7 @@ const dashboard = async (req, res) => {
             where: {
                 medico_id: medico.id_medico
             },
-            attributes: ["id_cita", "medico_id", "paciente_id", "fecha", "hora", "motivo_consulta", "fecha_inicio_atencion"],
+            attributes: ["id_cita", "medico_id", "paciente_id", "fecha", "hora", "motivo_consulta", "fecha_inicio_atencion", "fecha_fin_atencion"],
             include: [
                 {
                     model: Paciente,
@@ -376,6 +376,7 @@ const actualizarEstadoCita = async (req, res) => {
                 if (diagnostico.decision_medicamentos === "No requiere" && prescripciones.length > 0) {
                     return { status: 409, mensaje: "La decisión No requiere no puede tener medicamentos registrados" };
                 }
+                actualizacion.fecha_fin_atencion = new Date();
             } else {
                 const ahora = new Date();
                 if (!consultaSupera24Horas({

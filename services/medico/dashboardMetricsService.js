@@ -1,6 +1,20 @@
 const dayMs = 86400000;
 const limiteConsultaAbiertaMs = 24 * 60 * 60 * 1000;
 
+function obtenerInstante(valor) {
+    if (valor instanceof Date) return Number.isFinite(valor.getTime()) ? valor.getTime() : NaN;
+    if (typeof valor === "string" && /(?:Z|[+-]\d{2}:\d{2})$/i.test(valor)) return Date.parse(valor);
+    return NaN;
+}
+
+function fechaEnBogota(instante) {
+    const partes = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit"
+    }).formatToParts(new Date(instante));
+    const valores = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+    return `${valores.year}-${valores.month}-${valores.day}`;
+}
+
 // Compara marcas de tiempo reales; las citas antiguas sin inicio quedan sin alerta.
 export function consultaSupera24Horas(cita, ahora = new Date()) {
     if (cita?.Estado?.nombre !== "En Curso" || !cita.fecha_inicio_atencion
@@ -84,6 +98,7 @@ export function dashboardPeriods(now = new Date()) {
 export function calculateDashboardMetrics(appointments, doctorId, now = new Date()) {
     const periods = dashboardPeriods(now);
     const seen = new Set(), patients = new Set();
+    const duracionesConsulta = [];
     let todayTotal = 0, todayCompleted = 0, todayRemaining = 0, weeklyAppointments = 0;
     for (const appointment of appointments) {
         // El controlador filtra en SQL; esta comprobación conserva también el aislamiento del cálculo.
@@ -101,7 +116,19 @@ export function calculateDashboardMetrics(appointments, doctorId, now = new Date
         if (state === "Completada" && date >= periods.monthStart && date <= periods.monthEnd) {
             patients.add(appointment.paciente_id);
         }
+        if (state === "Completada") {
+            const inicio = obtenerInstante(appointment.fecha_inicio_atencion);
+            const fin = obtenerInstante(appointment.fecha_fin_atencion);
+            if (Number.isFinite(inicio) && Number.isFinite(fin) && fin > inicio
+                && fin <= now.getTime() && fechaEnBogota(fin) >= periods.monthStart
+                && fechaEnBogota(fin) <= periods.monthEnd) {
+                duracionesConsulta.push((fin - inicio) / 60000);
+            }
+        }
     }
+    const averageMinutes = duracionesConsulta.length
+        ? Math.round(duracionesConsulta.reduce((total, minutos) => total + minutos, 0) / duracionesConsulta.length)
+        : null;
     return {
         todayTotal,
         todayCompleted,
@@ -110,7 +137,6 @@ export function calculateDashboardMetrics(appointments, doctorId, now = new Date
         progressPercent: todayTotal ? Math.round(todayCompleted * 100 / todayTotal) : 0,
         monthlyPatients: patients.size,
         weeklyAppointments,
-        // Duración programada y fecha_actualizacion no equivalen a duración clínica real.
-        averageMinutes: null
+        averageMinutes
     };
 }

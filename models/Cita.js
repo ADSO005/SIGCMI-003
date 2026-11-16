@@ -70,6 +70,11 @@ const Cita = db.define(
             allowNull: true,
         },
 
+        fecha_fin_atencion: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
         fecha_cierre_sin_finalizar: {
             type: DataTypes.DATE,
             allowNull: true,
