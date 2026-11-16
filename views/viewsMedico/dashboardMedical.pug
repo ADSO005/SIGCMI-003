@@ -123,3 +123,9 @@ block content
 
             #historialPaciente(class="space-y-3 [&>.historial-card]:rounded-2xl [&>.historial-card]:border [&>.historial-card]:border-slate-200 [&>.historial-card]:bg-white [&>.historial-card]:p-4 [&>.historial-card]:shadow-[0_3px_12px_rgba(15,35,80,0.04)] [&_.historial-card>h4]:mb-2 [&_.historial-card>h4]:text-base [&_.historial-card>h4]:font-bold [&_.historial-card>h4]:text-[#10285e] [&_.historial-card>p]:mb-1 [&_.historial-card>p]:text-sm [&_.historial-card>p]:leading-6 [&_.historial-card>p]:text-slate-600 [&_.historial-card>p]:break-words [&_.historial-card>p.historial-fecha]:mb-3 [&_.historial-card>p.historial-fecha]:inline-flex [&_.historial-card>p.historial-fecha]:rounded-full [&_.historial-card>p.historial-fecha]:bg-blue-50 [&_.historial-card>p.historial-fecha]:px-3 [&_.historial-card>p.historial-fecha]:py-1 [&_.historial-card>p.historial-fecha]:text-xs [&_.historial-card>p.historial-fecha]:font-semibold [&_.historial-card>p.historial-fecha]:text-[#315bd7] [&_.historial-card>ul]:mt-2 [&_strong]:font-semibold [&_strong]:text-slate-800 [&>p]:rounded-xl [&>p]:bg-slate-50 [&>p]:p-4 [&>p]:text-sm [&>p]:text-slate-500 [&>p]:break-words")
               p Selecciona un paciente para consultar su historial.
+            nav#paginacionHistorial(
+              hidden
+              aria-label="Páginas del historial médico"
+              aria-live="polite"
+              class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4"
+            )
