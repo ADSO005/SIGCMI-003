@@ -1,53 +1,51 @@
-const ctx = document.getElementById('graficoEstados');
+// Gráfico de citas por estado. Los datos reales llegan desde el servidor
+// en el atributo data-estados del canvas y se dibuja al abrir la ventana.
+let graficoCreado = false;
 
-            new window.Chart(ctx, {
-                type: 'doughnut',
+window.abrirGraficoEstados = () => {
+    document.getElementById('modalGrafico').showModal();
 
-                data: {
-                    labels: [
-                        'Pendientes',
-                        'En Curso',
-                        'Completadas',
-                        'Canceladas'
-                    ],
+    if (graficoCreado) return;
+    graficoCreado = true;
 
-                    datasets: [{
-                        data: [10, 3, 18, 2],
+    const canvas = document.getElementById('graficoEstados');
+    const estados = JSON.parse(canvas.dataset.estados || '[]');
+    const total = estados.reduce((suma, estado) => suma + estado.total, 0);
 
-                        backgroundColor: [
-                            '#3B82F6',
-                            '#F59E0B',
-                            '#10B981',
-                            '#EF4444'
-                        ],
+    if (total === 0) {
+        canvas.insertAdjacentHTML(
+            'afterend',
+            '<p class="py-10 text-center text-sm text-slate-500">Aún no hay citas registradas.</p>'
+        );
+        canvas.remove();
+        return;
+    }
 
-                        borderWidth: 0,
-                        hoverOffset: 12
-                    }]
-                },
-
-                options: {
-                    responsive: true,
-
-                    cutout: '72%',
-
-                    plugins: {
-
-                        legend: {
-
-                            position: 'bottom',
-
-                            labels: {
-
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                                padding: 20,
-                                font: {
-                                    size: 13,
-                                    weight: 'bold'
-                                }
-                            }
-                        }
+    new window.Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: estados.map((estado) => `${estado.nombre} (${estado.total})`),
+            datasets: [{
+                data: estados.map((estado) => estado.total),
+                backgroundColor: estados.map((estado) => estado.color),
+                borderWidth: 0,
+                hoverOffset: 12
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '72%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 20,
+                        font: { size: 13, weight: 'bold' }
                     }
                 }
-            });
+            }
+        }
+    });
+};

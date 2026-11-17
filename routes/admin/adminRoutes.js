@@ -8,12 +8,18 @@ import { verDashboard } from "../../controllers/admin/dashboardController.js";
 //APARTADO USUARIOS
 import {
     listarUsuarios,
-    obtenerUsuario,
-    actualizarUsuario,
     cambiarEstadoUsuario
 } from "../../controllers/admin/usuariosController.js";
 
-//APARTADO CREAR CITA
+import {
+    mostrarFormularioUsuario,
+    registrarUsuario,
+    mostrarFormularioEditarUsuario,
+    actualizarUsuarioCompleto,
+    fijarRol,
+    ROLES
+} from "../../controllers/admin/registrarUsuarioController.js";
+
 import {
     mostrarFormularioNuevaCita,
     obtenerHorasDisponibles,
@@ -26,18 +32,14 @@ import {
 
 //APARTADO CREAR UN PACIENTE
 import {
-    mostrarFormularioPaciente,
-    registrarPaciente,
     listarPacientes,
-    obtenerPaciente,
-    actualizarPaciente
+    obtenerPaciente
 } from "../../controllers/admin/pacientesController.js";
 
 //APARTADO MEDICOS
 import {
     listarMedicos,
     obtenerMedico,
-    actualizarMedico,
     crearHorariosMedico
 } from "../../controllers/admin/medicosController.js";
 
@@ -100,17 +102,31 @@ router.get(
 );
 
 router.get(
-    "/usuarios/:id",
+    "/usuarios/nuevo",
     auth,
     role(1),
-    obtenerUsuario
+    mostrarFormularioUsuario
 );
 
-router.put(
-    "/usuarios/:id",
+router.post(
+    "/usuarios/nuevo",
     auth,
     role(1),
-    actualizarUsuario
+    registrarUsuario
+);
+
+router.get(
+    "/usuarios/:id/editar",
+    auth,
+    role(1),
+    mostrarFormularioEditarUsuario
+);
+
+router.post(
+    "/usuarios/:id/editar",
+    auth,
+    role(1),
+    actualizarUsuarioCompleto
 );
 
 router.patch(
@@ -130,14 +146,16 @@ router.get(
     "/pacientes/nuevo",
     auth,
     role(1),
-    mostrarFormularioPaciente
+    fijarRol(ROLES.PACIENTE),
+    mostrarFormularioUsuario
 );
 
 router.post(
     "/pacientes/nuevo",
     auth,
     role(1),
-    registrarPaciente
+    fijarRol(ROLES.PACIENTE),
+    registrarUsuario
 );
 
 // Listar pacientes
@@ -156,13 +174,6 @@ router.get(
     obtenerPaciente
 );
 
-// Actualizar paciente
-router.put(
-    "/pacientes/:id",
-    auth,
-    role(1),
-    actualizarPaciente
-);
 
 
 // ===============================
@@ -183,12 +194,6 @@ router.get(
     obtenerMedico
 );
 
-router.put(
-    "/medicos/:id",
-    auth,
-    role(1),
-    actualizarMedico
-);
 
 
 router.post(
