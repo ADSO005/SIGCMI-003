@@ -4,7 +4,7 @@
 @source "../";
 
 @layer base {
-  .patient-dashboard :focus-visible {
+  :focus-visible {
     outline: 3px solid #00BC8D;
     outline-offset: 2px;
   }
