@@ -42,16 +42,11 @@ const dashboard = async (req, res) => {
             include: [
                 {
                     model: Paciente,
+                    attributes: ["id_paciente"],
                     include: [
                         {
                             model: Usuario,
-                            attributes: [
-                                "id_usuario",
-                                "nombres",
-                                "apellidos",
-                                "correo",
-                                "telefono"
-                            ]
+                            attributes: ["nombres", "apellidos"]
                         }
                     ]
                 },
@@ -72,6 +67,7 @@ const dashboard = async (req, res) => {
         include: [
             {
                 model: Paciente,
+                attributes: ["id_paciente"],
                 include: [
                     {
                         model: Usuario,
