@@ -1,5 +1,5 @@
 aside#sidebar.sidebar.group(
-  class="fixed top-0 left-0 z-[1000] flex h-screen w-[314px] flex-col bg-[#263F9D] px-6 text-white [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:w-[260px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
+  class="fixed top-0 left-0 z-[1000] flex h-screen w-[314px] flex-col bg-[#465DE5] px-6 text-white [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:w-[260px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
 )
   .logo(class="flex h-16 shrink-0 items-center justify-between px-2 group-[.collapsed]:justify-center group-[.collapsed]:px-0")
     span.logo-text(class="text-[28px] leading-none font-bold group-[.collapsed]:hidden") SIGCMI
@@ -31,7 +31,7 @@ aside#sidebar.sidebar.group(
 
   nav(class="flex flex-col pt-4")
     a.nav-link.preActive(
-      class="mb-[6px] flex h-9 items-center gap-2 rounded-lg px-2 py-2 text-[14px] text-white no-underline transition-colors hover:bg-white/15 focus-visible:outline-white group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[#3C62BE]"
+      class="mb-[6px] flex h-9 items-center gap-2 rounded-lg px-2 py-2 text-[14px] text-white no-underline transition-colors hover:bg-white/15 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[rgba(94,156,245,0.35)]"
       href="#"
       onclick="cambiarVista(event,'agendaView',this)"
     )
@@ -43,7 +43,7 @@ aside#sidebar.sidebar.group(
       .nav-item(class="group-[.collapsed]:hidden") Agenda
 
     a.nav-link(
-      class="mb-[6px] flex h-9 items-center gap-2 rounded-lg px-2 py-2 text-[14px] text-white no-underline transition-colors hover:bg-white/15 focus-visible:outline-white group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[#3C62BE]"
+      class="mb-[6px] flex h-9 items-center gap-2 rounded-lg px-2 py-2 text-[14px] text-white no-underline transition-colors hover:bg-white/15 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[rgba(94,156,245,0.35)]"
       href="#"
       onclick="cambiarVista(event,'pacientesView',this)"
     )
