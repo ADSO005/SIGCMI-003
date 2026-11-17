@@ -40,6 +40,17 @@ window.cambiarVista = (e, viewId, link) => {
   if (window.innerWidth <= 768) cerrarSidebarMovil();
 };
 
+// Permite abrir la sección de pacientes desde enlaces que vienen de otra vista.
+if (window.location.hash === "#pacientesView") {
+  const vistaPacientes = document.getElementById("pacientesView");
+  if (vistaPacientes) {
+    document.querySelectorAll(".view").forEach(vista => vista.classList.remove("active"));
+    vistaPacientes.classList.add("active");
+    document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("preActive"));
+    document.querySelector('.nav-link[onclick*="pacientesView"]')?.classList.add("preActive");
+  }
+}
+
 // INICIAR ATENCIÓN: el servidor valida nuevamente propietario, fecha y estado.
 const iniciosPendientes = new Set();
 window.iniciarConsulta = async button => {
