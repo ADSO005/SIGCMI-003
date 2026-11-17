@@ -1,5 +1,7 @@
 //- ==========================================
 //- SIDEBAR ADMINISTRATIVO
+//- Mismos estilos que el sidebar del portal médico (viewsMedico/includes/sidebar.pug).
+//- Hooks de toggleSidebar.js: #sidebar con las clases "collapsed" (escritorio) y "open" (móvil).
 //- ==========================================
 
 dialog#logoutModal(
@@ -7,7 +9,7 @@ dialog#logoutModal(
     class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
 )
     div(class="p-6")
-        h2#logoutModalTitle(class="text-xl font-bold")
+        h2#logoutModalTitle(class="text-xl font-bold text-[#10285e]")
             | Confirmar cierre de sesión
 
         p(class="mt-2 text-slate-600")
@@ -28,205 +30,93 @@ dialog#logoutModal(
                 )
                     | Sí, cerrar sesión
 
-aside(
-    id="sidebar"
-    class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 bg-indigo-600 text-white flex flex-col transition-all duration-300 -translate-x-full md:translate-x-0"
+
+mixin enlaceAdmin(href, icono, texto)
+    a.nav-link(
+        href=href
+        title=texto
+        class="mb-2 flex h-12 shrink-0 items-center gap-3 rounded-xl px-3 py-2 text-[15px] font-medium text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[rgba(94,156,245,0.38)] [&.preActive]:!shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
+    )
+        i(class=`${icono} w-[18px] shrink-0 text-center text-[17px]`)
+        .nav-item(class="group-[.collapsed]:hidden")= texto
+
+aside#sidebar.sidebar.group(
+    class="sticky top-0 z-[1000] flex h-screen w-[290px] shrink-0 flex-col self-start overflow-hidden bg-gradient-to-b from-[#263c91] via-[#263f9e] to-[#1f367f] px-6 text-white shadow-xl font-[Arial,sans-serif] [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:fixed [@media(max-width:768px)]:left-0 [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
 )
 
-    //- ==========================================
-    //- LOGO
-    //- ==========================================
+    //- LOGO Y BOTÓN DE MENÚ
+    .logo(class="flex h-[82px] shrink-0 items-center justify-between px-1 group-[.collapsed]:justify-center group-[.collapsed]:px-0")
+        span.logo-text(class="flex items-center gap-3 text-[26px] leading-none font-bold tracking-wide group-[.collapsed]:hidden")
+            svg(class="h-9 w-9 text-teal-300" viewBox="0 0 40 40" fill="none" aria-hidden="true")
+                path(d="M20 3v34M3 20h34" stroke="currentColor" stroke-width="10" stroke-linecap="round")
+                path(d="M20 9v22M9 20h22" stroke="#60a5fa" stroke-width="6" stroke-linecap="round")
+            | SIGCMI
+        button#toggleBtn(
+            type="button"
+            class="flex h-10 w-10 shrink-0 items-center justify-center cursor-pointer border-0 bg-transparent text-[22px] text-white transition-transform duration-200 hover:scale-110"
+            onclick="toggleSidebar()"
+            aria-label="Abrir o cerrar menú"
+        ) ☰
 
-    div(class="flex flex-1 min-h-0 flex-col")
+    hr.line-1(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
 
-        div(class="flex items-center justify-between p-6")
-
-            h1(class="sidebar-text text-2xl font-bold")
-                | SIGCMI
-
-            button(
-                type="button"
-                onclick="toggleSidebar()"
-                class="p-2 rounded-lg hover:bg-indigo-500 transition"
-                aria-label="Abrir menú"
+    //- USUARIO
+    .user(class="flex min-h-[120px] shrink-0 items-start gap-4 py-6 group-[.collapsed]:hidden")
+        .avatar(class="mt-1 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/15 shadow-inner")
+            img.avatar-img(
+                class="h-8 w-8 brightness-0 invert"
+                src="/medico/img/icono-medico-avatar.svg"
+                alt="Avatar"
             )
+        div(class="min-w-0 flex-1")
+            p.bienvenido-txt(class="text-sm leading-5 text-blue-100") Bienvenido
+            h4(class="truncate text-base leading-5 font-semibold text-white")= usuarios.nombre
+            span(class="mt-1 inline-block rounded-full bg-white/15 px-2.5 py-1 text-xs leading-4 text-blue-50") Administrador
 
-                svg(
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-7 h-7"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                )
+    hr.line-2(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20 group-[.collapsed]:hidden")
 
-                    path(
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M4 6h16M4 12h16M4 18h16"
-                    )
+    //- NAVEGACIÓN (con scroll propio: son varios enlaces)
+    nav(class="flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden")
+        +enlaceAdmin("/admin/dashboard", "fa-solid fa-house", "Dashboard")
+        +enlaceAdmin("/admin/usuarios", "fa-solid fa-users", "Usuarios")
+        +enlaceAdmin("/admin/pacientes", "fa-solid fa-heart-pulse", "Pacientes")
+        +enlaceAdmin("/admin/medicos", "fa-solid fa-user-doctor", "Médicos")
+        +enlaceAdmin("/admin/especialidades", "fa-solid fa-hospital", "Especialidades")
+        +enlaceAdmin("/admin/citas", "fa-solid fa-calendar-check", "Citas")
+        +enlaceAdmin("/admin/calendario", "fa-solid fa-calendar-days", "Calendario")
+        +enlaceAdmin("/admin/horarios", "fa-solid fa-clock", "Horarios")
+        +enlaceAdmin("/admin/diagnosticos", "fa-solid fa-stethoscope", "Diagnósticos")
+        +enlaceAdmin("/admin/prescripciones", "fa-solid fa-pills", "Prescripciones")
+        +enlaceAdmin("/admin/whatsapp", "fa-brands fa-whatsapp", "WhatsApp")
+        +enlaceAdmin("/admin/reportes", "fa-solid fa-chart-column", "Reportes")
 
+    hr.line-3(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
 
-        //- ==========================================
-        //- BIENVENIDA
-        //- ==========================================
+    //- CERRAR SESIÓN (pide confirmación)
+    button(
+        type="button"
+        onclick="document.getElementById('logoutModal').showModal()"
+        aria-haspopup="dialog"
+        aria-controls="logoutModal"
+        aria-label="Cerrar sesión"
+        class="flex min-h-[68px] w-full shrink-0 cursor-pointer items-center gap-3 border-0 bg-transparent px-1 text-white group-[.collapsed]:justify-center transition-opacity hover:opacity-75"
+    )
+        img.log-out(
+            class="h-7 w-7 shrink-0 brightness-0 invert"
+            src="/medico/img/icono-salir.svg"
+            alt=""
+        )
+        span.sesionlogout(class="text-[16px] text-white group-[.collapsed]:hidden") Cerrar sesión
 
-        div(class="sidebar-text px-6 pb-6")
-
-            p(class="text-indigo-200 text-sm")
-                | Bienvenido
-
-            p(class="font-bold")
-                = usuarios.nombre
-
-            p(class="text-indigo-200 text-sm")
-                | Admin
-
-
-        //- ==========================================
-        //- NAVEGACIÓN
-        //- ==========================================
-
-        nav(class="flex-1 min-h-0 overflow-y-auto px-3 space-y-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden")
-
-            // Dashboard
-            a(
-                href="/admin/dashboard"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-house w-6 text-center")
-                span(class="sidebar-text") Dashboard
-
-
-            // Usuarios
-            a(
-                href="/admin/usuarios"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-users w-6 text-center")
-                span(class="sidebar-text") Usuarios
-
-
-            // Pacientes
-            a(
-                href="/admin/pacientes"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-heart-pulse w-6 text-center")
-                span(class="sidebar-text") Pacientes
-
-
-            // Médicos
-            a(
-                href="/admin/medicos"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-user-doctor w-6 text-center")
-                span(class="sidebar-text") Médicos
-
-
-            // Especialidades
-            a(
-                href="/admin/especialidades"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-hospital w-6 text-center")
-                span(class="sidebar-text") Especialidades
-
-
-            // Citas
-            a(
-                href="/admin/citas"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-calendar-check w-6 text-center")
-                span(class="sidebar-text") Citas
-
-
-            // Calendario
-            a(
-                href="/admin/calendario"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-calendar-days w-6 text-center")
-                span(class="sidebar-text") Calendario
-
-
-            // Horarios
-            a(
-                href="/admin/horarios"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-clock w-6 text-center")
-                span(class="sidebar-text") Horarios
-
-
-            // Diagnósticos
-            a(
-                href="/admin/diagnosticos"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-stethoscope w-6 text-center")
-                span(class="sidebar-text") Diagnósticos
-
-
-            // Prescripciones
-            a(
-                href="/admin/prescripciones"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-pills w-6 text-center")
-                span(class="sidebar-text") Prescripciones
-
-
-            // WhatsApp
-            a(
-                href="/admin/whatsapp"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-brands fa-whatsapp w-6 text-center")
-                span(class="sidebar-text") WhatsApp
-
-
-            // Reportes
-            a(
-                href="/admin/reportes"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
-            )
-                i(class="fa-solid fa-chart-column w-6 text-center")
-                span(class="sidebar-text") Reportes
-
-
-    //- ==========================================
-    //- CERRAR SESIÓN
-    //- ==========================================
-
-    div(class="mt-auto p-3")
-
-        form(action="/auth/logout" method="POST")
-
-            button(
-                type="button"
-                onclick="document.getElementById('logoutModal').showModal()"
-                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 text-white"
-                aria-haspopup="dialog"
-                aria-controls="logoutModal"
-            )
-
-                svg(
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6 shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                )
-
-                    path(
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                    )
-
-                span(class="sidebar-text")
-                    | Cerrar Sesión
+//- Marca el enlace de la sección actual (misma clase preActive que el portal médico)
+script.
+    (function () {
+        var ruta = window.location.pathname;
+        document.querySelectorAll('#sidebar nav a').forEach(function (enlace) {
+            var destino = enlace.getAttribute('href');
+            var coincide = destino === '/admin/dashboard'
+                ? ruta === destino
+                : ruta === destino || ruta.indexOf(destino + '/') === 0;
+            if (coincide) enlace.classList.add('preActive');
+        });
+    })();
