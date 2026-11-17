@@ -2,3 +2,10 @@
 
 @source "../../views";
 @source "../";
+
+@layer base {
+  :focus-visible {
+    outline: 3px solid #00BC8D;
+    outline-offset: 2px;
+  }
+}
