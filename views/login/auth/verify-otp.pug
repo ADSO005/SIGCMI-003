@@ -3,11 +3,11 @@ extends ../layouts/layout
 
 block contenido
 
-    main(class="min-h-screen bg-slate-100 flex items-center justify-center px-4")
+    main(class="min-h-screen bg-[#F4F8FF] flex items-center justify-center px-4")
 
         .bg-white.rounded-3xl.shadow-2xl.w-full.max-w-md.overflow-hidden
 
-            .bg-blue-700.px-8.py-6.text-center
+            .px-8.py-6.text-center(class="bg-[#263F9D]")
 
                 h1.text-3xl.font-bold.text-white
                     | SIGCMI
@@ -17,16 +17,13 @@ block contenido
 
             .p-8
 
-                h2.text-2xl.font-bold.text-center.text-slate-800.mb-3
+                h2.text-2xl.font-bold.text-center.mb-3(class="text-[#001B4D]")
                     | Verifica tu código
-
-                p.text-center.text-slate-500.mb-6
-                    | Si existe una cuenta asociada al correo, enviaremos un código de 6 dígitos. Ingresa el código recibido.
 
                 if mensaje
                     div(
                         id="mensajeExito"
-                        class="mb-5 rounded-lg bg-green-100 border border-green-300 px-4 py-3 text-green-700 text-sm text-center"
+                        class="mb-5 rounded-lg bg-[#F1FEF8] border border-[#059669]/30 px-4 py-3 text-[#059669] text-sm text-center"
                         role="status"
                     )
                         | #{mensaje}
@@ -50,7 +47,7 @@ block contenido
 
                         label(
                             for="codigo"
-                            class="block mb-2 text-sm font-semibold text-slate-700"
+                            class="block mb-2 text-sm font-semibold text-[#001B4D]"
                         )
                             | Código de verificación
 
@@ -64,7 +61,7 @@ block contenido
                             pattern="[0-9]{6}"
                             placeholder="Ingresa tu código"
                             required
-                            class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-center tracking-widest text-lg text-slate-700 outline-none transition-all duration-200 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                            class="w-full rounded-xl border border-[#E2E8F0] bg-slate-50 px-4 py-3 text-center tracking-widest text-lg text-slate-700 outline-none transition-all duration-200 focus:border-[#335CD8] focus:bg-white focus:ring-4 focus:ring-[#335CD8]/10"
                         )
 
                     div.mt-6.flex.gap-4.px-2
@@ -77,7 +74,7 @@ block contenido
 
                         button(
                             type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors duration-200"
+                            class="w-full bg-[#335CD8] hover:bg-[#263F9D] text-white font-semibold py-3 rounded-xl transition-colors duration-200"
                         )
                             | Verificar código
 
