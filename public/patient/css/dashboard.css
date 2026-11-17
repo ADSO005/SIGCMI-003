@@ -1,0 +1,149 @@
+﻿.patient-portal {
+  min-height: 100vh;
+  background: #F4F8FF;
+  color: #001B4D;
+}
+
+.patient-dashboard {
+  min-height: 100vh;
+  background: #F4F8FF;
+  color: #001B4D;
+}
+
+.patient-sidebar {
+  z-index: 50;
+  flex: 0 0 auto;
+  width: 16rem;
+  background: #263F9D;
+  color: #fff;
+}
+
+.patient-sidebar .border-indigo-500\/40 {
+  border-color: rgb(255 255 255 / 18%);
+}
+
+.patient-sidebar .patient-nav-active {
+  background: #3C62BE;
+  color: #fff;
+}
+
+.patient-sidebar nav a:not(.patient-nav-active) {
+  color: rgb(255 255 255 / 88%);
+}
+
+.patient-sidebar nav a:not(.patient-nav-active):hover,
+.patient-sidebar #toggleSidebar:hover,
+.patient-sidebar #btnAbrirConfirmacionCerrarSesion:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.patient-sidebar :focus-visible,
+.patient-portal :focus-visible {
+  outline: 3px solid #00BC8D;
+  outline-offset: 2px;
+}
+
+.patient-dashboard > .min-w-0.flex-1.flex.flex-col {
+  min-width: 0;
+  background: #F4F8FF;
+}
+
+.patient-dashboard > .min-w-0.flex-1.flex.flex-col > header {
+  border-color: #E2E8F0;
+  background: rgb(255 255 255 / 92%);
+}
+
+.patient-dashboard main > section,
+.patient-quick-actions,
+.patient-support-card {
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 10%);
+}
+
+.patient-appointment-card {
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  background: #F8FFFF;
+}
+
+.patient-appointment-card [data-lucide="calendar"] {
+  color: #335CD8;
+}
+
+.patient-quick-actions button#btnNuevaCita {
+  min-height: 44px;
+  background: #335CD8;
+  color: #fff;
+}
+
+.patient-quick-actions button#btnNuevaCita:hover {
+  background: #263F9D;
+}
+
+.patient-quick-actions a[href^="https://wa.me/"] {
+  min-height: 44px;
+  background: #00BC8D;
+  color: #fff;
+}
+
+.patient-quick-actions a[href^="https://wa.me/"]:hover {
+  background: #008f6d;
+}
+
+.patient-next-appointment {
+  border-radius: 1rem;
+  background: #263F9D;
+  color: #fff;
+}
+
+.patient-next-detail {
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: .75rem;
+  background: #3C62BE;
+}
+
+.patient-support-card {
+  background: #F1FEF8;
+  color: #001B4D;
+}
+
+.patient-modal-header {
+  background: #335CD8;
+  color: #fff;
+}
+
+#modalNuevaCita input:focus-visible,
+#modalNuevaCita select:focus-visible,
+#modalReprogramarCita input:focus-visible,
+#modalReprogramarCita select:focus-visible {
+  border-color: #335CD8;
+  outline-color: #00BC8D;
+}
+
+@media (max-width: 768px) {
+  .patient-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    height: 100vh;
+  }
+}
+
+@media (min-width: 769px) {
+  .patient-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+}
+
+@media (max-width: 639px) {
+  .patient-appointment-card {
+    align-items: flex-start;
+  }
+
+  .patient-appointment-card > .flex.flex-col.items-end {
+    align-items: flex-start;
+  }
+}
