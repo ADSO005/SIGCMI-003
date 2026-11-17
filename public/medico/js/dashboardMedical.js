@@ -639,11 +639,11 @@ async function cargarPaginaHistorial(idPaciente, pagina, opciones = {}) {
     const paginaInfo = datos?.paginacion;
     if (!datos?.paciente || !Array.isArray(datos.citas) || !paginaInfo
       || !Number.isInteger(paginaInfo.paginaActual) || paginaInfo.paginaActual < 1
-      || paginaInfo.porPagina !== 5 || !Number.isInteger(paginaInfo.totalCitas) || paginaInfo.totalCitas < 1
+      || paginaInfo.porPagina !== 1 || !Number.isInteger(paginaInfo.totalCitas) || paginaInfo.totalCitas < 1
       || !Number.isInteger(paginaInfo.totalPaginas) || paginaInfo.totalPaginas < 1
       || paginaInfo.paginaActual > paginaInfo.totalPaginas
       || !Number.isInteger(paginaInfo.totalDiagnosticos) || paginaInfo.totalDiagnosticos < 0
-      || datos.citas.length < 1 || datos.citas.length > paginaInfo.porPagina) {
+      || datos.citas.length !== 1) {
       throw new Error("La respuesta del servidor no tiene el formato esperado.");
     }
     mostrarDetallePaciente(datos.paciente, datos.citas, paginaInfo);
@@ -752,10 +752,9 @@ function mostrarPaginacionHistorial(paginacion) {
   nav.hidden = false;
 
   const desde = (paginacion.paginaActual - 1) * paginacion.porPagina + 1;
-  const hasta = Math.min(paginacion.paginaActual * paginacion.porPagina, paginacion.totalCitas);
   const resumen = document.createElement("p");
   resumen.className = "m-0 text-xs leading-5 text-slate-600";
-  resumen.textContent = `Mostrando citas ${desde}–${hasta} de ${paginacion.totalCitas}. Página ${paginacion.paginaActual} de ${paginacion.totalPaginas}.`;
+  resumen.textContent = `Cita ${desde} de ${paginacion.totalCitas}. Página ${paginacion.paginaActual} de ${paginacion.totalPaginas}.`;
   nav.appendChild(resumen);
 
   const controles = document.createElement("div");

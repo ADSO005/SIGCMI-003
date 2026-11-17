@@ -220,7 +220,7 @@ const detallePaciente = async (req, res) => {
 
         // La asociación Diagnostico usa alias y las citas se limitan al médico autenticado.
         const whereCitas = { paciente_id: Number(id), medico_id: medico.id_medico };
-        const porPagina = 5;
+        const porPagina = 1;
         const totalCitas = await Cita.count({ where: whereCitas, distinct: true, col: "id_cita" });
         if (totalCitas === 0) {
             return res.status(404).json({ mensaje: "Paciente no disponible o sin citas vinculadas a este médico" });
