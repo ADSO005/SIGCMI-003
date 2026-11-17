@@ -60,7 +60,7 @@ aside#sidebar.sidebar.group(
 
   hr.line-3(class="-mx-6 mt-auto w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
 
-  form.logout(action="/auth/logout" method="POST")
+  form#formLogout.logout(action="/auth/logout" method="POST")
     button(
       type="submit"
       aria-label="Cerrar sesión"
