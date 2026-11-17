@@ -30,7 +30,7 @@ dialog#logoutModal(
 
 aside(
     id="sidebar"
-    class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 bg-[#263F9D] text-white flex flex-col transition-all duration-300 -translate-x-full md:translate-x-0"
+    class="fixed md:sticky top-0 left-0 z-50 h-screen w-64 shrink-0 bg-indigo-600 text-white flex flex-col transition-all duration-300 -translate-x-full md:translate-x-0"
 )
 
     //- ==========================================
@@ -47,7 +47,7 @@ aside(
             button(
                 type="button"
                 onclick="toggleSidebar()"
-                class="p-2 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="p-2 rounded-lg hover:bg-indigo-500 transition"
                 aria-label="Abrir menú"
             )
 
@@ -92,8 +92,7 @@ aside(
             // Dashboard
             a(
                 href="/admin/dashboard"
-                aria-current="page"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg bg-[#3C62BE] shadow-sm hover:bg-[#3C62BE] transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-house w-6 text-center")
                 span(class="sidebar-text") Dashboard
@@ -102,7 +101,7 @@ aside(
             // Usuarios
             a(
                 href="/admin/usuarios"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-users w-6 text-center")
                 span(class="sidebar-text") Usuarios
@@ -111,7 +110,7 @@ aside(
             // Pacientes
             a(
                 href="/admin/pacientes"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-heart-pulse w-6 text-center")
                 span(class="sidebar-text") Pacientes
@@ -120,7 +119,7 @@ aside(
             // Médicos
             a(
                 href="/admin/medicos"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-user-doctor w-6 text-center")
                 span(class="sidebar-text") Médicos
@@ -129,7 +128,7 @@ aside(
             // Especialidades
             a(
                 href="/admin/especialidades"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-hospital w-6 text-center")
                 span(class="sidebar-text") Especialidades
@@ -138,7 +137,7 @@ aside(
             // Citas
             a(
                 href="/admin/citas"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-calendar-check w-6 text-center")
                 span(class="sidebar-text") Citas
@@ -147,7 +146,7 @@ aside(
             // Calendario
             a(
                 href="/admin/calendario"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-calendar-days w-6 text-center")
                 span(class="sidebar-text") Calendario
@@ -156,7 +155,7 @@ aside(
             // Horarios
             a(
                 href="/admin/horarios"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-clock w-6 text-center")
                 span(class="sidebar-text") Horarios
@@ -165,7 +164,7 @@ aside(
             // Diagnósticos
             a(
                 href="/admin/diagnosticos"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-stethoscope w-6 text-center")
                 span(class="sidebar-text") Diagnósticos
@@ -174,7 +173,7 @@ aside(
             // Prescripciones
             a(
                 href="/admin/prescripciones"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-pills w-6 text-center")
                 span(class="sidebar-text") Prescripciones
@@ -183,7 +182,7 @@ aside(
             // WhatsApp
             a(
                 href="/admin/whatsapp"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-brands fa-whatsapp w-6 text-center")
                 span(class="sidebar-text") WhatsApp
@@ -192,7 +191,7 @@ aside(
             // Reportes
             a(
                 href="/admin/reportes"
-                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 transition focus-visible:outline-white"
+                class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 transition"
             )
                 i(class="fa-solid fa-chart-column w-6 text-center")
                 span(class="sidebar-text") Reportes
@@ -209,7 +208,7 @@ aside(
             button(
                 type="button"
                 onclick="document.getElementById('logoutModal').showModal()"
-                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/15 text-white"
+                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-indigo-500/40 text-white"
                 aria-haspopup="dialog"
                 aria-controls="logoutModal"
             )
