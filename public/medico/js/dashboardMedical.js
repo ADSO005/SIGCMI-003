@@ -796,32 +796,31 @@ function mostrarPaginacionHistorial(paginacion) {
   nav.appendChild(controles);
 }
 
+function separarFechaCivil(fecha) {
+  const coincidencia = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fecha || "");
+  if (!coincidencia) return null;
+  const partes = coincidencia.slice(1).map(Number);
+  const fechaUtc = new Date(Date.UTC(partes[0], partes[1] - 1, partes[2]));
+  if (fechaUtc.toISOString().slice(0, 10) !== fecha) return null;
+  return { anio: partes[0], mes: partes[1], dia: partes[2] };
+}
+
+function fechaActualBogota() {
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(new Date());
+  const fecha = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+  return `${fecha.year}-${fecha.month}-${fecha.day}`;
+}
+
 function calcularEdad(fechaNacimiento) {
+  const nacimiento = separarFechaCivil(fechaNacimiento);
+  const hoy = separarFechaCivil(fechaActualBogota());
+  if (!nacimiento || !hoy) return "No registrada";
 
-  if (!fechaNacimiento) {
-    return "No registrada";
-  }
-
-  const nacimiento = new Date(
-    `${fechaNacimiento}T00:00:00`
-  );
-
-  const hoy = new Date();
-
-  let edad =
-    hoy.getFullYear() - nacimiento.getFullYear();
-
-  const mes =
-    hoy.getMonth() - nacimiento.getMonth();
-
-  if (
-    mes < 0 ||
-    (mes === 0 && hoy.getDate() < nacimiento.getDate())
-  ) {
-    edad--;
-  }
-
-  return `${edad} años`;
+  let edad = hoy.anio - nacimiento.anio;
+  if (hoy.mes < nacimiento.mes || (hoy.mes === nacimiento.mes && hoy.dia < nacimiento.dia)) edad--;
+  return edad < 0 ? "No registrada" : `${edad} años`;
 }
 
 function obtenerUltimaVisita(citas) {
@@ -831,14 +830,11 @@ function obtenerUltimaVisita(citas) {
   }
 
   const fecha = citas[0].fecha;
+  const partes = separarFechaCivil(fecha);
+  if (!partes) return "Sin visitas";
 
-  if (!fecha) {
-    return "Sin visitas";
-  }
-
-  return new Date(
-    `${fecha}T00:00:00`
-  ).toLocaleDateString("es-CO");
+  return new Date(Date.UTC(partes.anio, partes.mes - 1, partes.dia))
+    .toLocaleDateString("es-CO", { timeZone: "UTC" });
 }
 
 function mostrarHistorial(citas) {
