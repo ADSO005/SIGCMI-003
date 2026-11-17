@@ -11,6 +11,7 @@ const diasSemana = [
 // Controlador GET
 
 export const listarHorarios = async (req, res) => {
+    res.set("Cache-Control", "no-store");
     if (!req.usuario?.id_usuario) {
         return res.status(401).json({ mensaje: "Sesión inválida" });
     }

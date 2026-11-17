@@ -19,6 +19,7 @@ const datosUsuario = (usuario, formulario = {}) => ({
 });
 
 const renderizarPerfil = async (req, res, opciones = {}) => {
+    res.set("Cache-Control", "no-store");
     const medico = await buscarMedicoAutenticado(req.usuario.id_usuario);
     if (!medico) return res.status(404).send("No se encontró el perfil del médico.");
 

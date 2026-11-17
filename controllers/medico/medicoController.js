@@ -12,6 +12,8 @@ import { medicamentoPersistidoValido } from "../../services/medico/prescripcione
 
 const dashboard = async (req, res) => {
 
+    res.set("Cache-Control", "no-store");
+
     try {
         const now = new Date();
 
@@ -203,6 +205,7 @@ const dashboard = async (req, res) => {
 };
 
 const detallePaciente = async (req, res) => {
+    res.set("Cache-Control", "no-store");
     try {
         const { id } = req.params;
         if (!/^[1-9]\d*$/.test(id) || Number(id) > 2147483647) {
