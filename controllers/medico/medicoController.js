@@ -187,10 +187,7 @@ const dashboard = async (req, res) => {
 
     } catch (error) {
 
-        console.error(
-            "❌ Error al cargar dashboard médico:",
-            error
-        );
+        console.error("Error al cargar el dashboard médico:", error?.name || "Error desconocido");
 
         res.status(500).send(
             "Error al cargar el dashboard"

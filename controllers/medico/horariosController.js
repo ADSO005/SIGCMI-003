@@ -42,7 +42,7 @@ export const listarHorarios = async (req, res) => {
             })
         });
     } catch (error) {
-        console.error("Error al consultar los horarios del médico:", error);
+        console.error("Error al consultar los horarios del médico:", error?.name || "Error desconocido");
         return res.status(500).json({ mensaje: "No se pudieron consultar los horarios" });
     }
 };

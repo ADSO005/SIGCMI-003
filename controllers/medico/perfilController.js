@@ -44,7 +44,7 @@ export const mostrarPerfilMedico = async (req, res) => {
     try {
         return await renderizarPerfil(req, res);
     } catch (error) {
-        console.error("Error al cargar el perfil médico:", error);
+        console.error("Error al cargar el perfil médico:", error?.name || "Error desconocido");
         return res.status(500).send("No fue posible cargar el perfil médico.");
     }
 };
@@ -53,7 +53,7 @@ export const mostrarEdicionPerfilMedico = async (req, res) => {
     try {
         return await renderizarPerfil(req, res, { modoEdicion: true });
     } catch (error) {
-        console.error("Error al cargar la edición del perfil médico:", error);
+        console.error("Error al cargar la edición del perfil médico:", error?.name || "Error desconocido");
         return res.status(500).send("No fue posible cargar la edición del perfil médico.");
     }
 };
@@ -129,7 +129,7 @@ export const guardarPerfilMedico = async (req, res) => {
                 errorPerfil: "Ese correo ya está registrado en otra cuenta."
             });
         }
-        console.error("Error al guardar el perfil médico:", error);
+        console.error("Error al guardar el perfil médico:", error?.name || "Error desconocido");
         return res.status(500).send("No fue posible guardar los cambios del perfil.");
     }
 };
@@ -167,7 +167,7 @@ export const cambiarContrasenaMedico = async (req, res) => {
             mensajeExito: "La contraseña se actualizó correctamente."
         });
     } catch (error) {
-        console.error("Error al cambiar la contraseña médica:", error);
+        console.error("Error al cambiar la contraseña médica:", error?.name || "Error desconocido");
         return res.status(500).send("No fue posible actualizar la contraseña.");
     }
 };
