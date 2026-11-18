@@ -1,17 +1,15 @@
 import express from "express";
-import { formRegister, register, confirmRegister } from "../../controllers/auth/register.js";
+import { formRegister, register } from "../../controllers/auth/register.js";
+import { confirmRegister } from "../../controllers/auth/confirmation.js";
+import { formRecoverPassword, recoverPassword } from "../../controllers/auth/recoverPassword.js";
+import { formVerifyOTP, verifyOTP } from "../../controllers/auth/verifyOtp.js";
+import { formResetPassword, resetPassword } from "../../controllers/auth/resetPassword.js";
 
 import {
     formLogin,
     login,
-    logout,
-    formRecoverPassword,
-    recoverPassword,
-    formVerifyOTP,
-    verifyOTP,
-    formResetPassword,
-    resetPassword
-} from "../../controllers/auth/userController.js";
+    logout
+} from "../../controllers/auth/login.js";
 
 const router = express.Router();
 
@@ -19,8 +17,8 @@ const router = express.Router();
 // Login
 // ===============================
 
-router.get("/login", formLogin);
-router.post("/login", login);
+router.get("/login", formLogin); // Muestra el formulario de inicio de sesión.
+router.post("/login", login); // Procesa las credenciales y crea la sesión.
 
 // ===============================
 // Registro
@@ -34,7 +32,7 @@ router.get("/confirm-register/:token", confirmRegister);
 // Cerrar sesión
 // ===============================
 
-router.post("/logout", logout);
+router.post("/logout", logout); // Cierra la sesión del usuario.
 
 // ===============================
 // Recuperar contraseña

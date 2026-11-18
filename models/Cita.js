@@ -65,6 +65,31 @@ const Cita = db.define(
             defaultValue: DataTypes.NOW,
         },
 
+        fecha_inicio_atencion: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        fecha_fin_atencion: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        fecha_cierre_sin_finalizar: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        motivo_cierre_sin_finalizar: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+
+        cerrada_por_medico_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+
         motivo_cancelacion: {
             type: DataTypes.TEXT,
             allowNull: true,

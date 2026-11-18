@@ -5,36 +5,18 @@ window.toggleSidebar = () => {
 
     if (!sidebar) return;
 
+    if (window.innerWidth <= 768) {
 
-    // ==========================================
-    // VISTA MÓVIL
-    // ==========================================
-
-    if (window.innerWidth < 768) {
-
-        sidebar.classList.toggle("-translate-x-full");
+        sidebar.classList.toggle("open");
 
         if (overlay) {
-            overlay.classList.toggle("hidden");
+            overlay.classList.toggle("hidden", !sidebar.classList.contains("open"));
         }
 
         return;
     }
 
-
-    // ==========================================
-    // VISTA ESCRITORIO
-    // ==========================================
-
-    sidebar.classList.toggle("w-64");
-    sidebar.classList.toggle("w-20");
-
-    const textos =
-        document.querySelectorAll(".sidebar-text");
-
-    textos.forEach((texto) => {
-        texto.classList.toggle("hidden");
-    });
+    sidebar.classList.toggle("collapsed");
 };
 
 
@@ -44,15 +26,12 @@ window.toggleSidebar = () => {
 
 window.closeSidebar = () => {
 
-    const sidebar =
-        document.getElementById("sidebar");
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
 
-    const overlay =
-        document.getElementById("sidebarOverlay");
-
-    if (!sidebar) return;
-
-    sidebar.classList.add("-translate-x-full");
+    if (sidebar) {
+        sidebar.classList.remove("open");
+    }
 
     if (overlay) {
         overlay.classList.add("hidden");
@@ -64,29 +43,9 @@ window.closeSidebar = () => {
 // RESPONSIVE
 // ==========================================
 
-window.addEventListener("resize", function () {
+window.addEventListener("resize", () => {
 
-    const sidebar =
-        document.getElementById("sidebar");
-
-    const overlay =
-        document.getElementById("sidebarOverlay");
-
-    if (!sidebar) return;
-
-
-    if (window.innerWidth >= 768) {
-
-        sidebar.classList.remove("-translate-x-full");
-
-        if (overlay) {
-            overlay.classList.add("hidden");
-        }
-
-    } else {
-
-        sidebar.classList.add("-translate-x-full");
-
+    if (window.innerWidth > 768) {
+        window.closeSidebar();
     }
-
 });

@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 
+// Crea el transporte SMTP usando la configuración definida en las variables de entorno.
 const createTransporter = () => {
     const port = Number(process.env.EMAIL_PORT || 587);
 
@@ -19,7 +20,7 @@ const createTransporter = () => {
 
 const transporter = createTransporter();
 
-/* funcion smtp simulador envios de correos */
+// Envía al paciente el código necesario para confirmar la cancelación de una cita.
 const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
     const fecha = new Intl.DateTimeFormat("es-CO", {
         dateStyle: "long",
@@ -36,6 +37,7 @@ const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
     });
 };
 
+// Envía un código de identidad para confirmar una cita nueva o una reprogramación.
 const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) => {
     const fecha = new Intl.DateTimeFormat("es-CO", {
         dateStyle: "long",
@@ -55,7 +57,12 @@ const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) =
     });
 };
 
+// Envía el código OTP de recuperación de contraseña al correo del usuario.
 const sendRecoveryEmail = async (usuario) => {
+    const nombre = typeof usuario.nombres === "string" && usuario.nombres.trim()
+        ? usuario.nombres.trim()
+        : "";
+    const saludo = nombre ? `Hola, ${nombre}.` : "Hola.";
 
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,
@@ -112,7 +119,7 @@ const sendRecoveryEmail = async (usuario) => {
                             font-size: 16px;
                             margin-top: 0;
                         ">
-                            Hola.
+                            ${saludo}
                         </p>
     
                         <p style="
@@ -179,11 +186,19 @@ const sendRecoveryEmail = async (usuario) => {
 
 };
 
-/* funcion confirmacion de correo para el registro */
-
+// Envía el enlace para confirmar una cuenta creada mediante el formulario de registro.
 const sendConfirmationEmail = async (registro) => {
-    const confirmationUrl =
-        `http://localhost:3000/auth/confirm-register/${registro.token}`;
+    const backendUrl = new URL(process.env.BACKEND_URL || "http://localhost");
+    const localHosts = ["localhost", "127.0.0.1", "[::1]"];
+
+    if (!backendUrl.port && localHosts.includes(backendUrl.hostname)) {
+        backendUrl.port = process.env.PORT || "3000";
+    }
+
+    const confirmationUrl = new URL(
+        `/auth/confirm-register/${encodeURIComponent(registro.token)}`,
+        backendUrl.origin
+    ).toString();
 
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,

@@ -177,7 +177,7 @@ html(lang="es")
 
                         div(
                             class="relative"
-                        )
+                        )   
 
                             i(
                                 class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
@@ -196,7 +196,7 @@ html(lang="es")
                         div
 
                             select#filtroEstadoMedico(
-                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                                class="w-full sm:w-50 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
                             )
 
                                 option(
@@ -442,9 +442,8 @@ html(lang="es")
 
                                                     // Editar
 
-                                                    button.btnEditarMedico(
-                                                        type="button"
-                                                        data-id=medico.id
+                                                    a(
+                                                        href=`/admin/usuarios/${medico.usuarioId}/editar?volver=medicos`
                                                         title="Editar médico"
                                                         class="w-9 h-9 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition flex items-center justify-center"
                                                     )
@@ -530,7 +529,6 @@ html(lang="es")
                 // =================================================
 
                 include ../components/modals/verMedico.pug
-                include ../components/modals/editarMedico.pug
                 include ../components/modals/horariosMedico.pug
             // =================================================
             // SCRIPTS

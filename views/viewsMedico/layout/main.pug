@@ -6,7 +6,7 @@ html(lang='es')
     title SIGCMI - Portal Médico
     link(rel="stylesheet" href="/css/output.css")
     block styles
-  body.portal-medico(class="bg-[#0f172a] text-white font-[Arial,sans-serif] [&_*]:font-[Arial,sans-serif]")
+  body.portal-medico(class="bg-[#f4f8ff] text-slate-900 font-[Arial,sans-serif] [&_*]:font-[Arial,sans-serif]")
     .container(class="relative w-full max-w-none")
       // Incluye la barra lateral
       include ../includes/sidebar.pug
@@ -22,6 +22,11 @@ html(lang='es')
     // Incluye todos los modales
     include ../includes/modalGestion.pug
     include ../includes/modalHorarios.pug
+    include ../includes/modalCierreConsulta.pug
+    include ../includes/modalConfirmarLogout.pug
+    if typeof contextoConsulta !== "undefined" && contextoConsulta
+      include ../includes/modalAtencion.pug
 
     script(src="/medico/js/dashboardMedical.js")
+    script(src="/medico/js/diagnosticoMedical.js")
     block scripts

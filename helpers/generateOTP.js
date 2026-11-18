@@ -1,7 +1,7 @@
+import { randomInt } from "node:crypto";
+
 const generateOTP = () => {
-
-    return Math.floor(100000 + Math.random() * 900000).toString();
-
+    return randomInt(100_000, 1_000_000).toString();
 };
 
 export default generateOTP;

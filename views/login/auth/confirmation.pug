@@ -1,11 +1,12 @@
+//- Resultado de la confirmación de cuenta; informa éxito o explica por qué falló.
 extends ../layouts/layout
 
 block contenido
-    main(class="min-h-screen flex items-center justify-center bg-slate-100 px-4")
+    main(class="min-h-screen flex items-center justify-center bg-[#F4F8FF] px-4")
 
         .bg-white.rounded-2xl.shadow-xl.w-full.max-w-md.overflow-hidden
 
-            .bg-blue-700.p-6.text-center
+            div(class="bg-[#263F9D] p-6 text-center")
                 h1.text-2xl.font-bold.text-white
                     | Confirmación de cuenta
 
@@ -13,18 +14,24 @@ block contenido
 
                 if error
                     div(
+                        id="mensajeConfirmacion"
+                        role="alert"
                         class="mb-6 rounded-lg bg-red-100 border border-red-300 px-4 py-3 text-red-700 text-sm"
                     )
                         | #{error}
 
                 if mensaje
                     div(
-                        class="mb-6 rounded-lg bg-green-100 border border-green-300 px-4 py-3 text-green-700 text-sm"
+                        id="mensajeConfirmacion"
+                        role="status"
+                        class="mb-6 rounded-lg bg-[#F1FEF8] border border-[#059669]/30 px-4 py-3 text-[#059669] text-sm"
                     )
                         | #{mensaje}
 
                 a(
                     href="/auth/login"
-                    class="inline-block bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg transition"
+                    class="inline-block bg-[#335CD8] hover:bg-[#263F9D] text-white font-semibold px-6 py-3 rounded-lg transition"
                 )
                     | Ir al inicio de sesión
+
+    script(src="/auth/js/confirmation.js" defer)
