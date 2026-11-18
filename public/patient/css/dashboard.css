@@ -389,3 +389,26 @@ body.patient-portal form a:focus-visible,
 body.patient-portal form button:focus-visible {
   outline-color: #00BC8D;
 }
+
+
+/* Emblema transparente junto al nombre del portal */
+.patient-sidebar .patient-logo-frame {
+  position: relative;
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.patient-sidebar .patient-logo-image {
+  position: absolute;
+  top: -0.99rem;
+  left: -1.79rem;
+  width: 6.375rem;
+  max-width: none;
+  height: 6.375rem;
+  object-fit: contain;
+}

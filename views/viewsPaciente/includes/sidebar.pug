@@ -8,7 +8,10 @@ aside#sidebar.patient-sidebar.text-white.flex.flex-col.justify-between.shadow-xl
     .flex.items-center.justify-between.p-4.border-b(
       class="border-indigo-500/40"
     )
-      h1.text-2xl.font-bold.tracking-wide.sidebar-text SIGCMI
+      .flex.items-center.gap-2.sidebar-text
+        span.patient-logo-frame(aria-hidden="true")
+          img.patient-logo-image(src="/patient/img/sigcmi-logo.png" alt="")
+        h1.text-2xl.font-bold.tracking-wide SIGCMI
       button#toggleSidebar.flex.h-9.w-9.flex-col.items-center.justify-center.gap-1.rounded-lg.transition(
         type="button"
         aria-label="Mostrar u ocultar menú lateral"
