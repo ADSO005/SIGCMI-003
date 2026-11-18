@@ -1,4 +1,3 @@
-import { revisionHorarios } from "../../services/medico/horariosService.js";
 import { col, fn } from "sequelize";
 import Medico from "../../models/Medico.js";
 import Horario from "../../models/Horario.js";
@@ -11,6 +10,7 @@ const diasSemana = [
 // Controlador GET
 
 export const listarHorarios = async (req, res) => {
+    res.set("Cache-Control", "no-store");
     if (!req.usuario?.id_usuario) {
         return res.status(401).json({ mensaje: "Sesión inválida" });
     }
@@ -39,11 +39,10 @@ export const listarHorarios = async (req, res) => {
             horarios: horarios.map(h => {
                 const { id_horario, dia_semana, hora_inicio, hora_fin, fecha_inicio, fecha_fin, estado } = h;
                 return { id_horario, dia_semana, hora_inicio, hora_fin, fecha_inicio, fecha_fin, estado };
-            }),
-            revision: revisionHorarios(horarios)
+            })
         });
     } catch (error) {
-        console.error("Error al consultar los horarios del médico:", error);
+        console.error("Error al consultar los horarios del médico:", error?.name || "Error desconocido");
         return res.status(500).json({ mensaje: "No se pudieron consultar los horarios" });
     }
 };

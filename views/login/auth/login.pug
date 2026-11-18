@@ -2,12 +2,12 @@
 extends ../layouts/layout
 
 block contenido
-    main(class="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-6 [&_button[type=submit]]:bg-[#465DE5] [&_button[type=submit]:hover]:bg-[#3e52cc] [&_button[type=submit]:focus]:ring-[#465DE5]/30 [&_input:focus]:border-[#465DE5] [&_input:focus]:ring-[#465DE5]/10")
+    main(class="min-h-screen bg-[#F4F8FF] flex items-center justify-center px-4 py-6")
 
         .bg-white.rounded-3xl.shadow-2xl.max-w-lg.w-full.overflow-hidden
 
             // Encabezado
-            .p-4.text-center(class="bg-[#465DE5]")
+            .p-4.text-center(class="bg-[#263F9D]")
 
                 h1.text-4xl.font-extrabold.text-white
                     | SIGCMI
@@ -20,7 +20,7 @@ block contenido
             // Formulario
             .p-8
 
-                h2.text-3xl.font-bold.text-center.text-slate-800.mb-2
+                h2.text-3xl.font-bold.text-center.mb-2(class="text-[#001B4D]")
                     | Iniciar Sesión
 
                 if error
@@ -33,14 +33,14 @@ block contenido
                         if mostrarRegistro
                             a(
                                 href="/auth/register"
-                                class="block mt-2 text-[#465DE5] font-semibold hover:underline"
+                                class="block mt-2 text-[#335CD8] font-semibold hover:underline"
                             )
                                 | ¿Aún no tienes una cuenta? ¡Regístrate aquí!
 
                 if mensaje
                     div(
                         id="mensajeExito"
-                        class="mb-5 rounded-lg bg-green-100 border border-green-300 px-4 py-3 text-green-700 text-sm text-center"
+                        class="mb-5 rounded-lg bg-[#F1FEF8] border border-[#059669]/30 px-4 py-3 text-[#059669] text-sm text-center"
                     )
                         | #{mensaje}
 
@@ -63,7 +63,7 @@ block contenido
 
                     a(
                         href="/auth/recover-password"
-                        class="text-sm text-[#465DE5] hover:underline"
+                        class="text-sm text-[#335CD8] hover:underline"
                     )
                         | ¿Olvidaste tu contraseña?
 
@@ -74,7 +74,7 @@ block contenido
 
                         a(
                             href="/auth/register"
-                            class="ml-1 text-[#465DE5] font-semibold hover:underline"
+                            class="ml-1 text-[#335CD8] font-semibold hover:underline"
                         )
                             | Regístrate
 

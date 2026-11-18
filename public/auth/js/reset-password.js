@@ -63,8 +63,8 @@ document.querySelectorAll("[data-password-toggle]").forEach((button) => {
     button.setAttribute("aria-pressed", String(visible));
     button.setAttribute("aria-label", visible ? "Ocultar contraseña" : "Mostrar contraseña");
     button.title = visible ? "Ocultar contraseña" : "Mostrar contraseña";
-    eyeIcon.classList.toggle("hidden", visible);
-    eyeSlashIcon.classList.toggle("hidden", !visible);
+    eyeIcon.classList.toggle("hidden", !visible);
+    eyeSlashIcon.classList.toggle("hidden", visible);
   });
 });
 
@@ -74,8 +74,3 @@ passwordForm.addEventListener("submit", (event) => {
 });
 
 updatePasswordFeedback();
-
-// Retira el mensaje de error después de unos segundos.
-setTimeout(() => {
-  document.getElementById("mensajeError")?.remove();
-}, 5000);

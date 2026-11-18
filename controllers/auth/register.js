@@ -61,6 +61,8 @@ const register = async (req, res) => {
     }
     if (correoLimpio.length < 6 || correoLimpio.length > 150 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correoLimpio)) {
       errors.email = { msg: "Ingresa un correo válido de entre 6 y 150 caracteres." };
+    } else if (contieneLenguajeInapropiado(correoLimpio)) {
+      errors.email = { msg: "El correo contiene lenguaje no permitido." };
     }
     if (telefonoLimpio && !/^\d{10}$/.test(telefonoLimpio)) {
       errors.telefono = { msg: "El teléfono debe tener exactamente 10 dígitos, sin espacios ni código de país." };
@@ -100,6 +102,14 @@ const register = async (req, res) => {
       return res.render("login/auth/register", {
         titulo: "Crear Cuenta",
         errors: { password: { msg: passwordError } },
+        formData
+      });
+    }
+
+    if (contieneLenguajeInapropiado(password)) {
+      return res.render("login/auth/register", {
+        titulo: "Crear Cuenta",
+        errors: { password: { msg: "La contraseña contiene lenguaje no permitido." } },
         formData
       });
     }

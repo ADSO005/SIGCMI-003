@@ -1,0 +1,19 @@
+dialog#modalCierreConsulta(
+  aria-labelledby="tituloCierreConsulta"
+  aria-describedby="descripcionCierreConsulta"
+  class="m-auto max-h-[92dvh] w-[calc(100%-24px)] max-w-[780px] overflow-hidden rounded-2xl border-0 bg-white p-0 text-slate-800 shadow-xl backdrop:bg-black/40 [&[open]]:flex [&[open]]:flex-col"
+)
+  header(class="flex shrink-0 items-center justify-between gap-3 bg-linear-to-r from-[#2D5FB9] to-[#3F7ACF] px-4 py-3 text-white sm:px-6 sm:py-4")
+    div
+      h2#tituloCierreConsulta(class="text-lg font-bold sm:text-xl") Cerrar consulta sin finalizar
+      p#descripcionCierreConsulta(class="mt-1 text-xs text-white/90") La información clínica guardada se conservará y quedará bloqueada.
+    button#cerrarModalCierreConsulta(type="button" aria-label="Cerrar ventana" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-2xl hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white") ×
+  form#formCierreConsulta(class="min-h-0 overflow-y-auto p-4 sm:p-6")
+    p(class="mb-4 text-sm text-slate-700") Indica por qué debes cerrar esta consulta sin completarla. El motivo quedará registrado.
+    label(for="motivoCierreConsulta" class="mb-2 block text-sm font-semibold text-slate-800") Motivo de cierre
+    textarea#motivoCierreConsulta(name="motivo_cierre" rows="5" maxlength="2000" required class="block w-full resize-y rounded-lg border border-slate-300 bg-white p-3 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
+    p#estadoCierreConsulta(role="status" aria-live="polite" tabindex="-1" hidden class="mt-3 rounded-lg bg-indigo-50 p-3 text-sm text-slate-800")
+    p#errorCierreConsulta(role="alert" tabindex="-1" hidden class="mt-3 rounded-lg bg-rose-50 p-3 text-sm text-rose-800")
+    div(class="mt-5 flex flex-wrap justify-end gap-3")
+      button#cancelarCierreConsulta(type="button" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-blue-700") Cancelar
+      button#confirmarCierreConsulta(type="submit" class="rounded-lg bg-[#315bd7] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50") Cerrar sin finalizar

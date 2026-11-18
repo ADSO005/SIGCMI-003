@@ -19,11 +19,11 @@ html(lang="es")
     //- Reutiliza la estructura común de etiqueta, campo y mensaje de error.
     mixin formInput(name, label, type, placeholder, icon)
       .form-group(class="flex w-full min-w-0 flex-col gap-2")
-        label.form-label(class="text-sm font-medium text-[#1e2559]" for=name)= label
+        label.form-label(class="text-sm font-medium text-[#001B4D]" for=name)= label
           span.form-label__required(class="ml-1 text-red-500") *
         .input-wrapper(class="relative flex items-center")
           i.input-icon(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]" class=icon)
-          input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]"
+          input.form-input(class="w-full min-w-0 rounded-xl border border-[#E2E8F0] bg-white py-3 pl-11 pr-4 text-base text-[#001B4D] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#335CD8] focus:ring-[3px] focus:ring-[rgba(51,92,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#059669]"
             type=type
             id=name
             name=name
@@ -41,20 +41,20 @@ html(lang="es")
         if typeof errors !== 'undefined' && errors && errors[name]
           span.form-error= errors[name].msg
 
-    .auth-page(class="min-h-screen w-full flex items-start justify-center bg-[linear-gradient(180deg,#e9eefd,#f6f8fe)] md:items-center md:px-6 md:py-10 [&_.form-error]:mt-1 [&_.form-error]:text-sm [&_.form-error]:text-red-500 [&_.form-success]:mt-1 [&_.form-success]:text-sm [&_.form-success]:text-green-600")
+    .auth-page(class="min-h-screen w-full flex items-start justify-center bg-[#F4F8FF] md:items-center md:px-6 md:py-10 [&_.form-error]:mt-1 [&_.form-error]:text-sm [&_.form-error]:text-red-500 [&_.form-success]:mt-1 [&_.form-success]:text-sm [&_.form-success]:text-[#059669]")
       .auth-card(class="w-full bg-transparent md:max-w-[720px] md:overflow-hidden md:rounded-3xl md:bg-white md:shadow-xl")
         //- ===== HEADER =====
-        header.auth-header(class="relative bg-[linear-gradient(135deg,#4952d8,#3b43bd)] px-6 pt-8 pb-12 text-center text-white md:pt-9 md:pb-14")
+        header.auth-header(class="relative bg-[#263F9D] px-6 pt-8 pb-12 text-center text-white md:pt-9 md:pb-14")
           h1.auth-header__title(class="text-4xl font-semibold tracking-wide md:text-5xl") SIGCMI
           p.auth-header__subtitle(class="mx-auto mt-2 max-w-md text-lg font-light leading-snug md:max-w-2xl md:text-xl") Sistema Integral de Gestión de Citas Médicas
-          .auth-header__wave(class="absolute bottom-0 left-0 w-full [&>svg]:block [&>svg]:h-8 [&>svg]:w-full [&>svg]:fill-white [@media(max-width:767px)]:[&>svg]:fill-[#e9eefd] md:[&>svg]:h-10")
+          .auth-header__wave(class="absolute bottom-0 left-0 w-full [&>svg]:block [&>svg]:h-8 [&>svg]:w-full [&>svg]:fill-white [@media(max-width:767px)]:[&>svg]:fill-[#F4F8FF] md:[&>svg]:h-10")
             svg(viewBox="0 0 500 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg")
               path(d="M0,20 C150,60 350,0 500,25 L500,60 L0,60 Z")
 
         //- ===== BODY =====
         .auth-body(class="px-5 pt-5 pb-7 md:px-8 md:pt-6 md:pb-8")
           .form-heading(class="mb-6 text-center")
-            h2.form-title(class="text-2xl font-semibold text-[#1e2559] md:text-3xl") Registro de Pacientes
+            h2.form-title(class="text-2xl font-semibold text-[#001B4D] md:text-3xl") Registro de Pacientes
             p.form-subtitle(class="mt-2 text-base text-[#4b5573]") Crea tu cuenta para gestionar tus citas médicas
 
           if typeof error !== "undefined" && error
@@ -68,7 +68,7 @@ html(lang="es")
                     a.underline(href=`#${fieldName}`)= fieldError.msg
           - const mensajeRegistro = typeof mensaje !== "undefined" && mensaje ? mensaje : (typeof success !== "undefined" ? success : null)
           if mensajeRegistro
-            p#mensajeExito.form-success(class="mb-4 rounded-md border border-green-200 bg-green-50 p-3" role="status")= mensajeRegistro
+            p#mensajeExito.form-success(class="mb-4 rounded-md border border-[#059669]/30 bg-[#F1FEF8] p-3" role="status")= mensajeRegistro
 
           form.register-form(action="/auth/register" method="POST" novalidate=true)
             .form-grid(class="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2")
@@ -85,10 +85,10 @@ html(lang="es")
                 .form-group(class="flex w-full min-w-0 flex-col gap-2")
                   .form-row(class="flex items-start gap-4")
                     .form-group.form-group--small(class="flex w-32 shrink-0 flex-col gap-2")
-                      label.form-label(class="whitespace-nowrap text-sm font-medium text-[#1e2559]" for="tipoDocumento") Tipo
+                      label.form-label(class="whitespace-nowrap text-sm font-medium text-[#001B4D]" for="tipoDocumento") Tipo
                         span.form-label__required(class="ml-1 text-red-500") *
                       .input-wrapper(class="relative flex items-center")
-                        select.form-select#tipoDocumento(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-4 pr-4 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" name="tipoDocumento" required)
+                        select.form-select#tipoDocumento(class="w-full appearance-none rounded-xl border border-[#E2E8F0] bg-white py-3 pl-4 pr-4 text-base text-[#001B4D] transition outline-none focus:border-[#335CD8] focus:ring-[3px] focus:ring-[rgba(51,92,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#059669]" name="tipoDocumento" required)
                           option(value="CC" selected=(typeof formData === 'undefined' || !formData || formData.tipoDocumento === 'CC')) CC
                           option(value="CE" selected=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'CE')) CE
                           option(value="PA" selected=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'PA')) PA
@@ -96,10 +96,10 @@ html(lang="es")
                           path(d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z")
 
                     .form-group.form-group--grow(class="flex min-w-0 flex-1 flex-col gap-2")
-                      label.form-label(class="text-sm font-medium text-[#1e2559]" for="numeroDocumento") Número
+                      label.form-label(class="text-sm font-medium text-[#001B4D]" for="numeroDocumento") Número
                         span.form-label__required(class="ml-1 text-red-500") *
                       .input-wrapper(class="relative flex items-center")
-                        input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-4 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]"
+                        input.form-input(class="w-full min-w-0 rounded-xl border border-[#E2E8F0] bg-white py-3 pl-11 pr-4 text-base text-[#001B4D] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#335CD8] focus:ring-[3px] focus:ring-[rgba(51,92,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#059669]"
                           type="text"
                           inputmode=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'PA' ? 'text' : 'numeric')
                           maxlength=(typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'CE' ? 7 : (typeof formData !== 'undefined' && formData && formData.tipoDocumento === 'PA' ? 30 : 10))
@@ -114,41 +114,46 @@ html(lang="es")
                     span.form-error= (errors.tipoDocumento || errors.numeroDocumento).msg
 
                 .form-group(class="flex w-full min-w-0 flex-col gap-2")
-                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="departamento") Departamento de Residencia
+                  label.form-label(class="text-sm font-medium text-[#001B4D]" for="departamento") Departamento de Residencia
                     span.form-label__required(class="ml-1 text-red-500") *
                   .input-wrapper(class="relative flex items-center")
                     i.input-icon.fa-solid.fa-location-dot(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
-                    select.form-select#departamento(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-10 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)]" name="departamento" required data-selected=(typeof formData !== 'undefined' && formData ? formData.departamento : '') aria-describedby="departamentoEstado")
+                    select.form-select#departamento(class="w-full appearance-none rounded-xl border border-[#E2E8F0] bg-white py-3 pl-11 pr-10 text-base text-[#001B4D] transition outline-none focus:border-[#335CD8] focus:ring-[3px] focus:ring-[rgba(51,92,216,0.15)]" name="departamento" required data-selected=(typeof formData !== 'undefined' && formData ? formData.departamento : '') aria-describedby="departamentoEstado")
                       option(value="") Cargando departamentos...
                     svg(class="pointer-events-none absolute right-4 h-4 w-4 fill-[#9aa3c9]" viewBox="0 0 20 20" aria-hidden="true")
                       path(d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z")
                   p#departamentoEstado.sr-only(aria-live="polite")
-                  button#reintentarDepartamentos(class="hidden text-left text-xs font-medium text-[#4952d8] underline" type="button") Reintentar carga de departamentos
+                  button#reintentarDepartamentos(class="hidden text-left text-xs font-medium text-[#335CD8] underline" type="button") Reintentar carga de departamentos
                   if typeof errors !== 'undefined' && errors && errors.departamento
                     span.form-error= errors.departamento.msg
 
                 .form-group(class="flex w-full min-w-0 flex-col gap-2")
-                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="ciudad") Ciudad/Municipio de Residencia
+                  label.form-label(class="text-sm font-medium text-[#001B4D]" for="ciudad") Ciudad/Municipio de Residencia
                     span.form-label__required(class="ml-1 text-red-500") *
                   .input-wrapper(class="relative flex items-center")
                     i.input-icon.fa-solid.fa-location-dot(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
-                    select.form-select#ciudad(class="w-full appearance-none rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-10 text-base text-[#1e2559] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400" name="ciudad" required disabled data-selected=(typeof formData !== 'undefined' && formData ? formData.ciudad : '') aria-describedby="ciudadEstado")
+                    select.form-select#ciudad(class="w-full appearance-none rounded-xl border border-[#E2E8F0] bg-white py-3 pl-11 pr-10 text-base text-[#001B4D] transition outline-none focus:border-[#335CD8] focus:ring-[3px] focus:ring-[rgba(51,92,216,0.15)] disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400" name="ciudad" required disabled data-selected=(typeof formData !== 'undefined' && formData ? formData.ciudad : '') aria-describedby="ciudadEstado")
                       option(value="") Selecciona primero un departamento
                     svg(class="pointer-events-none absolute right-4 h-4 w-4 fill-[#9aa3c9]" viewBox="0 0 20 20" aria-hidden="true")
                       path(d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z")
                   p#ciudadEstado.text-xs.text-slate-500(aria-live="polite")
-                  button#reintentarCiudades(class="hidden text-left text-xs font-medium text-[#4952d8] underline" type="button") Reintentar carga de municipios
+                  button#reintentarCiudades(class="hidden text-left text-xs font-medium text-[#335CD8] underline" type="button") Reintentar carga de municipios
                   if typeof errors !== 'undefined' && errors && errors.ciudad
                     span.form-error= errors.ciudad.msg
 
                 .form-group(class="flex w-full min-w-0 flex-col gap-2")
-                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="password") Contraseña
+                  label.form-label(class="text-sm font-medium text-[#001B4D]" for="password") Contraseña
                     span.form-label__required(class="ml-1 text-red-500") *
                   .input-wrapper(class="relative flex items-center")
                     i.input-icon.fa-solid.fa-lock(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
-                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-12 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="password" name="password" placeholder="••••••••••••" autocomplete="new-password" aria-describedby="passwordStrengthText" minlength="8" maxlength="16" required)
-                    button.password-toggle(class="absolute right-3 rounded-md p-1 text-[#687292] transition hover:bg-slate-100 hover:text-[#4952d8] focus:outline-none focus:ring-2 focus:ring-[#4952d8]" type="button" data-password-toggle="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña")
-                      i.fa-solid.fa-eye(aria-hidden="true")
+                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#E2E8F0] bg-white py-3 pl-11 pr-12 text-base text-[#001B4D] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#335CD8] focus:ring-[3px] focus:ring-[rgba(51,92,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#059669]" type="password" id="password" name="password" placeholder="••••••••••••" autocomplete="new-password" aria-describedby="passwordStrengthText" minlength="8" maxlength="16" required)
+                    button.password-toggle(class="absolute right-3 rounded-md p-1 text-[#687292] transition hover:bg-slate-100 hover:text-[#335CD8] focus:outline-none focus:ring-2 focus:ring-[#335CD8]" type="button" data-password-toggle="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña")
+                      svg.eye-icon.hidden.h-5.w-5(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+                        path(d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z")
+                        circle(cx="12" cy="12" r="3")
+                      svg.eye-slash-icon.h-5.w-5(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+                        path(d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8")
+                        path(d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 9.5 7 9.5 7a16 16 0 0 1-3.1 3.9M6.2 6.2C3.8 7.9 2.5 12 2.5 12s3.5 7 9.5 7a10 10 0 0 0 3.1-.5")
                   .mt-1.space-y-2#passwordStrength(aria-live="polite")
                     .h-2.overflow-hidden.rounded-full.bg-slate-200
                       .h-full.w-0.rounded-full.transition-all.duration-300#passwordStrengthBar
@@ -157,13 +162,18 @@ html(lang="es")
                     span.form-error= errors.password.msg
 
                 .form-group(class="flex w-full min-w-0 flex-col gap-2")
-                  label.form-label(class="text-sm font-medium text-[#1e2559]" for="confirmPassword") Confirmar Contraseña
+                  label.form-label(class="text-sm font-medium text-[#001B4D]" for="confirmPassword") Confirmar Contraseña
                     span.form-label__required(class="ml-1 text-red-500") *
                   .input-wrapper(class="relative flex items-center")
                     i.input-icon.fa-solid.fa-lock(class="pointer-events-none absolute left-4 text-lg text-[#9aa3c9]")
-                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#d7defc] bg-white py-3 pl-11 pr-12 text-base text-[#1e2559] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#4952d8] focus:ring-[3px] focus:ring-[rgba(73,82,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#22c55e]" type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••••••" autocomplete="new-password" aria-describedby="confirmPasswordMatchText" minlength="8" maxlength="16" required)
-                    button.password-toggle(class="absolute right-3 rounded-md p-1 text-[#687292] transition hover:bg-slate-100 hover:text-[#4952d8] focus:outline-none focus:ring-2 focus:ring-[#4952d8]" type="button" data-password-toggle="confirmPassword" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña")
-                      i.fa-regular.fa-eye(aria-hidden="true")
+                    input.form-input(class="w-full min-w-0 rounded-xl border border-[#E2E8F0] bg-white py-3 pl-11 pr-12 text-base text-[#001B4D] placeholder:text-[#9aa3c9] transition outline-none focus:border-[#335CD8] focus:ring-[3px] focus:ring-[rgba(51,92,216,0.15)] [&.input-error]:border-2 [&.input-error]:border-[#ef4444] [&.input-success]:border-2 [&.input-success]:border-[#059669]" type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••••••" autocomplete="new-password" aria-describedby="confirmPasswordMatchText" minlength="8" maxlength="16" required)
+                    button.password-toggle(class="absolute right-3 rounded-md p-1 text-[#687292] transition hover:bg-slate-100 hover:text-[#335CD8] focus:outline-none focus:ring-2 focus:ring-[#335CD8]" type="button" data-password-toggle="confirmPassword" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña")
+                      svg.eye-icon.hidden.h-5.w-5(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+                        path(d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z")
+                        circle(cx="12" cy="12" r="3")
+                      svg.eye-slash-icon.h-5.w-5(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+                        path(d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8")
+                        path(d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6 0 9.5 7 9.5 7a16 16 0 0 1-3.1 3.9M6.2 6.2C3.8 7.9 2.5 12 2.5 12s3.5 7 9.5 7a10 10 0 0 0 3.1-.5")
                   .mt-1.space-y-2#confirmPasswordMatch(aria-live="polite")
                     .h-2.overflow-hidden.rounded-full.bg-slate-200
                       .h-full.w-0.rounded-full.transition-all.duration-300#confirmPasswordMatchBar
@@ -172,12 +182,12 @@ html(lang="es")
                     span.form-error= errors.confirmPassword.msg
 
             .form-actions(class="mt-6 flex items-center justify-center gap-4")
-              button.btn-primary(class="w-full cursor-pointer rounded-full bg-[#4952d8] py-4 text-base font-semibold text-white transition-all duration-250 ease-[ease] hover:-translate-y-[2px] hover:bg-[#3b43bd] active:scale-[0.98] md:w-auto md:px-16" type="submit") Crear cuenta
+              button.btn-primary(class="w-full cursor-pointer rounded-full bg-[#335CD8] py-4 text-base font-semibold text-white transition-all duration-250 ease-[ease] hover:-translate-y-[2px] hover:bg-[#263F9D] active:scale-[0.98] md:w-auto md:px-16" type="submit") Crear cuenta
               a.whatsapp-fab(class="fixed right-6 bottom-6 z-[999] flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-2xl text-white shadow-lg transition-transform duration-250 hover:scale-[1.08] md:static md:h-12 md:w-12 md:text-xl" href="https://wa.me/573112222222" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp")
                 i.fa-brands.fa-whatsapp
 
             p.auth-footer(class="mt-4 pb-6 text-center text-sm text-[#4b5573] md:pb-0")
               | ¿Ya tienes cuenta?
-              a.auth-footer__link(class="font-semibold text-[#4952d8] transition-colors duration-200 hover:text-[#3b43bd] hover:underline" href="/auth/login")  Inicia Sesión
+              a.auth-footer__link(class="font-semibold text-[#335CD8] transition-colors duration-200 hover:text-[#263F9D] hover:underline" href="/auth/login")  Inicia Sesión
 
     script(src="/auth/js/register.js" defer)

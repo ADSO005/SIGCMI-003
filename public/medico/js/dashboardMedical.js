@@ -40,6 +40,56 @@ window.cambiarVista = (e, viewId, link) => {
   if (window.innerWidth <= 768) cerrarSidebarMovil();
 };
 
+// Permite abrir la sección de pacientes desde enlaces que vienen de otra vista.
+if (window.location.hash === "#pacientesView") {
+  const vistaPacientes = document.getElementById("pacientesView");
+  if (vistaPacientes) {
+    document.querySelectorAll(".view").forEach(vista => vista.classList.remove("active"));
+    vistaPacientes.classList.add("active");
+    document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("preActive"));
+    document.querySelector('.nav-link[onclick*="pacientesView"]')?.classList.add("preActive");
+  }
+}
+
+// Confirma el cierre antes de enviar el formulario POST existente.
+const formularioLogout = document.getElementById("formLogout");
+const modalConfirmarLogout = document.getElementById("modalConfirmarLogout");
+const botonCancelarLogout = document.getElementById("cancelarLogout");
+const botonConfirmarLogout = document.getElementById("confirmarLogout");
+let focoAntesDeLogout = null;
+let confirmandoLogout = false;
+
+if (formularioLogout && modalConfirmarLogout && botonCancelarLogout && botonConfirmarLogout) {
+  formularioLogout.addEventListener("submit", event => {
+    if (confirmandoLogout) return;
+    event.preventDefault();
+    focoAntesDeLogout = event.submitter || document.activeElement;
+
+    if (typeof modalConfirmarLogout.showModal !== "function") {
+      if (window.confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+        confirmandoLogout = true;
+        formularioLogout.requestSubmit();
+      }
+      return;
+    }
+
+    modalConfirmarLogout.showModal();
+    botonCancelarLogout.focus();
+  });
+
+  botonCancelarLogout.addEventListener("click", () => modalConfirmarLogout.close());
+  botonConfirmarLogout.addEventListener("click", () => {
+    if (botonConfirmarLogout.disabled) return;
+    botonConfirmarLogout.disabled = true;
+    confirmandoLogout = true;
+    formularioLogout.requestSubmit();
+  });
+  modalConfirmarLogout.addEventListener("close", () => {
+    botonConfirmarLogout.disabled = false;
+    if (!confirmandoLogout && focoAntesDeLogout?.isConnected) focoAntesDeLogout.focus();
+  });
+}
+
 // INICIAR ATENCIÓN: el servidor valida nuevamente propietario, fecha y estado.
 const iniciosPendientes = new Set();
 window.iniciarConsulta = async button => {
@@ -85,6 +135,104 @@ window.iniciarConsulta = async button => {
     }
   }
 };
+
+// El cierre conserva la consulta y registra el motivo antes de bloquearla.
+let cierreConsultaReturnFocus = null;
+let cierreConsultaEnviando = false;
+const modalCierreConsulta = document.getElementById("modalCierreConsulta");
+const formularioCierreConsulta = document.getElementById("formCierreConsulta");
+
+window.abrirModalCierreConsulta = button => {
+  if (!modalCierreConsulta || modalCierreConsulta.open || !button) return;
+  const idCita = button.dataset.cita;
+  const estadoId = Number(button.dataset.estadoId);
+  if (!/^[1-9]\d*$/.test(idCita || "") || !Number.isSafeInteger(estadoId) || estadoId <= 0) return;
+
+  cierreConsultaReturnFocus = button;
+  formularioCierreConsulta.dataset.cita = idCita;
+  formularioCierreConsulta.dataset.estadoId = String(estadoId);
+  formularioCierreConsulta.reset();
+  const estado = document.getElementById("estadoCierreConsulta");
+  estado.textContent = "El motivo es obligatorio. La consulta no se finalizará.";
+  estado.hidden = false;
+  document.getElementById("errorCierreConsulta").hidden = true;
+  modalCierreConsulta.showModal();
+  document.getElementById("motivoCierreConsulta").focus();
+};
+
+function cerrarModalCierreConsulta() {
+  if (cierreConsultaEnviando || !modalCierreConsulta?.open) return;
+  modalCierreConsulta.close();
+}
+
+document.getElementById("cerrarModalCierreConsulta")?.addEventListener("click", cerrarModalCierreConsulta);
+document.getElementById("cancelarCierreConsulta")?.addEventListener("click", cerrarModalCierreConsulta);
+modalCierreConsulta?.addEventListener("cancel", event => {
+  if (cierreConsultaEnviando) event.preventDefault();
+});
+modalCierreConsulta?.addEventListener("close", () => {
+  cierreConsultaReturnFocus?.focus();
+  cierreConsultaReturnFocus = null;
+});
+
+formularioCierreConsulta?.addEventListener("submit", async event => {
+  event.preventDefault();
+  if (cierreConsultaEnviando) return;
+
+  const idCita = formularioCierreConsulta.dataset.cita;
+  const estadoId = Number(formularioCierreConsulta.dataset.estadoId);
+  const motivo = document.getElementById("motivoCierreConsulta").value.trim();
+  const estado = document.getElementById("estadoCierreConsulta");
+  const error = document.getElementById("errorCierreConsulta");
+  const botonConfirmar = document.getElementById("confirmarCierreConsulta");
+  const botonCancelar = document.getElementById("cancelarCierreConsulta");
+  const botonCerrar = document.getElementById("cerrarModalCierreConsulta");
+
+  if (!motivo || [...motivo].length > 2000) {
+    error.textContent = "Escribe un motivo de hasta 2000 caracteres.";
+    error.hidden = false;
+    document.getElementById("motivoCierreConsulta").focus();
+    return;
+  }
+
+  cierreConsultaEnviando = true;
+  botonConfirmar.disabled = true;
+  botonCancelar.disabled = true;
+  botonCerrar.disabled = true;
+  estado.textContent = "Registrando el cierre…";
+  error.hidden = true;
+  try {
+    const respuesta = await fetch(`/medico/citas/${encodeURIComponent(idCita)}/estado`, {
+      method: "PATCH",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ estado_id: estadoId, motivo_cierre: motivo })
+    });
+    if (respuesta.redirected || respuesta.status === 401) throw Error("La sesión venció. Inicia sesión nuevamente.");
+    if (!respuesta.headers.get("content-type")?.includes("application/json")) {
+      throw Error("No se recibió una respuesta válida. Comprueba tu sesión e inténtalo de nuevo.");
+    }
+    const resultado = await respuesta.json();
+    if (respuesta.status === 409) throw Error(resultado.mensaje || "La consulta cambió de estado. Actualiza la agenda.");
+    if (!respuesta.ok) throw Error(resultado.mensaje || "No se pudo cerrar la consulta.");
+    if (resultado.id_cita !== Number(idCita) || resultado.estado_id !== estadoId) {
+      throw Error("No se pudo confirmar el cierre. Actualiza la agenda.");
+    }
+    window.location.assign(`/medico/dashboard?citaCerrada=${encodeURIComponent(idCita)}#agendaView`);
+  } catch (errorCierre) {
+    estado.textContent = "No se cerró la consulta. Corrige el problema e inténtalo nuevamente.";
+    error.textContent = errorCierre instanceof TypeError
+      ? "No fue posible conectar con el servidor. Revisa la conexión."
+      : errorCierre.message || "No se pudo cerrar la consulta.";
+    error.hidden = false;
+    error.focus();
+  } finally {
+    cierreConsultaEnviando = false;
+    botonConfirmar.disabled = false;
+    botonCancelar.disabled = false;
+    botonCerrar.disabled = false;
+  }
+});
 
 // MODAL DE CONSULTA DE CITAS
 let citaReturnFocus = null;
@@ -428,11 +576,20 @@ window.cerrarModalHorariosFuera = event => {
 
 // Evita que una respuesta lenta reemplace al paciente seleccionado más recientemente.
 let versionCargaPaciente = 0;
+let pacienteSeleccionadoId = null;
+let paginaHistorialActual = 1;
+let paginacionHistorialActual = null;
 
 // SELECCIONAR PACIENTE DE LA LISTA
 async function seleccionarPaciente(element) {
   const idPaciente = element?.dataset.id;
-  const versionActual = ++versionCargaPaciente;
+  ++versionCargaPaciente;
+  const pacienteNuevo = idPaciente !== pacienteSeleccionadoId;
+  pacienteSeleccionadoId = idPaciente;
+  if (pacienteNuevo) {
+    paginaHistorialActual = 1;
+    paginacionHistorialActual = null;
+  }
 
   document.querySelectorAll(".paciente-item").forEach(item => {
     item.classList.toggle("activo", item === element);
@@ -444,34 +601,82 @@ async function seleccionarPaciente(element) {
     return;
   }
 
+  await cargarPaginaHistorial(idPaciente, paginaHistorialActual, { limpiarDetalleAlFallar: true });
+}
+
+async function cargarPaginaHistorial(idPaciente, pagina, opciones = {}) {
+  const versionActual = ++versionCargaPaciente;
+  const historial = document.getElementById("historialPaciente");
+  const paginacion = document.getElementById("paginacionHistorial");
+  let cargaExitosa = false;
+  historial.setAttribute("aria-busy", "true");
+  paginacion.setAttribute("aria-busy", "true");
+  paginacion.querySelectorAll("button").forEach(boton => { boton.disabled = true; });
+
   try {
-    const respuesta = await fetch(`/medico/pacientes/${encodeURIComponent(idPaciente)}`, {
+    const respuesta = await fetch(`/medico/pacientes/${encodeURIComponent(idPaciente)}?pagina=${encodeURIComponent(pagina)}`, {
       credentials: "same-origin",
       cache: "no-store"
     });
     if (versionActual !== versionCargaPaciente) return;
 
+    if (respuesta.redirected || respuesta.status === 401) {
+      throw new Error("Tu sesión venció. Inicia sesión nuevamente.");
+    }
     if (!respuesta.ok) {
       const mensajes = {
-        401: "Tu sesión venció. Inicia sesión nuevamente.",
         403: "No tienes permiso para consultar este paciente.",
         404: "El paciente no está disponible o no tiene citas vinculadas a este médico."
       };
       throw new Error(mensajes[respuesta.status] || "No se pudo cargar la información del paciente.");
     }
+    if (!respuesta.headers.get("content-type")?.includes("application/json")) {
+      throw new Error("El servidor no devolvió una respuesta JSON válida.");
+    }
 
     const datos = await respuesta.json();
     if (versionActual !== versionCargaPaciente) return;
-    if (!datos?.paciente || !Array.isArray(datos.citas)) {
+    const paginaInfo = datos?.paginacion;
+    if (!datos?.paciente || !Array.isArray(datos.citas) || !paginaInfo
+      || !Number.isInteger(paginaInfo.paginaActual) || paginaInfo.paginaActual < 1
+      || paginaInfo.porPagina !== 1 || !Number.isInteger(paginaInfo.totalCitas) || paginaInfo.totalCitas < 1
+      || !Number.isInteger(paginaInfo.totalPaginas) || paginaInfo.totalPaginas < 1
+      || paginaInfo.paginaActual > paginaInfo.totalPaginas
+      || !Number.isInteger(paginaInfo.totalDiagnosticos) || paginaInfo.totalDiagnosticos < 0
+      || datos.citas.length !== 1) {
       throw new Error("La respuesta del servidor no tiene el formato esperado.");
     }
-    mostrarDetallePaciente(datos.paciente, datos.citas);
+    mostrarDetallePaciente(datos.paciente, datos.citas, paginaInfo);
+    paginaHistorialActual = paginaInfo.paginaActual;
+    cargaExitosa = true;
+    if (opciones.restaurarFoco) {
+      paginacion.querySelector(`[data-page="${paginaHistorialActual}"]`)?.focus();
+    }
   } catch (error) {
     if (versionActual !== versionCargaPaciente) return;
     console.error("Error al cargar el detalle del paciente");
-    mostrarErrorDetallePaciente(error.message || "No fue posible conectar con el servidor.");
+    const mensaje = error instanceof TypeError
+      ? "No fue posible conectar con el servidor. Revisa la conexión."
+      : error.message || "No fue posible conectar con el servidor.";
+    if (opciones.limpiarDetalleAlFallar) mostrarErrorDetallePaciente(mensaje);
+    else mostrarAvisoHistorial(mensaje);
+  } finally {
+    if (versionActual === versionCargaPaciente) {
+      historial.setAttribute("aria-busy", "false");
+      paginacion.setAttribute("aria-busy", "false");
+      if (!cargaExitosa && !opciones.limpiarDetalleAlFallar && paginacionHistorialActual) {
+        mostrarPaginacionHistorial(paginacionHistorialActual);
+      }
+    }
   }
 }
+
+document.getElementById("paginacionHistorial")?.addEventListener("click", event => {
+  const boton = event.target.closest("button[data-page]");
+  const pagina = Number(boton?.dataset.page);
+  if (!boton || boton.disabled || !pacienteSeleccionadoId || !Number.isSafeInteger(pagina) || pagina < 1) return;
+  cargarPaginaHistorial(pacienteSeleccionadoId, pagina, { restaurarFoco: true });
+});
 
 function limpiarDetallePaciente(mensaje) {
   document.getElementById("detalleNombre").textContent = mensaje;
@@ -483,6 +688,12 @@ function limpiarDetallePaciente(mensaje) {
   document.getElementById("detalleCitas").textContent = "0";
   document.getElementById("detalleDiagnosticos").textContent = "0";
   document.getElementById("historialPaciente").replaceChildren();
+  document.getElementById("historialPaciente").setAttribute("aria-busy", "false");
+  const paginacion = document.getElementById("paginacionHistorial");
+  paginacion.replaceChildren();
+  paginacion.hidden = true;
+  paginacion.setAttribute("aria-busy", "false");
+  paginacionHistorialActual = null;
 }
 
 function mostrarErrorDetallePaciente(mensaje) {
@@ -492,7 +703,13 @@ function mostrarErrorDetallePaciente(mensaje) {
   document.getElementById("historialPaciente").replaceChildren(aviso);
 }
 
-function mostrarDetallePaciente(paciente, citas) {
+function mostrarAvisoHistorial(mensaje) {
+  const aviso = document.createElement("p");
+  aviso.textContent = mensaje;
+  document.getElementById("historialPaciente").replaceChildren(aviso);
+}
+
+function mostrarDetallePaciente(paciente, citas, paginacion) {
   const usuario = paciente.Usuario || {};
   const nombre = [usuario.nombres, usuario.apellidos].filter(Boolean).join(" ");
   document.getElementById("detalleNombre").textContent = nombre || "Nombre no registrado";
@@ -504,40 +721,105 @@ function mostrarDetallePaciente(paciente, citas) {
 
   document.getElementById("detalleTelefono").textContent = usuario.telefono || "No registrado";
   document.getElementById("detalleEdad").textContent = calcularEdad(paciente.fecha_nacimiento);
-  document.getElementById("detalleCitas").textContent = String(citas.length);
-  document.getElementById("detalleUltimaVisita").textContent = obtenerUltimaVisita(citas);
+  document.getElementById("detalleCitas").textContent = String(paginacion.totalCitas);
+  if (paginacion.paginaActual === 1) {
+    document.getElementById("detalleUltimaVisita").textContent = obtenerUltimaVisita(citas);
+  }
 
-  const cantidadDiagnosticos = citas.filter(cita => cita.Diagnostico).length;
-  document.getElementById("detalleDiagnosticos").textContent = String(cantidadDiagnosticos);
+  document.getElementById("detalleDiagnosticos").textContent = String(paginacion.totalDiagnosticos);
   mostrarHistorial(citas);
+  paginacionHistorialActual = paginacion;
+  mostrarPaginacionHistorial(paginacion);
+}
+
+function crearBotonPagina(texto, numero, ariaLabel, actual = false) {
+  const boton = document.createElement("button");
+  boton.type = "button";
+  boton.textContent = texto;
+  boton.dataset.page = String(numero);
+  boton.setAttribute("aria-label", ariaLabel);
+  boton.disabled = actual;
+  if (actual) boton.setAttribute("aria-current", "page");
+  boton.className = actual
+    ? "inline-flex h-11 items-center justify-center rounded-lg border border-[#315bd7] bg-[#315bd7] px-3 text-sm font-semibold text-white disabled:opacity-50"
+    : "inline-flex h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50";
+  return boton;
+}
+
+function mostrarPaginacionHistorial(paginacion) {
+  const nav = document.getElementById("paginacionHistorial");
+  nav.replaceChildren();
+  nav.hidden = false;
+
+  const desde = (paginacion.paginaActual - 1) * paginacion.porPagina + 1;
+  const resumen = document.createElement("p");
+  resumen.className = "m-0 text-xs leading-5 text-slate-600";
+  resumen.textContent = `Cita ${desde} de ${paginacion.totalCitas}. Página ${paginacion.paginaActual} de ${paginacion.totalPaginas}.`;
+  nav.appendChild(resumen);
+
+  const controles = document.createElement("div");
+  controles.className = "flex flex-wrap items-center gap-2";
+  controles.appendChild(crearBotonPagina("Anterior", paginacion.paginaActual - 1, "Página anterior"));
+  controles.firstElementChild.disabled = paginacion.paginaActual === 1;
+
+  let primera = Math.max(1, paginacion.paginaActual - 2);
+  let ultima = Math.min(paginacion.totalPaginas, primera + 4);
+  primera = Math.max(1, ultima - 4);
+  const agregarNumero = numero => controles.appendChild(crearBotonPagina(
+    String(numero), numero, `Página ${numero}`, numero === paginacion.paginaActual
+  ));
+
+  if (primera > 1) {
+    agregarNumero(1);
+    if (primera > 2) {
+      const puntos = document.createElement("span");
+      puntos.textContent = "…";
+      puntos.setAttribute("aria-hidden", "true");
+      controles.appendChild(puntos);
+    }
+  }
+  for (let numero = primera; numero <= ultima; numero++) agregarNumero(numero);
+  if (ultima < paginacion.totalPaginas) {
+    if (ultima < paginacion.totalPaginas - 1) {
+      const puntos = document.createElement("span");
+      puntos.textContent = "…";
+      puntos.setAttribute("aria-hidden", "true");
+      controles.appendChild(puntos);
+    }
+    agregarNumero(paginacion.totalPaginas);
+  }
+
+  const siguiente = crearBotonPagina("Siguiente", paginacion.paginaActual + 1, "Página siguiente");
+  siguiente.disabled = paginacion.paginaActual === paginacion.totalPaginas;
+  controles.appendChild(siguiente);
+  nav.appendChild(controles);
+}
+
+function separarFechaCivil(fecha) {
+  const coincidencia = /^(\d{4})-(\d{2})-(\d{2})$/.exec(fecha || "");
+  if (!coincidencia) return null;
+  const partes = coincidencia.slice(1).map(Number);
+  const fechaUtc = new Date(Date.UTC(partes[0], partes[1] - 1, partes[2]));
+  if (fechaUtc.toISOString().slice(0, 10) !== fecha) return null;
+  return { anio: partes[0], mes: partes[1], dia: partes[2] };
+}
+
+function fechaActualBogota() {
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(new Date());
+  const fecha = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+  return `${fecha.year}-${fecha.month}-${fecha.day}`;
 }
 
 function calcularEdad(fechaNacimiento) {
+  const nacimiento = separarFechaCivil(fechaNacimiento);
+  const hoy = separarFechaCivil(fechaActualBogota());
+  if (!nacimiento || !hoy) return "No registrada";
 
-  if (!fechaNacimiento) {
-    return "No registrada";
-  }
-
-  const nacimiento = new Date(
-    `${fechaNacimiento}T00:00:00`
-  );
-
-  const hoy = new Date();
-
-  let edad =
-    hoy.getFullYear() - nacimiento.getFullYear();
-
-  const mes =
-    hoy.getMonth() - nacimiento.getMonth();
-
-  if (
-    mes < 0 ||
-    (mes === 0 && hoy.getDate() < nacimiento.getDate())
-  ) {
-    edad--;
-  }
-
-  return `${edad} años`;
+  let edad = hoy.anio - nacimiento.anio;
+  if (hoy.mes < nacimiento.mes || (hoy.mes === nacimiento.mes && hoy.dia < nacimiento.dia)) edad--;
+  return edad < 0 ? "No registrada" : `${edad} años`;
 }
 
 function obtenerUltimaVisita(citas) {
@@ -547,14 +829,11 @@ function obtenerUltimaVisita(citas) {
   }
 
   const fecha = citas[0].fecha;
+  const partes = separarFechaCivil(fecha);
+  if (!partes) return "Sin visitas";
 
-  if (!fecha) {
-    return "Sin visitas";
-  }
-
-  return new Date(
-    `${fecha}T00:00:00`
-  ).toLocaleDateString("es-CO");
+  return new Date(Date.UTC(partes.anio, partes.mes - 1, partes.dia))
+    .toLocaleDateString("es-CO", { timeZone: "UTC" });
 }
 
 function mostrarHistorial(citas) {
