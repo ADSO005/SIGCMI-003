@@ -8,7 +8,13 @@ mixin tarjetaAtencion(cita)
     if cita.estado === "En Curso"
       - const seleccionada = typeof contextoConsulta !== "undefined" && contextoConsulta && contextoConsulta.id_cita === cita.id_cita
       if cita.supera24Horas
-        p(role="alert" class="mt-3 rounded-lg border border-slate-200 bg-indigo-50 p-3 text-sm font-semibold text-slate-800") Esta consulta lleva más de 24 horas abierta.
+        div(role="alert" class="mt-3 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-900 shadow-sm")
+          svg(class="mt-0.5 h-5 w-5 shrink-0 text-amber-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+            circle(cx="12" cy="12" r="9")
+            path(d="M12 7v5l3 2M12 17h.01")
+          div
+            p(class="text-sm font-semibold") Esta consulta lleva más de 24 horas abierta.
+            p(class="mt-1 text-xs leading-5 text-amber-800") Puedes reanudarla o cerrarla sin finalizar.
       else if cita.inicioNoRegistrado
         p(role="status" class="mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-600") No se registró la hora real de inicio; no es posible calcular cuánto lleva abierta.
       div(class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2")
