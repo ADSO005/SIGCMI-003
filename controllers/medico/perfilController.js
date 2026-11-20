@@ -186,10 +186,12 @@ export const cambiarContrasenaMedico = async (req, res) => {
             errorPassword = "La contraseña actual no es correcta.";
         } else if (passwordNueva !== confirmarPassword) {
             errorPassword = "La contraseña nueva y su confirmación no coinciden.";
-        } else if (passwordNueva.length < 6 || Buffer.byteLength(passwordNueva, "utf8") > 72
+        } else if (Buffer.byteLength(passwordNueva, "utf8") > 72) {
+            errorPassword = "La contraseña es demasiado larga. Prueba con una más corta.";
+        } else if (passwordNueva.length < 6
             || !/[A-Za-z]/.test(passwordNueva) || !/\d/.test(passwordNueva)
             || !/[^A-Za-z\d]/.test(passwordNueva)) {
-            errorPassword = "Usa al menos 6 caracteres con letras, números y un carácter especial; el máximo admitido es 72 bytes.";
+            errorPassword = "Usa al menos 6 caracteres e incluye una letra, un número y un carácter especial.";
         } else if (await bcrypt.compare(passwordNueva, req.usuario.password)) {
             errorPassword = "La contraseña nueva debe ser diferente a la actual.";
         }
