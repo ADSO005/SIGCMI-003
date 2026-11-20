@@ -63,7 +63,7 @@ block content
                   input#correo(name="correo" type="email" maxlength="150" required autocomplete="email" value=usuarioPerfil.correo class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
                 div
                   label(for="telefono" class="mb-1 block text-sm font-semibold text-slate-700") Teléfono
-                  input#telefono(name="telefono" type="tel" maxlength="20" autocomplete="tel" value=usuarioPerfil.telefono class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
+                  input#telefono(name="telefono" type="tel" inputmode="tel" pattern="[+]?[0-9 ().-]*" title="Usa solo números, espacios y los signos + ( ) . -" maxlength="20" autocomplete="tel" value=usuarioPerfil.telefono class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
               div(class="rounded-xl border border-amber-200 bg-amber-50 p-4")
                 label(for="passwordActualPerfil" class="mb-1 block text-sm font-semibold text-amber-950") Confirma tu contraseña actual para guardar
                 input#passwordActualPerfil(name="passwordActual" type="password" required autocomplete="current-password" class="w-full rounded-lg border border-amber-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
@@ -167,3 +167,6 @@ block content
             div
               h2(class="mb-2 text-xl font-bold text-[#10285e]") Seguridad y privacidad
               p(class="text-sm leading-6 text-slate-700") Los cambios de datos personales requieren confirmar tu contraseña actual. La información profesional se presenta según los datos asociados a tu perfil médico.
+
+block append scripts
+  script(src="/medico/js/perfilMedical.js")
