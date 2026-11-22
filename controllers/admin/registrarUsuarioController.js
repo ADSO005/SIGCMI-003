@@ -1,3 +1,4 @@
+import { capitalizarNombre, normalizarCorreo } from "../../utils/formatoTexto.js";
 import db from "../../config/db.js";
 import bcrypt from "bcrypt";
 import { Usuario, Paciente, Medico, Especialidad, Cita } from "../../models/index.js";
@@ -83,11 +84,11 @@ export const registrarUsuario = async (req, res) => {
 
     const rol = req.rolFijo ?? Number(body.rol_id);
 
-    const nombres = texto(body.nombres);
-    const apellidos = texto(body.apellidos);
+    const nombres = capitalizarNombre(body.nombres);
+    const apellidos = capitalizarNombre(body.apellidos);
     const tipoDocumento = texto(body.tipo_documento);
     const numeroDocumento = texto(body.numero_documento);
-    const correo = texto(body.correo).toLowerCase();
+    const correo = normalizarCorreo(body.correo);
     const telefono = texto(body.telefono);
     const { password, confirmPassword } = body;
 
@@ -363,11 +364,11 @@ export const actualizarUsuarioCompleto = async (req, res) => {
         }
 
         const rol = Number(body.rol_id);
-        const nombres = texto(body.nombres);
-        const apellidos = texto(body.apellidos);
+        const nombres = capitalizarNombre(body.nombres);
+        const apellidos = capitalizarNombre(body.apellidos);
         const tipoDocumento = texto(body.tipo_documento);
         const numeroDocumento = texto(body.numero_documento);
-        const correo = texto(body.correo).toLowerCase();
+        const correo = normalizarCorreo(body.correo);
         const telefono = texto(body.telefono);
         const password = typeof body.password === "string" ? body.password : "";
         const confirmPassword = typeof body.confirmPassword === "string" ? body.confirmPassword : "";
