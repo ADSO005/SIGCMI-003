@@ -1,4 +1,64 @@
 doctype html
+-
+    // Resumen de horarios por semana: agrupa los bloques guardados y junta los días con las mismas horas.
+    const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+    const CORTO = { Lunes: "Lun", Martes: "Mar", Miercoles: "Mié", Jueves: "Jue", Viernes: "Vie", Sabado: "Sáb", Domingo: "Dom" };
+    const ORDEN = Object.keys(CORTO);
+    const pad = (n) => String(n).padStart(2, "0");
+    const aTexto = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const hoyTexto = aTexto(new Date());
+    const proximoLunes = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 8 - (d.getDay() || 7)); return aTexto(d); })();
+    const etiquetaFecha = (t) => { const d = new Date(`${t}T00:00:00`); return `${d.getDate()} ${MESES[d.getMonth()]}`; };
+    const resumenSemanas = (horarios = []) => {
+        const porSemana = new Map();
+        for (const h of horarios) {
+            const desde = String(h.fecha_inicio).slice(0, 10);
+            const hasta = String(h.fecha_fin).slice(0, 10);
+            if (hasta < hoyTexto) continue;
+            const clave = `${desde}|${hasta}`;
+            if (!porSemana.has(clave)) porSemana.set(clave, { desde, hasta, filas: [] });
+            porSemana.get(clave).filas.push(h);
+        }
+        return [...porSemana.values()].sort((a, b) => a.desde.localeCompare(b.desde)).map((s) => {
+            const textos = ORDEN.map((nombre) => s.filas
+                .filter((f) => f.dia_semana === nombre)
+                .sort((a, b) => String(a.hora_inicio).localeCompare(String(b.hora_inicio)))
+                .map((f) => `${String(f.hora_inicio).slice(0, 5)}–${String(f.hora_fin).slice(0, 5)}`)
+                .join(" · "));
+            const grupos = [];
+            textos.forEach((t, i) => {
+                const ultimo = grupos[grupos.length - 1];
+                if (ultimo && ultimo.texto === t) ultimo.fin = i;
+                else grupos.push({ inicio: i, fin: i, texto: t });
+            });
+            return {
+                desde: s.desde,
+                etiqueta: `${etiquetaFecha(s.desde)} – ${etiquetaFecha(s.hasta)}`,
+                marca: s.desde <= hoyTexto && hoyTexto <= s.hasta ? "Esta semana" : s.desde === proximoLunes ? "Próxima semana" : "",
+                lineas: grupos.map((g) => ({
+                    dias: g.inicio === g.fin ? CORTO[ORDEN[g.inicio]] : `${CORTO[ORDEN[g.inicio]]}–${CORTO[ORDEN[g.fin]]}`,
+                    texto: g.texto
+                }))
+            };
+        });
+    };
+    const lunesActual = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return aTexto(d); })();
+    const sumarDias = (t, n) => { const d = new Date(`${t}T00:00:00`); d.setDate(d.getDate() + n); return aTexto(d); };
+    // Siempre devuelve la semana actual y la próxima, con o sin agenda.
+    const semanasFijas = (horarios = []) => {
+        const existentes = resumenSemanas(horarios);
+        return [lunesActual, proximoLunes].map((desde) => {
+            const semana = existentes.find((s) => s.desde === desde);
+            if (semana) return { ...semana, abierta: true };
+            return {
+                desde,
+                etiqueta: `${etiquetaFecha(desde)} – ${etiquetaFecha(sumarDias(desde, 6))}`,
+                marca: desde === lunesActual ? "Esta semana" : "Próxima semana",
+                lineas: [],
+                abierta: false
+            };
+        });
+    };
 html(lang="es")
     head
         meta(charset="UTF-8")
@@ -65,13 +125,13 @@ html(lang="es")
 
                         - let totalHorarios = 0
                         each medico in medicos
-                            - totalHorarios += medico.horarios.length
+                            - totalHorarios += resumenSemanas(medico.horarios).length
 
                         div(class="flex items-center justify-between")
 
                             div
                                 p(class="text-sm text-slate-500")
-                                    | Horarios registrados
+                                    | Semanas con agenda
 
                                 p(class="text-3xl font-bold text-slate-800 mt-1")
                                     = totalHorarios
@@ -156,7 +216,8 @@ html(lang="es")
                                                 span(class="w-2 h-2 rounded-full bg-red-500")
                                                 | Inactivo
 
-                                // HORARIOS
+                                // HORARIOS (semana actual y próxima, altura fija)
+                                - const semanas = semanasFijas(medico.horarios)
                                 div(class="p-5")
 
                                     div(class="flex items-center justify-between mb-4")
@@ -164,89 +225,58 @@ html(lang="es")
                                         div
 
                                             h3(class="font-semibold text-slate-800")
-                                                | Horario de atención
+                                                | Agenda por semana
 
                                             p(class="text-xs text-slate-400 mt-1")
-                                                | Disponibilidad configurada
+                                                | Toca una semana para editarla
 
                                         span(class="text-xs font-medium text-slate-500")
-                                            = medico.horarios.length
-                                            |  horario(s)
+                                            | Semana actual y próxima
 
+                                    div(class="space-y-3")
 
-                                    if medico.horarios.length
+                                        each semana in semanas
 
-                                        div(class="space-y-3")
+                                            button(
+                                                type="button"
+                                                class=`btnGestionarHorario block h-[208px] w-full overflow-y-auto rounded-xl border p-4 text-left transition hover:border-[#335CD8] hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335CD8] ${semana.abierta ? "border-[#E2E8F0] bg-[#F4F8FF]" : "border-dashed border-[#E2E8F0] bg-white"}`
+                                                data-medico-id=medico.id_medico
+                                                data-medico-nombre=medico.nombre
+                                                data-semana=semana.desde
+                                                aria-label=`Editar la agenda del ${semana.etiqueta}`
+                                            )
 
-                                            each horario in medico.horarios.slice(0, 5)
+                                                span(class="flex flex-wrap items-center justify-between gap-2")
 
-                                                div(class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200")
+                                                    span(class="font-bold text-[#001B4D]")
+                                                        i(class="fa-regular fa-calendar mr-2 text-[#335CD8]" aria-hidden="true")
+                                                        = semana.etiqueta
 
-                                                    div(class="flex items-center gap-3")
+                                                    span(class="rounded-full bg-[#335CD8]/10 px-2.5 py-1 text-xs font-semibold text-[#335CD8]")= semana.marca
 
-                                                        div(class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0")
-                                                            i(class="fa-regular fa-calendar")
+                                                if semana.abierta
 
-                                                        div
+                                                    span(class="mt-3 block space-y-1.5")
 
-                                                            p(class="font-semibold text-slate-800")
-                                                                = horario.dia_semana
+                                                        each linea in semana.lineas
 
-                                                            p(class="text-xs text-slate-500 mt-1")
-                                                                = horario.fecha_inicio
-                                                                |  → 
-                                                                = horario.fecha_fin
+                                                            span(class="flex items-baseline gap-3 text-sm")
 
-                                                    div(class="flex items-center gap-2")
+                                                                span(class="w-[84px] shrink-0 font-semibold text-slate-700")= linea.dias
 
-                                                        span(class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm font-medium text-slate-700")
+                                                                if linea.texto
+                                                                    span(class="text-slate-600")= linea.texto
+                                                                else
+                                                                    span(class="text-slate-400") Cerrado
 
-                                                            i(class="fa-regular fa-clock text-blue-500")
+                                                else
 
-                                                            = horario.hora_inicio ? horario.hora_inicio.substring(0, 5) : ""
-                                                            |  -
-                                                            = horario.hora_fin ? horario.hora_fin.substring(0, 5) : ""
+                                                    span(class="flex h-[120px] flex-col items-center justify-center text-center")
 
-                                                        if horario.estado === "Aprobado"
+                                                        span(class="text-sm font-semibold text-slate-700") Sin agenda abierta
 
-                                                            span(
-                                                                class="w-2.5 h-2.5 rounded-full bg-green-500"
-                                                                title="Aprobado"
-                                                            )
+                                                        span(class="mt-1 text-xs text-slate-500") Toca para abrirla
 
-                                                        else if horario.estado === "Pendiente"
-
-                                                            span(
-                                                                class="w-2.5 h-2.5 rounded-full bg-amber-500"
-                                                                title="Pendiente"
-                                                            )
-
-                                                        else
-
-                                                            span(
-                                                                class="w-2.5 h-2.5 rounded-full bg-red-500"
-                                                                title="Rechazado"
-                                                            )
-
-                                        // AVISO SI HAY MÁS DE 5
-                                        if medico.horarios.length > 5
-
-                                            div(class="mt-4 flex items-center justify-between px-3 py-2 rounded-lg bg-blue-50 border border-blue-100")
-
-                                                p(class="text-sm text-blue-700")
-
-                                                    i(class="fa-solid fa-circle-info mr-1")
-
-                                                    | Mostrando 5 de #{medico.horarios.length} horarios
-
-                                                button(
-                                                    type="button"
-                                                    class="btnGestionarHorario text-sm font-semibold text-blue-700 hover:text-blue-900"
-                                                    data-medico-id=medico.id_medico
-                                                    data-medico-nombre=medico.nombre
-                                                )
-                                                    | Ver todos
-                                                    i(class="fa-solid fa-arrow-right ml-1")
 
                                 // ACCIONES
                                 div(class="px-5 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row gap-3")
