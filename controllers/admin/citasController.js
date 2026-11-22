@@ -11,6 +11,11 @@ import {
 import { Op } from "sequelize";
 
 import {
+    ESTADOS_CITA_REPROGRAMABLE,
+    soloCitasActivas
+} from "../../services/estadosCita.js";
+
+import {
     contieneLenguajeInapropiado
 } from "../../utils/filtroLenguaje.js";
 // =====================================================
@@ -143,6 +148,8 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
             medico_id,
             fecha
         },
+
+        include: [soloCitasActivas()],
 
         attributes: [
             "hora"
@@ -476,7 +483,9 @@ export const crearNuevaCita = async (req, res) => {
             where: {
                 paciente_id,
                 fecha
-            }
+            },
+
+            include: [soloCitasActivas()]
         });
 
         if (citaPacienteEseDia) {
@@ -1068,12 +1077,22 @@ export const reprogramarCita = async (req, res) => {
         // BUSCAR CITA
         // =========================================
 
-        const cita = await Cita.findByPk(id);
+        const cita = await Cita.findByPk(id, {
+            include: [{ model: EstadoCita, as: "Estado", attributes: ["nombre"] }]
+        });
 
         if (!cita) {
             return res.status(404).json({
                 ok: false,
                 mensaje: "La cita no existe."
+            });
+        }
+
+        // Una cita cancelada, completada o cerrada no se reprograma: no puede volver a ocupar la agenda.
+        if (!ESTADOS_CITA_REPROGRAMABLE.includes(cita.Estado?.nombre)) {
+            return res.status(409).json({
+                ok: false,
+                mensaje: "Solo se pueden reprogramar citas pendientes o confirmadas."
             });
         }
 
@@ -1274,7 +1293,9 @@ export const reprogramarCita = async (req, res) => {
                     id_cita: {
                         [Op.ne]: cita.id_cita
                     }
-                }
+                },
+
+            include: [soloCitasActivas()]
 
             });
 
@@ -1303,7 +1324,9 @@ export const reprogramarCita = async (req, res) => {
                     id_cita: {
                         [Op.ne]: cita.id_cita
                     }
-                }
+                },
+
+            include: [soloCitasActivas()]
 
             });
 
