@@ -121,5 +121,30 @@ script.
         });
     })();
 
+//- ==========================================
+//- BARRA SUPERIOR SOLO EN MÓVIL
+//- Da acceso al menú en las páginas cuyo encabezado no tiene botón propio.
+//- Debajo del menú (z-1000) y de su fondo (z-999), y debajo de los modales (z-50 o más).
+//- ==========================================
+div#barraMenuMovil(class="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-3 border-b border-[#E2E8F0] bg-white px-4 [@media(min-width:769px)]:hidden")
+    button(
+        type="button"
+        aria-label="Abrir menú"
+        onclick="toggleSidebar()"
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#335CD8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335CD8]"
+    )
+        i(class="fa-solid fa-bars")
+    span(class="text-lg font-bold text-[#001B4D]") SIGCMI
+
+//- Si la página ya trae su propio botón de menú, se quita la barra; si no, se deja espacio para ella.
+script.
+    document.addEventListener('DOMContentLoaded', function () {
+        var barra = document.getElementById('barraMenuMovil');
+        var principal = document.querySelector('main');
+        if (!barra || !principal) return;
+        if (principal.querySelector('[onclick*="toggleSidebar"]')) { barra.remove(); return; }
+        principal.classList.add('max-[768px]:pt-[4.5rem]');
+    });
+
 //- Formato en tiempo real de nombres, correos y fechas (compartido con los demás portales)
 script(src="/js/formularios.js")
