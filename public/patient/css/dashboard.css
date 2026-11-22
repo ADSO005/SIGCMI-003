@@ -105,6 +105,10 @@ body.patient-portal textarea:focus-visible {
 /* Navegación del paciente */
 .patient-sidebar {
   z-index: 50;
+  position: fixed;
+  inset: 0 auto 0 0;
+  height: 100vh;
+  height: 100dvh;
   flex: 0 0 auto;
   width: 16rem;
   background: #263F9D;
@@ -134,19 +138,150 @@ body.patient-portal textarea:focus-visible {
   outline-color: #00BC8D;
 }
 
+.patient-dashboard-content {
+  min-height: 100vh;
+  margin-left: 16rem;
+  transition: margin-left 300ms ease-in-out;
+}
+
+.patient-mobile-menu-toggle,
+.patient-sidebar-overlay {
+  display: none;
+}
+
+body.patient-sidebar-collapsed .patient-dashboard-content {
+  margin-left: 5rem;
+}
+
+body.patient-sidebar-collapsed .patient-sidebar {
+  width: 5rem;
+}
+
 @media (max-width: 768px) {
   .patient-sidebar {
+    width: min(18rem, calc(100vw - 3rem));
+    transform: translateX(-100%);
+    transition: transform 300ms ease-in-out;
+  }
+
+  .patient-mobile-menu-toggle {
     position: fixed;
-    inset: 0 auto 0 0;
-    height: 100vh;
+    top: .75rem;
+    left: .75rem;
+    z-index: 40;
+    display: flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    border: 1px solid #E2E8F0;
+    border-radius: .75rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgb(15 23 42 / 14%);
+  }
+
+  .patient-mobile-menu-toggle span {
+    width: 1.125rem;
+    height: 2px;
+    border-radius: 2px;
+    background: #263F9D;
+  }
+
+  .patient-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    display: block;
+    border: 0;
+    background: rgb(0 27 77 / 40%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease-in-out;
+  }
+
+  body.patient-sidebar-open .patient-sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.patient-sidebar-open .patient-mobile-menu-toggle {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body.patient-sidebar-open .patient-sidebar {
+    transform: translateX(0);
+  }
+
+  .patient-dashboard-content,
+  body.patient-sidebar-collapsed .patient-dashboard-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .patient-dashboard-content > header {
+    padding-top: 4rem;
+  }
+
+  body.patient-sidebar-collapsed .patient-sidebar {
+    width: min(18rem, calc(100vw - 3rem));
   }
 }
 
-@media (min-width: 769px) {
-  .patient-sidebar {
-    position: sticky;
-    top: 0;
-    height: 100vh;
+@media (max-width: 640px) {
+  body.patient-portal header {
+    padding-inline: 1rem;
+  }
+
+  body.patient-portal main {
+    min-width: 0;
+    padding: 1rem;
+  }
+
+  body.patient-portal main > section,
+  body.patient-portal main > div,
+  body.patient-portal main form > div {
+    min-width: 0;
+  }
+
+  body.patient-portal .overflow-x-auto {
+    max-width: 100%;
+  }
+
+  #lista-diagnosticos,
+  #detalle-diagnostico {
+    height: auto !important;
+    min-height: 16rem;
+    max-height: 65vh;
+  }
+
+  #lista-diagnosticos > .diagnostic-card {
+    align-items: flex-start;
+  }
+
+  body.patient-portal .patient-modal-header {
+    padding-inline: 1rem;
+  }
+
+  body.patient-portal #modalNuevaCita,
+  body.patient-portal #modalReprogramarCita,
+  body.patient-portal #modalCodigoCita {
+    align-items: flex-end;
+    padding: .5rem;
+  }
+
+  body.patient-portal #modalNuevaCita > div,
+  body.patient-portal #modalReprogramarCita > div,
+  body.patient-portal #modalCodigoCita > div {
+    max-height: calc(100dvh - 1rem);
+    border-radius: 1rem;
+  }
+
+  body.patient-portal .max-w-6xl,
+  body.patient-portal .max-w-5xl {
+    margin-top: 1rem;
   }
 }
 
@@ -411,4 +546,29 @@ body.patient-portal form button:focus-visible {
   max-width: none;
   height: 6.375rem;
   object-fit: contain;
+}
+
+.patient-date-chevron {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: .5rem;
+  background: #EAF0FF;
+  color: #335CD8;
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.patient-date-chevron svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.patient-select-trigger[aria-expanded="true"] .patient-date-chevron,
+button[aria-controls^="calendario-"][aria-expanded="true"] .patient-date-chevron {
+  transform: rotate(180deg);
+  background: #335CD8;
+  color: #fff;
 }

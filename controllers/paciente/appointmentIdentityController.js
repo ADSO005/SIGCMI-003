@@ -171,6 +171,49 @@ export const listarHorasDisponiblesCitaPaciente = async (req, res) => {
     }
 }
 
+export const listarDiasDisponiblesCitaPaciente = async (req, res) => {
+    try {
+        const medicoId = Number(req.query.medicoId)
+        const anio = Number(req.query.anio)
+        const mes = Number(req.query.mes)
+        if (!Number.isInteger(medicoId) || medicoId < 1 || !Number.isInteger(anio) || anio < 2020 || !Number.isInteger(mes) || mes < 1 || mes > 12) {
+            return responderError(res, 400, 'Selecciona un médico y un mes válidos.')
+        }
+
+        const paciente = await Paciente.findOne({ where: { usuario_id: req.usuario.id_usuario } })
+        if (!paciente) return responderError(res, 404, 'No se encontró el perfil del paciente.')
+
+        let excluirCitaId = null
+        if (req.query.citaId) {
+            excluirCitaId = Number(req.query.citaId)
+            if (!Number.isInteger(excluirCitaId) || excluirCitaId < 1) return responderError(res, 400, 'La cita seleccionada no es válida.')
+            const cita = await Cita.findOne({
+                where: { id_cita: excluirCitaId, paciente_id: paciente.id_paciente },
+                include: [{ model: EstadoCita, as: 'Estado' }]
+            })
+            if (!cita || !estadosActivos.includes(cita.Estado?.nombre)) return responderError(res, 404, 'No se encontró una cita activa para reprogramar.')
+        }
+
+        const totalDias = new Date(Date.UTC(anio, mes, 0)).getUTCDate()
+        const dias = []
+        for (let dia = 1; dia <= totalDias; dia++) {
+            const fecha = `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
+            const disponibilidad = await consultarHorasDisponiblesCita({
+                medicoId,
+                fecha,
+                pacienteId: paciente.id_paciente,
+                excluirCitaId,
+                anticipacionHoras: 24
+            })
+            if (disponibilidad.horas.length) dias.push(fecha)
+        }
+        return res.json({ ok: true, dias })
+    } catch (error) {
+        console.error('Error al consultar días disponibles para el paciente:', error)
+        return responderError(res, 500, 'No fue posible consultar los días disponibles.')
+    }
+}
+
 export const verificarCodigoCitaPaciente = async (req, res) => {
     const usuarioId = req.usuario.id_usuario
     const clave = String(usuarioId)

@@ -9,7 +9,7 @@ import {
 } from "../../controllers/paciente/controller.js";
 import { Usuario, Cita, Medico, Especialidad, EstadoCita } from '../../models/index.js'
 import { mostrarFormularioCancelacion, solicitarCodigoCancelacion, verificarCodigoCancelacion } from '../../controllers/paciente/cancelAppointment.js'
-import { solicitarCodigoCitaPaciente, verificarCodigoCitaPaciente, cancelarCodigoCitaPaciente, listarHorasDisponiblesCitaPaciente } from '../../controllers/paciente/appointmentIdentityController.js'
+import { solicitarCodigoCitaPaciente, verificarCodigoCitaPaciente, cancelarCodigoCitaPaciente, listarHorasDisponiblesCitaPaciente, listarDiasDisponiblesCitaPaciente } from '../../controllers/paciente/appointmentIdentityController.js'
 import { mostrarEdicionPerfil, guardarEdicionPerfil, cambiarContrasenaPaciente, obtenerOCrearPerfilPaciente } from '../../controllers/paciente/profileController.js'
 
 
@@ -177,6 +177,7 @@ router.post('/citas/codigo/solicitar', auth, role(3), solicitarCodigoCitaPacient
 router.post('/citas/codigo/verificar', auth, role(3), verificarCodigoCitaPaciente);
 router.post('/citas/codigo/cancelar', auth, role(3), cancelarCodigoCitaPaciente);
 router.get('/citas/horarios-disponibles', auth, role(3), listarHorasDisponiblesCitaPaciente);
+router.get('/citas/dias-disponibles', auth, role(3), listarDiasDisponiblesCitaPaciente);
 
 // Verificación de identidad antes de cancelar una cita.
 router.get('/citas/:id/cancelar', auth, role(3), mostrarFormularioCancelacion)
