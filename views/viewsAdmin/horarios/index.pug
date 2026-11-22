@@ -260,15 +260,6 @@ html(lang="es")
                                         i(class="fa-solid fa-sliders")
                                         | Gestionar horarios
 
-                                    button(
-                                        type="button"
-                                        class="btnNuevoHorarioMedico inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-semibold text-sm transition"
-                                        data-medico-id=medico.id_medico
-                                        data-medico-nombre=medico.nombre
-                                    )
-                                        i(class="fa-solid fa-plus")
-                                        | Agregar
-
                     else
 
                         div(class="xl:col-span-2 bg-white border border-slate-200 rounded-2xl p-12 text-center")
@@ -297,10 +288,10 @@ html(lang="es")
                     p(class="text-sm text-slate-500 mt-1")
                         | Intenta con otro nombre o especialidad.
 
-        include ../components/modals/gestionarHorarios.pug
+        include ../components/modals/editorSemanaHorarios.pug
         
         script.
             window.medicosHorarios = !{JSON.stringify(medicos).replace(/</g, '\\u003c')}
         
         script(src="/admin/js/toggleSidebar.js")
-        script(src="/admin/js/horarios.js")
+        script(src="/admin/js/horariosSemana.js")
