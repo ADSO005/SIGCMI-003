@@ -1,8 +1,8 @@
 import { Op } from 'sequelize'
 import { Cita, EstadoCita, Horario } from '../models/index.js'
+import { ESTADOS_CITA_ACTIVA } from './estadosCita.js'
 
 const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
-const estadosQueOcupanHorario = ['Pendiente', 'Confirmada']
 export const HORAS_CITA = Object.freeze([
     '08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00'
 ])
@@ -56,7 +56,7 @@ export const consultarHorasDisponiblesCita = async ({
             model: EstadoCita,
             as: 'Estado',
             attributes: [],
-            where: { nombre: { [Op.in]: estadosQueOcupanHorario } }
+            where: { nombre: { [Op.in]: ESTADOS_CITA_ACTIVA } }
         }],
         attributes: ['hora']
     })
@@ -69,7 +69,7 @@ export const consultarHorasDisponiblesCita = async ({
                 model: EstadoCita,
                 as: 'Estado',
                 attributes: [],
-                where: { nombre: { [Op.in]: estadosQueOcupanHorario } }
+                where: { nombre: { [Op.in]: ESTADOS_CITA_ACTIVA } }
             }],
             attributes: ['id_cita']
         })
