@@ -39,6 +39,10 @@ export const listarMedicos = async (req, res) => {
                         "nombre",
                         "descripcion"
                     ]
+                },
+                {
+                    model: Horario,
+                    attributes: ["id_horario", "dia_semana", "hora_inicio", "hora_fin", "fecha_inicio", "fecha_fin", "estado"]
                 }
             ],
 
@@ -76,7 +80,18 @@ export const listarMedicos = async (req, res) => {
 
             estado: medico.Usuario?.estado ?? false,
 
-            fechaRegistro: medico.Usuario?.fecha_registro || null
+            fechaRegistro: medico.Usuario?.fecha_registro || null,
+
+            // Horarios guardados: los usa el editor semanal.
+            horarios: (medico.Horarios || []).map((horario) => ({
+                id_horario: horario.id_horario,
+                dia_semana: horario.dia_semana,
+                hora_inicio: horario.hora_inicio,
+                hora_fin: horario.hora_fin,
+                fecha_inicio: horario.fecha_inicio,
+                fecha_fin: horario.fecha_fin,
+                estado: horario.estado
+            }))
 
         }));
 
