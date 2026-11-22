@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // BUSCAR ESPECIALIDAD (ignora mayúsculas, tildes y signos)
+    const buscador = document.getElementById("buscarEspecialidad");
+    const filasEspecialidades = document.querySelectorAll("#tablaEspecialidades tr[data-nombre]");
+    const sinResultados = document.getElementById("sinResultadosEspecialidades");
+
+    buscador?.addEventListener("input", () => {
+        let visibles = 0;
+
+        filasEspecialidades.forEach((fila) => {
+            const coincide = Busqueda.coincide(buscador.value, fila.dataset.nombre, fila.dataset.descripcion);
+            fila.classList.toggle("hidden", !coincide);
+            if (coincide) visibles++;
+        });
+
+        sinResultados?.classList.toggle("hidden", visibles !== 0);
+    });
+
 
 
     //MODAL NUEVA ESPECIALIDAD
