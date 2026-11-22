@@ -3,7 +3,7 @@
 // =====================================================
 div(
     id="modalNuevaCita"
-    class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4"
+    class="fixed inset-0 bg-black/50 hidden items-center justify-center z-[1100] p-4"
 )
 
     div(
@@ -53,6 +53,7 @@ div(
                         select(
                             id="modal_paciente_id"
                             name="paciente_id"
+                            data-select-buscable
                             required
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         ) 
@@ -76,6 +77,7 @@ div(
                         select(
                             id="modal_especialidad_id"
                             name="especialidad_id"
+                            data-select-buscable
                             required
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         )
@@ -99,6 +101,7 @@ div(
                         select(
                             id="modal_medico_id"
                             name="medico_id"
+                            data-select-buscable
                             required
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         )
@@ -142,6 +145,7 @@ div(
                         select(
                             id="modal_hora"
                             name="hora"
+                            data-select-buscable
                             required
                             disabled
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-400"
@@ -206,3 +210,5 @@ div(
                     )
                         i(class="fa-solid fa-calendar-check mr-2")
                         | Crear Cita
+
+script(src="/admin/js/selectBuscable.js")
