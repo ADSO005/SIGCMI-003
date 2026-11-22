@@ -538,5 +538,6 @@ html(lang="es")
             script(src="/admin/js/toggleSidebar.js")
             script.
                 window.medicosHorarios = !{JSON.stringify(medicosLista.map((m) => ({ id_medico: m.id, nombre: m.nombre, especialidad: m.especialidad, horarios: m.horarios }))).replace(/</g, '\\u003c')}
+            script(src="/admin/js/busqueda.js")
             script(src="/admin/js/medicos.js")
             script(src="/admin/js/horariosSemana.js")

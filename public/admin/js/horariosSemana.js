@@ -396,12 +396,11 @@
     const sinResultados = document.getElementById("sinResultadosMedicos");
 
     buscador.addEventListener("input", () => {
-        const busqueda = buscador.value.trim().toLowerCase();
+        const busqueda = buscador.value;
         let encontrados = 0;
 
         tarjetas.forEach((tarjeta) => {
-            const coincide = (tarjeta.dataset.nombre || "").toLowerCase().includes(busqueda)
-                || (tarjeta.dataset.especialidad || "").toLowerCase().includes(busqueda);
+            const coincide = Busqueda.coincide(busqueda, tarjeta.dataset.nombre, tarjeta.dataset.especialidad);
             tarjeta.classList.toggle("hidden", !coincide);
             if (coincide) encontrados++;
         });

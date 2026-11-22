@@ -22,10 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function filtrarPacientes() {
 
-        const texto =
-            buscarPaciente.value
-                .toLowerCase()
-                .trim();
+        const texto = buscarPaciente.value;
 
         const estadoSeleccionado =
             filtroEstado.value
@@ -36,27 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         filas.forEach((fila) => {
 
-            const nombre =
-                fila.dataset.nombre
-                    .toLowerCase();
-
-            const correo =
-                fila.dataset.correo
-                    .toLowerCase();
-
-            const documento =
-                fila.dataset.documento
-                    .toLowerCase();
-
             const estado =
                 fila.dataset.estado
                     .toLowerCase();
 
 
-            const coincideTexto =
-                nombre.includes(texto) ||
-                correo.includes(texto) ||
-                documento.includes(texto);
+            const coincideTexto = Busqueda.coincide(texto, fila.dataset.nombre, fila.dataset.correo, fila.dataset.documento);
 
 
             const coincideEstado =

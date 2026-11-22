@@ -16,14 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (inputBuscar) {
         inputBuscar.addEventListener("input", () => {
 
-            const texto = inputBuscar.value.toLowerCase().trim();
+            const texto = inputBuscar.value;
 
             filas.forEach((fila) => {
 
                 const contenido = fila.dataset.search || "";
 
                 fila.style.display =
-                    contenido.includes(texto)
+                    Busqueda.coincide(texto, contenido)
                         ? ""
                         : "none";
 

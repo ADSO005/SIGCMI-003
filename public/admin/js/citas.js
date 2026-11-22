@@ -11,9 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const filtrarCitas = () => {
 
-        const texto = buscador.value
-            .trim()
-            .toLowerCase();
+        const texto = buscador.value;
 
         const estadoSeleccionado =
             filtroEstado.value
@@ -26,18 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         filas.forEach((fila) => {
 
-            const paciente =
-                (fila.dataset.paciente || "")
-                    .toLowerCase();
-
-            const medico =
-                (fila.dataset.medico || "")
-                    .toLowerCase();
-
-            const documento =
-                (fila.dataset.documento || "")
-                    .toLowerCase();
-
             const estado =
                 (fila.dataset.estado || "")
                     .toLowerCase();
@@ -46,11 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 fila.dataset.fecha || "";
 
 
-            const coincideTexto =
-                !texto ||
-                paciente.includes(texto) ||
-                medico.includes(texto) ||
-                documento.includes(texto);
+            const coincideTexto = Busqueda.coincide(texto, fila.dataset.paciente, fila.dataset.medico, fila.dataset.documento);
 
 
             const coincideEstado =

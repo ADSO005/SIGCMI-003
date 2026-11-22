@@ -4,7 +4,6 @@
 // Uso: agregar el atributo data-select-buscable a cualquier <select>.
 (() => {
     const valorOriginal = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
-    const quitarTildes = (texto) => texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
     let contador = 0;
 
     function mejorar(select) {
@@ -112,14 +111,13 @@
                 li.addEventListener("pointermove", () => marcarActivo(visibles.findIndex((v) => v.li === li), false));
                 li.addEventListener("click", () => elegir(opcion));
                 lista.append(li);
-                opciones.push({ opcion, li, buscable: quitarTildes(opcion.textContent) });
+                opciones.push({ opcion, li });
             });
         }
 
         function filtrar() {
-            const consulta = quitarTildes(buscador.value);
             visibles = opciones.filter((item) => {
-                const coincide = item.buscable.includes(consulta);
+                const coincide = Busqueda.coincide(buscador.value, item.opcion.textContent);
                 item.li.hidden = !coincide;
                 return coincide;
             });

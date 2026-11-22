@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function filtrarDiagnosticos() {
 
         const texto = buscador
-            ? buscador.value.toLowerCase().trim()
+            ? buscador.value
             : "";
 
         const estado = filtroEstado
@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const estadoFila = fila.dataset.estado || "";
 
             const coincideTexto =
-                !texto || contenido.includes(texto);
+                Busqueda.coincide(texto, contenido);
 
             const coincideEstado =
                 !estado || estadoFila === estado;

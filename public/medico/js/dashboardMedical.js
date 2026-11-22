@@ -914,15 +914,19 @@ function agregarMedicamentosHistorial(card, diagnostico, agregarTexto) {
   card.appendChild(lista);
 }
 
+// Ignora mayúsculas, tildes y signos al buscar ("jose" encuentra "José").
+const normalizarBusqueda = valor => String(valor ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
 // FILTRAR PACIENTES EN TIEMPO REAL
 function filtrarPacientes(query) {
-  const texto = query.toLowerCase().trim();
+  const texto = normalizarBusqueda(query);
   const pacientes = document.querySelectorAll('.paciente-item');
   let encontrados = 0;
 
   pacientes.forEach(paciente => {
-    const nombre = paciente.querySelector('h4')?.textContent.toLowerCase() || '';
-    if (nombre.includes(texto)) {
+    const nombre = normalizarBusqueda(paciente.querySelector('h4')?.textContent);
+    if (texto.split(' ').every(palabra => nombre.includes(palabra))) {
       paciente.style.display = 'flex';
       encontrados++;
     } else {
