@@ -140,10 +140,10 @@ export const verDashboard = async (req, res) => {
         const totales = new Map(conteoPorEstado.map((fila) => [fila.estado_id, Number(fila.total)]));
 
         const coloresEstado = {
-            Pendiente: "#3B82F6",
-            Confirmada: "#8B5CF6",
+            Pendiente: "#335CD8",
+            Confirmada: "#00BC8D",
             "En Curso": "#F59E0B",
-            Completada: "#10B981",
+            Completada: "#059669",
             Cancelada: "#EF4444"
         };
 

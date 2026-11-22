@@ -35,13 +35,13 @@ mixin enlaceAdmin(href, icono, texto)
     a.nav-link(
         href=href
         title=texto
-        class="mb-2 flex h-12 shrink-0 items-center gap-3 rounded-xl px-3 py-2 text-[15px] font-medium text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[rgba(94,156,245,0.38)] [&.preActive]:!shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
+        class="mb-2 flex h-12 shrink-0 items-center gap-3 rounded-xl px-3 py-2 text-[15px] font-medium text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[#3C62BE] [&.preActive]:!shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
     )
         i(class=`${icono} w-[18px] shrink-0 text-center text-[17px]`)
         .nav-item(class="group-[.collapsed]:hidden")= texto
 
 aside#sidebar.sidebar.group(
-    class="sticky top-0 z-[1000] flex h-screen w-[290px] shrink-0 flex-col self-start overflow-hidden bg-gradient-to-b from-[#263c91] via-[#263f9e] to-[#1f367f] px-6 text-white shadow-xl font-[Arial,sans-serif] [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:fixed [@media(max-width:768px)]:left-0 [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
+    class="sticky top-0 z-[1000] flex h-screen w-[290px] shrink-0 flex-col self-start overflow-hidden bg-[#263F9D] px-6 text-white shadow-xl font-[Arial,sans-serif] [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:fixed [@media(max-width:768px)]:left-0 [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
 )
 
     //- LOGO Y BOTÓN DE MENÚ

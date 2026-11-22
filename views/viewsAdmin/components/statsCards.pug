@@ -3,7 +3,7 @@
 //- ==========================================
 
 mixin tarjetaResumen(titulo, valor, detalle, icono, claseIcono, claseBorde)
-    article(class=`min-w-0 rounded-[22px] border ${claseBorde} bg-gradient-to-br from-white to-slate-50 p-5 shadow-sm`)
+    article(class=`min-w-0 rounded-[22px] border border-[#E2E8F0] ${claseBorde} p-5 shadow-sm`)
         div(class="flex items-start gap-3")
             div(class=`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${claseIcono}`)
                 i(class=`fa-solid ${icono} text-lg`)
@@ -12,7 +12,7 @@ mixin tarjetaResumen(titulo, valor, detalle, icono, claseIcono, claseBorde)
         p(class="mt-3 text-sm leading-5 text-slate-600")= detalle
 
 section(aria-label="Resumen de citas" class="grid grid-cols-1 gap-4 min-[640px]:grid-cols-2 min-[1200px]:grid-cols-4")
-    +tarjetaResumen("Citas Hoy", stats.citasHoy, "Programadas para hoy", "fa-calendar-check", "bg-blue-100/80 text-[#315bd7]", "border-blue-200")
-    +tarjetaResumen("Pacientes Activos", stats.pacientesActivos, "Pacientes con cuenta activa", "fa-users", "bg-emerald-100/80 text-emerald-600", "border-emerald-100")
-    +tarjetaResumen("Médicos Disponibles", stats.medicosDisponibles, "Médicos activos en el sistema", "fa-user-doctor", "bg-violet-100/80 text-violet-600", "border-violet-100")
-    +tarjetaResumen("Tiempo Promedio Espera", `${stats.tiempoEspera} min`, "Por consulta", "fa-clock", "bg-amber-100/80 text-amber-600", "border-amber-100")
+    +tarjetaResumen("Citas Hoy", stats.citasHoy, "Programadas para hoy", "fa-calendar-check", "bg-[#335CD8]/10 text-[#335CD8]", "bg-white")
+    +tarjetaResumen("Pacientes Activos", stats.pacientesActivos, "Pacientes con cuenta activa", "fa-users", "bg-[#059669]/10 text-[#059669]", "bg-[#F1FEF8]")
+    +tarjetaResumen("Médicos Disponibles", stats.medicosDisponibles, "Médicos activos en el sistema", "fa-user-doctor", "bg-[#3C62BE]/10 text-[#3C62BE]", "bg-[#FAF9FF]")
+    +tarjetaResumen("Tiempo Promedio Espera", `${stats.tiempoEspera} min`, "Por consulta", "fa-clock", "bg-[#00BC8D]/10 text-[#00BC8D]", "bg-[#F8FFFF]")
