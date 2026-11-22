@@ -452,11 +452,12 @@ html(lang="es")
                                                             class="fa-solid fa-pen"
                                                         )
                                                     
-                                                    button.btnHorariosMedico(
+                                                    button.btnGestionarHorario(
                                                         type="button"
-                                                        data-id=medico.id
+                                                        data-medico-id=medico.id
                                                         title="Gestionar horarios"
-                                                        class="..."
+                                                        aria-label="Gestionar horarios"
+                                                        class="w-9 h-9 rounded-lg bg-[#335CD8]/10 hover:bg-[#335CD8]/20 text-[#335CD8] transition flex items-center justify-center"
                                                     )
                                                         i(class="fa-solid fa-clock")
 
@@ -529,10 +530,13 @@ html(lang="es")
                 // =================================================
 
                 include ../components/modals/verMedico.pug
-                include ../components/modals/horariosMedico.pug
+                include ../components/modals/editorSemanaHorarios.pug
             // =================================================
             // SCRIPTS
             // =================================================
 
             script(src="/admin/js/toggleSidebar.js")
+            script.
+                window.medicosHorarios = !{JSON.stringify(medicosLista.map((m) => ({ id_medico: m.id, nombre: m.nombre, especialidad: m.especialidad, horarios: m.horarios }))).replace(/</g, '\\u003c')}
             script(src="/admin/js/medicos.js")
+            script(src="/admin/js/horariosSemana.js")
