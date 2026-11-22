@@ -76,7 +76,7 @@ aside#sidebar.sidebar.group(
     hr.line-2(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20 group-[.collapsed]:hidden")
 
     //- NAVEGACIÓN (con scroll propio: son varios enlaces)
-    nav(class="flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden")
+    nav(class="flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 [scrollbar-width:thin] [scrollbar-color:transparent_transparent] group-hover:[scrollbar-color:rgba(255,255,255,0.5)_transparent]")
         +enlaceAdmin("/admin/dashboard", "fa-solid fa-house", "Dashboard")
         +enlaceAdmin("/admin/usuarios", "fa-solid fa-users", "Usuarios")
         +enlaceAdmin("/admin/pacientes", "fa-solid fa-heart-pulse", "Pacientes")
