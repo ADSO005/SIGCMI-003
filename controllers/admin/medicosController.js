@@ -7,9 +7,6 @@ import EstadoCita from "../../models/EstadoCita.js";
 import db from "../../config/db.js";
 import { Op } from "sequelize";
 
-// =====================================================
-// LISTAR MÉDICOS
-// =====================================================
 
 export const listarMedicos = async (req, res) => {
 
@@ -82,7 +79,6 @@ export const listarMedicos = async (req, res) => {
 
             fechaRegistro: medico.Usuario?.fecha_registro || null,
 
-            // Horarios guardados: los usa el editor semanal.
             horarios: (medico.Horarios || []).map((horario) => ({
                 id_horario: horario.id_horario,
                 dia_semana: horario.dia_semana,
@@ -144,9 +140,6 @@ export const listarMedicos = async (req, res) => {
     }
 };
 
-// =====================================================
-// OBTENER MÉDICO
-// =====================================================
 
 export const obtenerMedico = async (req, res) => {
     try {
@@ -234,9 +227,6 @@ export const crearHorariosMedico = async (req, res) => {
             horarios
         } = req.body;
 
-        // ============================================
-        // VALIDAR ID
-        // ============================================
 
         if (!/^\d+$/.test(String(id))) {
             return res.status(400).json({
@@ -245,9 +235,6 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // VALIDAR CAMPOS PRINCIPALES
-        // ============================================
 
         if (!fecha_inicio || !fecha_fin) {
             return res.status(400).json({
@@ -263,9 +250,6 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // VALIDAR FECHAS
-        // ============================================
 
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
@@ -304,9 +288,6 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // VALIDAR QUE SEA LUNES A DOMINGO
-        // ============================================
 
         const diaInicio = fechaInicioObj.getDay();
         const diaFin = fechaFinObj.getDay();
@@ -341,9 +322,6 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // VALIDAR MÉDICO
-        // ============================================
 
         const medico = await Medico.findByPk(id);
 
@@ -354,9 +332,6 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // DÍAS VÁLIDOS
-        // ============================================
 
         const diasValidos = [
             "Lunes",
@@ -368,9 +343,6 @@ export const crearHorariosMedico = async (req, res) => {
             "Domingo"
         ];
 
-        // ============================================
-        // VALIDAR CADA HORARIO
-        // ============================================
 
         for (const horario of horarios) {
 
@@ -380,7 +352,6 @@ export const crearHorariosMedico = async (req, res) => {
                 hora_fin
             } = horario;
 
-            // Validar día
             if (!diasValidos.includes(dia_semana)) {
                 return res.status(400).json({
                     ok: false,
@@ -389,7 +360,6 @@ export const crearHorariosMedico = async (req, res) => {
                 });
             }
 
-            // Validar horas
             if (!hora_inicio || !hora_fin) {
                 return res.status(400).json({
                     ok: false,
@@ -398,7 +368,6 @@ export const crearHorariosMedico = async (req, res) => {
                 });
             }
 
-            // Hora inicio
             if (
                 hora_inicio < "07:00" ||
                 hora_inicio > "19:00"
@@ -410,7 +379,6 @@ export const crearHorariosMedico = async (req, res) => {
                 });
             }
 
-            // Hora fin
             if (
                 hora_fin < "07:00" ||
                 hora_fin > "19:00"
@@ -422,7 +390,6 @@ export const crearHorariosMedico = async (req, res) => {
                 });
             }
 
-            // Hora final > hora inicial
             if (hora_fin <= hora_inicio) {
                 return res.status(400).json({
                     ok: false,
@@ -432,9 +399,6 @@ export const crearHorariosMedico = async (req, res) => {
             }
         }
 
-        // ============================================
-        // EVITAR DÍAS REPETIDOS
-        // ============================================
 
         const diasSeleccionados = horarios.map(
             (horario) => horario.dia_semana
@@ -450,9 +414,6 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // EVITAR DUPLICADOS
-        // ============================================
 
         const horariosExistentes = await Horario.findAll({
             where: {
@@ -462,7 +423,6 @@ export const crearHorariosMedico = async (req, res) => {
             }
         });
 
-        // Revisar si alguno de los días ya existe
         const diasExistentes = horariosExistentes.map(
             (horario) => horario.dia_semana
         );
@@ -482,9 +442,6 @@ export const crearHorariosMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // CREAR HORARIOS
-        // ============================================
 
         const horariosCreados = [];
 
@@ -504,9 +461,6 @@ export const crearHorariosMedico = async (req, res) => {
             horariosCreados.push(horario);
         }
 
-        // ============================================
-        // RESPUESTA
-        // ============================================
 
         return res.status(201).json({
             ok: true,
@@ -528,9 +482,6 @@ export const crearHorariosMedico = async (req, res) => {
     }
 };
 
-// =====================================================
-// GUARDAR AGENDA SEMANAL (rejilla por horas)
-// =====================================================
 
 const DIAS_AGENDA = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
 const HORA_APERTURA = 7;
@@ -562,9 +513,6 @@ export const guardarSemanaMedico = async (req, res) => {
             return res.status(400).json({ ok: false, mensaje: "El ID del médico no es válido." });
         }
 
-        // ============================================
-        // VALIDAR LA SEMANA (lunes a domingo)
-        // ============================================
 
         const inicio = new Date(`${fecha_inicio}T00:00:00`);
         const fin = new Date(`${fecha_fin}T00:00:00`);
@@ -585,9 +533,6 @@ export const guardarSemanaMedico = async (req, res) => {
             return res.status(400).json({ ok: false, mensaje: "No se puede modificar una semana que ya terminó." });
         }
 
-        // ============================================
-        // VALIDAR LAS HORAS DE CADA DÍA
-        // ============================================
 
         if (!dias || typeof dias !== "object" || Array.isArray(dias)) {
             return res.status(400).json({ ok: false, mensaje: "No se recibieron los días de la agenda." });
@@ -625,9 +570,6 @@ export const guardarSemanaMedico = async (req, res) => {
             return res.status(404).json({ ok: false, mensaje: "Médico no encontrado." });
         }
 
-        // ============================================
-        // NO CERRAR HORAS CON CITAS ACTIVAS
-        // ============================================
 
         const estadosInactivos = await EstadoCita.findAll({
             where: { nombre: ESTADOS_SIN_CITA_ACTIVA },
@@ -666,9 +608,6 @@ export const guardarSemanaMedico = async (req, res) => {
             });
         }
 
-        // ============================================
-        // REEMPLAZAR LOS BLOQUES DE LA SEMANA
-        // ============================================
 
         await db.transaction(async (transaction) => {
             await Horario.destroy({

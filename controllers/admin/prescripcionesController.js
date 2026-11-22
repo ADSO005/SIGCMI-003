@@ -9,9 +9,6 @@ import {
     EstadoCita
 } from "../../models/index.js";
 
-// =====================================================
-// LISTAR PRESCRIPCIONES
-// =====================================================
 
 export const listarPrescripciones = async (req, res) => {
 
@@ -117,10 +114,6 @@ export const listarPrescripciones = async (req, res) => {
     }
 };
 
-
-// =====================================================
-// OBTENER PRESCRIPCIÓN POR ID
-// =====================================================
 
 export const obtenerPrescripcion = async (req, res) => {
 

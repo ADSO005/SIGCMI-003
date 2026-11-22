@@ -84,9 +84,6 @@ export const listarHorarios = async (req, res) => {
     }
 };
 
-// ==========================================================
-// ACTUALIZAR HORARIO
-// ==========================================================
 
 export const actualizarHorario = async (req, res) => {
     try {
@@ -100,7 +97,6 @@ export const actualizarHorario = async (req, res) => {
             hora_fin
         } = req.body;
 
-        // Validar ID
         if (!id || isNaN(id)) {
             return res.status(400).json({
                 ok: false,
@@ -108,7 +104,6 @@ export const actualizarHorario = async (req, res) => {
             });
         }
 
-        // Buscar horario
         const horario = await Horario.findByPk(id);
 
         if (!horario) {
@@ -118,7 +113,6 @@ export const actualizarHorario = async (req, res) => {
             });
         }
 
-        // Validar campos
         if (
             !fecha_inicio ||
             !fecha_fin ||
@@ -132,7 +126,6 @@ export const actualizarHorario = async (req, res) => {
             });
         }
 
-        // Validar fechas
         const inicio = new Date(`${fecha_inicio}T00:00:00`);
         const fin = new Date(`${fecha_fin}T00:00:00`);
 
@@ -143,7 +136,6 @@ export const actualizarHorario = async (req, res) => {
             });
         }
 
-        // Validar horas
         if (hora_inicio < "07:00" || hora_inicio > "19:00") {
             return res.status(400).json({
                 ok: false,
@@ -165,7 +157,6 @@ export const actualizarHorario = async (req, res) => {
             });
         }
 
-        // Validar día
         const diasValidos = [
             "Lunes",
             "Martes",
@@ -183,7 +174,6 @@ export const actualizarHorario = async (req, res) => {
             });
         }
 
-        // Actualizar
         await horario.update({
             fecha_inicio,
             fecha_fin,
@@ -213,10 +203,6 @@ export const actualizarHorario = async (req, res) => {
 };
 
 
-// ==========================================================
-// ACTUALIZAR PERÍODO COMPLETO
-// ==========================================================
-
 export const actualizarPeriodoHorario = async (req, res) => {
 
     const transaction = await db.transaction();
@@ -230,9 +216,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             horarios
         } = req.body;
 
-        // ============================================
-        // VALIDAR IDS
-        // ============================================
 
         if (
             !Array.isArray(ids) ||
@@ -263,9 +246,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             });
         }
 
-        // ============================================
-        // VALIDAR CAMPOS
-        // ============================================
 
         if (!fecha_inicio || !fecha_fin) {
             await transaction.rollback();
@@ -290,9 +270,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             });
         }
 
-        // ============================================
-        // VALIDAR FECHAS
-        // ============================================
 
         const inicio =
             new Date(`${fecha_inicio}T00:00:00`);
@@ -313,9 +290,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             });
         }
 
-        // ============================================
-        // VALIDAR LUNES → DOMINGO
-        // ============================================
 
         const diaInicio = inicio.getDay();
         const diaFin = fin.getDay();
@@ -356,9 +330,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             });
         }
 
-        // ============================================
-        // DÍAS VÁLIDOS
-        // ============================================
 
         const diasValidos = [
             "Lunes",
@@ -370,9 +341,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             "Domingo"
         ];
 
-        // ============================================
-        // VALIDAR HORARIOS
-        // ============================================
 
         for (const horario of horarios) {
 
@@ -382,7 +350,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
                 hora_fin
             } = horario;
 
-            // Día válido
             if (!diasValidos.includes(dia_semana)) {
 
                 await transaction.rollback();
@@ -394,7 +361,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
                 });
             }
 
-            // Horas obligatorias
             if (!hora_inicio || !hora_fin) {
 
                 await transaction.rollback();
@@ -406,7 +372,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
                 });
             }
 
-            // Hora inicio
             if (
                 hora_inicio < "07:00" ||
                 hora_inicio > "19:00"
@@ -421,7 +386,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
                 });
             }
 
-            // Hora fin
             if (
                 hora_fin < "07:00" ||
                 hora_fin > "19:00"
@@ -436,7 +400,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
                 });
             }
 
-            // Fin > inicio
             if (hora_fin <= hora_inicio) {
 
                 await transaction.rollback();
@@ -449,9 +412,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             }
         }
 
-        // ============================================
-        // EVITAR DÍAS REPETIDOS
-        // ============================================
 
         const diasSeleccionados =
             horarios.map(
@@ -475,9 +435,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             });
         }
 
-        // ============================================
-        // BUSCAR HORARIOS ACTUALES
-        // ============================================
 
         const horariosActuales =
             await Horario.findAll({
@@ -501,9 +458,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             });
         }
 
-        // ============================================
-        // OBTENER DATOS DEL PERÍODO
-        // ============================================
 
         const medicoId =
             horariosActuales[0].medico_id;
@@ -514,9 +468,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
         const aprobadoPor =
             horariosActuales[0].aprobado_por;
 
-        // ============================================
-        // ELIMINAR HORARIOS ANTERIORES
-        // ============================================
 
         await Horario.destroy({
             where: {
@@ -525,9 +476,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             transaction
         });
 
-        // ============================================
-        // CREAR NUEVOS HORARIOS
-        // ============================================
 
         const nuevosHorarios =
             horarios.map((horario) => ({
@@ -546,9 +494,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
             { transaction }
         );
 
-        // ============================================
-        // CONFIRMAR
-        // ============================================
 
         await transaction.commit();
 
@@ -577,9 +522,6 @@ export const actualizarPeriodoHorario = async (req, res) => {
     }
 };
 
-// ==========================================================
-// ELIMINAR HORARIO
-// ==========================================================
 
 export const eliminarHorario = async (req, res) => {
 

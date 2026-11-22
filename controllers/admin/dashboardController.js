@@ -13,15 +13,9 @@ export const verDashboard = async (req, res) => {
 
     try {
 
-        //=========================================
-        // FECHA DE HOY
-        //=========================================
 
         const hoy = new Date().toISOString().split("T")[0];
 
-        //=========================================
-        // ESTADÍSTICAS
-        //=========================================
 
         const pacientesActivos = await Paciente.count();
 
@@ -57,9 +51,6 @@ export const verDashboard = async (req, res) => {
 
         const notificacionesHoy = await SolicitudWhatsApp.count();
 
-        //=========================================
-        // DATOS DEL DASHBOARD
-        //=========================================
 
         const stats = {
 
@@ -127,9 +118,6 @@ export const verDashboard = async (req, res) => {
             ]
         });
 
-        //=========================================
-        // GRÁFICO: TOTAL DE CITAS POR ESTADO
-        //=========================================
 
         const conteoPorEstado = await Cita.findAll({
             attributes: ["estado_id", [fn("COUNT", col("id_cita")), "total"]],
@@ -153,9 +141,6 @@ export const verDashboard = async (req, res) => {
             color: coloresEstado[estado.nombre] ?? "#94A3B8"
         }));
 
-        //=========================================
-        // RENDER
-        //=========================================
 
         res.render("viewsAdmin/dashboard", {
             usuarios: req.usuario,

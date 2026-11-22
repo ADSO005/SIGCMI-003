@@ -77,16 +77,12 @@ html(lang="es")
 
         div(class="flex min-h-screen")
 
-            // SIDEBAR
             include ../components/sidebar.pug
 
-            // OVERLAY
             include ../components/sidebarOverlay.pug
 
-            // CONTENIDO
             main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
 
-                // HEADER
                 div(class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8")
 
                     div
@@ -102,10 +98,8 @@ html(lang="es")
                                 p(class="text-sm text-slate-500 mt-1")
                                     | Administra la disponibilidad de los médicos.
 
-                // RESUMEN
                 div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-7")
 
-                    // MÉDICOS
                     div(class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm")
 
                         div(class="flex items-center justify-between")
@@ -120,7 +114,6 @@ html(lang="es")
                             div(class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center")
                                 i(class="fa-solid fa-user-doctor text-lg")
 
-                    // HORARIOS
                     div(class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm")
 
                         - let totalHorarios = 0
@@ -139,7 +132,6 @@ html(lang="es")
                             div(class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center")
                                 i(class="fa-solid fa-calendar-days text-lg")
 
-                    // MÉDICOS ACTIVOS
                     div(class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm")
 
                         - let medicosActivos = medicos.filter(m => m.estado === true).length
@@ -156,7 +148,6 @@ html(lang="es")
                             div(class="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center")
                                 i(class="fa-solid fa-user-check text-lg")
 
-                // BARRA DE BÚSQUEDA
                 div(class="bg-white border border-slate-200 rounded-2xl p-4 mb-7 shadow-sm")
 
                     div(class="relative max-w-md")
@@ -170,7 +161,6 @@ html(lang="es")
                             class="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                         )
 
-                // CONTENEDOR DE MÉDICOS
                 div(
                     id="contenedorMedicosHorarios"
                     class="grid grid-cols-1 xl:grid-cols-2 gap-6"
@@ -186,7 +176,6 @@ html(lang="es")
                                 data-especialidad=medico.especialidad
                             )
 
-                                // CABECERA MÉDICO
                                 div(class="p-5 border-b border-slate-200")
 
                                     div(class="flex items-start justify-between gap-4")
@@ -216,7 +205,6 @@ html(lang="es")
                                                 span(class="w-2 h-2 rounded-full bg-red-500")
                                                 | Inactivo
 
-                                // HORARIOS (semana actual y próxima, altura fija)
                                 - const semanas = semanasFijas(medico.horarios)
                                 div(class="p-5")
 
@@ -278,7 +266,6 @@ html(lang="es")
                                                         span(class="mt-1 text-xs text-slate-500") Toca para abrirla
 
 
-                                // ACCIONES
                                 div(class="px-5 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row gap-3")
 
                                     button(
@@ -303,7 +290,6 @@ html(lang="es")
                             p(class="text-sm text-slate-500 mt-2")
                                 | Los médicos registrados aparecerán aquí para gestionar sus horarios.
 
-                // SIN RESULTADOS
                 div(
                     id="sinResultadosMedicos"
                     class="hidden bg-white border border-slate-200 rounded-2xl p-10 text-center"

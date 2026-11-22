@@ -72,7 +72,6 @@
         if (nuevo !== campo.value) reemplazarValor(campo, nuevo);
     });
 
-    // Al salir del campo se quitan los espacios sobrantes de los nombres.
     document.addEventListener("focusout", (evento) => {
         const campo = evento.target;
         if (!(campo instanceof HTMLInputElement) || formatoDe(campo) !== capitalizar) return;

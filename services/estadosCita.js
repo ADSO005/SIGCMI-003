@@ -5,7 +5,6 @@ import { EstadoCita } from "../models/index.js";
 // Las canceladas, completadas y cerradas sin finalizar no cuentan: su hora y su fecha quedan libres.
 export const ESTADOS_CITA_ACTIVA = ["Pendiente", "Confirmada", "En Curso"];
 
-// Citas que el administrador o el paciente todavía pueden reprogramar.
 export const ESTADOS_CITA_REPROGRAMABLE = ["Pendiente", "Confirmada"];
 
 // Para usar dentro de `include` de una consulta sobre Cita: deja solo las citas activas.

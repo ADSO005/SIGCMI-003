@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // BUSCAR ESPECIALIDAD (ignora mayúsculas, tildes y signos)
     const buscador = document.getElementById("buscarEspecialidad");
     const filasEspecialidades = document.querySelectorAll("#tablaEspecialidades tr[data-nombre]");
     const sinResultados = document.getElementById("sinResultadosEspecialidades");
@@ -17,9 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-
-    //MODAL NUEVA ESPECIALIDAD
-
     const modal =
         document.getElementById("modalNuevaEspecialidad");
 
@@ -35,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const formulario =
         document.getElementById("formNuevaEspecialidad");
 
-    //MODAL EDITAR ESPECIALIDAD
 
     const modalEditar =
         document.getElementById("modalEditarEspecialidad");
@@ -52,9 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const botonesEditar =
         document.querySelectorAll(".btnEditarEspecialidad");
 
-    // ==========================================
-    // ABRIR MODAL EDITAR
-    // ==========================================
 
     botonesEditar.forEach((boton) => {
 
@@ -123,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-    //FORMULARIO EDITAR ESPECIALIDAD
 
     formularioEditar?.addEventListener(
         "submit",
@@ -192,7 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     );
 
-    //BOTONES PARA CERRAR MODAL EDITAR ESPECIALIDAD
 
     const cerrarModalEditar = () => {
 
@@ -213,10 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cerrarModalEditar
     );
 
-
-    // ==========================================
-    // ELIMINAR ESPECIALIDAD
-    // ==========================================
 
     const botonesEliminar =
         document.querySelectorAll(".btnEliminarEspecialidad");
@@ -288,9 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
     
-    // ==========================================
-    // ABRIR MODAL 
-    // ==========================================
 
     btnNueva?.addEventListener("click", () => {
 
@@ -299,10 +282,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-    // ==========================================
-    // CERRAR MODAL
-    // ==========================================
 
     const cerrarModal = () => {
 
@@ -324,10 +303,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cerrarModal
     );
 
-
-    // ==========================================
-    // CREAR ESPECIALIDAD
-    // ==========================================
 
     formulario?.addEventListener(
         "submit",
@@ -386,7 +361,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 cerrarModal();
 
-                // Recargar lista
                 window.location.reload();
 
 

@@ -13,9 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let fechaActual = new Date();
 
-    // --------------------------------------------------
-    // FECHA ACTUAL
-    // --------------------------------------------------
 
     const fechaActualTexto = document.getElementById("fechaActualTexto");
 
@@ -31,9 +28,6 @@ document.addEventListener("DOMContentLoaded", () => {
             texto.charAt(0).toUpperCase() + texto.slice(1);
     }
 
-    // --------------------------------------------------
-    // UTILIDADES
-    // --------------------------------------------------
 
     function formatearHora(hora) {
         if (!hora) return "";
@@ -68,9 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --------------------------------------------------
-    // RENDERIZAR CALENDARIO
-    // --------------------------------------------------
 
     function renderizarCalendario() {
 
@@ -91,9 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const cantidadDias = ultimoDia.getDate();
 
-        // --------------------------------------------------
-        // TÍTULO
-        // --------------------------------------------------
 
         const nombreMes = fechaActual.toLocaleDateString("es-CO", {
             month: "long"
@@ -111,9 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 `${cantidadDias} días`;
         }
 
-        // --------------------------------------------------
-        // DÍAS ANTERIORES
-        // --------------------------------------------------
 
         for (let i = 0; i < diaInicio; i++) {
 
@@ -125,9 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
             calendarioGrid.appendChild(celda);
         }
 
-        // --------------------------------------------------
-        // DÍAS DEL MES
-        // --------------------------------------------------
 
         for (let dia = 1; dia <= cantidadDias; dia++) {
 
@@ -157,9 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
             celda.className =
                 "min-h-[130px] bg-white border-r border-b border-slate-200 p-2";
 
-            // --------------------------------------------------
-            // NÚMERO DEL DÍA
-            // --------------------------------------------------
 
             const encabezadoDia = document.createElement("div");
 
@@ -178,9 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             celda.appendChild(encabezadoDia);
 
-            // --------------------------------------------------
-            // CITAS DEL DÍA
-            // --------------------------------------------------
 
             const filtro = filtroEstado
                 ? filtroEstado.value
@@ -253,9 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --------------------------------------------------
-    // VER DETALLE DE CITA
-    // --------------------------------------------------
 
     async function abrirDetalleCita(id) {
         try {
@@ -341,9 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --------------------------------------------------
-    // BOTONES DE NAVEGACIÓN
-    // --------------------------------------------------
 
     if (btnMesAnterior) {
 
@@ -386,9 +356,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --------------------------------------------------
-    // CERRAR MODAL
-    // --------------------------------------------------
 
     const btnCerrar =
         document.getElementById("btnCerrarVerCita");
@@ -413,9 +380,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --------------------------------------------------
-    // INICIAR
-    // --------------------------------------------------
 
     console.log("Citas recibidas por calendario:", citas);
 

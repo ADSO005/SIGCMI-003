@@ -17,25 +17,16 @@ html(lang="es")
 
         div(class="flex min-h-screen")
 
-            // ==========================================
-            // SIDEBAR
-            // ==========================================
 
             include ../components/sidebar.pug
             include ../components/sidebarOverlay.pug
 
-            // ==========================================
-            // CONTENIDO PRINCIPAL
-            // ==========================================
 
             main(
                 id="mainContent"
                 class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6"
             )
 
-                // ======================================
-                // BOTÓN MOBILE
-                // ======================================
 
                 div(class="md:hidden mb-4")
                     button(
@@ -46,9 +37,6 @@ html(lang="es")
                     )
                         i(class="fa-solid fa-bars text-xl")
 
-                // ======================================
-                // ENCABEZADO
-                // ======================================
 
                 div(
                     class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
@@ -69,21 +57,14 @@ html(lang="es")
                         i(class="fa-solid fa-calendar")
                         | #{new Date().toLocaleDateString("es-CO")}
 
-                // ======================================
-                // SEPARADOR
-                // ======================================
 
                 div(class="border-b border-slate-200 mb-6")
 
-                // ======================================
-                // ESTADÍSTICAS
-                // ======================================
 
                 div(
                     class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-6"
                 )
 
-                    // TOTAL
                     div(
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
                     )
@@ -103,7 +84,6 @@ html(lang="es")
                             )
                                 i(class="fa-solid fa-users text-xl")
 
-                    // ACTIVOS
                     div(
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
                     )
@@ -123,7 +103,6 @@ html(lang="es")
                             )
                                 i(class="fa-solid fa-user-check text-xl")
 
-                    // INACTIVOS
                     div(
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5"
                     )
@@ -143,17 +122,11 @@ html(lang="es")
                             )
                                 i(class="fa-solid fa-user-slash text-xl")
 
-                // ======================================
-                // TABLA
-                // ======================================
 
                 div(
                     class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
                 )
 
-                    // ==================================
-                    // CABECERA TABLA
-                    // ==================================
 
                     div(
                         class="p-5 border-b border-slate-200"
@@ -176,7 +149,6 @@ html(lang="es")
                                 class="flex flex-col sm:flex-row gap-3"
                             )
 
-                                // BUSCADOR
                                 div(class="relative")
 
                                     i(
@@ -190,7 +162,6 @@ html(lang="es")
                                         class="w-full sm:w-64 pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                                     )
 
-                                // FILTRO
                                 select(
                                     id="filtroEstadoPaciente"
                                     class="w-full sm:w-50 px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
@@ -199,9 +170,6 @@ html(lang="es")
                                     option(value="activo") Activos
                                     option(value="inactivo") Inactivos
 
-                    // ==================================
-                    // TABLA RESPONSIVE
-                    // ==================================
 
                     div(class="overflow-x-auto")
 
@@ -259,7 +227,6 @@ html(lang="es")
                                             data-estado=paciente.estado ? "activo" : "inactivo"
                                         )
 
-                                            // PACIENTE
                                             td(class="px-5 py-4")
 
                                                 div(
@@ -280,7 +247,6 @@ html(lang="es")
                                                             class="text-xs text-slate-500" hidden
                                                         ) ID: #{paciente.id}
 
-                                            // DOCUMENTO
                                             td(class="px-5 py-4")
 
                                                 p(
@@ -291,25 +257,21 @@ html(lang="es")
                                                     class="font-medium text-slate-800"
                                                 ) #{paciente.documento || "N/A"}
 
-                                            // CORREO
                                             td(
                                                 class="px-5 py-4 text-sm text-slate-700"
                                             )
                                                 | #{paciente.correo || "N/A"}
 
-                                            // TELÉFONO
                                             td(
                                                 class="px-5 py-4 text-sm text-slate-700"
                                             )
                                                 | #{paciente.telefono || "N/A"}
 
-                                            // CIUDAD
                                             td(
                                                 class="px-5 py-4 text-sm text-slate-700"
                                             )
                                                 | #{paciente.ciudad || "N/A"}
 
-                                            // ESTADO
                                             td(class="px-5 py-4")
 
                                                 if paciente.estado
@@ -326,7 +288,6 @@ html(lang="es")
                                                     )
                                                         | Inactivo
 
-                                            // REGISTRO
                                             td(
                                                 class="px-5 py-4 text-sm text-slate-600"
                                             )
@@ -336,7 +297,6 @@ html(lang="es")
                                                 else
                                                     | N/A
 
-                                            // ACCIONES
                                             td(class="px-5 py-4")
 
                                                 div(
@@ -382,9 +342,6 @@ html(lang="es")
 
                                             p No hay pacientes registrados.
 
-                    // ==================================
-                    // MENSAJE DE FILTRO
-                    // ==================================
 
                     div(
                         id="sinResultadosPacientes"
@@ -399,9 +356,6 @@ html(lang="es")
 
 
         include ../components/modals/verPaciente.pug
-        // ==========================================
-        // JAVASCRIPT
-        // ==========================================
 
         script(src="/admin/js/toggleSidebar.js")
         script(src="/admin/js/busqueda.js")

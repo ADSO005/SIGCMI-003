@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ========================================
-    // ELEMENTOS
-    // ========================================
 
     const buscarMedico =
         document.getElementById("buscarMedico");
@@ -16,10 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const sinResultados =
         document.getElementById("sinResultadosMedicos");
 
-
-    // ========================================
-    // FILTRAR MÉDICOS
-    // ========================================
 
     function filtrarMedicos() {
 
@@ -65,10 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-        // ========================================
-        // SIN RESULTADOS
-        // ========================================
-
         if (encontrados === 0) {
 
             sinResultados.classList.remove("hidden");
@@ -81,10 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // ========================================
-    // EVENTOS
-    // ========================================
-
     buscarMedico.addEventListener(
         "input",
         filtrarMedicos
@@ -95,11 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
         filtrarMedicos
     );
 
-
-
-    // =====================================================
-    // VER MÉDICO
-    // =====================================================
 
     const modalVerMedico =
         document.getElementById("modalVerMedico");
@@ -137,9 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const especialidad = medico.Especialidad;
             const horarios = medico.Horarios || [];
 
-            // ============================================
-            // DATOS DEL MÉDICO
-            // ============================================
 
             document.getElementById("ver_medico_nombre").textContent =
                 `${usuario.nombres} ${usuario.apellidos}`;
@@ -175,9 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? new Date(usuario.fecha_registro).toLocaleDateString("es-CO")
                     : "No registrada";
 
-            // ============================================
-            // HORARIOS
-            // ============================================
 
             const contenedorHorarios = document.getElementById(
                 "ver_medico_horarios"
@@ -194,9 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
             } else {
 
-                // ========================================
-                // AGRUPAR POR PERÍODO
-                // ========================================
 
                 const periodos = {};
 
@@ -218,9 +189,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     periodos[clave].horarios.push(horario);
                 });
 
-                // ========================================
-                // ORDEN DE LOS DÍAS
-                // ========================================
 
                 const ordenDias = {
                     Lunes: 1,
@@ -232,9 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     Domingo: 7
                 };
 
-                // ========================================
-                // FORMATEAR FECHA
-                // ========================================
 
                 const formatearFecha = (fecha) => {
 
@@ -253,9 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return `${dia}/${mes}/${anio}`;
                 };
 
-                // ========================================
-                // MOSTRAR CADA PERÍODO
-                // ========================================
 
                 Object.values(periodos).forEach((periodo) => {
 
@@ -340,9 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
 
-            // ============================================
-            // ABRIR MODAL
-            // ============================================
 
             modalVerMedico.classList.remove("hidden");
             modalVerMedico.classList.add("flex");
@@ -355,10 +314,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
-    // =====================================================
-    // BOTONES VER
-    // =====================================================
 
     botonesVerMedico.forEach((boton) => {
 
@@ -373,10 +328,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-    // =====================================================
-    // CERRAR MODAL
-    // =====================================================
 
     btnCerrarVerMedico.addEventListener(
         "click",

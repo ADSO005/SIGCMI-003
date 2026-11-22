@@ -17,24 +17,13 @@ html(lang="es")
 
         div(class="flex min-h-screen")
 
-            // =====================================================
-            // SIDEBAR
-            // =====================================================
 
             include ../components/sidebar.pug
             include ../components/sidebarOverlay.pug
 
 
-            // =====================================================
-            // CONTENIDO PRINCIPAL
-            // =====================================================
-
             main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
 
-
-                // =================================================
-                // ENCABEZADO
-                // =================================================
 
                 div(class="mb-6")
 
@@ -56,7 +45,6 @@ html(lang="es")
                                         | Consulta y organiza las citas médicas programadas.
 
 
-                        // Fecha actual
                         div(
                             class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm"
                         )
@@ -77,14 +65,9 @@ html(lang="es")
                                     | --
 
 
-                // =================================================
-                // ESTADÍSTICAS
-                // =================================================
-
                 div(class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6")
 
 
-                    // Total
                     div(
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
                     )
@@ -107,7 +90,6 @@ html(lang="es")
                                 i(class="fa-solid fa-calendar-check")
 
 
-                    // Pendientes
                     div(
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
                     )
@@ -130,7 +112,6 @@ html(lang="es")
                                 i(class="fa-regular fa-clock")
 
 
-                    // En curso
                     div(
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
                     )
@@ -153,7 +134,6 @@ html(lang="es")
                                 i(class="fa-solid fa-user-doctor")
 
 
-                    // Completadas
                     div(
                         class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition"
                     )
@@ -195,9 +175,6 @@ html(lang="es")
                                 class="w-11 h-11 rounded-xl bg-red-100 text-red-600 flex items-center justify-center"
                             )
                                 i(class="fa-solid fa-calendar-xmark")
-                // =================================================
-                // CONTROLES
-                // =================================================
 
                 div(
                     class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-5"
@@ -207,7 +184,6 @@ html(lang="es")
                         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
                     )
 
-                        // Navegación
                         div(class="flex items-center gap-2")
 
                             button(
@@ -237,7 +213,6 @@ html(lang="es")
                                 i(class="fa-solid fa-chevron-right")
 
 
-                        // Mes
                         div(class="text-center")
 
                             h2(
@@ -254,7 +229,6 @@ html(lang="es")
                                 | Vista mensual
 
 
-                        // Filtro
                         div(class="flex items-center gap-2")
 
                             div(
@@ -285,15 +259,10 @@ html(lang="es")
                                         | Canceladas
 
 
-                // =================================================
-                // CALENDARIO
-                // =================================================
-
                 div(
                     class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
                 )
 
-                    // Cabecera
                     div(
                         class="grid grid-cols-7 border-b border-slate-200 bg-slate-50 min-w-[850px]"
                     )
@@ -306,7 +275,6 @@ html(lang="es")
                                 | #{dia}
 
 
-                    // Contenedor responsive
                     div(class="overflow-x-auto")
 
                         div(
@@ -314,10 +282,6 @@ html(lang="es")
                             class="grid grid-cols-7 min-w-[850px]"
                         )
 
-
-                // =================================================
-                // LEYENDA
-                // =================================================
 
                 div(
                     class="flex flex-wrap items-center gap-x-6 gap-y-3 mt-5 px-1"
@@ -340,20 +304,12 @@ html(lang="es")
                         | Cancelada
 
 
-
-        // =========================================================
-        // DATOS
-        // =========================================================
-
         script.
             window.citasCalendario = !{JSON.stringify(citas)};
 
         
         include ../components/modals/verCita.pug
 
-        // =========================================================
-        // SCRIPTS
-        // =========================================================
 
         script(src="/admin/js/toggleSidebar.js")
         script(src="/admin/js/citas.js")

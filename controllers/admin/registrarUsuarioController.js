@@ -3,9 +3,6 @@ import db from "../../config/db.js";
 import bcrypt from "bcrypt";
 import { Usuario, Paciente, Medico, Especialidad, Cita } from "../../models/index.js";
 
-// =====================================================
-// CONSTANTES
-// =====================================================
 
 export const ROLES = {
     ADMIN: 1,
@@ -27,9 +24,6 @@ export const fijarRol = (rol) => (req, res, next) => {
     next();
 };
 
-// =====================================================
-// MOSTRAR FORMULARIO
-// =====================================================
 
 const renderFormularioRegistro = async (req, res, valores, { error = null, status = 200 } = {}) => {
     const especialidades = await Especialidad.findAll({
@@ -74,9 +68,6 @@ export const mostrarFormularioUsuario = async (req, res) => {
     }
 };
 
-// =====================================================
-// REGISTRAR USUARIO (ADMIN, MÉDICO O PACIENTE)
-// =====================================================
 
 export const registrarUsuario = async (req, res) => {
 
@@ -92,23 +83,19 @@ export const registrarUsuario = async (req, res) => {
     const telefono = texto(body.telefono);
     const { password, confirmPassword } = body;
 
-    // Vuelve a mostrar el formulario con los datos ingresados y el mensaje en una alerta
     const fallar = (mensaje, status = 400) =>
         renderFormularioRegistro(req, res, { ...body, password: "", confirmPassword: "" }, { error: mensaje, status });
 
     try {
 
-        // 1. Rol válido
         if (!Object.values(ROLES).includes(rol)) {
             return fallar("Selecciona un rol válido.");
         }
 
-        // 2. Campos comunes obligatorios
         if (!nombres || !apellidos || !tipoDocumento || !numeroDocumento || !correo || !password || !confirmPassword) {
             return fallar("Todos los campos obligatorios deben estar completos.");
         }
 
-        // 3. Contraseñas
         if (password !== confirmPassword) {
             return fallar("Las contraseñas no coinciden.");
         }
@@ -117,7 +104,6 @@ export const registrarUsuario = async (req, res) => {
             return fallar("La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.");
         }
 
-        // 4. Correo y documento
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
             return fallar("El correo electrónico no es válido.");
         }
@@ -126,7 +112,6 @@ export const registrarUsuario = async (req, res) => {
             return fallar("El número de documento contiene caracteres no permitidos.");
         }
 
-        // 5. Datos específicos del médico
         let datosMedico = null;
 
         if (rol === ROLES.MEDICO) {
@@ -164,7 +149,6 @@ export const registrarUsuario = async (req, res) => {
             };
         }
 
-        // 6. Duplicados
         if (await Usuario.findOne({ where: { correo } })) {
             return fallar("Ya existe un usuario registrado con ese correo.", 409);
         }
@@ -173,7 +157,6 @@ export const registrarUsuario = async (req, res) => {
             return fallar("Ya existe un usuario registrado con ese número de documento.", 409);
         }
 
-        // 7. Crear usuario y perfil en una sola transacción
         const passwordHash = await bcrypt.hash(password, 10);
         const transaction = await db.transaction();
 
@@ -227,7 +210,6 @@ export const registrarUsuario = async (req, res) => {
             throw error;
         }
 
-        // 8. Respuesta exitosa
         return res.send(paginaExito(rol));
 
     } catch (error) {
@@ -236,9 +218,6 @@ export const registrarUsuario = async (req, res) => {
     }
 };
 
-// =====================================================
-// CONTRASEÑA
-// =====================================================
 
 const esPasswordSegura = (password) =>
     password.length >= 8 &&
@@ -247,12 +226,6 @@ const esPasswordSegura = (password) =>
     /[0-9]/.test(password) &&
     /[^A-Za-z0-9]/.test(password);
 
-// =====================================================
-// EDITAR USUARIO (ADMIN, MÉDICO O PACIENTE)
-// Usa el mismo formulario del registro. Al cambiar el rol se crea
-// o actualiza el perfil de paciente o médico correspondiente.
-// Los perfiles anteriores no se borran para conservar el historial (citas, etc.).
-// =====================================================
 
 const TIPOS_DOCUMENTO = ["CC", "TI", "CE", "PP"];
 
@@ -276,7 +249,6 @@ const valoresDesdeRegistro = (usuario, paciente, medico) => ({
     anios_experiencia: medico?.anios_experiencia ?? ""
 });
 
-// Lista a la que se vuelve al terminar: usuarios, pacientes o medicos
 const destinoVolver = (valor) =>
     ["usuarios", "pacientes", "medicos"].includes(valor) ? valor : "usuarios";
 
@@ -350,7 +322,6 @@ export const actualizarUsuarioCompleto = async (req, res) => {
         return res.status(400).send("El ID del usuario no es válido.");
     }
 
-    // Vuelve a mostrar el formulario con los datos ingresados y el mensaje de error
     const volver = destinoVolver(body.volver);
 
     const fallar = (mensaje, status = 400) =>
@@ -374,7 +345,6 @@ export const actualizarUsuarioCompleto = async (req, res) => {
         const confirmPassword = typeof body.confirmPassword === "string" ? body.confirmPassword : "";
         const cambiarPassword = password !== "" || confirmPassword !== "";
 
-        // 1. Rol y campos comunes
         if (!Object.values(ROLES).includes(rol)) {
             return fallar("Selecciona un rol válido.");
         }
@@ -395,7 +365,6 @@ export const actualizarUsuarioCompleto = async (req, res) => {
             return fallar("El número de documento contiene caracteres no permitidos.");
         }
 
-        // 2. Contraseña (opcional en edición)
         if (cambiarPassword) {
             if (password !== confirmPassword) {
                 return fallar("Las contraseñas no coinciden.");
@@ -406,7 +375,6 @@ export const actualizarUsuarioCompleto = async (req, res) => {
             }
         }
 
-        // 3. Datos del médico
         let datosMedico = null;
 
         if (rol === ROLES.MEDICO) {
@@ -445,7 +413,6 @@ export const actualizarUsuarioCompleto = async (req, res) => {
             };
         }
 
-        // 4. Duplicados (excluyendo al propio usuario)
         const correoExiste = await Usuario.findOne({ where: { correo } });
 
         if (correoExiste && correoExiste.id_usuario !== usuario.id_usuario) {
@@ -479,7 +446,6 @@ export const actualizarUsuarioCompleto = async (req, res) => {
             }
         }
 
-        // 5. Guardar usuario y perfil según el rol en una sola transacción
         const campos = {
             rol_id: rol,
             nombres,
@@ -539,9 +505,6 @@ export const actualizarUsuarioCompleto = async (req, res) => {
     }
 };
 
-// =====================================================
-// PÁGINA DE ÉXITO
-// =====================================================
 
 const paginaExito = (rol) => `
 <!DOCTYPE html>

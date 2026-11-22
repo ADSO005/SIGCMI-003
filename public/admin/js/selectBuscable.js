@@ -15,7 +15,6 @@
         const etiqueta = select.id ? document.querySelector(`label[for="${select.id}"]`) : null;
         if (etiqueta && !etiqueta.id) etiqueta.id = `${id}-etiqueta`;
 
-        // ---------- Estructura ----------
         const contenedor = document.createElement("div");
         contenedor.className = "relative";
         select.parentNode.insertBefore(contenedor, select);
@@ -70,7 +69,6 @@
         panel.append(buscador, lista, aviso);
         contenedor.append(boton, panel);
 
-        // ---------- Estado ----------
         let opciones = []; // [{ opcion, li }]
         let visibles = []; // subconjunto de opciones que coincide con la búsqueda
         let activo = -1;
@@ -188,7 +186,6 @@
             if (cambio) select.dispatchEvent(new Event("change", { bubbles: true }));
         }
 
-        // ---------- Eventos ----------
         boton.addEventListener("click", () => (panel.hidden ? abrir() : cerrar()));
         boton.addEventListener("keydown", (evento) => {
             if (evento.key === "ArrowDown" || evento.key === "ArrowUp") {

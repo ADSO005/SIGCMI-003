@@ -9,9 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ".btnCerrarModalPrescripcion"
     );
 
-    // =====================================================
-    // BUSCAR PRESCRIPCIONES
-    // =====================================================
 
     if (inputBuscar) {
         inputBuscar.addEventListener("input", () => {
@@ -32,10 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
-    // =====================================================
-    // VER PRESCRIPCIÓN
-    // =====================================================
 
     const botones = document.querySelectorAll(".btnVerPrescripcion");
 
@@ -93,10 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     : null;
 
 
-                // =====================================================
-                // DATOS DE LA PRESCRIPCIÓN
-                // =====================================================
-
                 document.getElementById(
                     "modalPrescripcionMedicamento"
                 ).textContent =
@@ -122,10 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Sin duración";
 
 
-                // =====================================================
-                // PACIENTE
-                // =====================================================
-
                 document.getElementById(
                     "modalPrescripcionPaciente"
                 ).textContent =
@@ -139,10 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     pacienteUsuario?.numero_documento ||
                     "Sin documento";
 
-
-                // =====================================================
-                // MÉDICO
-                // =====================================================
 
                 document.getElementById(
                     "modalPrescripcionMedico"
@@ -158,20 +139,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Sin especialidad";
 
 
-                // =====================================================
-                // DIAGNÓSTICO
-                // =====================================================
-
                 document.getElementById(
                     "modalPrescripcionDiagnostico"
                 ).textContent =
                     diagnostico?.diagnostico ||
                     "Sin diagnóstico";
 
-
-                // =====================================================
-                // CITA
-                // =====================================================
 
                 document.getElementById(
                     "modalPrescripcionFecha"
@@ -187,10 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     estado?.nombre ||
                     "Sin estado";
 
-
-                // =====================================================
-                // ABRIR MODAL
-                // =====================================================
 
                 modal.classList.remove("hidden");
                 modal.classList.add("flex");
@@ -213,10 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // =====================================================
-    // CERRAR MODAL
-    // =====================================================
-
     botonesCerrar.forEach((boton) => {
 
         boton.addEventListener("click", () => {
@@ -228,10 +193,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-    // =====================================================
-    // CERRAR AL HACER CLICK FUERA
-    // =====================================================
 
     if (modal) {
 

@@ -1,8 +1,5 @@
-//- ==========================================
-//- SIDEBAR ADMINISTRATIVO
 //- Mismos estilos que el sidebar del portal médico (viewsMedico/includes/sidebar.pug).
 //- Hooks de toggleSidebar.js: #sidebar con las clases "collapsed" (escritorio) y "open" (móvil).
-//- ==========================================
 
 dialog#logoutModal(
     aria-labelledby="logoutModalTitle"
@@ -44,7 +41,6 @@ aside#sidebar.sidebar.group(
     class="sticky top-0 z-[1000] flex h-screen w-[290px] shrink-0 flex-col self-start overflow-hidden bg-[#263F9D] px-6 text-white shadow-xl font-[Arial,sans-serif] [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:fixed [@media(max-width:768px)]:left-0 [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
 )
 
-    //- LOGO Y BOTÓN DE MENÚ
     .logo(class="flex h-[82px] shrink-0 items-center justify-between px-1 group-[.collapsed]:justify-center group-[.collapsed]:px-0")
         span.logo-text(class="flex items-center gap-3 text-[26px] leading-none font-bold tracking-wide group-[.collapsed]:hidden")
             svg(class="h-9 w-9 text-teal-300" viewBox="0 0 40 40" fill="none" aria-hidden="true")
@@ -60,7 +56,6 @@ aside#sidebar.sidebar.group(
 
     hr.line-1(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
 
-    //- USUARIO
     .user(class="flex min-h-[120px] shrink-0 items-start gap-4 py-6 group-[.collapsed]:hidden")
         .avatar(class="mt-1 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/15 shadow-inner")
             img.avatar-img(
@@ -75,7 +70,6 @@ aside#sidebar.sidebar.group(
 
     hr.line-2(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20 group-[.collapsed]:hidden")
 
-    //- NAVEGACIÓN (con scroll propio: son varios enlaces)
     nav(class="flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 [scrollbar-width:thin] [scrollbar-color:transparent_transparent] group-hover:[scrollbar-color:rgba(255,255,255,0.5)_transparent]")
         +enlaceAdmin("/admin/dashboard", "fa-solid fa-house", "Dashboard")
         +enlaceAdmin("/admin/usuarios", "fa-solid fa-users", "Usuarios")
@@ -92,7 +86,6 @@ aside#sidebar.sidebar.group(
 
     hr.line-3(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
 
-    //- CERRAR SESIÓN (pide confirmación)
     button(
         type="button"
         onclick="document.getElementById('logoutModal').showModal()"
@@ -108,7 +101,6 @@ aside#sidebar.sidebar.group(
         )
         span.sesionlogout(class="text-[16px] text-white group-[.collapsed]:hidden") Cerrar sesión
 
-//- Marca el enlace de la sección actual (misma clase preActive que el portal médico)
 script.
     (function () {
         var ruta = window.location.pathname;
@@ -121,11 +113,8 @@ script.
         });
     })();
 
-//- ==========================================
-//- BARRA SUPERIOR SOLO EN MÓVIL
 //- Da acceso al menú en las páginas cuyo encabezado no tiene botón propio.
 //- Debajo del menú (z-1000) y de su fondo (z-999), y debajo de los modales (z-50 o más).
-//- ==========================================
 div#barraMenuMovil(class="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-3 border-b border-[#E2E8F0] bg-white px-4 [@media(min-width:769px)]:hidden")
     button(
         type="button"
@@ -146,5 +135,4 @@ script.
         principal.classList.add('max-[768px]:pt-[4.5rem]');
     });
 
-//- Formato en tiempo real de nombres, correos y fechas (compartido con los demás portales)
 script(src="/js/formularios.js")

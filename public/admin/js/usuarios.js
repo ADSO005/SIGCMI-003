@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ==========================================
-    // FILTROS
-    // ==========================================
 
     const buscarUsuario =
         document.getElementById("buscarUsuario");
@@ -61,10 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         filtrarUsuarios
     );
 
-
-    // ========================================
-    // CAMBIAR ESTADO DEL USUARIO
-    // ========================================
 
     const botonesEstado = document.querySelectorAll(
         ".btnCambiarEstadoUsuario"

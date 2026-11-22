@@ -37,7 +37,6 @@
         guardando: false,
     };
 
-    // ---------- Utilidades de fecha ----------
     const texto = (fecha) =>
         `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}-${String(fecha.getDate()).padStart(2, "0")}`;
     const sumarDias = (fecha, dias) => {
@@ -63,7 +62,6 @@
     const serializar = () => JSON.stringify(DIAS.map((dia) => [...state.borrador[dia]].sort((a, b) => a - b)));
     const hayCambios = () => serializar() !== state.original;
 
-    // ---------- Carga de la semana ----------
     function cargarSemana() {
         const desde = texto(state.inicio);
         const hasta = texto(sumarDias(state.inicio, 6));
@@ -78,7 +76,6 @@
         DIAS.forEach((dia, indice) => {
             const horas = new Set();
             if (state.nueva) {
-                // Semana sin abrir: se abren todas las horas de lunes a domingo.
                 if (!esPasado(indice)) TODAS.forEach((h) => horas.add(h));
             } else {
                 for (const fila of filas.filter((f) => f.dia_semana === dia)) {
@@ -98,7 +95,6 @@
         el.mensaje.textContent = "";
     }
 
-    // ---------- Pintado ----------
     function resumenDia(indice) {
         const n = horasDe(indice).size;
         return n === 0 ? "Cerrado" : `${n} h`;
@@ -210,7 +206,6 @@
         pintarHoras();
     }
 
-    // ---------- Edición ----------
     function fijarHoras(indice, horas) {
         if (esPasado(indice)) return;
         state.borrador[DIAS[indice]] = new Set(horas);
@@ -289,7 +284,6 @@
         }
     });
 
-    // ---------- Navegación y cierre ----------
     function confirmarDescarte() {
         return !hayCambios() || window.confirm("Tienes cambios sin guardar. ¿Quieres descartarlos?");
     }
@@ -298,7 +292,6 @@
         state.inicio = inicio;
         state.dia = 0;
         cargarSemana();
-        // Selecciona el primer día que todavía se puede editar.
         const primero = DIAS.findIndex((_, i) => !esPasado(i));
         state.dia = primero === -1 ? 0 : Math.max(0, primero);
         if (state.inicio.getTime() === lunesDe(hoy()).getTime()) {
@@ -318,15 +311,12 @@
     }
     document.getElementById("editorSemanaCerrar").addEventListener("click", cerrar);
     modal.addEventListener("cancel", (evento) => {
-        // Escape: pide confirmación antes de cerrar si hay cambios.
         if (hayCambios() && !window.confirm("Tienes cambios sin guardar. ¿Quieres descartarlos?")) evento.preventDefault();
     });
     modal.addEventListener("pointerdown", (evento) => {
-        // Clic en el fondo del diálogo.
         if (evento.target === modal) cerrar();
     });
 
-    // ---------- Guardado ----------
     el.guardar.addEventListener("click", async () => {
         if (state.guardando || !(hayCambios() || state.nueva)) return;
         state.guardando = true;
@@ -366,7 +356,6 @@
         }
     });
 
-    // ---------- Apertura ----------
     function abrir(medicoId, semana) {
         const medico = (window.medicosHorarios || []).find((m) => String(m.id_medico) === String(medicoId));
         if (!medico) return;
@@ -374,7 +363,6 @@
         state.guardando = false;
         el.medico.textContent = `${medico.nombre} · ${medico.especialidad}`;
 
-        // Sin semana indicada se abre la semana actual.
         const inicio = /^\d{4}-\d{2}-\d{2}$/.test(semana || "") ? lunesDe(new Date(`${semana}T00:00:00`)) : lunesDe(hoy());
         irASemana(inicio);
         modal.showModal();
@@ -387,7 +375,6 @@
     });
 })();
 
-// Buscador de médicos por nombre o especialidad.
 (() => {
     const buscador = document.getElementById("buscarMedicoHorario");
     if (!buscador) return;

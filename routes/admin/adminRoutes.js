@@ -5,7 +5,6 @@ import role from "../../middleware/role.js";
 
 import { verDashboard } from "../../controllers/admin/dashboardController.js";
 
-//APARTADO USUARIOS
 import {
     listarUsuarios,
     cambiarEstadoUsuario
@@ -30,13 +29,11 @@ import {
     cancelarCita
 } from "../../controllers/admin/citasController.js";
 
-//APARTADO CREAR UN PACIENTE
 import {
     listarPacientes,
     obtenerPaciente
 } from "../../controllers/admin/pacientesController.js";
 
-//APARTADO MEDICOS
 import {
     listarMedicos,
     obtenerMedico,
@@ -44,7 +41,6 @@ import {
     guardarSemanaMedico
 } from "../../controllers/admin/medicosController.js";
 
-//APARTADO ESPECIALIDADES
 import {
     listarEspecialidades,
     crearEspecialidad,
@@ -53,13 +49,11 @@ import {
     eliminarEspecialidad
 } from "../../controllers/admin/especialidadesController.js";
 
-//APARTADO DE CALENDARIO
 import {
     mostrarCalendario
 } from "../../controllers/admin/calendarioController.js";
 const router = express.Router();
 
-//APARTADO DE HORARIOS
 import {
     listarHorarios,
     actualizarHorario,
@@ -67,22 +61,17 @@ import {
     eliminarHorario
 } from "../../controllers/admin/horariosController.js";
 
-//APARTADO DE DIAGNOSTICOS
 
 import {
     listarDiagnosticos,
     obtenerDiagnostico
 } from "../../controllers/admin/diagnosticosController.js";
 
-//APARTADO DE PRESCRIPCIONES
 import {
     listarPrescripciones,
     obtenerPrescripcion
 } from "../../controllers/admin/prescripcionesController.js";
 
-// ===============================
-// DASHBOARD
-// ===============================
 
 router.get(
     "/dashboard",
@@ -91,9 +80,6 @@ router.get(
     verDashboard
 );
 
-// ===============================
-// USUARIOS
-// ===============================
 
 router.get(
     "/usuarios",
@@ -137,12 +123,7 @@ router.patch(
     cambiarEstadoUsuario
 );
 
-// ===============================
-// PACIENTES
-// ===============================
 
-
-// Registrar paciente
 router.get(
     "/pacientes/nuevo",
     auth,
@@ -159,7 +140,6 @@ router.post(
     registrarUsuario
 );
 
-// Listar pacientes
 router.get(
     "/pacientes",
     auth,
@@ -167,7 +147,6 @@ router.get(
     listarPacientes
 );
 
-// Obtener paciente
 router.get(
     "/pacientes/:id",
     auth,
@@ -175,11 +154,6 @@ router.get(
     obtenerPaciente
 );
 
-
-
-// ===============================
-// MÉDICOS
-// ===============================
 
 router.get(
     "/medicos",
@@ -196,7 +170,6 @@ router.get(
 );
 
 
-
 router.post(
     "/medicos/:id/horarios",
     auth,
@@ -204,7 +177,6 @@ router.post(
     crearHorariosMedico
 );
 
-// Guarda la agenda semanal completa (rejilla por horas).
 router.put(
     "/medicos/:id/semana",
     auth,
@@ -212,9 +184,6 @@ router.put(
     guardarSemanaMedico
 );
 
-// ===============================
-// ESPECIALIDADES
-// ===============================
 
 router.get(
     "/especialidades",
@@ -251,9 +220,6 @@ router.delete(
     eliminarEspecialidad
 )
 
-// ===============================
-// CITAS
-// ===============================
 router.get(
     "/citas",
     auth,
@@ -304,9 +270,6 @@ router.put(
     cancelarCita
 );
 
-//===================
-//CALENDARIO
-//===================
 
 router.get(
     "/calendario",
@@ -315,9 +278,6 @@ router.get(
     mostrarCalendario
 );
 
-// ===============================
-// HORARIOS
-// ===============================
 
 router.get(
     "/horarios",
@@ -347,9 +307,6 @@ router.put(
     actualizarPeriodoHorario
 );
 
-// =====================================================
-// DIAGNÓSTICOS
-// =====================================================
 
 router.get(
     "/diagnosticos",
@@ -366,9 +323,6 @@ router.get(
     obtenerDiagnostico
 );
 
-// =====================================================
-// PRESCRIPCIONES
-// =====================================================
 
 router.get(
     "/prescripciones",

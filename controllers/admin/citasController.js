@@ -18,9 +18,6 @@ import {
 import {
     contieneLenguajeInapropiado
 } from "../../utils/filtroLenguaje.js";
-// =====================================================
-// FUNCIONES AUXILIARES
-// =====================================================
 
 const diasSemana = [
     "Domingo",
@@ -33,7 +30,6 @@ const diasSemana = [
 ];
 
 
-// Convierte HH:mm a minutos
 const horaAMinutos = (hora) => {
 
     const [horas, minutos] = hora
@@ -45,7 +41,6 @@ const horaAMinutos = (hora) => {
 };
 
 
-// Convierte minutos a HH:mm
 const minutosAHora = (minutos) => {
 
     const horas = Math.floor(minutos / 60);
@@ -55,7 +50,6 @@ const minutosAHora = (minutos) => {
 };
 
 
-// Obtiene fecha local YYYY-MM-DD
 const obtenerFechaLocal = (fecha = new Date()) => {
 
     const anio = fecha.getFullYear();
@@ -66,15 +60,8 @@ const obtenerFechaLocal = (fecha = new Date()) => {
 };
 
 
-// =====================================================
-// GENERAR HORAS DISPONIBLES
-// =====================================================
-
 const calcularHorasDisponibles = async (medico_id, fecha) => {
 
-    // ---------------------------------------------
-    // Validar fecha
-    // ---------------------------------------------
 
     const fechaSeleccionada = new Date(`${fecha}T00:00:00`);
 
@@ -91,18 +78,10 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
     }
 
 
-    // ---------------------------------------------
-    // Día de la semana
-    // ---------------------------------------------
-
     const diaSemana = diasSemana[
         fechaSeleccionada.getDay()
     ];
 
-
-    // ---------------------------------------------
-    // Buscar horarios APROBADOS del médico
-    // ---------------------------------------------
 
     const horariosMedico = await Horario.findAll({
 
@@ -111,8 +90,6 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
             dia_semana: diaSemana,
             estado: "Aprobado",
 
-            // La fecha seleccionada debe estar
-            // dentro del período aprobado
             fecha_inicio: {
                 [Op.lte]: fecha
             },
@@ -132,15 +109,10 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
     });
 
 
-    // Si el médico no trabaja ese día
     if (horariosMedico.length === 0) {
         return [];
     }
 
-
-    // ---------------------------------------------
-    // Buscar citas existentes
-    // ---------------------------------------------
 
     const citasExistentes = await Cita.findAll({
 
@@ -163,10 +135,6 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
     );
 
 
-    // ---------------------------------------------
-    // Generar intervalos de 30 minutos
-    // ---------------------------------------------
-
     const horasDisponibles = new Set();
 
     const inicioGeneral = 7 * 60;
@@ -184,7 +152,6 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
         );
 
 
-        // Respetar horario global 07:00 - 19:00
         const inicio = Math.max(
             inicioGeneral,
             inicioMedico
@@ -196,7 +163,6 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
         );
 
 
-        // Primer intervalo válido de 30 minutos
         const primerSlot =
             Math.ceil(inicio / 30) * 30;
 
@@ -210,18 +176,10 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
             const hora = minutosAHora(minutos);
 
 
-            // -------------------------------------
-            // No mostrar horas ocupadas
-            // -------------------------------------
-
             if (horasOcupadas.includes(hora)) {
                 continue;
             }
 
-
-            // -------------------------------------
-            // Regla de mínimo 5 horas
-            // -------------------------------------
 
             const fechaHoraCita = new Date(
                 `${fecha}T${hora}:00`
@@ -248,10 +206,6 @@ const calcularHorasDisponibles = async (medico_id, fecha) => {
 };
 
 
-// =====================================================
-// OBTENER HORAS DISPONIBLES
-// =====================================================
-
 export const obtenerHorasDisponibles = async (req, res) => {
 
     try {
@@ -273,7 +227,6 @@ export const obtenerHorasDisponibles = async (req, res) => {
         }
 
 
-        // Verificar médico
         const medico = await Medico.findByPk(
             medico_id
         );
@@ -321,10 +274,6 @@ export const obtenerHorasDisponibles = async (req, res) => {
 
 };
 
-
-// =====================================================
-// MOSTRAR FORMULARIO NUEVA CITA
-// =====================================================
 
 export const mostrarFormularioNuevaCita = async (req, res) => {
 
@@ -418,10 +367,6 @@ export const mostrarFormularioNuevaCita = async (req, res) => {
 };
 
 
-// =====================================================
-// CREAR NUEVA CITA
-// =====================================================
-
 export const crearNuevaCita = async (req, res) => {
 
     try {
@@ -435,10 +380,6 @@ export const crearNuevaCita = async (req, res) => {
             motivo_consulta
         } = req.body;
 
-
-        // -----------------------------------------
-        // Campos obligatorios
-        // -----------------------------------------
 
         if (
             !paciente_id ||
@@ -457,10 +398,6 @@ export const crearNuevaCita = async (req, res) => {
         }
 
 
-        // -----------------------------------------
-        // Validar paciente
-        // -----------------------------------------
-
         const paciente =
             await Paciente.findByPk(paciente_id);
 
@@ -475,9 +412,6 @@ export const crearNuevaCita = async (req, res) => {
 
         }
 
-        // -----------------------------------------
-        // VALIDAR UNA CITA POR PACIENTE AL DÍA
-        // -----------------------------------------
 
         const citaPacienteEseDia = await Cita.findOne({
             where: {
@@ -498,9 +432,6 @@ export const crearNuevaCita = async (req, res) => {
 
         }
 
-        // -----------------------------------------
-        // Validar médico
-        // -----------------------------------------
 
         const medico =
             await Medico.findByPk(medico_id);
@@ -517,10 +448,6 @@ export const crearNuevaCita = async (req, res) => {
         }
 
 
-        // -----------------------------------------
-        // Validar especialidad del médico
-        // -----------------------------------------
-
         if (
             Number(medico.especialidad_id) !==
             Number(especialidad_id)
@@ -535,10 +462,6 @@ export const crearNuevaCita = async (req, res) => {
         }
 
 
-        // -----------------------------------------
-        // Validar formato de hora
-        // -----------------------------------------
-
         if (
             !/^\d{2}:\d{2}$/.test(hora)
         ) {
@@ -551,10 +474,6 @@ export const crearNuevaCita = async (req, res) => {
 
         }
 
-
-        // -----------------------------------------
-        // Validar intervalo de 30 minutos
-        // -----------------------------------------
 
         const minutosHora =
             horaAMinutos(hora);
@@ -575,10 +494,8 @@ export const crearNuevaCita = async (req, res) => {
         }
 
 
-        // -----------------------------------------
         // Volver a consultar disponibilidad
         // BACKEND = fuente de verdad
-        // -----------------------------------------
 
         const horasDisponibles =
             await calcularHorasDisponibles(
@@ -599,10 +516,6 @@ export const crearNuevaCita = async (req, res) => {
 
         }
 
-
-        // -----------------------------------------
-        // Estado automático PENDIENTE
-        // -----------------------------------------
 
         const estadoPendiente =
             await EstadoCita.findOne({
@@ -638,9 +551,6 @@ export const crearNuevaCita = async (req, res) => {
 
         }
 
-        // -----------------------------------------
-        // Obtener administrador autenticado
-        // -----------------------------------------
 
         const creadoPor =
             req.usuario?.id_usuario;
@@ -656,10 +566,6 @@ export const crearNuevaCita = async (req, res) => {
 
         }
 
-
-        // -----------------------------------------
-        // Crear cita
-        // -----------------------------------------
 
         const nuevaCita =
             await Cita.create({
@@ -733,9 +639,6 @@ export const crearNuevaCita = async (req, res) => {
 export const listarCitas = async (req, res) => {
     try {
 
-        // ==========================================
-        // CITAS
-        // ==========================================
 
         const citas = await Cita.findAll({
             include: [
@@ -790,10 +693,6 @@ export const listarCitas = async (req, res) => {
         });
 
 
-        // ==========================================
-        // PACIENTES PARA NUEVA CITA
-        // ==========================================
-
         const pacientes = await Paciente.findAll({
             include: [
                 {
@@ -816,20 +715,12 @@ export const listarCitas = async (req, res) => {
         });
 
 
-        // ==========================================
-        // ESPECIALIDADES PARA NUEVA CITA
-        // ==========================================
-
         const especialidades = await Especialidad.findAll({
             order: [
                 ["nombre", "ASC"]
             ]
         });
 
-
-        // ==========================================
-        // MÉDICOS PARA NUEVA CITA
-        // ==========================================
 
         const medicos = await Medico.findAll({
             include: [
@@ -859,10 +750,6 @@ export const listarCitas = async (req, res) => {
         });
 
 
-        // ==========================================
-        // RENDER
-        // ==========================================
-
         res.render("viewsAdmin/citas/index", {
             citas,
             pacientes,
@@ -885,9 +772,6 @@ export const listarCitas = async (req, res) => {
     }
 };
 
-// =====================================================
-// OBTENER DETALLE DE UNA CITA
-// =====================================================
 
 export const obtenerCita = async (req, res) => {
 
@@ -895,7 +779,6 @@ export const obtenerCita = async (req, res) => {
 
         const { id } = req.params;
 
-        // Validar ID
         if (!/^\d+$/.test(String(id))) {
 
             return res.status(400).json({
@@ -910,7 +793,6 @@ export const obtenerCita = async (req, res) => {
 
             include: [
 
-                // PACIENTE
                 {
                     model: Paciente,
 
@@ -931,7 +813,6 @@ export const obtenerCita = async (req, res) => {
                 },
 
 
-                // MÉDICO
                 {
                     model: Medico,
 
@@ -963,7 +844,6 @@ export const obtenerCita = async (req, res) => {
                 },
 
 
-                // ESTADO
                 {
                     model: EstadoCita,
                     as: "Estado",
@@ -1012,9 +892,6 @@ export const obtenerCita = async (req, res) => {
 
 };
 
-// =====================================================
-// REPROGRAMAR CITA
-// =====================================================
 
 export const reprogramarCita = async (req, res) => {
     try {
@@ -1028,10 +905,6 @@ export const reprogramarCita = async (req, res) => {
         } = req.body;
 
 
-        // =========================================
-        // VALIDAR ID
-        // =========================================
-
         if (!/^\d+$/.test(String(id))) {
             return res.status(400).json({
                 ok: false,
@@ -1039,10 +912,6 @@ export const reprogramarCita = async (req, res) => {
             });
         }
 
-
-        // =========================================
-        // VALIDAR CAMPOS
-        // =========================================
 
         if (
             !fecha ||
@@ -1057,10 +926,6 @@ export const reprogramarCita = async (req, res) => {
         }
 
 
-        // =========================================
-        // VALIDAR LENGUAJE
-        // =========================================
-
         if (
             contieneLenguajeInapropiado(
                 motivo_reprogramacion.trim()
@@ -1072,10 +937,6 @@ export const reprogramarCita = async (req, res) => {
             });
         }
 
-
-        // =========================================
-        // BUSCAR CITA
-        // =========================================
 
         const cita = await Cita.findByPk(id, {
             include: [{ model: EstadoCita, as: "Estado", attributes: ["nombre"] }]
@@ -1096,10 +957,6 @@ export const reprogramarCita = async (req, res) => {
             });
         }
 
-
-        // =========================================
-        // VALIDAR FECHA
-        // =========================================
 
         const fechaSeleccionada =
             new Date(`${fecha}T00:00:00`);
@@ -1124,10 +981,6 @@ export const reprogramarCita = async (req, res) => {
             });
         }
 
-
-        // =========================================
-        // VALIDAR HORA
-        // =========================================
 
         if (!/^\d{2}:\d{2}$/.test(hora)) {
             return res.status(400).json({
@@ -1157,11 +1010,6 @@ export const reprogramarCita = async (req, res) => {
         }
 
 
-        // =========================================
-        // HORARIO GLOBAL DEL SISTEMA
-        // 07:00 - 19:00
-        // =========================================
-
         if (
             minutosTotales < 420 ||
             minutosTotales > 1140 ||
@@ -1174,11 +1022,6 @@ export const reprogramarCita = async (req, res) => {
             });
         }
 
-
-        // =========================================
-        // OBTENER HORARIOS APROBADOS
-        // DEL MÉDICO PARA ESA FECHA
-        // =========================================
 
         const diaSemana =
             diasSemana[fechaSeleccionada.getDay()];
@@ -1209,10 +1052,6 @@ export const reprogramarCita = async (req, res) => {
             });
 
 
-        // =========================================
-        // EL MÉDICO NO TRABAJA ESE DÍA
-        // =========================================
-
         if (horariosMedico.length === 0) {
             return res.status(400).json({
                 ok: false,
@@ -1221,11 +1060,6 @@ export const reprogramarCita = async (req, res) => {
             });
         }
 
-
-        // =========================================
-        // VALIDAR QUE LA HORA ESTÉ DENTRO
-        // DE UNO DE LOS HORARIOS APROBADOS
-        // =========================================
 
         const horaValidaEnHorario =
             horariosMedico.some((horario) => {
@@ -1252,10 +1086,6 @@ export const reprogramarCita = async (req, res) => {
         }
 
 
-        // =========================================
-        // VALIDAR ANTICIPACIÓN MÍNIMA
-        // =========================================
-
         const fechaHoraCita =
             new Date(`${fecha}T${hora}:00`);
 
@@ -1275,11 +1105,6 @@ export const reprogramarCita = async (req, res) => {
         }
 
 
-        // =========================================
-        // BUSCAR OTRA CITA DEL MÉDICO
-        // EN ESA FECHA Y HORA
-        // =========================================
-
         const citaExistente =
             await Cita.findOne({
 
@@ -1288,8 +1113,6 @@ export const reprogramarCita = async (req, res) => {
                     fecha,
                     hora,
 
-                    // Excluir la cita que estamos
-                    // reprogramando
                     id_cita: {
                         [Op.ne]: cita.id_cita
                     }
@@ -1308,11 +1131,6 @@ export const reprogramarCita = async (req, res) => {
             });
         }
 
-
-        // =========================================
-        // VALIDAR QUE EL PACIENTE NO TENGA
-        // OTRA CITA ESE MISMO DÍA
-        // =========================================
 
         const citaPaciente =
             await Cita.findOne({
@@ -1340,17 +1158,9 @@ export const reprogramarCita = async (req, res) => {
         }
 
 
-        // =========================================
-        // GUARDAR DATOS ANTERIORES
-        // =========================================
-
         const fechaAnterior = cita.fecha;
         const horaAnterior = cita.hora;
 
-
-        // =========================================
-        // ACTUALIZAR CITA
-        // =========================================
 
         await cita.update({
 
@@ -1369,10 +1179,6 @@ export const reprogramarCita = async (req, res) => {
 
         });
 
-
-        // =========================================
-        // RESPUESTA
-        // =========================================
 
         return res.status(200).json({
 
@@ -1419,9 +1225,6 @@ export const reprogramarCita = async (req, res) => {
     }
 };
 
-// =====================================================
-// CANCELAR CITA
-// =====================================================
 
 export const cancelarCita = async (req, res) => {
     try {
@@ -1430,10 +1233,6 @@ export const cancelarCita = async (req, res) => {
         const { motivo_cancelacion } = req.body;
 
 
-        // ==========================================
-        // VALIDAR ID
-        // ==========================================
-
         if (!/^\d+$/.test(String(id))) {
             return res.status(400).json({
                 ok: false,
@@ -1441,10 +1240,6 @@ export const cancelarCita = async (req, res) => {
             });
         }
 
-
-        // ==========================================
-        // VALIDAR MOTIVO
-        // ==========================================
 
         if (
             !motivo_cancelacion ||
@@ -1456,10 +1251,6 @@ export const cancelarCita = async (req, res) => {
             });
         }
 
-
-        // ==========================================
-        // VALIDAR LENGUAJE
-        // ==========================================
 
         if (
             contieneLenguajeInapropiado(
@@ -1474,10 +1265,6 @@ export const cancelarCita = async (req, res) => {
         }
 
 
-        // ==========================================
-        // BUSCAR CITA
-        // ==========================================
-
         const cita = await Cita.findByPk(id);
 
         if (!cita) {
@@ -1487,10 +1274,6 @@ export const cancelarCita = async (req, res) => {
             });
         }
 
-
-        // ==========================================
-        // BUSCAR ESTADO CANCELADA
-        // ==========================================
 
         const estadoCancelada =
             await EstadoCita.findOne({
@@ -1509,10 +1292,6 @@ export const cancelarCita = async (req, res) => {
         }
 
 
-        // ==========================================
-        // VERIFICAR SI YA ESTÁ CANCELADA
-        // ==========================================
-
         if (
             Number(cita.estado_id) ===
             Number(estadoCancelada.id_estado)
@@ -1523,10 +1302,6 @@ export const cancelarCita = async (req, res) => {
             });
         }
 
-
-        // ==========================================
-        // ACTUALIZAR CITA
-        // ==========================================
 
         cita.estado_id =
             estadoCancelada.id_estado;
@@ -1543,10 +1318,6 @@ export const cancelarCita = async (req, res) => {
 
         await cita.save();
 
-
-        // ==========================================
-        // RESPUESTA
-        // ==========================================
 
         return res.status(200).json({
             ok: true,
