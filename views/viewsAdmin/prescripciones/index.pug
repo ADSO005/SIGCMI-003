@@ -21,6 +21,9 @@ html(lang="es")
 
             include ../components/sidebar.pug
 
+            //- Fondo oscuro del menú en móvil: al tocarlo se cierra el menú
+            include ../components/sidebarOverlay.pug
+
 
             //- =====================================================
             //- CONTENIDO PRINCIPAL
@@ -272,5 +275,6 @@ html(lang="es")
             include ../components/modals/modalPrescripcion.pug
 
 
+            script(src="/admin/js/toggleSidebar.js")
             script(src="/admin/js/busqueda.js")
             script(src="/admin/js/prescripciones.js")
