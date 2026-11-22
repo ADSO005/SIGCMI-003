@@ -40,7 +40,8 @@ import {
 import {
     listarMedicos,
     obtenerMedico,
-    crearHorariosMedico
+    crearHorariosMedico,
+    guardarSemanaMedico
 } from "../../controllers/admin/medicosController.js";
 
 //APARTADO ESPECIALIDADES
@@ -201,6 +202,14 @@ router.post(
     auth,
     role(1),
     crearHorariosMedico
+);
+
+// Guarda la agenda semanal completa (rejilla por horas).
+router.put(
+    "/medicos/:id/semana",
+    auth,
+    role(1),
+    guardarSemanaMedico
 );
 
 // ===============================
