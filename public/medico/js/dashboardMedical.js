@@ -375,7 +375,6 @@ function renderScheduleMonth() {
     const day = firstDay + index;
     const date = scheduleDate(day);
     const rows = scheduleRowsForDay(day);
-    const approved = rows.some(row => row.estado === "Aprobado");
     const selected = selectedScheduleDay === day;
     const adjacent = day < displayedScheduleMonth || day >= nextMonth;
     const weekday = ((day + 3) % 7 + 7) % 7;
@@ -389,7 +388,7 @@ function renderScheduleMonth() {
     cell.setAttribute("data-date", date);
     cell.setAttribute("data-adjacent", String(adjacent));
     cell.setAttribute("aria-pressed", String(selected));
-    cell.setAttribute("aria-label", `${scheduleDayNames[weekday]} ${formatScheduleDay(day)}: ${approved ? "con horarios aprobados" : rows.length ? "asignaciones sin aprobar" : "sin horarios"}${day === today ? ", hoy" : ""}`);
+    cell.setAttribute("aria-label", `${scheduleDayNames[weekday]} ${formatScheduleDay(day)}: ${rows.length ? "con horarios" : "sin horarios"}${day === today ? ", hoy" : ""}`);
     cell.addEventListener("click", () => window.seleccionarDiaHorario(date));
     if (day === today) {
       cell.setAttribute("aria-current", "date");

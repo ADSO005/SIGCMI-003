@@ -324,36 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 ? horario.hora_fin.substring(0, 5)
                                 : "--:--";
 
-                        let estadoHTML;
-
-                        if (horario.estado === "Aprobado") {
-
-                            estadoHTML = `
-                                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-medium">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        Aprobado
-                                    </span>
-                                `;
-
-                        } else if (horario.estado === "Pendiente") {
-
-                            estadoHTML = `
-                                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 text-xs font-medium">
-                                        <i class="fa-solid fa-clock"></i>
-                                        Pendiente
-                                    </span>
-                                `;
-
-                        } else {
-
-                            estadoHTML = `
-                                    <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">
-                                        <i class="fa-solid fa-circle-xmark"></i>
-                                        ${horario.estado || "Sin estado"}
-                                    </span>
-                                `;
-                        }
-
                         return `
                                 <div class="flex items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50">
 
@@ -376,8 +346,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                         </div>
 
                                     </div>
-
-                                    ${estadoHTML}
 
                                 </div>
                             `;
