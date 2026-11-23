@@ -2,7 +2,7 @@ aside#sidebar.sidebar.group(
   class="fixed top-0 left-0 z-[1000] flex h-screen w-[290px] flex-col overflow-hidden px-6 text-white shadow-xl [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
   style="background:linear-gradient(180deg,#071b68 0%,#0b3294 54%,#09267a 100%);border-radius:0;"
 )
-  svg.sidebar-wave(aria-hidden="true" viewBox="0 0 290 220" preserveAspectRatio="none" style="position:absolute;top:78px;left:0;width:100%;height:220px;pointer-events:none;z-index:0;")
+  svg.sidebar-wave(class="group-[.collapsed]:hidden" aria-hidden="true" viewBox="0 0 290 220" preserveAspectRatio="none" style="position:absolute;top:78px;left:0;width:100%;height:220px;pointer-events:none;z-index:0;")
     path(d="M0 0h290v76c-34-8-73-4-114 18-62 33-111 46-176 13V0Z" fill="#1247b3" opacity=".58")
     path(d="M0 66c54 45 101 62 164 42 51-16 81-42 126-36" fill="none" stroke="#0d56cc" stroke-width="42" opacity=".78")
     path(d="M0 77c56 44 102 57 163 37 50-16 82-42 127-36" fill="none" stroke="#1686ff" stroke-width="16" opacity=".92")
@@ -37,15 +37,15 @@ aside#sidebar.sidebar.group(
 
   nav(class="relative z-10 mt-6 flex flex-col pt-4")
     if perfilActivo
-      a.nav-link(class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0" href="/medico/dashboard" style="width:90%")
+      a.nav-link(class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:h-10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0" href="/medico/dashboard" style="width:90%")
         img(class="h-6 w-6 shrink-0 brightness-0 invert" src="/medico/img/icono-agenda.svg" alt="")
         .nav-item(class="group-[.collapsed]:hidden") Agenda
-      a.nav-link(class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0" href="/medico/dashboard#pacientesView" style="width:90%")
+      a.nav-link(class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:h-10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0" href="/medico/dashboard#pacientesView" style="width:90%")
         img(class="h-6 w-6 shrink-0 brightness-0 invert" src="/medico/img/icono-pacientes.svg" alt="")
         .nav-item(class="group-[.collapsed]:hidden") Mis Pacientes
     else
       a.nav-link.preActive(
-        class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl bg-[#315bd7] px-4 py-2 text-base font-semibold text-white no-underline shadow-lg transition-colors hover:bg-[#315bd7] group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0"
+        class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl bg-[#315bd7] px-4 py-2 text-base font-semibold text-white no-underline shadow-lg transition-colors hover:bg-[#315bd7] group-[.collapsed]:h-10 group-[.collapsed]:shadow-none group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0"
         href="#"
         onclick="cambiarVista(event,'agendaView',this)"
         style="width:90%"
@@ -53,7 +53,7 @@ aside#sidebar.sidebar.group(
         img(class="h-6 w-6 shrink-0 brightness-0 invert" src="/medico/img/icono-agenda.svg" alt="")
         .nav-item(class="group-[.collapsed]:hidden") Agenda
       a.nav-link(
-        class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0"
+        class="mb-2 mx-auto flex h-14 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:h-10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0"
         href="#"
         onclick="cambiarVista(event,'pacientesView',this)"
         style="width:90%"
