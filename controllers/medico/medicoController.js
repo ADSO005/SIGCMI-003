@@ -10,6 +10,17 @@ import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday, canS
 import { textoDiagnosticoValido } from "../../services/medico/diagnosticoService.js";
 import { medicamentoPersistidoValido } from "../../services/medico/prescripcionesService.js";
 
+const formatearFechaConsulta = fecha => {
+    if (typeof fecha !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+    return new Intl.DateTimeFormat("es-CO", {
+        timeZone: "UTC",
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }).format(new Date(`${fecha}T12:00:00.000Z`));
+};
+
 const dashboard = async (req, res) => {
 
     res.set("Cache-Control", "no-store");
@@ -122,7 +133,7 @@ const dashboard = async (req, res) => {
         const pacientes = Array.from(pacientesMap.values());
 
         const prepararAtencion = cita => ({
-            id_cita: cita.id_cita, fecha: cita.fecha, hora: cita.hora,
+            id_cita: cita.id_cita, fecha: cita.fecha, fechaLegible: formatearFechaConsulta(cita.fecha), hora: cita.hora,
             paciente: [cita.Paciente?.Usuario?.nombres, cita.Paciente?.Usuario?.apellidos].filter(Boolean).join(" ") || "Paciente no disponible",
             motivo: cita.motivo_consulta?.trim() || "Motivo no registrado",
             estado: cita.Estado?.nombre || "Sin estado",
@@ -148,6 +159,7 @@ const dashboard = async (req, res) => {
         // El modal recibe solo datos de consulta, sin información clínica adicional.
         const citasAgenda = citas.map(cita => ({
             fecha: cita.fecha,
+            fechaLegible: formatearFechaConsulta(cita.fecha),
             hora: cita.hora,
             paciente: [cita.Paciente?.Usuario?.nombres, cita.Paciente?.Usuario?.apellidos].filter(Boolean).join(" ") || "Paciente no disponible",
             motivo: cita.motivo_consulta?.trim() || "Motivo no registrado",

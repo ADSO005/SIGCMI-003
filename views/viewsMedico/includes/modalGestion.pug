@@ -23,13 +23,20 @@
       each cita in agenda
         article.cita-card(data-fecha=cita.fecha data-estado=cita.estado class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 [overflow-wrap:anywhere]")
           div(class="mb-3 flex flex-wrap items-center justify-between gap-2")
-            time(datetime=cita.fecha class="text-sm font-semibold text-slate-800")= cita.fecha
+            div(class="flex min-w-0 flex-wrap items-center gap-2")
+              time(datetime=cita.fecha class="inline-flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-2.5 py-1.5 text-sm font-semibold text-[#315bd7]")
+                svg(class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+                  rect(x="3" y="5" width="18" height="16" rx="2")
+                  path(d="M7 3v4M17 3v4M3 10h18")
+                span= cita.fechaLegible
+              time(datetime=`${cita.fecha}T${cita.hora}` class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm font-semibold text-slate-700")
+                svg(class="h-4 w-4 shrink-0 text-[#315bd7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true")
+                  circle(cx="12" cy="12" r="9")
+                  path(d="M12 7v5l3 2")
+                span= cita.hora.slice(0, 5)
             - const colorEstado = cita.estado === "Cancelada" ? "bg-rose-50 text-rose-800" : ["Completada", "En Curso"].includes(cita.estado) ? "bg-emerald-50 text-emerald-800" : "bg-indigo-50 text-indigo-800"
             span(class=`rounded-full px-2 py-1 text-xs font-semibold ${colorEstado}`)= cita.estado
           dl(class="space-y-2 text-sm")
-            div
-              dt(class="text-xs text-slate-500") Hora
-              dd(class="font-semibold text-[#465DE5]")= cita.hora.slice(0, 5)
             div
               dt(class="text-xs text-slate-500") Paciente
               dd(class="font-semibold text-slate-800")= cita.paciente
