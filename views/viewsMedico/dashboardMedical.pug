@@ -2,11 +2,12 @@ extends layout/main
 
 block content
   main#mainContent.main(
-    class="min-h-screen w-[calc(100%-290px)] ml-[290px] float-none bg-[#f4f8ff] px-8 pb-8 text-slate-900 transition-all duration-300 ease-[ease] [&.collapsed]:w-[calc(100%-80px)] [&.collapsed]:ml-[80px] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:ml-0 [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&.collapsed]:w-full [@media(max-width:768px)]:[&.collapsed]:ml-0"
+    class="min-h-screen w-[calc(100%-290px)] ml-[290px] float-none px-8 pb-8 text-slate-900 transition-all duration-300 ease-[ease] [&.collapsed]:w-[calc(100%-80px)] [&.collapsed]:ml-[80px] [@media(max-width:768px)]:w-full [@media(max-width:768px)]:ml-0 [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&.collapsed]:w-full [@media(max-width:768px)]:[&.collapsed]:ml-0"
+    style="background-color:#eff6ff;background-image:url('/medico/img/fondo-dashboard-sigcmi.svg');background-position:center top;background-repeat:no-repeat;background-size:cover;"
   )
     // VISTA: AGENDA
     section#agendaView.view.active(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
-      header(class="-mx-8 mb-7 flex min-h-[112px] items-center justify-between gap-4 border-b border-blue-100 bg-white px-8 py-5 [&_h1]:text-[#10285e] [&_h1]:text-3xl [&_h1]:leading-9 [&_h1]:tracking-tight [&_h1]:font-bold [&_span]:text-sm [&_span]:text-slate-500 [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:min-h-[90px] [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&_h1]:text-2xl")
+      header(class="-mx-8 mb-7 flex min-h-[112px] items-center justify-between gap-4 px-8 py-5 [&_h1]:text-[#10285e] [&_h1]:text-3xl [&_h1]:leading-9 [&_h1]:tracking-tight [&_h1]:font-bold [&_span]:text-sm [&_span]:text-slate-500 [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:min-h-[90px] [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&_h1]:text-2xl")
         button(type="button" aria-label="Abrir menú" class="mr-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#315bd7] min-[769px]:hidden" onclick="toggleSidebar()")
           svg(class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
             path(d="M4 6h16M4 12h16M4 18h16")
@@ -41,7 +42,7 @@ block content
     // fin agendaView
 
     section#pacientesView.view(class="hidden opacity-0 transition-opacity duration-300 ease-[ease] [&.active]:block [&.active]:opacity-100")
-      header(class="-mx-8 mb-7 flex min-h-[112px] items-center justify-between gap-4 border-b border-blue-100 bg-white px-8 py-5 [&_h1]:text-[#10285e] [&_h1]:text-3xl [&_h1]:leading-9 [&_h1]:tracking-tight [&_h1]:font-bold [&_span]:text-sm [&_span]:text-slate-500 [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:min-h-[90px] [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&_h1]:text-2xl")
+      header(class="-mx-8 mb-7 flex min-h-[112px] items-center justify-between gap-4 px-8 py-5 [&_h1]:text-[#10285e] [&_h1]:text-3xl [&_h1]:leading-9 [&_h1]:tracking-tight [&_h1]:font-bold [&_span]:text-sm [&_span]:text-slate-500 [@media(max-width:768px)]:-mx-4 [@media(max-width:768px)]:min-h-[90px] [@media(max-width:768px)]:px-4 [@media(max-width:768px)]:[&_h1]:text-2xl")
         button(type="button" aria-label="Abrir menú" class="mr-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#315bd7] min-[769px]:hidden" onclick="toggleSidebar()")
           svg(class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
             path(d="M4 6h16M4 12h16M4 18h16")

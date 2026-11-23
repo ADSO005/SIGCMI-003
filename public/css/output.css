@@ -78,6 +78,7 @@
     --color-violet-200: oklch(89.4% 0.057 293.283);
     --color-violet-600: oklch(54.1% 0.281 293.009);
     --color-violet-700: oklch(49.1% 0.27 292.581);
+    --color-fuchsia-500: oklch(66.7% 0.295 322.15);
     --color-rose-50: oklch(96.9% 0.015 12.422);
     --color-rose-200: oklch(89.2% 0.058 10.001);
     --color-rose-500: oklch(64.5% 0.246 16.439);
@@ -580,6 +581,9 @@
   .ml-1 {
     margin-left: var(--spacing);
   }
+  .ml-2 {
+    margin-left: calc(var(--spacing) * 2);
+  }
   .ml-\[290px\] {
     margin-left: 290px;
   }
@@ -672,9 +676,6 @@
   }
   .h-\[15px\] {
     height: 15px;
-  }
-  .h-\[18px\] {
-    height: 18px;
   }
   .h-\[82px\] {
     height: 82px;
@@ -1427,12 +1428,6 @@
       border-color: color-mix(in oklab, var(--color-white) 10%, transparent);
     }
   }
-  .border-white\/15 {
-    border-color: color-mix(in srgb, #fff 15%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      border-color: color-mix(in oklab, var(--color-white) 15%, transparent);
-    }
-  }
   .border-white\/20 {
     border-color: color-mix(in srgb, #fff 20%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -2143,6 +2138,9 @@
   .text-right {
     text-align: right;
   }
+  .align-middle {
+    vertical-align: middle;
+  }
   .font-\[Arial\,sans-serif\] {
     font-family: Arial,sans-serif;
   }
@@ -2744,6 +2742,9 @@
   .group-\[\.collapsed\]\:hidden:is(:where(.group):is(.collapsed) *) {
     display: none;
   }
+  .group-\[\.collapsed\]\:h-10:is(:where(.group):is(.collapsed) *) {
+    height: calc(var(--spacing) * 10);
+  }
   .group-\[\.collapsed\]\:w-10:is(:where(.group):is(.collapsed) *) {
     width: calc(var(--spacing) * 10);
   }
@@ -2755,6 +2756,10 @@
   }
   .group-\[\.collapsed\]\:px-0:is(:where(.group):is(.collapsed) *) {
     padding-inline: 0px;
+  }
+  .group-\[\.collapsed\]\:shadow-none:is(:where(.group):is(.collapsed) *) {
+    --tw-shadow: 0 0 #0000;
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
   .peer-checked\:bg-indigo-600:is(:where(.peer):checked ~ *) {
     background-color: var(--color-indigo-600);
@@ -2874,6 +2879,9 @@
     }
     .hover\:bg-\[\#335CD8\]\/20:hover {
       background-color: color-mix(in oklab, #335CD8 20%, transparent);
+    }
+    .hover\:bg-\[\#315bd7\]:hover {
+      background-color: #315bd7;
     }
     .hover\:bg-\[\#2748b2\]:hover {
       background-color: #2748b2;
