@@ -47,13 +47,9 @@ export const crearEspecialidad = async (req, res) => {
     try {
         let { nombre, descripcion } = req.body;
 
-        // Limpiar espacios
         nombre = nombre?.trim();
         descripcion = descripcion?.trim();
 
-        // ==========================================
-        // VALIDAR NOMBRE
-        // ==========================================
 
         if (!nombre) {
             return res.status(400).json({
@@ -76,9 +72,6 @@ export const crearEspecialidad = async (req, res) => {
             });
         }
 
-        // ==========================================
-        // FILTRO DE LENGUAJE
-        // ==========================================
 
         if (contieneLenguajeInapropiado(nombre)) {
             return res.status(400).json({
@@ -99,9 +92,6 @@ export const crearEspecialidad = async (req, res) => {
             });
         }
 
-        // ==========================================
-        // VALIDAR DUPLICADO
-        // ==========================================
 
         const especialidadExistente =
             await Especialidad.findOne({
@@ -118,9 +108,6 @@ export const crearEspecialidad = async (req, res) => {
             });
         }
 
-        // ==========================================
-        // CREAR
-        // ==========================================
 
         const especialidad =
             await Especialidad.create({
@@ -299,7 +286,6 @@ export const eliminarEspecialidad = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Validar ID
         if (!/^\d+$/.test(String(id))) {
             return res.status(400).json({
                 ok: false,
@@ -307,7 +293,6 @@ export const eliminarEspecialidad = async (req, res) => {
             });
         }
 
-        // Buscar especialidad
         const especialidad = await Especialidad.findByPk(id);
 
         if (!especialidad) {
@@ -317,7 +302,6 @@ export const eliminarEspecialidad = async (req, res) => {
             });
         }
 
-        // Verificar médicos asociados
         const cantidadMedicos = await Medico.count({
             where: {
                 especialidad_id: id
@@ -331,7 +315,6 @@ export const eliminarEspecialidad = async (req, res) => {
             });
         }
 
-        // Eliminar especialidad
         await especialidad.destroy();
 
         return res.status(200).json({

@@ -1,9 +1,6 @@
 import Usuario from "../../models/Usuario.js";
 import Paciente from "../../models/Paciente.js";
 
-// =====================================================
-// LISTAR PACIENTES
-// =====================================================
 
 export const listarPacientes = async (req, res) => {
     try {
@@ -108,9 +105,6 @@ export const listarPacientes = async (req, res) => {
     }
 };
 
-// =====================================================
-// OBTENER PACIENTE
-// =====================================================
 
 export const obtenerPaciente = async (req, res) => {
     try {

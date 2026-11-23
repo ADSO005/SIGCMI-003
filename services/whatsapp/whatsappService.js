@@ -5,6 +5,7 @@ import Medico from "../../models/Medico.js";
 import Horario from "../../models/Horario.js";
 import Cita from "../../models/Cita.js";
 import EstadoCita from "../../models/EstadoCita.js";
+import { soloCitasActivas } from "../estadosCita.js";
 
 const sesiones = new Map();
 
@@ -1016,9 +1017,9 @@ Por favor selecciona otra fecha.`
             const citasExistentes = await Cita.findAll({
                 where: {
                     medico_id: sesion.medicoId,
-                    fecha: sesion.nuevaFecha,
-                    estado_id: 1
-                }
+                    fecha: sesion.nuevaFecha
+                },
+                include: [soloCitasActivas()]
             });
 
             const horasOcupadas = citasExistentes.map(
@@ -1231,9 +1232,9 @@ Regresando al menú principal.`
                 where: {
                     medico_id: sesion.medicoId,
                     fecha: sesion.nuevaFecha,
-                    hora: sesion.nuevaHora,
-                    estado_id: 1
-                }
+                    hora: sesion.nuevaHora
+                },
+                include: [soloCitasActivas()]
             });
 
             if (citaExistente && citaExistente.id_cita !== cita.id_cita) {
@@ -1648,7 +1649,8 @@ Por favor selecciona otra fecha.`
                 where: {
                     medico_id: sesion.medicoId,
                     fecha: sesion.fecha
-                }
+                },
+                include: [soloCitasActivas()]
             });
 
             const horasOcupadas = citasExistentes.map(
@@ -1832,7 +1834,8 @@ Por favor selecciona una de las horas disponibles que te mostré anteriormente.`
                     medico_id: sesion.medicoId,
                     fecha: sesion.fecha,
                     hora: sesion.hora
-                }
+                },
+                include: [soloCitasActivas()]
             });
 
             // La hora fue ocupada mientras el paciente confirmaba

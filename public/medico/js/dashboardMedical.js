@@ -375,7 +375,6 @@ function renderScheduleMonth() {
     const day = firstDay + index;
     const date = scheduleDate(day);
     const rows = scheduleRowsForDay(day);
-    const approved = rows.some(row => row.estado === "Aprobado");
     const selected = selectedScheduleDay === day;
     const adjacent = day < displayedScheduleMonth || day >= nextMonth;
     const weekday = ((day + 3) % 7 + 7) % 7;
@@ -389,7 +388,7 @@ function renderScheduleMonth() {
     cell.setAttribute("data-date", date);
     cell.setAttribute("data-adjacent", String(adjacent));
     cell.setAttribute("aria-pressed", String(selected));
-    cell.setAttribute("aria-label", `${scheduleDayNames[weekday]} ${formatScheduleDay(day)}: ${approved ? "con horarios aprobados" : rows.length ? "asignaciones sin aprobar" : "sin horarios"}${day === today ? ", hoy" : ""}`);
+    cell.setAttribute("aria-label", `${scheduleDayNames[weekday]} ${formatScheduleDay(day)}: ${rows.length ? "con horarios" : "sin horarios"}${day === today ? ", hoy" : ""}`);
     cell.addEventListener("click", () => window.seleccionarDiaHorario(date));
     if (day === today) {
       cell.setAttribute("aria-current", "date");
@@ -915,15 +914,19 @@ function agregarMedicamentosHistorial(card, diagnostico, agregarTexto) {
   card.appendChild(lista);
 }
 
+// Ignora mayúsculas, tildes y signos al buscar ("jose" encuentra "José").
+const normalizarBusqueda = valor => String(valor ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
 // FILTRAR PACIENTES EN TIEMPO REAL
 function filtrarPacientes(query) {
-  const texto = query.toLowerCase().trim();
+  const texto = normalizarBusqueda(query);
   const pacientes = document.querySelectorAll('.paciente-item');
   let encontrados = 0;
 
   pacientes.forEach(paciente => {
-    const nombre = paciente.querySelector('h4')?.textContent.toLowerCase() || '';
-    if (nombre.includes(texto)) {
+    const nombre = normalizarBusqueda(paciente.querySelector('h4')?.textContent);
+    if (texto.split(' ').every(palabra => nombre.includes(palabra))) {
       paciente.style.display = 'flex';
       encontrados++;
     } else {

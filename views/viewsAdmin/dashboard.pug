@@ -11,20 +11,16 @@ html(lang="es")
 
         div(class="flex min-h-screen")
 
-            //- ============ SIDEBAR ============
             include components/sidebar.pug
 
-            //- ============ OVERLAY (móvil) ============
             include components/sidebarOverlay.pug
 
-            //- ============ CONTENIDO ============
             main(
                 id="mainContent"
                 class="flex-1 min-w-0 px-4 pb-8 md:px-8 xl:px-10"
             )
 
-                //- ENCABEZADO
-                header(class="-mx-4 mb-7 flex min-h-[112px] items-center justify-between gap-4 border-b border-blue-100 bg-white px-4 py-5 md:-mx-8 md:px-8 xl:-mx-10 xl:px-10")
+                header(class="-mx-4 mb-7 flex min-h-[112px] items-center justify-between gap-4 border-b border-[#E2E8F0] bg-white px-4 py-5 md:-mx-8 md:px-8 xl:-mx-10 xl:px-10")
 
                     div(class="flex items-center gap-3")
 
@@ -32,7 +28,7 @@ html(lang="es")
                             type="button"
                             aria-label="Abrir menú"
                             onclick="toggleSidebar()"
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#315bd7] md:hidden"
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#335CD8] md:hidden"
                         )
                             i(class="fa-solid fa-bars")
 
@@ -40,7 +36,6 @@ html(lang="es")
                             h1(class="text-[26px] leading-[30px] font-bold text-black") Portal Administrativo
                             span(class="block text-sm text-slate-500")= new Date().toLocaleDateString("es-CO", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
 
-                //- TARJETAS
                 include components/statsCards
 
                 div(class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3")
@@ -48,64 +43,62 @@ html(lang="es")
                     div(class="min-w-0 xl:col-span-2")
                         include components/appointmentsTable
 
-                    //- ACCIONES RÁPIDAS
                     div(class="flex min-w-0 flex-col gap-5")
 
-                        div(class="rounded-[20px] border border-slate-200 bg-white p-5 shadow-sm")
-                            h3(class="mb-4 text-lg font-bold text-[#10285e]") Acciones Rápidas
+                        div(class="rounded-[20px] border border-[#E2E8F0] bg-white p-5 shadow-sm")
+                            h3(class="mb-4 text-lg font-bold text-[#001B4D]") Acciones Rápidas
 
                             div(class="flex flex-col gap-3")
 
                                 a(
                                     href="/admin/usuarios/nuevo"
-                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-[#263F9D] to-[#263F9D] px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
                                 )
                                     span Registrar Usuario
                                     span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
                                 button(
                                     type="button"
-                                    class="btnNuevaCita group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-[#315bd7] to-[#4969e8] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
+                                    class="btnNuevaCita group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-[#335CD8] to-[#335CD8] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:brightness-105"
                                 )
                                     span Nueva Cita
                                     span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
                                 a(
                                     href="/admin/citas"
-                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-[#059669] to-[#059669] px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
                                 )
                                     span Gestionar Citas
                                     span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
                                 a(
                                     href="/admin/calendario"
-                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-[#3C62BE] to-[#3C62BE] px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
                                 )
                                     span Ver Calendario
                                     span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
                                 a(
                                     href="/admin/horarios"
-                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
+                                    class="group flex min-h-[54px] w-full items-center justify-between rounded-xl bg-gradient-to-r from-[#00BC8D] to-[#00BC8D] px-4 py-3 text-sm font-semibold text-white no-underline shadow-sm transition hover:brightness-105"
                                 )
                                     span Consultar Horarios
                                     span(class="text-xl transition-transform group-hover:translate-x-1" aria-hidden="true") →
 
-                        div(class="rounded-[20px] border border-emerald-100 bg-gradient-to-br from-white to-emerald-50 p-5 shadow-sm")
+                        div(class="rounded-[20px] border border-[#E2E8F0] bg-[#F1FEF8] p-5 shadow-sm")
                             div(class="flex items-center gap-3")
-                                span(class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600")
+                                span(class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#00BC8D]/15 text-[#059669]")
                                     i(class="fa-brands fa-whatsapp text-lg")
                                 div
                                     p(class="font-bold text-slate-900") WhatsApp
-                                    p(class="text-xs text-emerald-600") Activo
+                                    p(class="text-xs text-[#059669]") Activo
                             p(class="mt-4 text-sm text-slate-600")= `${stats.notificacionesHoy} notificaciones enviadas hoy`
 
-        //- GRÁFICO DE ESTADOS (se abre con el botón de Acciones Rápidas)
         dialog#modalGrafico(class="m-auto w-[calc(100%-2rem)] max-w-lg rounded-[22px] bg-white p-0 shadow-2xl backdrop:bg-slate-950/60")
             div(class="p-6")
                 div(class="mb-5 flex items-center justify-between")
-                    h3(class="flex items-center gap-2 text-lg font-bold text-[#10285e]")
-                        i(class="fa-solid fa-chart-pie text-[#315bd7]")
+                    h3(class="flex items-center gap-2 text-lg font-bold text-[#001B4D]")
+                        i(class="fa-solid fa-chart-pie text-[#335CD8]")
                         | Estado de las Citas
                     button(
                         type="button"
@@ -116,7 +109,6 @@ html(lang="es")
                         i(class="fa-solid fa-xmark")
                 canvas(id="graficoEstados" height="260" data-estados=JSON.stringify(graficoEstados))
 
-        //- COMPONENTES
         include components/modals/nuevaCita.pug
         include components/modals/verCita.pug
 

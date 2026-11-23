@@ -8,9 +8,6 @@ import {
     EstadoCita
 } from "../../models/index.js";
 
-// =====================================================
-// LISTAR DIAGNÓSTICOS
-// =====================================================
 
 export const listarDiagnosticos = async (req, res) => {
 
@@ -20,9 +17,6 @@ export const listarDiagnosticos = async (req, res) => {
 
             include: [
 
-                // ==========================================
-                // CITA
-                // ==========================================
 
                 {
                     model: Cita,
@@ -30,9 +24,6 @@ export const listarDiagnosticos = async (req, res) => {
 
                     include: [
 
-                        // ----------------------------------
-                        // PACIENTE
-                        // ----------------------------------
 
                         {
                             model: Paciente,
@@ -51,9 +42,6 @@ export const listarDiagnosticos = async (req, res) => {
                             ]
                         },
 
-                        // ----------------------------------
-                        // MÉDICO
-                        // ----------------------------------
 
                         {
                             model: Medico,
@@ -81,9 +69,6 @@ export const listarDiagnosticos = async (req, res) => {
                             ]
                         },
 
-                        // ----------------------------------
-                        // ESTADO
-                        // ----------------------------------
 
                         {
                             model: EstadoCita,
@@ -103,9 +88,6 @@ export const listarDiagnosticos = async (req, res) => {
             ]
         });
 
-        // ==========================================
-        // RESPUESTA
-        // ==========================================
 
         return res.render(
             "viewsAdmin/diagnosticos/index",
@@ -130,19 +112,12 @@ export const listarDiagnosticos = async (req, res) => {
 };
 
 
-// =====================================================
-// OBTENER DIAGNÓSTICO POR ID
-// =====================================================
-
 export const obtenerDiagnostico = async (req, res) => {
 
     try {
 
         const { id } = req.params;
 
-        // ==========================================
-        // VALIDAR ID
-        // ==========================================
 
         if (!id || isNaN(id)) {
 
@@ -152,17 +127,11 @@ export const obtenerDiagnostico = async (req, res) => {
             });
         }
 
-        // ==========================================
-        // BUSCAR DIAGNÓSTICO
-        // ==========================================
 
         const diagnostico = await Diagnostico.findByPk(id, {
 
             include: [
 
-                // ======================================
-                // CITA
-                // ======================================
 
                 {
                     model: Cita,
@@ -170,9 +139,6 @@ export const obtenerDiagnostico = async (req, res) => {
 
                     include: [
 
-                        // --------------------------------
-                        // PACIENTE
-                        // --------------------------------
 
                         {
                             model: Paciente,
@@ -191,9 +157,6 @@ export const obtenerDiagnostico = async (req, res) => {
                             ]
                         },
 
-                        // --------------------------------
-                        // MÉDICO
-                        // --------------------------------
 
                         {
                             model: Medico,
@@ -221,9 +184,6 @@ export const obtenerDiagnostico = async (req, res) => {
                             ]
                         },
 
-                        // --------------------------------
-                        // ESTADO
-                        // --------------------------------
 
                         {
                             model: EstadoCita,
@@ -239,9 +199,6 @@ export const obtenerDiagnostico = async (req, res) => {
             ]
         });
 
-        // ==========================================
-        // DIAGNÓSTICO NO ENCONTRADO
-        // ==========================================
 
         if (!diagnostico) {
 
@@ -251,9 +208,6 @@ export const obtenerDiagnostico = async (req, res) => {
             });
         }
 
-        // ==========================================
-        // RESPUESTA
-        // ==========================================
 
         return res.json({
             ok: true,
