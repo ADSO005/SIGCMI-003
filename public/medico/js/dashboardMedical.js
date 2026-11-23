@@ -48,8 +48,8 @@ function cerrarSidebarMovil() {
 // NAVEGACIÓN ENTRE VISTAS
 window.cambiarVista = (e, viewId, link) => {
   e.preventDefault();
-  document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("preActive"));
-  link.classList.add("preActive");
+  document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("preActive", "bg-[#315bd7]", "shadow-lg"));
+  link.classList.add("preActive", "bg-[#315bd7]", "shadow-lg");
   
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
   const vistaTarget = document.getElementById(viewId);
@@ -64,8 +64,8 @@ if (window.location.hash === "#pacientesView") {
   if (vistaPacientes) {
     document.querySelectorAll(".view").forEach(vista => vista.classList.remove("active"));
     vistaPacientes.classList.add("active");
-    document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("preActive"));
-    document.querySelector('.nav-link[onclick*="pacientesView"]')?.classList.add("preActive");
+    document.querySelectorAll(".nav-link").forEach(link => link.classList.remove("preActive", "bg-[#315bd7]", "shadow-lg"));
+    document.querySelector('.nav-link[onclick*="pacientesView"]')?.classList.add("preActive", "bg-[#315bd7]", "shadow-lg");
   }
 }
 
