@@ -8,6 +8,8 @@ window.toggleSidebar = () => {
   if (window.innerWidth <= 768) {
     sidebar.classList.toggle("open");
     if (overlay) overlay.classList.toggle("show");
+    const mobileToggle = document.getElementById("mobileSidebarToggle");
+    if (mobileToggle) mobileToggle.setAttribute("aria-expanded", String(sidebar.classList.contains("open")));
   } else {
     sidebar.classList.toggle("collapsed");
     main.classList.toggle("collapsed");
@@ -25,6 +27,8 @@ function cerrarSidebarMovil() {
   
   if (sidebar) sidebar.classList.remove("open");
   if (overlay) overlay.classList.remove("show");
+  const mobileToggle = document.getElementById("mobileSidebarToggle");
+  if (mobileToggle) mobileToggle.setAttribute("aria-expanded", "false");
 }
 
 // NAVEGACIÓN ENTRE VISTAS

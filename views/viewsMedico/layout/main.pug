@@ -14,6 +14,17 @@ html(lang='es')
       // Contenido dinámico de las vistas
       block content
 
+    button#mobileSidebarToggle(
+      type="button"
+      aria-label="Abrir o cerrar el menú de navegación"
+      aria-controls="sidebar"
+      aria-expanded="false"
+      class="fixed bottom-4 right-4 z-[1000] flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-[#315bd7] text-white shadow-lg min-[769px]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+      onclick="toggleSidebar()"
+    )
+      svg(class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+        path(d="M4 6h16M4 12h16M4 18h16")
+
     #sidebarOverlay.sidebar-overlay(
       class="hidden fixed inset-0 z-[999] bg-black/40 opacity-0 transition-opacity duration-300 ease-[ease] [@media(max-width:768px)]:[&.show]:block [@media(max-width:768px)]:[&.show]:opacity-100"
       onclick='cerrarSidebarMovil()'
