@@ -17,13 +17,12 @@ html(lang="es")
 
         div(class="flex min-h-screen")
 
-            // SIDEBAR
             include ../components/sidebar.pug
 
-            // CONTENIDO PRINCIPAL
+            include ../components/sidebarOverlay.pug
+
             main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
 
-                // ENCABEZADO
                 div(class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6")
 
                     div
@@ -40,12 +39,10 @@ html(lang="es")
                         i(class="fa-solid fa-plus")
                         | Nueva cita
 
-                // FILTROS
                 div(class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6")
 
                     div(class="flex flex-col lg:flex-row gap-4")
 
-                        // BUSCAR
                         div(class="flex-1")
 
                             label(
@@ -67,7 +64,6 @@ html(lang="es")
                                     class="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 )
 
-                        // ESTADO
                         div(class="w-full lg:w-56")
 
                             label(
@@ -88,7 +84,6 @@ html(lang="es")
                                     option(value=estado)
                                         = estado
 
-                        // FECHA
                         div(class="w-full lg:w-56")
 
                             label(
@@ -103,7 +98,6 @@ html(lang="es")
                                 class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                             )
 
-                // TABLA
                 div(class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden")
 
                     div(class="overflow-x-auto")
@@ -171,12 +165,10 @@ html(lang="es")
                                             data-fecha=cita.fecha
                                         )
 
-                                            // ID
                                             td(class="px-5 py-4 font-semibold text-slate-700")
                                                 | #
                                                 = cita.id_cita
 
-                                            // PACIENTE
                                             td(class="px-5 py-4")
 
                                                 p(class="font-semibold text-slate-800")
@@ -186,26 +178,21 @@ html(lang="es")
                                                     | CC: 
                                                     = documentoPaciente || "Sin documento"
 
-                                            // MÉDICO
                                             td(class="px-5 py-4")
 
                                                 p(class="font-semibold text-slate-800")
                                                     = `${nombrePaciente} ${apellidoPaciente}`
 
-                                            // ESPECIALIDAD
                                             td(class="px-5 py-4")
                                                 span(class="text-slate-600")
                                                     = nombreEspecialidad
 
-                                            // FECHA
                                             td(class="px-5 py-4 text-slate-600")
                                                 = cita.fecha
 
-                                            // HORA
                                             td(class="px-5 py-4 text-slate-600")
                                                 = String(cita.hora).substring(0, 5)
 
-                                            // ESTADO
                                             td(class="px-5 py-4")
 
                                                 - const estado = cita.Estado?.nombre || "Sin estado"
@@ -230,13 +217,9 @@ html(lang="es")
                                                     span(class="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600")
                                                         = estado
 
-                                            // ACCIONES
                                             td(class="px-4 py-4")
                                                 div(class="flex items-center gap-2")
 
-                                                    // =========================================
-                                                    // VER CITA
-                                                    // =========================================
 
                                                     button(
                                                         type="button"
@@ -247,10 +230,7 @@ html(lang="es")
                                                         i(class="fa-solid fa-eye")
 
 
-                                                    // =========================================
-                                                    // REPROGRAMAR
-                                                    // Solo citas Pendientes
-                                                    // =========================================
+                                                    //- Solo citas Pendientes
 
                                                     if nombreEstado === "Pendiente"
 
@@ -263,10 +243,7 @@ html(lang="es")
                                                             i(class="fa-solid fa-calendar-days")
 
 
-                                                    // =========================================
-                                                    // CANCELAR
-                                                    // Solo citas Pendientes
-                                                    // =========================================
+                                                    //- Solo citas Pendientes
 
                                                     if nombreEstado === "Pendiente"
 
@@ -278,7 +255,6 @@ html(lang="es")
                                                         )
                                                             i(class="fa-solid fa-calendar-xmark")
                                                     
-
 
                                 else
 
@@ -305,6 +281,7 @@ html(lang="es")
             include ../components/modals/cancelarCita.pug
 
             script(src="/admin/js/toggleSidebar.js")
+            script(src="/admin/js/busqueda.js")
             script(src="/admin/js/citas.js")
             script(src="/admin/js/nuevaCita.js")
             

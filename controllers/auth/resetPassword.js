@@ -2,6 +2,7 @@ import Usuario from "../../models/Usuario.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { getPasswordPolicyError } from "../../helpers/passwordPolicy.js";
+import { contieneLenguajeInapropiado } from "../../utils/filtroLenguaje.js";
 
 // Verifica la cookie temporal antes de mostrar el formulario de nueva contraseña.
 const formResetPassword = async (req, res) => {
@@ -87,6 +88,13 @@ const resetPassword = async (req, res) => {
             return res.status(400).render("login/auth/reset-password", {
                 titulo: "Nueva contraseña",
                 error: passwordError
+            });
+        }
+
+        if (contieneLenguajeInapropiado(password)) {
+            return res.status(400).render("login/auth/reset-password", {
+                titulo: "Nueva contraseña",
+                error: "La contraseña contiene lenguaje no permitido."
             });
         }
 

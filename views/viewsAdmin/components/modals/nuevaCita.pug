@@ -1,16 +1,12 @@
-// =====================================================
-// MODAL NUEVA CITA
-// =====================================================
 div(
     id="modalNuevaCita"
-    class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4"
+    class="fixed inset-0 bg-black/50 hidden overflow-y-auto z-[1100] p-4"
 )
 
     div(
-        class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden"
+        class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden m-auto"
     )
 
-        // Encabezado
         div(
             class="bg-indigo-600 text-white px-6 py-5 flex items-center justify-between"
         )
@@ -31,7 +27,6 @@ div(
                 i(class="fa-solid fa-xmark")
 
 
-        // Contenido
         div(class="p-6")
 
             form(
@@ -42,7 +37,6 @@ div(
 
                 div(class="grid grid-cols-1 md:grid-cols-2 gap-5")
 
-                    // Paciente
                     div
                         label(
                             for="modal_paciente_id"
@@ -53,6 +47,7 @@ div(
                         select(
                             id="modal_paciente_id"
                             name="paciente_id"
+                            data-select-buscable
                             required
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         ) 
@@ -65,7 +60,6 @@ div(
                                         = paciente.Usuario.nombres + " " + paciente.Usuario.apellidos
 
 
-                    // Especialidad
                     div
                         label(
                             for="modal_especialidad_id"
@@ -76,6 +70,7 @@ div(
                         select(
                             id="modal_especialidad_id"
                             name="especialidad_id"
+                            data-select-buscable
                             required
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         )
@@ -88,7 +83,6 @@ div(
                                         = especialidad.nombre
 
 
-                    // Médico
                     div
                         label(
                             for="modal_medico_id"
@@ -99,6 +93,7 @@ div(
                         select(
                             id="modal_medico_id"
                             name="medico_id"
+                            data-select-buscable
                             required
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         )
@@ -114,7 +109,6 @@ div(
                                         = medico.Usuario.nombres + " " + medico.Usuario.apellidos
 
 
-                    // Fecha
                     div
                         label(
                             for="modal_fecha"
@@ -131,7 +125,6 @@ div(
                         )
 
 
-                    // Hora
                     div
                         label(
                             for="modal_hora"
@@ -142,6 +135,7 @@ div(
                         select(
                             id="modal_hora"
                             name="hora"
+                            data-select-buscable
                             required
                             disabled
                             class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-400"
@@ -150,9 +144,6 @@ div(
                                 | Seleccione médico y fecha
 
 
-
-
-                // Motivo
                 div(class="mt-5")
                     label(
                         for="modal_motivo"
@@ -192,7 +183,6 @@ div(
                     i(class="fa-solid fa-circle-check mr-2")
                     | Datos de la cita válidos.
 
-                // Botones
                 div(class="flex justify-end gap-3 mt-6")
                     button(
                         type="button"
@@ -206,3 +196,6 @@ div(
                     )
                         i(class="fa-solid fa-calendar-check mr-2")
                         | Crear Cita
+
+script(src="/admin/js/busqueda.js")
+script(src="/admin/js/selectBuscable.js")

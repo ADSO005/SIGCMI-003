@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // =====================================================
-    // ELEMENTOS
-    // =====================================================
 
     const buscador = document.getElementById("buscarDiagnostico");
     const filtroEstado = document.getElementById("filtroEstado");
@@ -14,14 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("modalDiagnostico");
     const btnCerrarModal = document.getElementById("btnCerrarModal");
 
-    // =====================================================
-    // FILTROS
-    // =====================================================
 
     function filtrarDiagnosticos() {
 
         const texto = buscador
-            ? buscador.value.toLowerCase().trim()
+            ? buscador.value
             : "";
 
         const estado = filtroEstado
@@ -36,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const estadoFila = fila.dataset.estado || "";
 
             const coincideTexto =
-                !texto || contenido.includes(texto);
+                Busqueda.coincide(texto, contenido);
 
             const coincideEstado =
                 !estado || estadoFila === estado;
@@ -90,10 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-
-    // =====================================================
-    // VER DIAGNÓSTICO
-    // =====================================================
 
     const botonesVer =
         document.querySelectorAll(".btnVerDiagnostico");
@@ -156,9 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById("modalPaciente")
                 );
 
-                // =================================================
-                // PACIENTE
-                // =================================================
 
                 document.getElementById(
                     "modalPaciente"
@@ -176,10 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         : "Documento: -";
 
 
-                // =================================================
-                // MÉDICO
-                // =================================================
-
                 document.getElementById(
                     "modalMedico"
                 ).textContent =
@@ -194,10 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     especialidad?.nombre ||
                     "Sin especialidad";
 
-
-                // =================================================
-                // FECHA
-                // =================================================
 
                 const fecha =
                     diagnostico.fecha_diagnostico
@@ -215,20 +194,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         : "Sin fecha";
 
 
-                // =================================================
-                // ESTADO
-                // =================================================
-
                 document.getElementById(
                     "modalEstado"
                 ).textContent =
                     estado?.nombre ||
                     "Sin estado";
 
-
-                // =================================================
-                // SIGNOS VITALES
-                // =================================================
 
                 document.getElementById(
                     "modalTemperatura"
@@ -269,10 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         : "-";
 
 
-                // =================================================
-                // INFORMACIÓN CLÍNICA
-                // =================================================
-
                 document.getElementById(
                     "modalSintomas"
                 ).textContent =
@@ -301,10 +268,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Sin notas adicionales";
 
 
-                // =================================================
-                // MOSTRAR MODAL
-                // =================================================
-
                 modal.classList.remove("hidden");
                 modal.classList.add("flex");
 
@@ -325,10 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // =====================================================
-    // CERRAR MODAL
-    // =====================================================
-
     if (btnCerrarModal) {
 
         btnCerrarModal.addEventListener(
@@ -343,10 +302,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    // =====================================================
-    // CERRAR AL HACER CLICK FUERA
-    // =====================================================
 
     if (modal) {
 

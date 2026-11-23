@@ -1,0 +1,91 @@
+//- Se abre con la clase .btnGestionarHorario (opcional data-semana=YYYY-MM-DD).
+//- La lógica está en /admin/js/horariosSemana.js
+
+dialog#editorSemana(
+    aria-labelledby="editorSemanaTitulo"
+    class="m-auto w-[calc(100%-1rem)] max-w-3xl overflow-hidden rounded-[22px] border border-[#E2E8F0] bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
+)
+    div(class="flex max-h-[92dvh] flex-col")
+
+        header(class="flex shrink-0 items-start justify-between gap-3 border-b border-[#E2E8F0] px-4 py-4 sm:px-6")
+            div(class="flex min-w-0 items-center gap-3")
+                span(class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#335CD8]/10 text-[#335CD8]" aria-hidden="true")
+                    i(class="fa-solid fa-calendar-week text-lg")
+                div(class="min-w-0")
+                    h2#editorSemanaTitulo(class="truncate text-lg font-bold text-[#001B4D]") Agenda semanal
+                    p#editorSemanaMedico(class="truncate text-sm text-slate-500")
+            button#editorSemanaCerrar(
+                type="button"
+                aria-label="Cerrar editor de agenda"
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335CD8]"
+            )
+                i(class="fa-solid fa-xmark")
+
+        div(class="min-h-0 flex-1 space-y-4 overflow-y-auto bg-[#F4F8FF] p-4 sm:p-6")
+
+            div(class="flex items-center justify-between gap-2 rounded-2xl border border-[#E2E8F0] bg-white p-2")
+                button#editorSemanaAnterior(
+                    type="button"
+                    aria-label="Semana anterior"
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#335CD8] hover:bg-[#335CD8]/10 focus-visible:outline-2 focus-visible:outline-[#335CD8] disabled:opacity-40"
+                )
+                    i(class="fa-solid fa-chevron-left")
+                div(class="min-w-0 text-center")
+                    p#editorSemanaRango(class="text-sm font-bold text-[#001B4D]" aria-live="polite")
+                    p#editorSemanaEstado(class="text-xs text-slate-500")
+                button#editorSemanaSiguiente(
+                    type="button"
+                    aria-label="Semana siguiente"
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-[#335CD8] hover:bg-[#335CD8]/10 focus-visible:outline-2 focus-visible:outline-[#335CD8]"
+                )
+                    i(class="fa-solid fa-chevron-right")
+
+            p#editorSemanaAviso(
+                class="hidden rounded-xl border border-[#335CD8]/20 bg-[#335CD8]/5 px-4 py-3 text-sm text-[#001B4D]"
+                role="status"
+            )
+
+            div#editorSemanaDias(
+                role="group"
+                aria-label="Días de la semana"
+                class="grid grid-cols-7 gap-1.5 sm:gap-2"
+            )
+
+            section(
+                aria-labelledby="editorDiaTitulo"
+                class="rounded-2xl border border-[#E2E8F0] bg-white p-4 sm:p-5"
+            )
+                div(class="flex flex-wrap items-center justify-between gap-2")
+                    div
+                        h3#editorDiaTitulo(class="text-base font-bold text-[#001B4D]")
+                        p#editorDiaResumen(class="text-sm text-slate-500" aria-live="polite")
+                    div(class="flex flex-wrap gap-2")
+                        button(type="button" data-accion="dia-completo" class="min-h-10 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm font-semibold text-[#335CD8] hover:bg-[#335CD8]/10 focus-visible:outline-2 focus-visible:outline-[#335CD8] disabled:opacity-40") Día completo
+                        button(type="button" data-accion="manana" class="min-h-10 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm font-semibold text-[#335CD8] hover:bg-[#335CD8]/10 focus-visible:outline-2 focus-visible:outline-[#335CD8] disabled:opacity-40") Mañana
+                        button(type="button" data-accion="tarde" class="min-h-10 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm font-semibold text-[#335CD8] hover:bg-[#335CD8]/10 focus-visible:outline-2 focus-visible:outline-[#335CD8] disabled:opacity-40") Tarde
+                        button(type="button" data-accion="cerrar-dia" class="min-h-10 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm font-semibold text-slate-600 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-[#335CD8] disabled:opacity-40") Cerrar día
+
+                p(class="mt-3 text-xs text-slate-500") Toca una hora para abrirla o cerrarla. Arrastra para cambiar varias seguidas.
+
+                div#editorSemanaHoras(
+                    role="group"
+                    aria-label="Horas del día"
+                    class="mt-3 grid touch-none select-none grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6"
+                )
+
+                div(class="mt-4 flex flex-wrap items-center gap-2 border-t border-[#E2E8F0] pt-4")
+                    span(class="text-sm font-semibold text-[#001B4D]") Copiar este día a:
+                    button(type="button" data-accion="copiar-habiles" class="min-h-10 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm font-semibold text-[#335CD8] hover:bg-[#335CD8]/10 focus-visible:outline-2 focus-visible:outline-[#335CD8]") Lunes a viernes
+                    button(type="button" data-accion="copiar-todos" class="min-h-10 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm font-semibold text-[#335CD8] hover:bg-[#335CD8]/10 focus-visible:outline-2 focus-visible:outline-[#335CD8]") Toda la semana
+
+        footer(class="flex shrink-0 flex-col gap-3 border-t border-[#E2E8F0] bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6")
+            p#editorSemanaMensaje(class="min-h-5 text-sm" role="status" aria-live="polite")
+            div(class="flex gap-2 sm:justify-end")
+                button#editorSemanaDescartar(
+                    type="button"
+                    class="min-h-11 flex-1 rounded-xl border border-[#E2E8F0] bg-white px-5 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335CD8] disabled:opacity-40 sm:flex-none"
+                ) Descartar cambios
+                button#editorSemanaGuardar(
+                    type="button"
+                    class="min-h-11 flex-1 rounded-xl bg-[#335CD8] px-5 text-sm font-semibold text-white shadow-sm hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335CD8] disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
+                ) Guardar agenda

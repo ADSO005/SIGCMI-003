@@ -17,18 +17,12 @@ html(lang="es")
         div(class="flex min-h-screen")
 
             include ../components/sidebar.pug
-            //- ==========================================
-            //- CONTENIDO PRINCIPAL
-            //- ==========================================
+
+            include ../components/sidebarOverlay.pug
 
 
             main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
 
-                // AQUÍ VA TODO EL CONTENIDO QUE YA TIENES
-
-                // =================================================
-                // HEADER
-                // =================================================
 
                 div(
                     class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
@@ -46,26 +40,11 @@ html(lang="es")
                         )
                             | Administra y consulta los médicos registrados.
 
-                    // Botón menú móvil
-
-                    button#btnMenuMobile(
-                        type="button"
-                        class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-sm text-slate-600 hover:bg-slate-50 transition"
-                    )
-
-                        i(class="fa-solid fa-bars")
-
-                // =================================================
-                // ESTADÍSTICAS
-                // =================================================
 
                 div(
                     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
                 )
 
-                    // =============================================
-                    // TOTAL MÉDICOS
-                    // =============================================
 
                     div(
                         class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200"
@@ -95,9 +74,6 @@ html(lang="es")
                                     class="fa-solid fa-user-doctor text-blue-600 text-xl"
                                 )
 
-                    // =============================================
-                    // MÉDICOS ACTIVOS
-                    // =============================================
 
                     div(
                         class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200"
@@ -127,9 +103,6 @@ html(lang="es")
                                     class="fa-solid fa-circle-check text-emerald-600 text-xl"
                                 )
 
-                    // =============================================
-                    // MÉDICOS INACTIVOS
-                    // =============================================
 
                     div(
                         class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200"
@@ -159,9 +132,6 @@ html(lang="es")
                                     class="fa-solid fa-circle-xmark text-red-600 text-xl"
                                 )
 
-                // =================================================
-                // FILTROS
-                // =================================================
 
                 div(
                     class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 mb-6"
@@ -171,9 +141,6 @@ html(lang="es")
                         class="grid grid-cols-1 md:grid-cols-2 gap-4"
                     )
 
-                        // =========================================
-                        // BUSCAR MÉDICO
-                        // =========================================
 
                         div(
                             class="relative"
@@ -189,9 +156,6 @@ html(lang="es")
                                 class="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
                             )
 
-                        // =========================================
-                        // FILTRO ESTADO
-                        // =========================================
 
                         div
 
@@ -214,9 +178,6 @@ html(lang="es")
                                 )
                                     | Inactivos
 
-                // =================================================
-                // TABLA DE MÉDICOS
-                // =================================================
 
                 div(
                     class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
@@ -230,9 +191,6 @@ html(lang="es")
                             class="w-full min-w-[1000px]"
                         )
 
-                            // =====================================
-                            // CABECERA
-                            // =====================================
 
                             thead(
                                 class="bg-slate-50 border-b border-slate-200"
@@ -275,9 +233,6 @@ html(lang="es")
                                     )
                                         | Acciones
 
-                            // =====================================
-                            // CUERPO
-                            // =====================================
 
                             tbody#tablaMedicos
 
@@ -293,9 +248,6 @@ html(lang="es")
                                             data-estado=medico.estado ? "activo" : "inactivo"
                                         )
 
-                                            // =================================
-                                            // MÉDICO
-                                            // =================================
 
                                             td(
                                                 class="px-6 py-4"
@@ -327,9 +279,6 @@ html(lang="es")
                                                         )
                                                             | #{medico.correo}
 
-                                            // =================================
-                                            // DOCUMENTO
-                                            // =================================
 
                                             td(
                                                 class="px-6 py-4"
@@ -345,9 +294,6 @@ html(lang="es")
                                                 )
                                                     | #{medico.documento}
 
-                                            // =================================
-                                            // ESPECIALIDAD
-                                            // =================================
 
                                             td(
                                                 class="px-6 py-4"
@@ -358,18 +304,12 @@ html(lang="es")
                                                 )
                                                     | #{medico.especialidad}
 
-                                            // =================================
-                                            // CÉDULA PROFESIONAL
-                                            // =================================
 
                                             td(
                                                 class="px-6 py-4 text-sm text-slate-700"
                                             )
                                                 | #{medico.cedulaProfesional}
 
-                                            // =================================
-                                            // EXPERIENCIA
-                                            // =================================
 
                                             td(
                                                 class="px-6 py-4 text-sm text-slate-700"
@@ -383,9 +323,6 @@ html(lang="es")
 
                                                     | Sin especificar
 
-                                            // =================================
-                                            // ESTADO
-                                            // =================================
 
                                             td(
                                                 class="px-6 py-4"
@@ -415,9 +352,6 @@ html(lang="es")
 
                                                         | Inactivo
 
-                                            // =================================
-                                            // ACCIONES
-                                            // =================================
 
                                             td(
                                                 class="px-6 py-4"
@@ -427,7 +361,6 @@ html(lang="es")
                                                     class="flex justify-end gap-2"
                                                 )
 
-                                                    // Ver
 
                                                     button.btnVerMedico(
                                                         type="button"
@@ -440,7 +373,6 @@ html(lang="es")
                                                             class="fa-solid fa-eye"
                                                         )
 
-                                                    // Editar
 
                                                     a(
                                                         href=`/admin/usuarios/${medico.usuarioId}/editar?volver=medicos`
@@ -452,11 +384,12 @@ html(lang="es")
                                                             class="fa-solid fa-pen"
                                                         )
                                                     
-                                                    button.btnHorariosMedico(
+                                                    button.btnGestionarHorario(
                                                         type="button"
-                                                        data-id=medico.id
+                                                        data-medico-id=medico.id
                                                         title="Gestionar horarios"
-                                                        class="..."
+                                                        aria-label="Gestionar horarios"
+                                                        class="w-9 h-9 rounded-lg bg-[#335CD8]/10 hover:bg-[#335CD8]/20 text-[#335CD8] transition flex items-center justify-center"
                                                     )
                                                         i(class="fa-solid fa-clock")
 
@@ -491,9 +424,6 @@ html(lang="es")
                                                 )
                                                     | Cuando se registren médicos aparecerán aquí.
 
-                            // =====================================
-                            // SIN RESULTADOS
-                            // =====================================
 
                             tr#sinResultadosMedicos.hidden
 
@@ -524,15 +454,13 @@ html(lang="es")
                                         )
                                             | Intenta cambiar los filtros de búsqueda.
 
-                // =================================================
-                // MODAL VER MÉDICO
-                // =================================================
 
                 include ../components/modals/verMedico.pug
-                include ../components/modals/horariosMedico.pug
-            // =================================================
-            // SCRIPTS
-            // =================================================
+                include ../components/modals/editorSemanaHorarios.pug
 
             script(src="/admin/js/toggleSidebar.js")
+            script.
+                window.medicosHorarios = !{JSON.stringify(medicosLista.map((m) => ({ id_medico: m.id, nombre: m.nombre, especialidad: m.especialidad, horarios: m.horarios }))).replace(/</g, '\\u003c')}
+            script(src="/admin/js/busqueda.js")
             script(src="/admin/js/medicos.js")
+            script(src="/admin/js/horariosSemana.js")

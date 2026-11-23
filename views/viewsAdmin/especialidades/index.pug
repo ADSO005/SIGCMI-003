@@ -25,13 +25,12 @@ html(lang="es")
 
             include ../components/sidebar.pug
 
+            include ../components/sidebarOverlay.pug
+
             main(
                 class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6"
             )
 
-                //- ==========================================
-                //- ENCABEZADO
-                //- ==========================================
 
                 div(
                     class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
@@ -56,10 +55,6 @@ html(lang="es")
                         | Nueva especialidad
 
 
-                //- ==========================================
-                //- BUSCADOR
-                //- ==========================================
-
                 div(
                     class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6"
                 )
@@ -77,10 +72,6 @@ html(lang="es")
                             class="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                         )
 
-
-                //- ==========================================
-                //- TABLA
-                //- ==========================================
 
                 div(
                     class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
@@ -126,6 +117,7 @@ html(lang="es")
                                         tr(
                                             class="border-b border-slate-100 hover:bg-slate-50 transition"
                                             data-nombre=especialidad.nombre
+                                            data-descripcion=especialidad.descripcion || ""
                                         )
 
                                             td(class="px-6 py-4")
@@ -201,6 +193,11 @@ html(lang="es")
                                                         i(class="fa-solid fa-trash")
 
 
+                                    tr#sinResultadosEspecialidades(class="hidden")
+                                        td(colspan="4" class="px-6 py-12 text-center text-slate-500")
+                                            p(class="font-medium") No se encontraron especialidades.
+                                            p(class="mt-1 text-sm") Intenta con otro nombre o descripción.
+
                                 else
 
                                     tr
@@ -221,5 +218,6 @@ html(lang="es")
             include ../components/modals/crearEspecialidad.pug
             include ../components/modals/editarEspecialidad.pug
             
+            script(src="/admin/js/busqueda.js")
             script(src="/admin/js/especialidades.js")
             script(src="/admin/js/toggleSidebar.js")

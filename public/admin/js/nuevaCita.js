@@ -1,8 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // =====================================================
-    // ELEMENTOS
-    // =====================================================
 
     const modal =
         document.getElementById("modalNuevaCita");
@@ -49,10 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // =====================================================
-    // FECHA MÍNIMA
-    // =====================================================
-
     const obtenerFechaLocal = () => {
 
         const ahora = new Date();
@@ -77,10 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fechaInput.min =
         obtenerFechaLocal();
 
-
-    // =====================================================
-    // MENSAJES
-    // =====================================================
 
     const mostrarError = (mensaje) => {
 
@@ -111,10 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    // =====================================================
-    // ABRIR MODAL
-    // =====================================================
-
     const abrirModal = () => {
 
         modal.classList.remove(
@@ -130,10 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    // =====================================================
-    // EVENTOS
-    // =====================================================
-
     botonesNuevaCita.forEach((boton) => {
         boton.addEventListener(
             "click",
@@ -141,10 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     });
 
-
-    // =====================================================
-    // CERRAR MODAL
-    // =====================================================
 
     const cerrarModal = () => {
 
@@ -168,8 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-
-
     btnCerrar?.addEventListener(
         "click",
         cerrarModal
@@ -182,10 +157,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =====================================================
-    // CERRAR HACIENDO CLICK FUERA
-    // =====================================================
-
     modal.addEventListener(
         "click",
         (event) => {
@@ -197,10 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     );
 
-
-    // =====================================================
-    // FILTRAR MÉDICOS POR ESPECIALIDAD
-    // =====================================================
 
     const opcionesMedicos =
         Array.from(
@@ -275,10 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =====================================================
-    // LIMPIAR HORAS
-    // =====================================================
-
     function limpiarHoras() {
 
         horaSelect.innerHTML =
@@ -289,10 +252,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-
-    // =====================================================
-    // CARGAR HORAS DISPONIBLES
-    // =====================================================
 
     const cargarHorasDisponibles =
         async () => {
@@ -438,10 +397,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // =====================================================
-    // VALIDAR MOTIVO
-    // =====================================================
-
     const motivoValido = () => {
 
         let texto =
@@ -529,10 +484,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     };
 
-
-    // =====================================================
-    // ENVIAR FORMULARIO
-    // =====================================================
 
     form.addEventListener(
         "submit",

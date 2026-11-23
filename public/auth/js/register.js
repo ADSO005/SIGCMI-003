@@ -241,21 +241,16 @@ document.querySelectorAll("[data-password-toggle]").forEach((button) => {
   button.addEventListener("click", () => {
     const input = document.getElementById(button.dataset.passwordToggle);
     const visible = input.type === "password";
-    const icon = button.querySelector("i");
+    const eyeIcon = button.querySelector(".eye-icon");
+    const eyeSlashIcon = button.querySelector(".eye-slash-icon");
 
     input.type = visible ? "text" : "password";
     button.setAttribute("aria-pressed", String(visible));
     button.setAttribute("aria-label", visible ? "Ocultar contraseña" : "Mostrar contraseña");
     button.title = visible ? "Ocultar contraseña" : "Mostrar contraseña";
-    icon.classList.toggle("fa-eye", !visible);
-    icon.classList.toggle("fa-eye-slash", visible);
+    eyeIcon.classList.toggle("hidden", !visible);
+    eyeSlashIcon.classList.toggle("hidden", visible);
   });
 });
 
 updatePasswordFeedback();
-
-// Oculta los mensajes de resultado del registro después de unos segundos.
-setTimeout(() => {
-  document.getElementById("mensajeError")?.remove();
-  document.getElementById("mensajeExito")?.remove();
-}, 9000);
