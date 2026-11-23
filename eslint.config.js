@@ -29,6 +29,7 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
+        obtenerLimitesCalendarioCitas: "readonly",
       },
     },
   },
