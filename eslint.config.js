@@ -29,6 +29,8 @@ export default [
     languageOptions: {
       globals: {
         ...globals.browser,
+        // Utilidad de búsqueda compartida (public/admin/js/busqueda.js)
+        Busqueda: "readonly",
       },
     },
   },

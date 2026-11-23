@@ -15,20 +15,14 @@ html(lang="es")
 
         div(class="flex min-h-screen")
 
-            //- =====================================================
-            //- SIDEBAR
-            //- =====================================================
 
             include ../components/sidebar.pug
 
+            include ../components/sidebarOverlay.pug
 
-            //- =====================================================
-            //- CONTENIDO PRINCIPAL
-            //- =====================================================
 
             main(class="flex-1 min-w-0 px-4 md:px-8 xl:px-10 py-6")
 
-                //- HEADER
                 div(class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8")
 
                     div
@@ -46,10 +40,6 @@ html(lang="es")
                         div(class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center")
                             i(class="fa-solid fa-prescription-bottle-medical text-blue-600")
 
-
-                //- =====================================================
-                //- TARJETAS DE RESUMEN
-                //- =====================================================
 
                 div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8")
 
@@ -95,13 +85,8 @@ html(lang="es")
                                 i(class="fa-solid fa-file-medical text-violet-600 text-xl")
 
 
-                //- =====================================================
-                //- TABLA
-                //- =====================================================
-
                 div(class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden")
 
-                    //- CABECERA DE TABLA
                     div(class="p-5 border-b border-slate-200")
 
                         div(class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4")
@@ -127,7 +112,6 @@ html(lang="es")
                                 )
 
 
-                    //- CONTENEDOR RESPONSIVE
                     div(class="overflow-x-auto")
 
                         table(class="w-full text-sm")
@@ -272,4 +256,6 @@ html(lang="es")
             include ../components/modals/modalPrescripcion.pug
 
 
+            script(src="/admin/js/toggleSidebar.js")
+            script(src="/admin/js/busqueda.js")
             script(src="/admin/js/prescripciones.js")

@@ -34,14 +34,16 @@ window.abrirGraficoEstados = () => {
         },
         options: {
             responsive: true,
-            cutout: '72%',
+            cutout: '65%',
+            maintainAspectRatio: true,
+            aspectRatio: 1.6,
             plugins: {
                 legend: {
-                    position: 'bottom',
+                    position: 'right',
                     labels: {
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        padding: 20,
+                        padding: 14,
                         font: { size: 13, weight: 'bold' }
                     }
                 }

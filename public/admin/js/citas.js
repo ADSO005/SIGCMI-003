@@ -11,9 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const filtrarCitas = () => {
 
-        const texto = buscador.value
-            .trim()
-            .toLowerCase();
+        const texto = buscador.value;
 
         const estadoSeleccionado =
             filtroEstado.value
@@ -26,18 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         filas.forEach((fila) => {
 
-            const paciente =
-                (fila.dataset.paciente || "")
-                    .toLowerCase();
-
-            const medico =
-                (fila.dataset.medico || "")
-                    .toLowerCase();
-
-            const documento =
-                (fila.dataset.documento || "")
-                    .toLowerCase();
-
             const estado =
                 (fila.dataset.estado || "")
                     .toLowerCase();
@@ -46,11 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 fila.dataset.fecha || "";
 
 
-            const coincideTexto =
-                !texto ||
-                paciente.includes(texto) ||
-                medico.includes(texto) ||
-                documento.includes(texto);
+            const coincideTexto = Busqueda.coincide(texto, fila.dataset.paciente, fila.dataset.medico, fila.dataset.documento);
 
 
             const coincideEstado =
@@ -82,15 +64,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
 
-    // BUSCADOR
-
     buscador?.addEventListener(
         "input",
         filtrarCitas
     );
 
-
-    // ESTADO
 
     filtroEstado?.addEventListener(
         "change",
@@ -98,17 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-    // FECHA
-
     filtroFecha?.addEventListener(
         "change",
         filtrarCitas
     );
 
-
-    // ==========================================
-    // MODAL VER CITA
-    // ==========================================
 
     const modalVerCita =
         document.getElementById("modalVerCita");
@@ -175,8 +147,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const cita = data.cita;
 
 
-                // PACIENTE
-
                 const paciente =
                     cita.Paciente;
 
@@ -185,8 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ? paciente.Usuario
                         : null;
 
-
-                // MÉDICO
 
                 const medico =
                     cita.Medico;
@@ -202,8 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         ? medico.Especialidad
                         : null;
 
-
-                // DATOS
 
                 document.getElementById(
                     "detalleCitaId"
@@ -241,8 +207,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Sin teléfono";
 
 
-                // MÉDICO
-
                 document.getElementById(
                     "detalleMedico"
                 ).textContent =
@@ -273,8 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Sin teléfono";
 
 
-                // FECHA Y HORA
-
                 document.getElementById(
                     "detalleFecha"
                 ).textContent =
@@ -287,8 +249,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     `Hora: ${String(cita.hora).substring(0, 5)}`;
 
 
-                // ESTADO
-
                 document.getElementById(
                     "detalleEstado"
                 ).textContent =
@@ -297,16 +257,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         : "Sin estado";
 
 
-                // MOTIVO
-
                 document.getElementById(
                     "detalleMotivo"
                 ).textContent =
                     cita.motivo_consulta ||
                     "Sin información";
 
-
-                // ABRIR MODAL
 
                 modalVerCita.classList.remove(
                     "hidden"
@@ -344,11 +300,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
 
-
-    // =====================================================
-    // REPROGRAMAR CITA
-    // =====================================================
-
     const modalReprogramarCita = document.getElementById("modalReprogramarCita");
     const btnCerrarReprogramarCita = document.getElementById("btnCerrarReprogramarCita");
     const btnCancelarReprogramarCita = document.getElementById("btnCancelarReprogramarCita");
@@ -373,10 +324,6 @@ document.addEventListener("DOMContentLoaded", () => {
         hora.disabled = true;
     };
 
-
-    // =====================================================
-    // ABRIR MODAL
-    // =====================================================
 
     botonesReprogramar.forEach((boton) => {
 
@@ -413,20 +360,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     : null;
 
 
-                // =========================================
-                // DATOS OCULTOS
-                // =========================================
-
                 document.getElementById("reprogramarCitaId").value =
                     cita.id_cita;
 
                 document.getElementById("reprogramarMedicoId").value =
                     cita.medico_id;
 
-
-                // =========================================
-                // INFORMACIÓN DE LA CITA
-                // =========================================
 
                 document.getElementById("reprogramarCitaNumero").textContent =
                     `Cita #${cita.id_cita}`;
@@ -450,10 +389,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     `${cita.fecha} - ${String(cita.hora).substring(0, 5)}`;
 
 
-                // =========================================
-                // LIMPIAR CAMPOS
-                // =========================================
-
                 document.getElementById("reprogramarFecha").value = "";
 
                 document.getElementById("reprogramarMotivo").value = "";
@@ -467,10 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 hora.disabled = true;
 
 
-                // =========================================
-                // OCULTAR MENSAJES
-                // =========================================
-
                 document
                     .getElementById("errorReprogramarCita")
                     .classList.add("hidden");
@@ -479,10 +410,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     .getElementById("exitoReprogramarCita")
                     .classList.add("hidden");
 
-
-                // =========================================
-                // MOSTRAR MODAL
-                // =========================================
 
                 modalReprogramarCita.classList.remove("hidden");
 
@@ -502,10 +429,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
-
-    // =====================================================
-    // CONSULTAR HORAS DISPONIBLES
-    // =====================================================
 
     const reprogramarFecha = document.getElementById("reprogramarFecha");
     const reprogramarHora = document.getElementById("reprogramarHora");
@@ -603,10 +526,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // =====================================================
-    // CERRAR MODAL
-    // =====================================================
-
     btnCerrarReprogramarCita?.addEventListener(
         "click",
         cerrarModalReprogramarCita
@@ -617,9 +536,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cerrarModalReprogramarCita
     );
 
-    // =====================================================
-    // GUARDAR REPROGRAMACIÓN
-    // =====================================================
 
     const formReprogramarCita =
         document.getElementById("formReprogramarCita");
@@ -750,10 +666,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // =====================================================
-    // CANCELAR CITA - ABRIR MODAL
-    // =====================================================
-
     const modalCancelarCita =
         document.getElementById("modalCancelarCita");
 
@@ -783,10 +695,6 @@ document.addEventListener("DOMContentLoaded", () => {
             .classList.add("hidden");
     };
 
-
-    // =====================================================
-    // ABRIR MODAL
-    // =====================================================
 
     botonesCancelar.forEach((boton) => {
 
@@ -828,10 +736,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         : null;
 
 
-                // =========================================
-                // INFORMACIÓN
-                // =========================================
-
                 document.getElementById(
                     "cancelarCitaNumero"
                 ).textContent =
@@ -866,17 +770,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     String(cita.hora).substring(0, 5);
 
 
-                // =========================================
-                // GUARDAR ID
-                // =========================================
-
                 modalCancelarCita.dataset.id =
                     cita.id_cita;
 
-
-                // =========================================
-                // LIMPIAR
-                // =========================================
 
                 document.getElementById(
                     "cancelarMotivo"
@@ -890,10 +786,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     .getElementById("exitoCancelarCita")
                     .classList.add("hidden");
 
-
-                // =========================================
-                // MOSTRAR MODAL
-                // =========================================
 
                 modalCancelarCita.classList.remove("hidden");
 
@@ -914,10 +806,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // =====================================================
-    // CERRAR MODAL
-    // =====================================================
-
     btnCerrarCancelarCita?.addEventListener(
         "click",
         cerrarModalCancelarCita
@@ -928,9 +816,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cerrarModalCancelarCita
     );
 
-    // =====================================================
-    // CONFIRMAR CANCELACIÓN
-    // =====================================================
 
     const btnConfirmarCancelarCita =
         document.getElementById("btnConfirmarCancelarCita");
@@ -968,10 +853,6 @@ document.addEventListener("DOMContentLoaded", () => {
             exitoBox.classList.add("hidden");
 
 
-            // =========================================
-            // VALIDAR MOTIVO
-            // =========================================
-
             if (!motivo) {
 
                 mensajeError.textContent =
@@ -982,10 +863,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-
-            // =========================================
-            // DESHABILITAR BOTÓN
-            // =========================================
 
             btnConfirmarCancelarCita.disabled = true;
 
@@ -1030,16 +907,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
 
-                // =========================================
-                // ÉXITO
-                // =========================================
-
                 exitoBox.classList.remove("hidden");
 
-
-                // =========================================
-                // RECARGAR LISTADO
-                // =========================================
 
                 setTimeout(() => {
 

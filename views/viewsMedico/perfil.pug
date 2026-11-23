@@ -63,7 +63,7 @@ block content
                   input#correo(name="correo" type="email" maxlength="150" required autocomplete="email" value=usuarioPerfil.correo class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
                 div
                   label(for="telefono" class="mb-1 block text-sm font-semibold text-slate-700") Teléfono
-                  input#telefono(name="telefono" type="tel" maxlength="20" autocomplete="tel" value=usuarioPerfil.telefono class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
+                  input#telefono(name="telefono" type="tel" inputmode="tel" pattern="[+]?[0-9 ().-]*" title="Usa solo números, espacios y los signos + ( ) . -" maxlength="20" autocomplete="tel" value=usuarioPerfil.telefono class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
               div(class="rounded-xl border border-amber-200 bg-amber-50 p-4")
                 label(for="passwordActualPerfil" class="mb-1 block text-sm font-semibold text-amber-950") Confirma tu contraseña actual para guardar
                 input#passwordActualPerfil(name="passwordActual" type="password" required autocomplete="current-password" class="w-full rounded-lg border border-amber-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100")
@@ -89,9 +89,6 @@ block content
               div(class="rounded-xl border border-blue-100 bg-blue-50/70 p-4")
                 dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Teléfono
                 dd(class="mt-1 break-words text-sm font-semibold text-slate-800")= usuarioPerfil.telefono || "No registrado"
-              div(class="rounded-xl border border-blue-100 bg-blue-50/70 p-4")
-                dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Fecha de nacimiento
-                dd(class="mt-1 text-sm font-semibold text-slate-600") No disponible en el perfil médico
               div(class="rounded-xl border border-blue-100 bg-blue-50/70 p-4")
                 dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500") Tipo de documento
                 dd(class="mt-1 text-sm font-semibold text-slate-800")= usuarioPerfil.tipoDocumento
@@ -134,6 +131,18 @@ block content
             div(class="grid grid-cols-1 gap-2 rounded-xl border border-emerald-100 bg-white/80 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:gap-3")
               dt(class="text-sm font-semibold text-slate-700") Años de experiencia
               dd(class="break-words text-sm text-slate-800")= perfilProfesional.aniosExperiencia === null ? "No registrados" : perfilProfesional.aniosExperiencia
+            div(class="grid grid-cols-1 gap-2 rounded-xl border border-emerald-100 bg-white/80 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:gap-3")
+              dt(class="text-sm font-semibold text-slate-700") Horario de atención
+              dd(class="min-w-0 text-sm text-slate-800")
+                if perfilProfesional.horarios.length
+                  ul(class="space-y-2")
+                    each horario in perfilProfesional.horarios
+                      li(class="break-words")
+                        span(class="font-semibold")= horario.dia
+                        |  · #{horario.horaInicio}–#{horario.horaFin}
+                        p(class="text-xs text-slate-500") Vigente del #{horario.fechaInicio} al #{horario.fechaFin}
+                else
+                  span No tienes horarios aprobados vigentes.
           p(class="mt-4 text-xs leading-5 text-slate-600") La especialidad y los datos profesionales son de solo lectura en este perfil.
 
         section(class="rounded-3xl border border-violet-200 bg-gradient-to-br from-white to-violet-50 p-6 shadow-sm sm:p-8")
@@ -148,17 +157,6 @@ block content
                 dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500")= etiqueta
                 dd(class="mt-1 text-sm text-slate-600") No registrada en el perfil médico
 
-        section(class="rounded-3xl border border-emerald-200 bg-gradient-to-br from-white to-emerald-50 p-6 shadow-sm sm:p-8")
-          div(class="mb-5 flex items-center gap-3")
-            svg(class="h-7 w-7 shrink-0 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
-              path(d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.4 2.8a2 2 0 0 1-.6 1.7L7.6 9.5a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 1.7-.6l2.8.4a2 2 0 0 1 1.6 1.9Z")
-            h2(class="text-xl font-bold text-[#10285e]") Contacto de emergencia
-          dl(class="grid grid-cols-1 gap-3 sm:grid-cols-2")
-            each etiqueta in ["Nombres", "Apellidos", "Teléfono", "Correo electrónico"]
-              div(class="rounded-xl border border-emerald-100 bg-white/80 p-4")
-                dt(class="text-xs font-semibold uppercase tracking-wide text-slate-500")= etiqueta
-                dd(class="mt-1 break-words text-sm text-slate-600") No registrado en el perfil médico
-
         section(class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-100 p-6 shadow-sm sm:p-8")
           div(class="flex items-start gap-4")
             svg(class="h-8 w-8 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
@@ -167,3 +165,6 @@ block content
             div
               h2(class="mb-2 text-xl font-bold text-[#10285e]") Seguridad y privacidad
               p(class="text-sm leading-6 text-slate-700") Los cambios de datos personales requieren confirmar tu contraseña actual. La información profesional se presenta según los datos asociados a tu perfil médico.
+
+block append scripts
+  script(src="/medico/js/perfilMedical.js")

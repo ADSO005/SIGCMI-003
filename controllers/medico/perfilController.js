@@ -1,7 +1,22 @@
 import bcrypt from "bcrypt";
+import { Op } from "sequelize";
 import Medico from "../../models/Medico.js";
 import Especialidad from "../../models/Especialidad.js";
+import Horario from "../../models/Horario.js";
 import Usuario from "../../models/Usuario.js";
+
+const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
+
+const obtenerFechaActualBogota = () => {
+    const partes = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Bogota",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).formatToParts(new Date());
+    const fecha = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+    return `${fecha.year}-${fecha.month}-${fecha.day}`;
+};
 
 const buscarMedicoAutenticado = usuarioId => Medico.findOne({
     where: { usuario_id: usuarioId },
@@ -23,6 +38,28 @@ const renderizarPerfil = async (req, res, opciones = {}) => {
     const medico = await buscarMedicoAutenticado(req.usuario.id_usuario);
     if (!medico) return res.status(404).send("No se encontró el perfil del médico.");
 
+    const hoy = obtenerFechaActualBogota();
+    const horariosActuales = await Horario.findAll({
+        where: {
+            medico_id: medico.id_medico,
+            estado: "Aprobado",
+            fecha_inicio: { [Op.lte]: hoy },
+            fecha_fin: { [Op.gte]: hoy }
+        },
+        attributes: ["dia_semana", "hora_inicio", "hora_fin", "fecha_inicio", "fecha_fin"]
+    });
+    const horariosPorDia = horariosActuales.sort((a, b) => {
+        const ordenDia = diasSemana.indexOf(a.dia_semana) - diasSemana.indexOf(b.dia_semana);
+        return ordenDia || a.hora_inicio.localeCompare(b.hora_inicio);
+    }).map(horario => ({
+        dia: horario.dia_semana === "Miercoles" ? "Miércoles"
+            : horario.dia_semana === "Sabado" ? "Sábado" : horario.dia_semana,
+        horaInicio: horario.hora_inicio.slice(0, 5),
+        horaFin: horario.hora_fin.slice(0, 5),
+        fechaInicio: horario.fecha_inicio,
+        fechaFin: horario.fecha_fin
+    }));
+
     return res.status(opciones.status || 200).render("viewsMedico/perfil", {
         perfilActivo: true,
         modoEdicion: Boolean(opciones.modoEdicion),
@@ -32,7 +69,8 @@ const renderizarPerfil = async (req, res, opciones = {}) => {
         perfilProfesional: {
             especialidad: medico.Especialidad?.nombre || "Especialidad no registrada",
             cedulaProfesional: medico.cedula_profesional || "No registrada",
-            aniosExperiencia: medico.anios_experiencia ?? null
+            aniosExperiencia: medico.anios_experiencia ?? null,
+            horarios: horariosPorDia
         },
         mensajeExito: opciones.mensajeExito || null,
         errorPerfil: opciones.errorPerfil || null,
@@ -148,10 +186,12 @@ export const cambiarContrasenaMedico = async (req, res) => {
             errorPassword = "La contraseña actual no es correcta.";
         } else if (passwordNueva !== confirmarPassword) {
             errorPassword = "La contraseña nueva y su confirmación no coinciden.";
-        } else if (passwordNueva.length < 6 || Buffer.byteLength(passwordNueva, "utf8") > 72
+        } else if (Buffer.byteLength(passwordNueva, "utf8") > 72) {
+            errorPassword = "La contraseña es demasiado larga. Prueba con una más corta.";
+        } else if (passwordNueva.length < 6
             || !/[A-Za-z]/.test(passwordNueva) || !/\d/.test(passwordNueva)
             || !/[^A-Za-z\d]/.test(passwordNueva)) {
-            errorPassword = "Usa al menos 6 caracteres con letras, números y un carácter especial; el máximo admitido es 72 bytes.";
+            errorPassword = "Usa al menos 6 caracteres e incluye una letra, un número y un carácter especial.";
         } else if (await bcrypt.compare(passwordNueva, req.usuario.password)) {
             errorPassword = "La contraseña nueva debe ser diferente a la actual.";
         }
