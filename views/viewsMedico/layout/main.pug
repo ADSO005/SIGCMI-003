@@ -19,7 +19,9 @@ html(lang='es')
       aria-label="Abrir o cerrar el menú de navegación"
       aria-controls="sidebar"
       aria-expanded="false"
-      class="fixed bottom-4 right-4 z-[1000] flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-[#315bd7] text-white shadow-lg min-[769px]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+      aria-hidden="true"
+      tabindex="-1"
+      class="fixed bottom-4 right-4 z-[1000] flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-[#315bd7] text-white shadow-lg opacity-0 pointer-events-none transition-all duration-200 min-[769px]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
       onclick="toggleSidebar()"
     )
       svg(class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")

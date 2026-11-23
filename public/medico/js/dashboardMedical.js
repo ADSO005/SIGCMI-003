@@ -21,6 +21,20 @@ window.toggleSidebar = () => {
   }
 };
 
+const botonSidebarMovil = document.getElementById("mobileSidebarToggle");
+const actualizarBotonSidebarMovil = () => {
+  if (!botonSidebarMovil) return;
+  const visible = window.innerWidth <= 768 && window.scrollY > 100;
+  botonSidebarMovil.classList.toggle("opacity-0", !visible);
+  botonSidebarMovil.classList.toggle("pointer-events-none", !visible);
+  botonSidebarMovil.setAttribute("aria-hidden", String(!visible));
+  botonSidebarMovil.tabIndex = visible ? 0 : -1;
+};
+
+window.addEventListener("scroll", actualizarBotonSidebarMovil, { passive: true });
+window.addEventListener("resize", actualizarBotonSidebarMovil);
+actualizarBotonSidebarMovil();
+
 function cerrarSidebarMovil() {
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("sidebarOverlay");
