@@ -62,7 +62,7 @@ aside#sidebar.patient-sidebar.text-white.flex.flex-col.justify-between.shadow-xl
   .p-4.border-t(
     class="border-indigo-500/40"
   )
-    form#formCerrarSesion(action="/auth/logout" method="POST")
+    div
       button.flex.w-full.items-center.gap-3.px-3.py-2.rounded-xl.text-left.text-sm.font-medium.text-indigo-100.transition(
         type="button"
         id="btnAbrirConfirmacionCerrarSesion"
@@ -70,5 +70,3 @@ aside#sidebar.patient-sidebar.text-white.flex.flex-col.justify-between.shadow-xl
       )
         i(data-lucide="log-out").w-5.h-5.shrink-0
         span.sidebar-text Cerrar Sesión
-
-  include ./modalCerrarSesion

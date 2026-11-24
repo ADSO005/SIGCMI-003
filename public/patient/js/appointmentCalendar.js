@@ -48,8 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const posicionar = () => {
             const rect = botonFecha.getBoundingClientRect()
             const ancho = Math.min(Math.max(rect.width, 240), window.innerWidth - 16)
+            const alto = Math.min(calendario.scrollHeight || 300, window.innerHeight - 24)
+            const espacioAbajo = window.innerHeight - rect.bottom
+            const abrirArriba = espacioAbajo < alto + 24
             Object.assign(calendario.style, {
-                top: `${rect.bottom + 4}px`,
+                top: `${Math.max(8, abrirArriba ? rect.top - alto - 8 : rect.bottom - 8)}px`,
                 left: `${Math.max(8, Math.min(rect.left, window.innerWidth - ancho - 8))}px`,
                 width: `${ancho}px`
             })
@@ -63,10 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 cerrarCalendario()
                 return
             }
-            posicionar()
             calendario.style.display = 'block'
+            posicionar()
             botonFecha.setAttribute('aria-expanded', 'true')
-            dibujar()
+            dibujar().finally(posicionar)
         })
         document.addEventListener('pointerdown', evento => {
             if (!calendario.contains(evento.target) && !botonFecha.contains(evento.target)) cerrarCalendario()
