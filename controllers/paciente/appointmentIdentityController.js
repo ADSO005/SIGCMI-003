@@ -2,6 +2,7 @@ import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import { Cita, EstadoCita, Especialidad, Medico, Paciente } from '../../models/index.js'
 import { sendAppointmentIdentityCodeEmail } from '../../services/emailService.js'
 import { consultarHorasDisponiblesCita, HORAS_CITA } from '../../services/citaAvailability.js'
+import { contieneLenguajeInapropiado } from '../../utils/filtroLenguaje.js'
 
 const verificaciones = new Map()
 const estadosActivos = ['Pendiente', 'Confirmada']
@@ -27,7 +28,15 @@ const obtenerDatosAccion = async (usuarioId, datos) => {
     const hora = String(datos.hora || '')
     const medicoId = Number(datos.medicoId)
     const especialidadId = Number(datos.especialidadId)
+    const motivoConsulta = String(datos.motivoConsulta || '').trim()
     const citaId = datos.citaId ? Number(datos.citaId) : null
+
+    if (!motivoConsulta || motivoConsulta.length > 2000) {
+        return { error: 'Escribe un motivo de consulta de hasta 2000 caracteres.', status: 400 }
+    }
+    if (contieneLenguajeInapropiado(motivoConsulta)) {
+        return { error: 'El motivo de consulta contiene lenguaje no permitido.', status: 400 }
+    }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || !/^\d{2}:\d{2}$/.test(hora) ||
         !Number.isInteger(medicoId) || medicoId < 1 ||
@@ -84,7 +93,7 @@ const obtenerDatosAccion = async (usuarioId, datos) => {
         accion,
         paciente,
         cita,
-        datos: { fecha, hora, medicoId, especialidadId, citaId }
+        datos: { fecha, hora, medicoId, especialidadId, motivoConsulta, citaId }
     }
 }
 
@@ -260,7 +269,8 @@ export const verificarCodigoCitaPaciente = async (req, res) => {
                 estado_id: estadoPendiente.id_estado,
                 creado_por: usuarioId,
                 fecha: datos.fecha,
-                hora: `${datos.hora}:00`
+                hora: `${datos.hora}:00`,
+                motivo_consulta: datos.motivoConsulta
             })
             verificaciones.delete(clave)
             return res.json({ ok: true, mensaje: 'La cita quedó registrada.', citaId: nuevaCita.id_cita })
@@ -270,6 +280,7 @@ export const verificarCodigoCitaPaciente = async (req, res) => {
             medico_id: datos.medicoId,
             fecha: datos.fecha,
             hora: `${datos.hora}:00`,
+            motivo_consulta: datos.motivoConsulta,
             reprogramado_por: usuarioId,
             fecha_reprogramacion: new Date(),
             motivo_reprogramacion: 'Reprogramación solicitada por el paciente y confirmada por correo.'

@@ -474,17 +474,100 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 })
 
+//- AVISO DE INACTIVIDAD PARA LAS VISTAS AUTENTICADAS DEL PACIENTE
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modalInactividad')
+    const modalConfirmacion = document.getElementById('modalConfirmarCerrarSesion')
+    const botonContinuar = document.getElementById('btnContinuarSesion')
+    const botonSalir = document.getElementById('btnSalirPorInactividad')
+    if (!modal || !botonContinuar) return
+
+    const tiempoInactividad = 10 * 60 * 1000
+    let ultimaActividad = Date.now()
+    let temporizador
+    let elementoEnfocadoAntesDelModal = null
+    let modalVisible = false
+
+    const mostrarModal = () => {
+        if (modalVisible) return
+        modalVisible = true
+        clearTimeout(temporizador)
+        elementoEnfocadoAntesDelModal = document.activeElement
+        modal.classList.remove('hidden')
+        modal.classList.add('flex')
+        botonContinuar.focus()
+    }
+
+    const revisarInactividad = () => {
+        if (modalVisible || document.visibilityState === 'hidden') return
+        const restante = tiempoInactividad - (Date.now() - ultimaActividad)
+        if (restante <= 0) mostrarModal()
+        else temporizador = window.setTimeout(revisarInactividad, restante)
+    }
+
+    const registrarActividad = () => {
+        if (modalVisible) return
+        ultimaActividad = Date.now()
+        clearTimeout(temporizador)
+        revisarInactividad()
+    }
+
+    const continuarEnPortal = () => {
+        modalVisible = false
+        modal.classList.add('hidden')
+        modal.classList.remove('flex')
+        ultimaActividad = Date.now()
+        revisarInactividad()
+        if (elementoEnfocadoAntesDelModal instanceof HTMLElement && elementoEnfocadoAntesDelModal.isConnected) {
+            elementoEnfocadoAntesDelModal.focus()
+        }
+    }
+
+    let ultimoMovimiento = 0
+    document.addEventListener('pointermove', () => {
+        const ahora = Date.now()
+        if (ahora - ultimoMovimiento < 1000) return
+        ultimoMovimiento = ahora
+        registrarActividad()
+    }, { passive: true })
+
+    ;['pointerdown', 'keydown', 'click', 'input', 'change', 'touchstart', 'scroll'].forEach((evento) => {
+        window.addEventListener(evento, registrarActividad, { passive: true, capture: true })
+    })
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') revisarInactividad()
+    })
+
+    document.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Escape' && modalVisible && modalConfirmacion?.classList.contains('hidden')) continuarEnPortal()
+    })
+
+    botonContinuar.addEventListener('click', continuarEnPortal)
+    botonSalir?.addEventListener('click', () => {
+        modal.classList.add('hidden')
+        modal.classList.remove('flex')
+        document.dispatchEvent(new CustomEvent('paciente:confirmar-cierre', {
+            detail: { desdeInactividad: true }
+        }))
+    })
+    revisarInactividad()
+})
+
 //- CONFIRMAR CIERRE DE SESIÓN
 document.addEventListener('DOMContentLoaded', () => {
     const modalCerrarSesion = document.getElementById('modalConfirmarCerrarSesion')
     const formularioCerrarSesion = document.getElementById('formCerrarSesion')
     const botonAbrir = document.getElementById('btnAbrirConfirmacionCerrarSesion')
     const botonCancelar = document.getElementById('btnCancelarCerrarSesion')
-    const botonConfirmar = document.getElementById('btnConfirmarCerrarSesion')
+    const botonSalirInactividad = document.getElementById('btnSalirPorInactividad')
+    const modalInactividad = document.getElementById('modalInactividad')
 
-    if (!modalCerrarSesion || !formularioCerrarSesion || !botonAbrir) return
+    if (!modalCerrarSesion || !formularioCerrarSesion) return
+    let volverAInactividad = false
 
-    const abrirModalCerrarSesion = () => {
+    const abrirModalCerrarSesion = (desdeInactividad = false) => {
+        volverAInactividad = desdeInactividad
         modalCerrarSesion.classList.remove('hidden')
         modalCerrarSesion.classList.add('flex')
         botonCancelar?.focus()
@@ -493,12 +576,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const cerrarModalCerrarSesion = () => {
         modalCerrarSesion.classList.add('hidden')
         modalCerrarSesion.classList.remove('flex')
-        botonAbrir.focus()
+        if (volverAInactividad && modalInactividad) {
+            modalInactividad.classList.remove('hidden')
+            modalInactividad.classList.add('flex')
+            botonSalirInactividad?.focus()
+        } else {
+            botonAbrir?.focus()
+        }
+        volverAInactividad = false
     }
 
-    botonAbrir.addEventListener('click', abrirModalCerrarSesion)
+    botonAbrir?.addEventListener('click', () => abrirModalCerrarSesion())
+    document.addEventListener('paciente:confirmar-cierre', (evento) => {
+        abrirModalCerrarSesion(Boolean(evento.detail?.desdeInactividad))
+    })
     botonCancelar?.addEventListener('click', cerrarModalCerrarSesion)
-    botonConfirmar?.addEventListener('click', () => formularioCerrarSesion.submit())
 
     modalCerrarSesion.addEventListener('click', (evento) => {
         if (evento.target === modalCerrarSesion) cerrarModalCerrarSesion()
@@ -554,6 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hora: datos.get('hora'),
             especialidadId: datos.get('especialidad'),
             medicoId: datos.get('medico'),
+            motivoConsulta: datos.get('motivo_consulta'),
             citaId: datos.get('citaId')
         }
         const boton = formulario.querySelector('button[type="submit"]')
