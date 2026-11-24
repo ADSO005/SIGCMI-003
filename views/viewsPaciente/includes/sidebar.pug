@@ -1,14 +1,17 @@
 //- SIDEBAR LATERAL AZUL
 
-aside#sidebar.bg-indigo-600.text-white.flex.flex-col.justify-between.shadow-xl.transition-all.duration-300.ease-in-out.shrink-0(
-  class="w-64"
+aside#sidebar.patient-sidebar.text-white.flex.flex-col.justify-between.shadow-xl.transition-all.duration-300.ease-in-out.shrink-0(
+  class="w-64 bg-[#263F9D] max-[768px]:fixed max-[768px]:inset-y-0 max-[768px]:left-0 max-[768px]:z-50"
 )
   div
     //- LOGO Y BOTÓN
     .flex.items-center.justify-between.p-4.border-b(
       class="border-indigo-500/40"
     )
-      h1.text-2xl.font-bold.tracking-wide.sidebar-text SIGCMI
+      .flex.items-center.gap-2.sidebar-text
+        span.patient-logo-frame(aria-hidden="true")
+          img.patient-logo-image(src="/patient/img/sigcmi-logo.png" alt="")
+        h1.text-2xl.font-bold.tracking-wide SIGCMI
       button#toggleSidebar.flex.h-9.w-9.flex-col.items-center.justify-center.gap-1.rounded-lg.transition(
         type="button"
         aria-label="Mostrar u ocultar menú lateral"
@@ -33,25 +36,25 @@ aside#sidebar.bg-indigo-600.text-white.flex.flex-col.justify-between.shadow-xl.t
         span.text-xs.text-indigo-200= paciente ? (paciente.rol || 'Paciente') : 'Paciente'
         a.mt-1.text-xs.text-white.px-3.py-1.rounded-md.text-center.border.w-max.transition(
           href="/paciente/perfil"
-          class="bg-indigo-500/50 border-indigo-400/30 hover:bg-indigo-500"
+          class="bg-white/10 border-white/20 hover:bg-white/20 focus-visible:outline-white"
         ) Ver Mi Perfil
     //- OPCIONES DE NAVEGACIÓN
     nav.p-3.space-y-2
       a.flex.items-center.gap-3.px-3.py-2.rounded-xl.text-sm.font-medium.transition(
         href="/paciente/dashboard"
-        class= typeof activeSection !== 'undefined' && activeSection === 'citas' ? 'bg-indigo-500/80 text-white shadow-sm' : 'text-indigo-100 hover:bg-indigo-500/50'
+        class= typeof activeSection !== 'undefined' && activeSection === 'citas' ? 'patient-nav-active bg-[#3C62BE] text-white shadow-sm' : 'text-white/85 hover:bg-white/10'
       )
         i(data-lucide="calendar").w-5.h-5.shrink-0
         span.sidebar-text Mis Citas
       a.flex.items-center.gap-3.px-3.py-2.rounded-xl.text-sm.font-medium.transition(
         href="/paciente/historial-diagnosticos"
-        class= typeof activeSection !== 'undefined' && activeSection === 'diagnosticos' ? 'bg-indigo-500/80 text-white shadow-sm' : 'text-indigo-100 hover:bg-indigo-500/50'
+        class= typeof activeSection !== 'undefined' && activeSection === 'diagnosticos' ? 'patient-nav-active bg-[#3C62BE] text-white shadow-sm' : 'text-white/85 hover:bg-white/10'
       )
         i(data-lucide="file-text").w-5.h-5.shrink-0
         span.sidebar-text Mis Diagnósticos
       a.flex.items-center.gap-3.px-3.py-2.rounded-xl.text-sm.font-medium.transition(
         href="/paciente/notificaciones"
-        class= typeof activeSection !== 'undefined' && activeSection === 'notificaciones' ? 'bg-indigo-500/80 text-white shadow-sm' : 'text-indigo-100 hover:bg-indigo-500/50'
+        class= typeof activeSection !== 'undefined' && activeSection === 'notificaciones' ? 'patient-nav-active bg-[#3C62BE] text-white shadow-sm' : 'text-white/85 hover:bg-white/10'
       )
         i(data-lucide="settings").w-5.h-5.shrink-0
         span.sidebar-text Notificaciones
@@ -63,7 +66,7 @@ aside#sidebar.bg-indigo-600.text-white.flex.flex-col.justify-between.shadow-xl.t
       button.flex.w-full.items-center.gap-3.px-3.py-2.rounded-xl.text-left.text-sm.font-medium.text-indigo-100.transition(
         type="button"
         id="btnAbrirConfirmacionCerrarSesion"
-        class="hover:bg-indigo-700/80"
+        class="hover:bg-white/15 focus-visible:outline-white"
       )
         i(data-lucide="log-out").w-5.h-5.shrink-0
         span.sidebar-text Cerrar Sesión
