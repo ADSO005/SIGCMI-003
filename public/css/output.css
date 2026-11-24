@@ -363,6 +363,9 @@
   .top-4 {
     top: calc(var(--spacing) * 4);
   }
+  .top-\[105px\] {
+    top: 105px;
+  }
   .-right-16 {
     right: calc(var(--spacing) * -16);
   }
@@ -422,6 +425,9 @@
   }
   .left-4 {
     left: calc(var(--spacing) * 4);
+  }
+  .z-0 {
+    z-index: 0;
   }
   .z-10 {
     z-index: 10;
@@ -491,6 +497,9 @@
   }
   .m-auto {
     margin: auto;
+  }
+  .-mx-2 {
+    margin-inline: calc(var(--spacing) * -2);
   }
   .-mx-4 {
     margin-inline: calc(var(--spacing) * -4);
@@ -678,6 +687,9 @@
   .h-\[120px\] {
     height: 120px;
   }
+  .h-\[150px\] {
+    height: 150px;
+  }
   .h-\[208px\] {
     height: 208px;
   }
@@ -762,8 +774,8 @@
   .min-h-\[130px\] {
     min-height: 130px;
   }
-  .min-h-\[150px\] {
-    min-height: 150px;
+  .min-h-\[140px\] {
+    min-height: 140px;
   }
   .min-h-\[320px\] {
     min-height: 320px;
@@ -1430,6 +1442,12 @@
     border-color: color-mix(in srgb, #fff 40%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       border-color: color-mix(in oklab, var(--color-white) 40%, transparent);
+    }
+  }
+  .border-white\/45 {
+    border-color: color-mix(in srgb, #fff 45%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-white) 45%, transparent);
     }
   }
   .border-white\/80 {
@@ -2577,6 +2595,18 @@
     --tw-shadow: 0 3px 12px var(--tw-shadow-color, rgba(15,35,80,0.05));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
+  .shadow-\[4px_0_20px_rgba\(7\,27\,104\,0\.12\)\] {
+    --tw-shadow: 4px 0 20px var(--tw-shadow-color, rgba(7,27,104,0.12));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[inset_0_1px_0_rgba\(255\,255\,255\,0\.12\)\] {
+    --tw-shadow: inset 0 1px 0 var(--tw-shadow-color, rgba(255,255,255,0.12));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-\[inset_0_1px_0_rgba\(255\,255\,255\,0\.15\)\] {
+    --tw-shadow: inset 0 1px 0 var(--tw-shadow-color, rgba(255,255,255,0.15));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
   .shadow-inner {
     --tw-shadow: inset 0 2px 4px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.05));
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
@@ -3599,6 +3629,31 @@
   }
   .\[\&_\.historial-card\>ul\]\:mt-2 .historial-card > ul {
     margin-top: calc(var(--spacing) * 2);
+  }
+  .\[\&_\.nav-link\]\:focus-visible\:outline-2 .nav-link:focus-visible {
+    outline-style: var(--tw-outline-style);
+    outline-width: 2px;
+  }
+  .\[\&_\.nav-link\]\:focus-visible\:outline-offset-2 .nav-link:focus-visible {
+    outline-offset: 2px;
+  }
+  .\[\&_\.nav-link\]\:focus-visible\:outline-white .nav-link:focus-visible {
+    outline-color: var(--color-white);
+  }
+  .\[\&_\.nav-link\.preActive\]\:bg-linear-to-r .nav-link.preActive {
+    --tw-gradient-position: to right;
+    @supports (background-image: linear-gradient(in lab, red, red)) {
+      --tw-gradient-position: to right in oklab;
+    }
+    background-image: linear-gradient(var(--tw-gradient-stops));
+  }
+  .\[\&_\.nav-link\.preActive\]\:from-\[\#315ce6\] .nav-link.preActive {
+    --tw-gradient-from: #315ce6;
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .\[\&_\.nav-link\.preActive\]\:to-\[\#365ee4\] .nav-link.preActive {
+    --tw-gradient-to: #365ee4;
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .\[\&_a\]\:break-words a {
     overflow-wrap: break-word;
