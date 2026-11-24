@@ -560,7 +560,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const formularioCerrarSesion = document.getElementById('formCerrarSesion')
     const botonAbrir = document.getElementById('btnAbrirConfirmacionCerrarSesion')
     const botonCancelar = document.getElementById('btnCancelarCerrarSesion')
-    const botonConfirmar = document.getElementById('btnConfirmarCerrarSesion')
     const botonSalirInactividad = document.getElementById('btnSalirPorInactividad')
     const modalInactividad = document.getElementById('modalInactividad')
 
