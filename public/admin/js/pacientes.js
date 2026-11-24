@@ -16,16 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("sinResultadosPacientes");
 
 
-    // ========================================
-    // FILTRAR PACIENTES
-    // ========================================
-
     function filtrarPacientes() {
 
-        const texto =
-            buscarPaciente.value
-                .toLowerCase()
-                .trim();
+        const texto = buscarPaciente.value;
 
         const estadoSeleccionado =
             filtroEstado.value
@@ -36,27 +29,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         filas.forEach((fila) => {
 
-            const nombre =
-                fila.dataset.nombre
-                    .toLowerCase();
-
-            const correo =
-                fila.dataset.correo
-                    .toLowerCase();
-
-            const documento =
-                fila.dataset.documento
-                    .toLowerCase();
-
             const estado =
                 fila.dataset.estado
                     .toLowerCase();
 
 
-            const coincideTexto =
-                nombre.includes(texto) ||
-                correo.includes(texto) ||
-                documento.includes(texto);
+            const coincideTexto = Busqueda.coincide(texto, fila.dataset.nombre, fila.dataset.correo, fila.dataset.documento);
 
 
             const coincideEstado =
@@ -80,8 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 
-        // Mostrar mensaje si no hay resultados
-
         if (encontrados === 0) {
 
             sinResultados.classList.remove("hidden");
@@ -93,10 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // ========================================
-    // EVENTOS
-    // ========================================
-
     buscarPaciente.addEventListener(
         "input",
         filtrarPacientes
@@ -107,9 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
         filtrarPacientes
     );
 
-    // ========================================
-    // VER PACIENTE
-    // ========================================
 
     const modalVerPaciente =
         document.getElementById("modalVerPaciente");
@@ -128,10 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-    // ========================================
-    // CERRAR MODAL
-    // ========================================
-
     function cerrarModalVerPaciente() {
 
         modalVerPaciente.classList.add("hidden");
@@ -139,10 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
         modalVerPaciente.classList.remove("flex");
     }
 
-
-    // ========================================
-    // ABRIR MODAL
-    // ========================================
 
     async function verPaciente(id) {
 
@@ -165,10 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const paciente = data.paciente;
             const usuario = paciente.Usuario;
 
-
-            // ====================================
-            // DATOS DEL USUARIO
-            // ====================================
 
             document.getElementById(
                 "ver_nombre_completo"
@@ -196,10 +153,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 usuario.telefono || "N/A";
 
 
-            // ====================================
-            // ESTADO
-            // ====================================
-
             const estado =
                 document.getElementById(
                     "ver_estado"
@@ -215,10 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? "inline-flex mt-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700"
                     : "inline-flex mt-2 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700";
 
-
-            // ====================================
-            // DATOS DEL PACIENTE
-            // ====================================
 
             document.getElementById(
                 "ver_fecha_nacimiento"
@@ -270,10 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 paciente.condiciones_medicas || "N/A";
 
 
-            // ====================================
-            // MOSTRAR MODAL
-            // ====================================
-
             modalVerPaciente.classList.remove(
                 "hidden"
             );
@@ -293,10 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-
-    // ========================================
-    // EVENTOS
-    // ========================================
 
     botonesVerPaciente.forEach((boton) => {
 

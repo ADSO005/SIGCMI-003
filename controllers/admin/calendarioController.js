@@ -10,9 +10,6 @@ import {
 export const mostrarCalendario = async (req, res) => {
     try {
 
-        // ==========================================
-        // CITAS
-        // ==========================================
 
         const citasDB = await Cita.findAll({
             include: [
@@ -67,10 +64,6 @@ export const mostrarCalendario = async (req, res) => {
         });
 
 
-        // ==========================================
-        // CONVERTIR CITAS A DATOS PLANOS
-        // ==========================================
-
         const citas = citasDB.map(cita => {
 
             const data = cita.toJSON();
@@ -102,10 +95,6 @@ export const mostrarCalendario = async (req, res) => {
             };
         });
 
-
-        // ==========================================
-        // ESTADÍSTICAS DIRECTAMENTE DESDE LA BD
-        // ==========================================
 
         const totalCitas = await Cita.count();
 
@@ -166,10 +155,6 @@ export const mostrarCalendario = async (req, res) => {
         });
 
 
-        // ==========================================
-        // ESTADÍSTICAS PLANAS
-        // ==========================================
-
         const estadisticas = {
             total: totalCitas,
             pendientes: totalPendientes,
@@ -184,10 +169,6 @@ export const mostrarCalendario = async (req, res) => {
             estadisticas
         );
 
-
-        // ==========================================
-        // RENDER
-        // ==========================================
 
         res.render(
             "viewsAdmin/calendario/index",

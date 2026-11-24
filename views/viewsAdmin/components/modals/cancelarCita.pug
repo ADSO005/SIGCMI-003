@@ -1,19 +1,12 @@
-// =====================================================
-// MODAL CANCELAR CITA
-// =====================================================
-
 div(
     id="modalCancelarCita"
-    class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm items-center justify-center z-[100] p-4"
+    class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm overflow-y-auto z-[100] p-4"
 )
 
     div(
-        class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden"
+        class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden m-auto"
     )
 
-        // =================================================
-        // ENCABEZADO
-        // =================================================
 
         div(
             class="bg-red-600 text-white px-6 py-5 flex items-center justify-between"
@@ -38,13 +31,8 @@ div(
                 i(class="fa-solid fa-xmark")
 
 
-        // =================================================
-        // CONTENIDO
-        // =================================================
-
         div(class="p-6")
 
-            // Advertencia
             div(
                 class="bg-red-50 border border-red-200 rounded-xl p-4 mb-5"
             )
@@ -68,10 +56,6 @@ div(
                         )
                             | Esta acción cambiará el estado de la cita a Cancelada.
 
-
-            // =================================================
-            // INFORMACIÓN DE LA CITA
-            // =================================================
 
             div(
                 class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-5"
@@ -126,10 +110,6 @@ div(
                             ) -
 
 
-            // =================================================
-            // MOTIVO
-            // =================================================
-
             div
 
                 label(
@@ -147,10 +127,6 @@ div(
                     class="w-full border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
                 )
 
-
-            // =================================================
-            // ERROR
-            // =================================================
 
             div(
                 id="errorCancelarCita"
@@ -174,10 +150,6 @@ div(
                         )
 
 
-            // =================================================
-            // ÉXITO
-            // =================================================
-
             div(
                 id="exitoCancelarCita"
                 class="hidden mt-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-3"
@@ -187,10 +159,6 @@ div(
 
                 | La cita fue cancelada correctamente.
 
-
-            // =================================================
-            // BOTONES
-            // =================================================
 
             div(
                 class="flex justify-end gap-3 mt-6"

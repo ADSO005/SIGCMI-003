@@ -20,10 +20,6 @@ window.toggleSidebar = () => {
 };
 
 
-// ==========================================
-// CERRAR SIDEBAR EN MÓVIL
-// ==========================================
-
 window.closeSidebar = () => {
 
     const sidebar = document.getElementById("sidebar");
@@ -38,10 +34,6 @@ window.closeSidebar = () => {
     }
 };
 
-
-// ==========================================
-// RESPONSIVE
-// ==========================================
 
 window.addEventListener("resize", () => {
 

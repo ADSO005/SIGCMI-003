@@ -1,5 +1,3 @@
-// Botón "ver cita" del dashboard: abre el modal de detalle (components/modals/verCita.pug)
-// con los datos de GET /admin/citas/:id.
 document.addEventListener("DOMContentLoaded", () => {
 
     const modal = document.getElementById("modalVerCita");

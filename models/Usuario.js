@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import db from "../config/db.js";
+import { capitalizarNombre, normalizarCorreo } from "../utils/formatoTexto.js";
 
 const Usuario = db.define(
     "Usuario",
@@ -117,6 +118,15 @@ const Usuario = db.define(
     {
         tableName: "usuarios",
         timestamps: false,
+
+        hooks: {
+            // Red de seguridad: sin importar por dónde entre el dato, se guarda con el mismo formato.
+            beforeValidate(usuario) {
+                if (typeof usuario.nombres === "string") usuario.nombres = capitalizarNombre(usuario.nombres);
+                if (typeof usuario.apellidos === "string") usuario.apellidos = capitalizarNombre(usuario.apellidos);
+                if (typeof usuario.correo === "string") usuario.correo = normalizarCorreo(usuario.correo);
+            },
+        },
     }
 );
 

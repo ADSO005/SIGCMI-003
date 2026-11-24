@@ -1,9 +1,3 @@
-//- ==========================================
-//- REGISTRO UNIFICADO DE USUARIOS
-//- Un solo formulario para Administrador, Médico y Paciente.
-//- Las secciones por rol se muestran según el rol elegido.
-//- ==========================================
-
 doctype html
 html(lang="es")
     head
@@ -18,7 +12,6 @@ html(lang="es")
 
     body(class="bg-white text-slate-800")
 
-        //- Mixins de campos y encabezados
         include includes/mixins.pug
 
         div(class="flex min-h-screen")
@@ -28,7 +21,6 @@ html(lang="es")
 
             main(class="flex-1 px-4 md:px-8 xl:px-10 py-6")
 
-                //- Encabezado
                 div(
                     class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-5 border-b border-slate-200"
                 )
@@ -46,7 +38,6 @@ html(lang="es")
                         i(class="fa-solid fa-arrow-left")
                         | Volver
 
-                //- Formulario
                 div(class="max-w-6xl mx-auto mt-8")
 
                     if error
@@ -70,7 +61,6 @@ html(lang="es")
                         include includes/seguridad.pug
                         include includes/acciones.pug
 
-        //- Alerta de validación (se abre sola cuando el servidor devuelve un error)
         dialog#alertaError(
             role="alertdialog"
             aria-labelledby="alertaErrorTitulo"

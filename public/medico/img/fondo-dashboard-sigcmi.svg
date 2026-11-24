@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1650" height="928" viewBox="0 0 1650 928" fill="none" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="fondo" x1="70" y1="0" x2="1490" y2="1020" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/>
+      <stop offset="0.48" stop-color="#EFF6FF"/>
+      <stop offset="1" stop-color="#E1EDFF"/>
+    </linearGradient>
+    <linearGradient id="onda1" x1="775" y1="16" x2="1610" y2="228" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF4FF" stop-opacity="0"/>
+      <stop offset="0.6" stop-color="#BDD9FF" stop-opacity="0.64"/>
+      <stop offset="1" stop-color="#A6D5FF" stop-opacity="0.7"/>
+    </linearGradient>
+    <linearGradient id="onda2" x1="890" y1="20" x2="1635" y2="185" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="0.7" stop-color="#A6C9FF" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#9CC7FF" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1650" height="928" fill="url(#fondo)"/>
+  <path d="M700 34C892 46 1013 120 1158 140C1321 163 1367 38 1508 6C1562 -6 1611 -8 1650 0V180C1557 189 1477 199 1366 179C1219 152 1160 147 1040 105C920 63 824 39 700 34Z" fill="url(#onda2)"/>
+  <path d="M760 60C952 75 1103 158 1248 154C1383 151 1467 47 1551 59C1589 64 1621 69 1650 67V224C1531 235 1405 220 1275 184C1127 141 1048 127 942 95C874 75 815 65 760 60Z" fill="url(#onda1)"/>
+</svg>

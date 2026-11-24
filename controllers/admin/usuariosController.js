@@ -72,10 +72,8 @@ export const listarUsuarios = async (req, res) => {
 
         res.render("viewsAdmin/usuarios/index", {
 
-            // Administrador conectado
             usuarios: req.usuario,
 
-            // Usuarios de la BD
             usuariosLista
 
         });
@@ -97,7 +95,6 @@ export const cambiarEstadoUsuario = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Validar ID
         if (!/^\d+$/.test(String(id))) {
             return res.status(400).json({
                 ok: false,
@@ -105,7 +102,6 @@ export const cambiarEstadoUsuario = async (req, res) => {
             });
         }
 
-        // Buscar usuario
         const usuario = await Usuario.findByPk(id);
 
         if (!usuario) {
@@ -115,7 +111,6 @@ export const cambiarEstadoUsuario = async (req, res) => {
             });
         }
 
-        // Cambiar estado
         usuario.estado = !usuario.estado;
 
         await usuario.save();
