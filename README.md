@@ -90,13 +90,25 @@ SIGCMI is an intelligent medical appointment management system built with Node.j
 
 ### Start the application
 
-For development, run the server and CSS watchers:
+For development, start the server without rewriting the tracked CSS file:
 
 ```bash
 npm run dev
 ```
 
-To start only the server after the CSS files have been generated:
+When you intentionally change Tailwind classes, rebuild the stylesheet once with:
+
+```bash
+npm run css:build
+```
+
+To keep the Tailwind watcher running while actively styling, start it separately:
+
+```bash
+npm run css
+```
+
+To start only the server:
 
 ```bash
 npm start
