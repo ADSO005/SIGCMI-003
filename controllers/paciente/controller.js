@@ -1,4 +1,5 @@
 import ConfiguracionNotificacion from '../../models/ConfiguracionNotificacion.js';
+import { Cita, Diagnostico, Medico, Paciente, Prescripcion, Usuario } from '../../models/index.js';
 
 export const mostrarDashboard = (req, res) => {
     try {
@@ -90,30 +91,56 @@ export const mostrarPerfil = (req, res) => {
 
 export const obtenerHistorialDiagnosticos = async (req, res) => {
     try {
-        // Aquí va tu lógica o los datos de prueba simulados que pusimos antes
-        const diagnosticos = [
-            {
-                id_diagnostico: 1,
-                fecha_diagnostico: '2026-10-15',
-                diagnostico: 'Infección Respiratoria Aguda (Faringitis)',
-                sintomas: 'Dolor de garganta, tos seca, fiebre moderada.',
-                temperatura: '38.5',
-                presion_arterial: '120/80',
-                frecuencia_cardiaca: '88',
-                peso: '70.5',
-                tratamiento: 'Reposo absoluto e hidratación.',
-                prescripcion: 'Ibuprofeno 600mg + Amoxicilina 500mg.',
-                observaciones: 'Amígdalas inflamadas.',
-                Citum: {
-                    Medico: {
-                        Usuario: {
-                            nombres: 'Carlos Alberto',
-                            apellidos: 'Mendoza Ruiz'
-                        }
-                    }
+        const paciente = await Paciente.findOne({
+            where: { usuario_id: req.usuario.id_usuario },
+            attributes: ['id_paciente']
+        });
+
+        if (!paciente) {
+            return res.status(404).send('No se encontró el perfil del paciente.');
+        }
+
+        const citas = await Cita.findAll({
+            where: { paciente_id: paciente.id_paciente },
+            attributes: ['id_cita', 'fecha', 'hora'],
+            include: [
+                {
+                    model: Diagnostico,
+                    as: 'Diagnostico',
+                    required: true,
+                    include: [{
+                        model: Prescripcion,
+                        as: 'Prescripcions',
+                        attributes: ['nombre_medicamento', 'dosis', 'frecuencia', 'duracion'],
+                        required: false
+                    }]
+                },
+                {
+                    model: Medico,
+                    attributes: ['id_medico'],
+                    include: [{
+                        model: Usuario,
+                        attributes: ['nombres', 'apellidos']
+                    }]
                 }
-            }
-        ];
+            ],
+            order: [['fecha', 'DESC'], ['hora', 'DESC']]
+        });
+
+        const diagnosticos = citas.map((cita) => {
+            const diagnostico = cita.Diagnostico;
+            const medicamentos = (diagnostico.Prescripcions || [])
+                .map((prescripcion) => `${prescripcion.nombre_medicamento}: ${prescripcion.dosis} | ${prescripcion.frecuencia} | ${prescripcion.duracion}`)
+                .join('\n');
+
+            return {
+                ...diagnostico.get({ plain: true }),
+                fecha_diagnostico: diagnostico.fecha_diagnostico || cita.fecha,
+                Medico: cita.Medico,
+                prescripcion: medicamentos,
+                observaciones: diagnostico.notas_adicionales || ''
+            };
+        });
 
         return res.render('viewsPaciente/diagnosticHistory', {
             tituloPagina: 'Historial de Diagnósticos',
