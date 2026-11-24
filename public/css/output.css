@@ -78,7 +78,6 @@
     --color-violet-200: oklch(89.4% 0.057 293.283);
     --color-violet-600: oklch(54.1% 0.281 293.009);
     --color-violet-700: oklch(49.1% 0.27 292.581);
-    --color-fuchsia-500: oklch(66.7% 0.295 322.15);
     --color-rose-50: oklch(96.9% 0.015 12.422);
     --color-rose-200: oklch(89.2% 0.058 10.001);
     --color-rose-500: oklch(64.5% 0.246 16.439);
@@ -101,7 +100,6 @@
     --color-gray-300: oklch(87.2% 0.01 258.338);
     --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-gray-500: oklch(55.1% 0.027 264.364);
-    --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-700: oklch(37.3% 0.034 259.733);
     --color-gray-800: oklch(27.8% 0.033 256.848);
     --color-black: #000;
@@ -580,9 +578,6 @@
   }
   .ml-1 {
     margin-left: var(--spacing);
-  }
-  .ml-2 {
-    margin-left: calc(var(--spacing) * 2);
   }
   .ml-\[290px\] {
     margin-left: 290px;
@@ -1446,11 +1441,20 @@
   .bg-\[\#00BC8D\] {
     background-color: #00BC8D;
   }
+  .bg-\[\#00BC8D\]\/10 {
+    background-color: color-mix(in oklab, #00BC8D 10%, transparent);
+  }
+  .bg-\[\#00BC8D\]\/15 {
+    background-color: color-mix(in oklab, #00BC8D 15%, transparent);
+  }
   .bg-\[\#2D5FB9\] {
     background-color: #2D5FB9;
   }
   .bg-\[\#3C62BE\] {
     background-color: #3C62BE;
+  }
+  .bg-\[\#3C62BE\]\/10 {
+    background-color: color-mix(in oklab, #3C62BE 10%, transparent);
   }
   .bg-\[\#25D366\] {
     background-color: #25D366;
@@ -1473,6 +1477,9 @@
   .bg-\[\#465DE5\] {
     background-color: #465DE5;
   }
+  .bg-\[\#059669\]\/10 {
+    background-color: color-mix(in oklab, #059669 10%, transparent);
+  }
   .bg-\[\#EAF0FF\] {
     background-color: #EAF0FF;
   }
@@ -1487,6 +1494,9 @@
   }
   .bg-\[\#F8FFFF\] {
     background-color: #F8FFFF;
+  }
+  .bg-\[\#FAF9FF\] {
+    background-color: #FAF9FF;
   }
   .bg-\[\#f4f8ff\] {
     background-color: #f4f8ff;
@@ -1761,9 +1771,6 @@
       background-color: color-mix(in oklab, var(--color-white) 90%, transparent);
     }
   }
-  .bg-yellow-100 {
-    background-color: var(--color-yellow-100);
-  }
   .bg-yellow-200 {
     background-color: var(--color-yellow-200);
   }
@@ -1772,10 +1779,6 @@
     @supports (background-image: linear-gradient(in lab, red, red)) {
       --tw-gradient-position: to right in oklab;
     }
-    background-image: linear-gradient(var(--tw-gradient-stops));
-  }
-  .bg-gradient-to-b {
-    --tw-gradient-position: to bottom in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
   .bg-gradient-to-br {
@@ -1800,10 +1803,6 @@
   }
   .from-\[\#263F9D\] {
     --tw-gradient-from: #263F9D;
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
-  .from-\[\#263c91\] {
-    --tw-gradient-from: #263c91;
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .from-\[\#315bd7\] {
@@ -1838,11 +1837,6 @@
     --tw-gradient-from: var(--color-white);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
-  .via-\[\#263f9e\] {
-    --tw-gradient-via: #263f9e;
-    --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
-    --tw-gradient-stops: var(--tw-gradient-via-stops);
-  }
   .via-indigo-700 {
     --tw-gradient-via: var(--color-indigo-700);
     --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
@@ -1850,10 +1844,6 @@
   }
   .to-\[\#00BC8D\] {
     --tw-gradient-to: #00BC8D;
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
-  .to-\[\#1f367f\] {
-    --tw-gradient-to: #1f367f;
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
   .to-\[\#3C62BE\] {
@@ -2125,9 +2115,6 @@
   }
   .text-right {
     text-align: right;
-  }
-  .align-middle {
-    vertical-align: middle;
   }
   .font-\[Arial\,sans-serif\] {
     font-family: Arial,sans-serif;
@@ -2411,9 +2398,6 @@
   }
   .text-gray-500 {
     color: var(--color-gray-500);
-  }
-  .text-gray-600 {
-    color: var(--color-gray-600);
   }
   .text-gray-700 {
     color: var(--color-gray-700);
@@ -2868,6 +2852,9 @@
     .hover\:bg-\[\#263F9D\]:hover {
       background-color: #263F9D;
     }
+    .hover\:bg-\[\#315bd7\]:hover {
+      background-color: #315bd7;
+    }
     .hover\:bg-\[\#335CD8\]\/5:hover {
       background-color: color-mix(in oklab, #335CD8 5%, transparent);
     }
@@ -2876,9 +2863,6 @@
     }
     .hover\:bg-\[\#335CD8\]\/20:hover {
       background-color: color-mix(in oklab, #335CD8 20%, transparent);
-    }
-    .hover\:bg-\[\#315bd7\]:hover {
-      background-color: #315bd7;
     }
     .hover\:bg-\[\#2748b2\]:hover {
       background-color: #2748b2;
@@ -3201,6 +3185,9 @@
     }
     .max-\[768px\]\:z-50 {
       z-index: 50;
+    }
+    .max-\[768px\]\:pt-\[4\.5rem\] {
+      padding-top: 4.5rem;
     }
   }
   @media (width >= 640px) {
@@ -3731,9 +3718,6 @@
   }
   .\[\&\.preActive\]\:\!bg-\[\#3C62BE\].preActive {
     background-color: #3C62BE !important;
-  }
-  .\[\&\.preActive\]\:\!bg-\[rgba\(94\,156\,245\,0\.38\)\].preActive {
-    background-color: rgba(94,156,245,0.38) !important;
   }
   .\[\&\.preActive\]\:\!shadow-\[inset_0_0_0_1px_rgba\(255\,255\,255\,0\.14\)\].preActive {
     --tw-shadow: inset 0 0 0 1px var(--tw-shadow-color, rgba(255,255,255,0.14)) !important;
