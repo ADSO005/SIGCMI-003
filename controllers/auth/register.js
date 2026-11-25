@@ -153,7 +153,7 @@ const register = async (req, res) => {
       return renderDuplicateError("numeroDocumento", "Ya existe una solicitud pendiente con este documento. Verifica este campo.");
     }
 
-    const missingEmailSettings = ["EMAIL_HOST", "EMAIL_PORT", "EMAIL_USER", "EMAIL_PASS", "EMAIL_FROM"]
+    const missingEmailSettings = ["RESEND_API_KEY", "EMAIL_FROM"]
       .filter((key) => !process.env[key]?.trim());
     if (missingEmailSettings.length) {
       return res.status(503).render("login/auth/register", {
