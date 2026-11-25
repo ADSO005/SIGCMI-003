@@ -1,24 +1,44 @@
 import nodemailer from "nodemailer";
 
-// Crea el transporte SMTP usando la configuración definida en las variables de entorno.
-const createTransporter = () => {
-    const port = Number(process.env.EMAIL_PORT || 587);
+// Los correos de citas conservan su transporte SMTP independiente.
+const smtpTransport = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: Number(process.env.EMAIL_PORT || 587),
+    secure: Number(process.env.EMAIL_PORT || 587) === 465,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 20000,
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+});
 
-    return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port,
-        secure: port === 465,
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
+// Envía los correos de autenticación mediante la API HTTPS de Resend.
+const transporter = {
+    async sendMail(message) {
+        const apiKey = process.env.RESEND_API_KEY?.trim();
+        if (!apiKey || !process.env.EMAIL_FROM?.trim()) {
+            throw new Error("Falta configurar RESEND_API_KEY o EMAIL_FROM.");
         }
-    });
+        const senderName = process.env.NAME_EMAIL?.trim();
+        const senderEmail = process.env.EMAIL_FROM.trim();
+        const from = senderName ? `${senderName} <${senderEmail}>` : senderEmail;
+        const response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ ...message, from }),
+            signal: AbortSignal.timeout(20000)
+        });
+        if (!response.ok) {
+            const error = new Error(`Resend rechazó el envío (HTTP ${response.status}).`);
+            error.code = "EMAIL_PROVIDER_ERROR";
+            throw error;
+        }
+    }
 };
 
-const transporter = createTransporter();
+const nombreCompleto = (persona) => [persona.nombres, persona.apellidos]
+    .filter((parte) => typeof parte === "string" && parte.trim())
+    .map((parte) => parte.trim())
+    .join(" ");
 
 // Envía al paciente el código necesario para confirmar la cancelación de una cita.
 const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
@@ -28,7 +48,7 @@ const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
     }).format(new Date(`${cita.fecha}T12:00:00`));
     const hora = String(cita.hora).slice(0, 5);
 
-    await transporter.sendMail({
+    await smtpTransport.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,
         subject: "Código para cancelar tu cita - SIGCMI",
@@ -48,7 +68,7 @@ const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) =
     const asunto = esReprogramacion ? "Confirma la reprogramación de tu cita" : "Confirma tu nueva cita";
     const accionTexto = esReprogramacion ? "reprogramar" : "confirmar";
 
-    await transporter.sendMail({
+    await smtpTransport.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,
         subject: asunto,
@@ -59,9 +79,7 @@ const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) =
 
 // Envía el código OTP de recuperación de contraseña al correo del usuario.
 const sendRecoveryEmail = async (usuario) => {
-    const nombre = typeof usuario.nombres === "string" && usuario.nombres.trim()
-        ? usuario.nombres.trim()
-        : "";
+    const nombre = nombreCompleto(usuario);
     const saludo = nombre ? `Hola, ${nombre}.` : "Hola.";
 
     await transporter.sendMail({
@@ -188,6 +206,7 @@ const sendRecoveryEmail = async (usuario) => {
 
 // Envía el enlace para confirmar una cuenta creada mediante el formulario de registro.
 const sendConfirmationEmail = async (registro) => {
+    const nombre = nombreCompleto(registro);
     const backendUrl = new URL(process.env.BACKEND_URL || "http://localhost");
     const localHosts = ["localhost", "127.0.0.1", "[::1]"];
 
@@ -254,7 +273,7 @@ const sendConfirmationEmail = async (registro) => {
                             font-size: 16px;
                             margin-top: 0;
                         ">
-                            Hola ${registro.nombres}.
+                            Hola${nombre ? ` ${nombre}` : ""}.
                         </p>
 
                         <p style="
