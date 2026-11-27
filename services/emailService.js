@@ -2,7 +2,7 @@ import { appointmentEmailTemplate } from './paciente/appointmentEmailTemplate.js
 
 // Envía los correos de autenticación y citas mediante la API HTTPS de Resend.
 const transporter = {
-    async sendMail(message) {
+    async sendMail(message, idempotencyKey) {
         const apiKey = process.env.RESEND_API_KEY?.trim();
         if (!apiKey || !process.env.EMAIL_FROM?.trim()) {
             throw new Error("Falta configurar RESEND_API_KEY o EMAIL_FROM.");
@@ -12,7 +12,7 @@ const transporter = {
         const from = senderName ? `${senderName} <${senderEmail}>` : senderEmail;
         const response = await fetch("https://api.resend.com/emails", {
             method: "POST",
-            headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+            headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", ...(idempotencyKey && { 'Idempotency-Key': idempotencyKey }) },
             body: JSON.stringify({ ...message, from }),
             signal: AbortSignal.timeout(20000)
         });
@@ -30,11 +30,13 @@ const nombreCompleto = (persona) => [persona.nombres, persona.apellidos]
     .join(" ");
 
 // Aviso posterior a la acción; es independiente de los códigos de verificación.
-const sendAppointmentNotificationEmail = async (usuario, cita, tipo) => {
+const sendAppointmentNotificationEmail = async (usuario, cita, tipo, idempotencyKey) => {
     const mensajes = {
         confirmacion_cita: ['Cita registrada', 'Tu cita ha sido registrada'],
         reprogramacion: ['Cita reprogramada', 'Tu cita ha sido reprogramada'],
-        cancelacion_cita: ['Cita cancelada', 'Tu cita ha sido cancelada']
+        cancelacion_cita: ['Cita cancelada', 'Tu cita ha sido cancelada'],
+        recordatorio_24h: ['Recordatorio de cita', 'Tu cita está programada para las próximas 24 horas'],
+        recordatorio_1h: ['Recordatorio de cita', 'Tu cita está programada para la próxima hora']
     };
     const mensaje = mensajes[tipo];
     if (!mensaje) throw new Error('Tipo de notificación de cita no válido.');
@@ -47,7 +49,7 @@ const sendAppointmentNotificationEmail = async (usuario, cita, tipo) => {
         subject: `${mensaje[0]} - SIGCMI`,
         text: `${saludo} ${mensaje[1]} para el ${fecha} a las ${hora}.`,
         html: appointmentEmailTemplate({ titulo: mensaje[0], saludo, mensaje: mensaje[1], fecha, hora })
-    });
+    }, idempotencyKey);
 };
 
 // Envía al paciente el código necesario para confirmar la cancelación de una cita.
