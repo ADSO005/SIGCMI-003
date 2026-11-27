@@ -22,8 +22,14 @@ const Notificacion = db.define(
 
         enviado_por: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: true,
         },
+
+        clave_evento: { type: DataTypes.STRING(100), allowNull: true, unique: true },
+        evento: { type: DataTypes.STRING(40), allowNull: true },
+        cita_id: { type: DataTypes.INTEGER, allowNull: true },
+        fecha_cita: { type: DataTypes.DATEONLY, allowNull: true },
+        hora_cita: { type: DataTypes.TIME, allowNull: true },
 
         titulo: {
             type: DataTypes.STRING(150),
@@ -53,7 +59,8 @@ const Notificacion = db.define(
             type: DataTypes.ENUM(
                 "Pendiente",
                 "Enviada",
-                "Error"
+                "Error",
+                "Omitida"
             ),
             defaultValue: "Pendiente",
         },
@@ -73,16 +80,6 @@ const Notificacion = db.define(
 
         error_envio: {
             type: DataTypes.TEXT,
-            allowNull: true,
-        },
-
-        cita_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-
-        evento: {
-            type: DataTypes.STRING(40),
             allowNull: true,
         },
 
