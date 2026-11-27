@@ -82,6 +82,22 @@ const Notificacion = db.define(
             type: DataTypes.TEXT,
             allowNull: true,
         },
+
+        cita_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+
+        evento: {
+            type: DataTypes.STRING(40),
+            allowNull: true,
+        },
+
+        // wamid devuelto por Meta; permite enlazar los estados de entrega.
+        id_externo: {
+            type: DataTypes.STRING(120),
+            allowNull: true,
+        },
     },
     {
         tableName: "notificaciones",
