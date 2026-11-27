@@ -134,7 +134,7 @@ export const solicitarCodigoCitaPaciente = async (req, res) => {
             responseCode: error.responseCode,
             message: error.message
         })
-        return responderError(res, 503, 'No se pudo enviar el código. Revisa la conexión SMTP e inténtalo nuevamente.')
+        return responderError(res, 503, 'No se pudo enviar el código. Inténtalo nuevamente más tarde.')
     }
 }
 

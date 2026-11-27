@@ -1,17 +1,4 @@
-import nodemailer from "nodemailer";
-
-// Los correos de citas conservan su transporte SMTP independiente.
-const smtpTransport = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT || 587),
-    secure: Number(process.env.EMAIL_PORT || 587) === 465,
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 20000,
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-});
-
-// Envía los correos de autenticación mediante la API HTTPS de Resend.
+// Envía los correos de autenticación y citas mediante la API HTTPS de Resend.
 const transporter = {
     async sendMail(message) {
         const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -48,7 +35,7 @@ const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
     }).format(new Date(`${cita.fecha}T12:00:00`));
     const hora = String(cita.hora).slice(0, 5);
 
-    await smtpTransport.sendMail({
+    await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,
         subject: "Código para cancelar tu cita - SIGCMI",
@@ -68,7 +55,7 @@ const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) =
     const asunto = esReprogramacion ? "Confirma la reprogramación de tu cita" : "Confirma tu nueva cita";
     const accionTexto = esReprogramacion ? "reprogramar" : "confirmar";
 
-    await smtpTransport.sendMail({
+    await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,
         subject: asunto,
