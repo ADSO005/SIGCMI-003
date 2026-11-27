@@ -1,5 +1,5 @@
 import ConfiguracionNotificacion from '../../models/ConfiguracionNotificacion.js';
-import { Cita, Diagnostico, Medico, Paciente, Prescripcion, Usuario } from '../../models/index.js';
+import { Cita, Diagnostico, Medico, Paciente, Prescripcion, Usuario, EstadoCita } from '../../models/index.js';
 
 export const mostrarDashboard = (req, res) => {
     try {
@@ -104,6 +104,7 @@ export const obtenerHistorialDiagnosticos = async (req, res) => {
             where: { paciente_id: paciente.id_paciente },
             attributes: ['id_cita', 'fecha', 'hora'],
             include: [
+                { model: EstadoCita, as: 'Estado', required: true, where: { nombre: 'Completada' }, attributes: [] },
                 {
                     model: Diagnostico,
                     as: 'Diagnostico',

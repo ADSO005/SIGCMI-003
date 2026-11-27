@@ -9,6 +9,7 @@ import Especialidad from "../../models/Especialidad.js";
 import { calculateDashboardMetrics, dashboardPeriods, nextAppointmentToday, canStartAppointmentToday, consultaSupera24Horas } from "../../services/medico/dashboardMetricsService.js";
 import { textoDiagnosticoValido } from "../../services/medico/diagnosticoService.js";
 import { medicamentoPersistidoValido } from "../../services/medico/prescripcionesService.js";
+import { enqueueDiagnosisNotification } from "../../services/paciente/diagnosisNotifications.js";
 
 const formatearFechaConsulta = fecha => {
     if (typeof fecha !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
@@ -361,7 +362,7 @@ const actualizarEstadoCita = async (req, res) => {
         const resultado = await Cita.sequelize.transaction(async transaction => {
             const cita = await Cita.findOne({
                 where: { id_cita: Number(id), medico_id: medico.id_medico },
-                attributes: ["id_cita", "estado_id", "fecha", "hora", "fecha_inicio_atencion"],
+                attributes: ["id_cita", "paciente_id", "estado_id", "fecha", "hora", "fecha_inicio_atencion"],
                 transaction, lock: transaction.LOCK.UPDATE
             });
             if (!cita) return { status: 404, mensaje: "Cita no encontrada para este médico" };
@@ -426,6 +427,7 @@ const actualizarEstadoCita = async (req, res) => {
                 transaction
             });
             if (filasActualizadas !== 1) return { status: 409, mensaje: "La cita cambió de estado; recarga la agenda" };
+            if (completar) await enqueueDiagnosisNotification(cita, transaction);
             return { status: 200, mensaje: "Estado de la cita actualizado correctamente" };
         });
 

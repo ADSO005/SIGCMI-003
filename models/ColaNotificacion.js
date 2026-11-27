@@ -25,7 +25,8 @@ const ColaNotificacion = db.define(
                 "Pendiente",
                 "Procesando",
                 "Enviada",
-                "Error"
+                "Error",
+                "Omitida"
             ),
             defaultValue: "Pendiente",
         },
@@ -44,6 +45,9 @@ const ColaNotificacion = db.define(
             type: DataTypes.DATE,
             allowNull: true,
         },
+
+        lease_token: { type: DataTypes.STRING(32), allowNull: true },
+        actualizado: { type: DataTypes.DATE, allowNull: true },
     },
     {
         tableName: "cola_notificaciones",

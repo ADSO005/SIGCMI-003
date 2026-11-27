@@ -1,4 +1,4 @@
-import { appointmentEmailTemplate } from './paciente/appointmentEmailTemplate.js';
+import { appointmentEmailTemplate, diagnosisEmailTemplate } from './paciente/appointmentEmailTemplate.js';
 
 // Envía los correos de autenticación y citas mediante la API HTTPS de Resend.
 const transporter = {
@@ -28,6 +28,20 @@ const nombreCompleto = (persona) => [persona.nombres, persona.apellidos]
     .filter((parte) => typeof parte === "string" && parte.trim())
     .map((parte) => parte.trim())
     .join(" ");
+
+const sendDiagnosisNotificationEmail = async (usuario, idempotencyKey) => {
+    const base = new URL(process.env.BACKEND_URL || 'http://localhost:3000');
+    if (!['http:', 'https:'].includes(base.protocol)) throw new Error('BACKEND_URL no es una dirección web válida.');
+    const url = new URL('/paciente/historial-diagnosticos', base.origin).toString();
+    const nombre = nombreCompleto(usuario);
+    const saludo = nombre ? `Hola, ${nombre}.` : 'Hola.';
+    await transporter.sendMail({
+        to: usuario.correo,
+        subject: 'Tu diagnóstico está disponible - SIGCMI',
+        text: `${saludo} Tu diagnóstico está disponible en SIGCMI. Ingresa a tu cuenta para consultarlo: ${url}`,
+        html: diagnosisEmailTemplate({ saludo, url })
+    }, idempotencyKey);
+};
 
 // Aviso posterior a la acción; es independiente de los códigos de verificación.
 const sendAppointmentNotificationEmail = async (usuario, cita, tipo, idempotencyKey) => {
@@ -377,6 +391,7 @@ const sendConfirmationEmail = async (registro) => {
 };
 
 export {
+    sendDiagnosisNotificationEmail,
     sendAppointmentNotificationEmail,
     sendRecoveryEmail,
     sendConfirmationEmail,

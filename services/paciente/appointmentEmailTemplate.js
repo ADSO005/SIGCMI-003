@@ -24,3 +24,12 @@ export function appointmentEmailTemplate({ titulo, saludo, mensaje, fecha, hora,
   </div>
 </body></html>`;
 }
+
+export function diagnosisEmailTemplate({ saludo, url }) {
+    return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Diagnóstico disponible</title></head>
+<body style="margin:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;"><div style="max-width:600px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden;">
+<div style="background:#1d4ed8;padding:25px;text-align:center;color:#fff;"><h2 style="margin:0;font-size:24px;">Diagnóstico disponible</h2></div>
+<div style="padding:35px;color:#334155;line-height:1.6;"><p>${escaparHtml(saludo)}</p><p>Tu diagnóstico ya está disponible en SIGCMI. Ingresa a tu cuenta para consultarlo.</p>
+<p style="text-align:center;margin:30px 0;"><a href="${escaparHtml(url)}" style="display:inline-block;padding:14px 28px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">Consultar historial</a></p></div>
+<div style="background:#f8fafc;padding:20px;text-align:center;border-top:1px solid #e2e8f0;color:#64748b;font-size:13px;"><p>SIGCMI - Sistema Integral de Gestión de Citas Médicas</p><p>Este correo fue enviado automáticamente.</p></div></div></body></html>`;
+}
