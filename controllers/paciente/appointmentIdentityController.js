@@ -3,6 +3,7 @@ import { Cita, EstadoCita, Especialidad, Medico, Paciente } from '../../models/i
 import { sendAppointmentIdentityCodeEmail } from '../../services/emailService.js'
 import { consultarHorasDisponiblesCita, HORAS_CITA } from '../../services/citaAvailability.js'
 import { contieneLenguajeInapropiado } from '../../utils/filtroLenguaje.js'
+import { notifyPatientAppointment } from '../../services/paciente/appointmentNotifications.js'
 
 const verificaciones = new Map()
 const estadosActivos = ['Pendiente', 'Confirmada']
@@ -134,7 +135,7 @@ export const solicitarCodigoCitaPaciente = async (req, res) => {
             responseCode: error.responseCode,
             message: error.message
         })
-        return responderError(res, 503, 'No se pudo enviar el código. Revisa la conexión SMTP e inténtalo nuevamente.')
+        return responderError(res, 503, 'No se pudo enviar el código. Inténtalo nuevamente más tarde.')
     }
 }
 
@@ -273,6 +274,7 @@ export const verificarCodigoCitaPaciente = async (req, res) => {
                 motivo_consulta: datos.motivoConsulta
             })
             verificaciones.delete(clave)
+            await notifyPatientAppointment(req.usuario, nuevaCita, 'confirmacion_cita')
             return res.json({ ok: true, mensaje: 'La cita quedó registrada.', citaId: nuevaCita.id_cita })
         }
 
@@ -286,6 +288,7 @@ export const verificarCodigoCitaPaciente = async (req, res) => {
             motivo_reprogramacion: 'Reprogramación solicitada por el paciente y confirmada por correo.'
         })
         verificaciones.delete(clave)
+        await notifyPatientAppointment(req.usuario, cita, 'reprogramacion')
         return res.json({ ok: true, mensaje: 'La cita fue reprogramada.' })
     } catch (error) {
         console.error('Error al aplicar la acción de cita verificada:', error)

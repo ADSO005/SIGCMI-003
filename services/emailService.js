@@ -1,17 +1,6 @@
-import nodemailer from "nodemailer";
+import { appointmentEmailTemplate } from './paciente/appointmentEmailTemplate.js';
 
-// Los correos de citas conservan su transporte SMTP independiente.
-const smtpTransport = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: Number(process.env.EMAIL_PORT || 587),
-    secure: Number(process.env.EMAIL_PORT || 587) === 465,
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 20000,
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-});
-
-// Envía los correos de autenticación mediante la API HTTPS de Resend.
+// Envía los correos de autenticación y citas mediante la API HTTPS de Resend.
 const transporter = {
     async sendMail(message) {
         const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -40,6 +29,27 @@ const nombreCompleto = (persona) => [persona.nombres, persona.apellidos]
     .map((parte) => parte.trim())
     .join(" ");
 
+// Aviso posterior a la acción; es independiente de los códigos de verificación.
+const sendAppointmentNotificationEmail = async (usuario, cita, tipo) => {
+    const mensajes = {
+        confirmacion_cita: ['Cita registrada', 'Tu cita ha sido registrada'],
+        reprogramacion: ['Cita reprogramada', 'Tu cita ha sido reprogramada'],
+        cancelacion_cita: ['Cita cancelada', 'Tu cita ha sido cancelada']
+    };
+    const mensaje = mensajes[tipo];
+    if (!mensaje) throw new Error('Tipo de notificación de cita no válido.');
+    const nombre = nombreCompleto(usuario);
+    const saludo = nombre ? `Hola, ${nombre}.` : 'Hola.';
+    const fecha = String(cita.fecha);
+    const hora = String(cita.hora).slice(0, 5);
+    await transporter.sendMail({
+        to: usuario.correo,
+        subject: `${mensaje[0]} - SIGCMI`,
+        text: `${saludo} ${mensaje[1]} para el ${fecha} a las ${hora}.`,
+        html: appointmentEmailTemplate({ titulo: mensaje[0], saludo, mensaje: mensaje[1], fecha, hora })
+    });
+};
+
 // Envía al paciente el código necesario para confirmar la cancelación de una cita.
 const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
     const fecha = new Intl.DateTimeFormat("es-CO", {
@@ -48,12 +58,12 @@ const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
     }).format(new Date(`${cita.fecha}T12:00:00`));
     const hora = String(cita.hora).slice(0, 5);
 
-    await smtpTransport.sendMail({
+    await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,
         subject: "Código para cancelar tu cita - SIGCMI",
         text: `Hola ${usuario.nombres || ""}. Tu código para confirmar la cancelación de la cita del ${fecha} a las ${hora} es ${codigo}. Vence en 10 minutos.`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:24px auto;padding:24px;color:#334155"><h2 style="color:#1d4ed8">Confirma la cancelación de tu cita</h2><p>Hola ${usuario.nombres || ""},</p><p>Ingresa este código para confirmar la cancelación de tu cita del ${fecha} a las ${hora}:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1d4ed8">${codigo}</p><p>El código vence en 10 minutos. Si no solicitaste esta cancelación, ignora este mensaje.</p><p style="font-size:13px;color:#64748b">SIGCMI - Sistema Integral de Gestión de Citas Médicas</p></div>`
+        html: appointmentEmailTemplate({ titulo: 'Confirma la cancelación de tu cita', saludo: usuario.nombres ? `Hola, ${usuario.nombres}.` : 'Hola.', mensaje: 'Ingresa el código para confirmar la cancelación de tu cita', fecha, hora, codigo })
     });
 };
 
@@ -68,12 +78,12 @@ const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) =
     const asunto = esReprogramacion ? "Confirma la reprogramación de tu cita" : "Confirma tu nueva cita";
     const accionTexto = esReprogramacion ? "reprogramar" : "confirmar";
 
-    await smtpTransport.sendMail({
+    await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: usuario.correo,
         subject: asunto,
         text: `Hola ${usuario.nombres || ""}. Tu código para ${accionTexto} la cita del ${fecha} a las ${hora} es ${codigo}. Vence en 10 minutos.`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:24px auto;padding:24px;color:#334155"><h2 style="color:#1d4ed8">${asunto}</h2><p>Hola ${usuario.nombres || ""},</p><p>Ingresa este código para ${accionTexto} la cita del ${fecha} a las ${hora}:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1d4ed8">${codigo}</p><p>El código vence en 10 minutos. Si no solicitaste esta acción, ignora este mensaje.</p><p style="font-size:13px;color:#64748b">SIGCMI - Sistema Integral de Gestión de Citas Médicas</p></div>`
+        html: appointmentEmailTemplate({ titulo: asunto, saludo: usuario.nombres ? `Hola, ${usuario.nombres}.` : 'Hola.', mensaje: `Ingresa el código para ${accionTexto} tu cita`, fecha, hora, codigo })
     });
 };
 
@@ -365,6 +375,7 @@ const sendConfirmationEmail = async (registro) => {
 };
 
 export {
+    sendAppointmentNotificationEmail,
     sendRecoveryEmail,
     sendConfirmationEmail,
     sendCancellationCodeEmail,
