@@ -1,6 +1,7 @@
 ﻿import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import { Paciente, Cita, EstadoCita } from '../../models/index.js'
 import { sendCancellationCodeEmail } from '../../services/emailService.js'
+import { notifyPatientAppointment } from '../../services/paciente/appointmentNotifications.js'
 
 const verificacionesCancelacion = new Map()
 const ESTADOS_CANCELABLES = ['Pendiente', 'Confirmada']
@@ -190,6 +191,7 @@ const verificarCodigoCancelacion = async (req, res) => {
         await cita.save()
 
         verificacionesCancelacion.delete(llave)
+        await notifyPatientAppointment(req.usuario, cita, 'cancelacion_cita')
         return res.redirect('/paciente/dashboard')
     } catch (error) {
         console.error('Error al confirmar la cancelación de la cita:', error)
