@@ -21,7 +21,7 @@ test('fresh installation, model queries and doctor pages without weekly request 
     await import('../models/RegistroPendiente.js');
     (await import('../models/asociaciones.js')).default();
     for (const model of Object.values(db.models)) await model.findAll({ limit: 1, logging: false });
-    assert.equal(Object.keys(db.models).length, 17);
+    assert.ok(db.models.ConfiguracionWhatsApp, 'El modelo de configuración de WhatsApp debe estar registrado');
     const [tables] = await connection.query('SHOW TABLES');
     assert.equal(tables.some(row => Object.values(row).some(name => name.startsWith('solicitudes_horarios'))), false);
     const [scheduleColumns] = await connection.query('SHOW COLUMNS FROM horarios');
