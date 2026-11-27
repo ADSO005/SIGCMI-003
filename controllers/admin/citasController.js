@@ -9,6 +9,7 @@ import {
 } from "../../models/index.js";
 
 import { Op } from "sequelize";
+import { notificarCitaPorId } from "../../services/notificaciones/notificar.js";
 
 import {
     ESTADOS_CITA_REPROGRAMABLE,
@@ -589,6 +590,8 @@ export const crearNuevaCita = async (req, res) => {
 
             });
 
+
+        notificarCitaPorId(nuevaCita.id_cita, "confirmacion_cita");
 
         return res.status(201).json({
 
@@ -1179,6 +1182,7 @@ export const reprogramarCita = async (req, res) => {
 
         });
 
+        notificarCitaPorId(cita.id_cita, "reprogramacion");
 
         return res.status(200).json({
 
@@ -1318,6 +1322,7 @@ export const cancelarCita = async (req, res) => {
 
         await cita.save();
 
+        notificarCitaPorId(cita.id_cita, "cancelacion_cita");
 
         return res.status(200).json({
             ok: true,
