@@ -14,7 +14,8 @@ const app = express();
 // ===============================
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.json());
+// rawBody se conserva para validar la firma del webhook de WhatsApp.
+app.use(express.json({ verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 app.use(cookieParser());
 

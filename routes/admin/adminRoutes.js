@@ -52,6 +52,14 @@ import {
 import {
     mostrarCalendario
 } from "../../controllers/admin/calendarioController.js";
+import {
+    verConfiguracionWhatsApp,
+    guardarConfiguracionWhatsApp,
+    probarConexionWhatsApp,
+    probarEnvioWhatsApp,
+    listarPlantillasWhatsApp
+} from "../../controllers/admin/whatsappConfigController.js";
+
 const router = express.Router();
 
 import {
@@ -337,4 +345,10 @@ router.get(
     role(1),
     obtenerPrescripcion
 );
+router.get("/whatsapp", auth, role(1), verConfiguracionWhatsApp);
+router.post("/whatsapp/config", auth, role(1), guardarConfiguracionWhatsApp);
+router.post("/whatsapp/probar-conexion", auth, role(1), probarConexionWhatsApp);
+router.post("/whatsapp/probar-envio", auth, role(1), probarEnvioWhatsApp);
+router.get("/whatsapp/plantillas", auth, role(1), listarPlantillasWhatsApp);
+
 export default router;
