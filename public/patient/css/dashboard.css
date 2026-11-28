@@ -104,13 +104,13 @@ body.patient-portal textarea:focus-visible {
 
 /* Navegación del paciente */
 .patient-sidebar {
-  z-index: 50;
+  z-index: 1000;
   position: fixed;
   inset: 0 auto 0 0;
   height: 100vh;
   height: 100dvh;
   flex: 0 0 auto;
-  width: 16rem;
+  width: 18.125rem;
   background: #263F9D;
   color: #fff;
 }
@@ -140,7 +140,8 @@ body.patient-portal textarea:focus-visible {
 
 .patient-dashboard-content {
   min-height: 100vh;
-  margin-left: 16rem;
+  min-width: 0;
+  margin-left: 18.125rem;
   transition: margin-left 300ms ease-in-out;
 }
 
@@ -390,6 +391,21 @@ body.patient-portal > div > .flex-1.flex.flex-col,
 body.patient-portal > div > .flex-1.flex.flex-col.overflow-y-auto {
   min-width: 0;
   background: #F4F8FF;
+}
+
+.patient-dashboard-content {
+  width: calc(100% - 18.125rem);
+}
+
+body.patient-sidebar-collapsed .patient-dashboard-content {
+  width: calc(100% - 5rem);
+}
+
+@media (max-width: 768px) {
+  .patient-dashboard-content,
+  body.patient-sidebar-collapsed .patient-dashboard-content {
+    width: 100%;
+  }
 }
 
 body.patient-portal header.bg-white,

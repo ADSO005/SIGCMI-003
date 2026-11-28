@@ -389,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const aplicarEstadoInicialSidebar = () => {
         if (window.innerWidth <= 768) {
             sidebar.classList.remove('collapsed')
+            document.body.classList.remove('patient-sidebar-collapsed')
             sidebarToggle.setAttribute('aria-expanded', 'false')
             sidebarToggle.title = 'Cerrar menú'
         } else {
@@ -414,6 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const contraido = sidebar.classList.toggle('collapsed')
+        document.body.classList.toggle('patient-sidebar-collapsed', contraido)
         sidebar.setAttribute(
             'aria-label',
             contraido ? 'Menú lateral contraído' : 'Menú lateral expandido'
@@ -439,6 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebarToggle.title = sidebar.classList.contains('collapsed') ? 'Expandir menú' : 'Contraer menú'
         } else {
             sidebar.classList.remove('collapsed')
+            document.body.classList.remove('patient-sidebar-collapsed')
             sidebar.setAttribute('aria-label', 'Menú principal del paciente')
             sidebarToggle.setAttribute('aria-expanded', 'false')
             sidebarToggle.title = 'Cerrar menú'
