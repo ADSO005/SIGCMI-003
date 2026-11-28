@@ -13,6 +13,7 @@ import PlantillaNotificacion from "./PlantillaNotificacion.js";
 import ConfiguracionNotificacion from "./ConfiguracionNotificacion.js";
 import ColaNotificacion from "./ColaNotificacion.js";
 import SolicitudWhatsApp from "./SolicitudWhatsApp.js";
+import ConfiguracionWhatsApp from "./ConfiguracionWhatsApp.js";
 import Token from "./Token.js";
 
 export {
@@ -31,5 +32,6 @@ export {
     ConfiguracionNotificacion,
     ColaNotificacion,
     SolicitudWhatsApp,
+    ConfiguracionWhatsApp,
     Token,
 };

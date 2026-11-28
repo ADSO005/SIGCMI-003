@@ -15,6 +15,7 @@ const cargarHorasDisponiblesCita = async (medicoId, fecha, campoHora, citaId = '
 
     const solicitud = String(Number(campoHora.dataset.solicitud || 0) + 1)
     campoHora.dataset.solicitud = solicitud
+    campoHora.disabled = true
     campoHora.replaceChildren(new Option('Seleccionar hora', ''))
     if (!medicoId || !fecha) return
 
@@ -29,13 +30,15 @@ const cargarHorasDisponiblesCita = async (medicoId, fecha, campoHora, citaId = '
         if (!respuesta.ok || !resultado.ok) throw new Error(resultado.mensaje || 'No fue posible consultar los horarios.')
         resultado.horas.forEach((hora) => campoHora.add(new Option(hora, hora)))
         if (!resultado.horas.length) campoHora.add(new Option(resultado.mensaje || 'No hay horarios disponibles', ''))
+        campoHora.disabled = resultado.horas.length === 0
     } catch (error) {
         if (campoHora.dataset.solicitud !== solicitud) return
         campoHora.replaceChildren(new Option('Seleccionar hora', ''), new Option(error.message, ''))
+        campoHora.disabled = true
     }
 }
 
-const crearMenuHorasDesplegable = (select) => {
+const crearMenuDesplegableCita = (select, etiqueta) => {
     if (!select || select.dataset.menuPersonalizado === 'true') return
 
     const contenedor = document.createElement('div')
@@ -45,14 +48,17 @@ const crearMenuHorasDesplegable = (select) => {
 
     const boton = document.createElement('button')
     boton.type = 'button'
-    boton.className = `${select.className} flex cursor-pointer items-center justify-between text-left`
+    boton.id = `${select.id}Trigger`
+    boton.className = `${select.className} patient-select-trigger flex cursor-pointer items-center justify-between gap-3 text-left`
+    boton.setAttribute('aria-label', `Seleccionar ${etiqueta}`)
     boton.setAttribute('aria-haspopup', 'listbox')
     boton.setAttribute('aria-expanded', 'false')
-    boton.setAttribute('aria-label', 'Seleccionar hora')
 
     const textoBoton = document.createElement('span')
     const flecha = document.createElement('span')
-    flecha.textContent = '⌄'
+    flecha.className = 'patient-date-chevron'
+    flecha.setAttribute('aria-hidden', 'true')
+    flecha.innerHTML = '<svg viewBox="0 0 20 20" fill="none"><path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     boton.append(textoBoton, flecha)
 
     select.style.position = 'absolute'
@@ -63,6 +69,7 @@ const crearMenuHorasDesplegable = (select) => {
     select.style.left = '0'
     select.style.top = '0'
     select.setAttribute('aria-hidden', 'true')
+    Array.from(select.labels || []).forEach((label) => { label.htmlFor = boton.id })
     contenedor.appendChild(boton)
     select.dataset.menuPersonalizado = 'true'
 
@@ -86,13 +93,16 @@ const crearMenuHorasDesplegable = (select) => {
 
     const actualizarBoton = () => {
         textoBoton.textContent = select.selectedOptions[0]?.textContent?.trim() || 'Seleccionar hora'
+        boton.disabled = select.disabled
+        boton.classList.toggle('cursor-not-allowed', select.disabled)
+        boton.classList.toggle('opacity-50', select.disabled)
     }
 
     const renderizarOpciones = () => {
         menu.replaceChildren()
         for (const opcion of select.options) {
             if (opcion.hidden) continue
-            if (opcion.value === '' && opcion.textContent.trim() === 'Seleccionar hora') continue
+            if (opcion.value === '') continue
             const elemento = document.createElement('button')
             elemento.type = 'button'
             elemento.setAttribute('role', 'option')
@@ -112,9 +122,7 @@ const crearMenuHorasDesplegable = (select) => {
                 cursor: opcion.disabled ? 'default' : 'pointer'
             })
             if (!opcion.value) elemento.style.gridColumn = '1 / -1'
-            elemento.disabled = opcion.disabled || (
-                opcion.value === '' && opcion.textContent.trim() !== 'Seleccionar hora'
-            )
+            elemento.disabled = opcion.disabled
             elemento.addEventListener('mouseenter', () => {
                 if (!elemento.disabled) elemento.style.background = '#eef2ff'
             })
@@ -135,7 +143,7 @@ const crearMenuHorasDesplegable = (select) => {
 
     const posicionarMenu = () => {
         const rectangulo = boton.getBoundingClientRect()
-        const ancho = Math.max(rectangulo.width, 180)
+        const ancho = Math.max(rectangulo.width, 200)
         Object.assign(menu.style, {
             top: `${rectangulo.bottom}px`,
             left: `${Math.max(8, Math.min(rectangulo.left, window.innerWidth - ancho - 8))}px`,
@@ -150,6 +158,7 @@ const crearMenuHorasDesplegable = (select) => {
     }
 
     const abrirMenu = () => {
+        if (select.disabled) return
         renderizarOpciones()
         posicionarMenu()
         menu.hidden = false
@@ -180,14 +189,18 @@ const crearMenuHorasDesplegable = (select) => {
     new MutationObserver(() => {
         actualizarBoton()
         if (!menu.hidden) renderizarOpciones()
-    }).observe(select, { childList: true })
+    }).observe(select, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'hidden'] })
 
     actualizarBoton()
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    crearMenuHorasDesplegable(document.getElementById('horaCita'))
-    crearMenuHorasDesplegable(document.getElementById('horaReprogramar'))
+    crearMenuDesplegableCita(document.getElementById('especialidadCita'), 'especialidad')
+    crearMenuDesplegableCita(document.getElementById('medicoCita'), 'médico')
+    crearMenuDesplegableCita(document.getElementById('horaCita'), 'hora')
+    crearMenuDesplegableCita(document.getElementById('especialidadReprogramar'), 'especialidad')
+    crearMenuDesplegableCita(document.getElementById('medicoReprogramar'), 'médico')
+    crearMenuDesplegableCita(document.getElementById('horaReprogramar'), 'hora')
 })
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -306,6 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (campoMedicoReprogramar) {
             campoMedicoReprogramar.value = enlaceReprogramar.dataset.medico || ''
+            campoMedicoReprogramar.dispatchEvent(new Event('change', { bubbles: true }))
         }
         if (campoFechaReprogramar) {
             const limites = obtenerLimitesCalendarioCitas()
@@ -434,17 +448,100 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 })
 
+//- AVISO DE INACTIVIDAD PARA LAS VISTAS AUTENTICADAS DEL PACIENTE
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modalInactividad')
+    const modalConfirmacion = document.getElementById('modalConfirmarCerrarSesion')
+    const botonContinuar = document.getElementById('btnContinuarSesion')
+    const botonSalir = document.getElementById('btnSalirPorInactividad')
+    if (!modal || !botonContinuar) return
+
+    const tiempoInactividad = 10 * 60 * 1000
+    let ultimaActividad = Date.now()
+    let temporizador
+    let elementoEnfocadoAntesDelModal = null
+    let modalVisible = false
+
+    const mostrarModal = () => {
+        if (modalVisible) return
+        modalVisible = true
+        clearTimeout(temporizador)
+        elementoEnfocadoAntesDelModal = document.activeElement
+        modal.classList.remove('hidden')
+        modal.classList.add('flex')
+        botonContinuar.focus()
+    }
+
+    const revisarInactividad = () => {
+        if (modalVisible || document.visibilityState === 'hidden') return
+        const restante = tiempoInactividad - (Date.now() - ultimaActividad)
+        if (restante <= 0) mostrarModal()
+        else temporizador = window.setTimeout(revisarInactividad, restante)
+    }
+
+    const registrarActividad = () => {
+        if (modalVisible) return
+        ultimaActividad = Date.now()
+        clearTimeout(temporizador)
+        revisarInactividad()
+    }
+
+    const continuarEnPortal = () => {
+        modalVisible = false
+        modal.classList.add('hidden')
+        modal.classList.remove('flex')
+        ultimaActividad = Date.now()
+        revisarInactividad()
+        if (elementoEnfocadoAntesDelModal instanceof HTMLElement && elementoEnfocadoAntesDelModal.isConnected) {
+            elementoEnfocadoAntesDelModal.focus()
+        }
+    }
+
+    let ultimoMovimiento = 0
+    document.addEventListener('pointermove', () => {
+        const ahora = Date.now()
+        if (ahora - ultimoMovimiento < 1000) return
+        ultimoMovimiento = ahora
+        registrarActividad()
+    }, { passive: true })
+
+    ;['pointerdown', 'keydown', 'click', 'input', 'change', 'touchstart', 'scroll'].forEach((evento) => {
+        window.addEventListener(evento, registrarActividad, { passive: true, capture: true })
+    })
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') revisarInactividad()
+    })
+
+    document.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Escape' && modalVisible && modalConfirmacion?.classList.contains('hidden')) continuarEnPortal()
+    })
+
+    botonContinuar.addEventListener('click', continuarEnPortal)
+    botonSalir?.addEventListener('click', () => {
+        modal.classList.add('hidden')
+        modal.classList.remove('flex')
+        document.dispatchEvent(new CustomEvent('paciente:confirmar-cierre', {
+            detail: { desdeInactividad: true }
+        }))
+    })
+    revisarInactividad()
+})
+
 //- CONFIRMAR CIERRE DE SESIÓN
 document.addEventListener('DOMContentLoaded', () => {
     const modalCerrarSesion = document.getElementById('modalConfirmarCerrarSesion')
     const formularioCerrarSesion = document.getElementById('formCerrarSesion')
     const botonAbrir = document.getElementById('btnAbrirConfirmacionCerrarSesion')
     const botonCancelar = document.getElementById('btnCancelarCerrarSesion')
-    const botonConfirmar = document.getElementById('btnConfirmarCerrarSesion')
+    const botonSalirInactividad = document.getElementById('btnSalirPorInactividad')
+    const modalInactividad = document.getElementById('modalInactividad')
 
-    if (!modalCerrarSesion || !formularioCerrarSesion || !botonAbrir) return
+    if (!modalCerrarSesion || !formularioCerrarSesion) return
+    let volverAInactividad = false
 
-    const abrirModalCerrarSesion = () => {
+    const abrirModalCerrarSesion = (desdeInactividad = false) => {
+        volverAInactividad = desdeInactividad
         modalCerrarSesion.classList.remove('hidden')
         modalCerrarSesion.classList.add('flex')
         botonCancelar?.focus()
@@ -453,12 +550,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const cerrarModalCerrarSesion = () => {
         modalCerrarSesion.classList.add('hidden')
         modalCerrarSesion.classList.remove('flex')
-        botonAbrir.focus()
+        if (volverAInactividad && modalInactividad) {
+            modalInactividad.classList.remove('hidden')
+            modalInactividad.classList.add('flex')
+            botonSalirInactividad?.focus()
+        } else {
+            botonAbrir?.focus()
+        }
+        volverAInactividad = false
     }
 
-    botonAbrir.addEventListener('click', abrirModalCerrarSesion)
+    botonAbrir?.addEventListener('click', () => abrirModalCerrarSesion())
+    document.addEventListener('paciente:confirmar-cierre', (evento) => {
+        abrirModalCerrarSesion(Boolean(evento.detail?.desdeInactividad))
+    })
     botonCancelar?.addEventListener('click', cerrarModalCerrarSesion)
-    botonConfirmar?.addEventListener('click', () => formularioCerrarSesion.submit())
 
     modalCerrarSesion.addEventListener('click', (evento) => {
         if (evento.target === modalCerrarSesion) cerrarModalCerrarSesion()
@@ -514,6 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hora: datos.get('hora'),
             especialidadId: datos.get('especialidad'),
             medicoId: datos.get('medico'),
+            motivoConsulta: datos.get('motivo_consulta'),
             citaId: datos.get('citaId')
         }
         const boton = formulario.querySelector('button[type="submit"]')

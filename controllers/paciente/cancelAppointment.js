@@ -1,6 +1,7 @@
 ﻿import { createHmac, randomInt, timingSafeEqual } from 'node:crypto'
 import { Paciente, Cita, EstadoCita } from '../../models/index.js'
 import { sendCancellationCodeEmail } from '../../services/emailService.js'
+import { notifyPatientAppointment } from '../../services/paciente/appointmentNotifications.js'
 
 const verificacionesCancelacion = new Map()
 const ESTADOS_CANCELABLES = ['Pendiente', 'Confirmada']
@@ -119,11 +120,7 @@ const solicitarCodigoCancelacion = async (req, res) => {
 
         if (!cita) return res.status(500).send('No fue posible procesar la solicitud.')
 
-        const mensaje = error.code === 'ETIMEDOUT' || error.code === 'ECONNECTION'
-            ? 'No se pudo conectar con el servidor de correo. Revisa la configuración SMTP y vuelve a intentarlo.'
-            : error.code === 'EAUTH'
-                ? 'El servidor de correo rechazó las credenciales SMTP. Revisa EMAIL_USER y EMAIL_PASS.'
-                : 'No fue posible enviar el código. Revisa la configuración del correo e inténtalo de nuevo.'
+        const mensaje = 'No fue posible enviar el código. Inténtalo nuevamente más tarde.'
 
         return renderCorreo(res, cita, correoIngresado, mensaje, 503)
     }
@@ -194,6 +191,7 @@ const verificarCodigoCancelacion = async (req, res) => {
         await cita.save()
 
         verificacionesCancelacion.delete(llave)
+        await notifyPatientAppointment(req.usuario, cita, 'cancelacion_cita')
         return res.redirect('/paciente/dashboard')
     } catch (error) {
         console.error('Error al confirmar la cancelación de la cita:', error)

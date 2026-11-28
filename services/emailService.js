@@ -1,24 +1,70 @@
-import nodemailer from "nodemailer";
+import { appointmentEmailTemplate, diagnosisEmailTemplate } from './paciente/appointmentEmailTemplate.js';
 
-// Crea el transporte SMTP usando la configuración definida en las variables de entorno.
-const createTransporter = () => {
-    const port = Number(process.env.EMAIL_PORT || 587);
-
-    return nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port,
-        secure: port === 465,
-        connectionTimeout: 15000,
-        greetingTimeout: 15000,
-        socketTimeout: 20000,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
+// Envía los correos de autenticación y citas mediante la API HTTPS de Resend.
+const transporter = {
+    async sendMail(message, idempotencyKey) {
+        const apiKey = process.env.RESEND_API_KEY?.trim();
+        if (!apiKey || !process.env.EMAIL_FROM?.trim()) {
+            throw new Error("Falta configurar RESEND_API_KEY o EMAIL_FROM.");
         }
-    });
+        const senderName = process.env.NAME_EMAIL?.trim();
+        const senderEmail = process.env.EMAIL_FROM.trim();
+        const from = senderName ? `${senderName} <${senderEmail}>` : senderEmail;
+        const response = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", ...(idempotencyKey && { 'Idempotency-Key': idempotencyKey }) },
+            body: JSON.stringify({ ...message, from }),
+            signal: AbortSignal.timeout(20000)
+        });
+        if (!response.ok) {
+            const error = new Error(`Resend rechazó el envío (HTTP ${response.status}).`);
+            error.code = "EMAIL_PROVIDER_ERROR";
+            throw error;
+        }
+    }
 };
 
-const transporter = createTransporter();
+const nombreCompleto = (persona) => [persona.nombres, persona.apellidos]
+    .filter((parte) => typeof parte === "string" && parte.trim())
+    .map((parte) => parte.trim())
+    .join(" ");
+
+const sendDiagnosisNotificationEmail = async (usuario, idempotencyKey) => {
+    const base = new URL(process.env.BACKEND_URL || 'http://localhost:3000');
+    if (!['http:', 'https:'].includes(base.protocol)) throw new Error('BACKEND_URL no es una dirección web válida.');
+    const url = new URL('/paciente/historial-diagnosticos', base.origin).toString();
+    const nombre = nombreCompleto(usuario);
+    const saludo = nombre ? `Hola, ${nombre}.` : 'Hola.';
+    await transporter.sendMail({
+        to: usuario.correo,
+        subject: 'Tu diagnóstico está disponible - SIGCMI',
+        text: `${saludo} Tu diagnóstico está disponible en SIGCMI. Ingresa a tu cuenta para consultarlo: ${url}`,
+        html: diagnosisEmailTemplate({ saludo, url })
+    }, idempotencyKey);
+};
+
+// Aviso posterior a la acción; es independiente de los códigos de verificación.
+const sendAppointmentNotificationEmail = async (usuario, cita, tipo, idempotencyKey) => {
+    const mensajes = {
+        confirmacion_cita: ['Cita registrada', 'Tu cita ha sido registrada'],
+        reprogramacion: ['Cita reprogramada', 'Tu cita ha sido reprogramada'],
+        cancelacion_cita: ['Cita cancelada', 'Tu cita ha sido cancelada'],
+        recordatorio_24h: ['Recordatorio de cita', 'Tu cita está programada para las próximas 24 horas'],
+        recordatorio_1h: ['Recordatorio de cita', 'Tu cita está programada para la próxima hora']
+    };
+    const mensaje = mensajes[tipo];
+    if (!mensaje) throw new Error('Tipo de notificación de cita no válido.');
+    const nombre = nombreCompleto(usuario);
+    const saludo = nombre ? `Hola, ${nombre}.` : 'Hola.';
+    const fecha = String(cita.fecha);
+    const hora = String(cita.hora).slice(0, 5);
+    await transporter.sendMail({
+        to: usuario.correo,
+        subject: `${mensaje[0]} - SIGCMI`,
+        text: `${saludo} ${mensaje[1]} para el ${fecha} a las ${hora}.`,
+        html: appointmentEmailTemplate({ titulo: mensaje[0], saludo, mensaje: mensaje[1], fecha, hora })
+    }, idempotencyKey);
+};
 
 // Envía al paciente el código necesario para confirmar la cancelación de una cita.
 const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
@@ -33,7 +79,7 @@ const sendCancellationCodeEmail = async (usuario, codigo, cita) => {
         to: usuario.correo,
         subject: "Código para cancelar tu cita - SIGCMI",
         text: `Hola ${usuario.nombres || ""}. Tu código para confirmar la cancelación de la cita del ${fecha} a las ${hora} es ${codigo}. Vence en 10 minutos.`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:24px auto;padding:24px;color:#334155"><h2 style="color:#1d4ed8">Confirma la cancelación de tu cita</h2><p>Hola ${usuario.nombres || ""},</p><p>Ingresa este código para confirmar la cancelación de tu cita del ${fecha} a las ${hora}:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1d4ed8">${codigo}</p><p>El código vence en 10 minutos. Si no solicitaste esta cancelación, ignora este mensaje.</p><p style="font-size:13px;color:#64748b">SIGCMI - Sistema Integral de Gestión de Citas Médicas</p></div>`
+        html: appointmentEmailTemplate({ titulo: 'Confirma la cancelación de tu cita', saludo: usuario.nombres ? `Hola, ${usuario.nombres}.` : 'Hola.', mensaje: 'Ingresa el código para confirmar la cancelación de tu cita', fecha, hora, codigo })
     });
 };
 
@@ -53,15 +99,13 @@ const sendAppointmentIdentityCodeEmail = async (usuario, codigo, accion, cita) =
         to: usuario.correo,
         subject: asunto,
         text: `Hola ${usuario.nombres || ""}. Tu código para ${accionTexto} la cita del ${fecha} a las ${hora} es ${codigo}. Vence en 10 minutos.`,
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:24px auto;padding:24px;color:#334155"><h2 style="color:#1d4ed8">${asunto}</h2><p>Hola ${usuario.nombres || ""},</p><p>Ingresa este código para ${accionTexto} la cita del ${fecha} a las ${hora}:</p><p style="font-size:32px;font-weight:bold;letter-spacing:8px;color:#1d4ed8">${codigo}</p><p>El código vence en 10 minutos. Si no solicitaste esta acción, ignora este mensaje.</p><p style="font-size:13px;color:#64748b">SIGCMI - Sistema Integral de Gestión de Citas Médicas</p></div>`
+        html: appointmentEmailTemplate({ titulo: asunto, saludo: usuario.nombres ? `Hola, ${usuario.nombres}.` : 'Hola.', mensaje: `Ingresa el código para ${accionTexto} tu cita`, fecha, hora, codigo })
     });
 };
 
 // Envía el código OTP de recuperación de contraseña al correo del usuario.
 const sendRecoveryEmail = async (usuario) => {
-    const nombre = typeof usuario.nombres === "string" && usuario.nombres.trim()
-        ? usuario.nombres.trim()
-        : "";
+    const nombre = nombreCompleto(usuario);
     const saludo = nombre ? `Hola, ${nombre}.` : "Hola.";
 
     await transporter.sendMail({
@@ -188,6 +232,7 @@ const sendRecoveryEmail = async (usuario) => {
 
 // Envía el enlace para confirmar una cuenta creada mediante el formulario de registro.
 const sendConfirmationEmail = async (registro) => {
+    const nombre = nombreCompleto(registro);
     const backendUrl = new URL(process.env.BACKEND_URL || "http://localhost");
     const localHosts = ["localhost", "127.0.0.1", "[::1]"];
 
@@ -254,7 +299,7 @@ const sendConfirmationEmail = async (registro) => {
                             font-size: 16px;
                             margin-top: 0;
                         ">
-                            Hola ${registro.nombres}.
+                            Hola${nombre ? ` ${nombre}` : ""}.
                         </p>
 
                         <p style="
@@ -346,6 +391,8 @@ const sendConfirmationEmail = async (registro) => {
 };
 
 export {
+    sendDiagnosisNotificationEmail,
+    sendAppointmentNotificationEmail,
     sendRecoveryEmail,
     sendConfirmationEmail,
     sendCancellationCodeEmail,

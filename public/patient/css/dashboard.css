@@ -1,0 +1,801 @@
+﻿/* Colores institucionales aplicados únicamente a las vistas del paciente. */
+body.patient-portal {
+  min-height: 100vh;
+  background: #F4F8FF;
+  color: #001B4D;
+}
+
+body.patient-portal .bg-gray-100,
+body.patient-portal .bg-slate-100,
+body.patient-portal .bg-slate-200 {
+  background-color: #F4F8FF;
+}
+
+body.patient-portal .bg-blue-50,
+body.patient-portal .bg-slate-50 {
+  background-color: #F8FFFF;
+}
+
+body.patient-portal .bg-indigo-50 {
+  background-color: #FAF9FF;
+}
+
+body.patient-portal .bg-green-50,
+body.patient-portal .bg-emerald-50 {
+  background-color: #F1FEF8;
+}
+
+body.patient-portal .bg-blue-100,
+body.patient-portal .bg-indigo-100 {
+  background-color: #EAF0FF;
+}
+
+body.patient-portal .bg-indigo-600,
+body.patient-portal .bg-blue-600,
+body.patient-portal .bg-indigo-500 {
+  background-color: #335CD8;
+}
+
+body.patient-portal .bg-indigo-700,
+body.patient-portal .bg-indigo-800,
+body.patient-portal .bg-blue-700,
+body.patient-portal .bg-blue-800 {
+  background-color: #263F9D;
+}
+
+body.patient-portal .bg-emerald-500,
+body.patient-portal .bg-green-500,
+body.patient-portal .bg-green-600 {
+  background-color: #00BC8D;
+}
+
+body.patient-portal [class~="hover:bg-indigo-500"]:hover,
+body.patient-portal [class~="hover:bg-indigo-600"]:hover,
+body.patient-portal [class~="hover:bg-blue-600"]:hover {
+  background-color: #3C62BE;
+}
+
+body.patient-portal [class~="hover:bg-indigo-700"]:hover,
+body.patient-portal [class~="hover:bg-indigo-900"]:hover,
+body.patient-portal [class~="hover:bg-blue-700"]:hover {
+  background-color: #263F9D;
+}
+
+body.patient-portal [class~="hover:bg-emerald-600"]:hover,
+body.patient-portal [class~="hover:bg-green-600"]:hover {
+  background-color: #008F6D;
+}
+
+body.patient-portal .text-indigo-950,
+body.patient-portal .text-indigo-900,
+body.patient-portal .text-slate-900,
+body.patient-portal .text-gray-800 {
+  color: #001B4D;
+}
+
+body.patient-portal .text-indigo-600,
+body.patient-portal .text-blue-600 {
+  color: #335CD8;
+}
+
+body.patient-portal .text-indigo-500,
+body.patient-portal .text-blue-500 {
+  color: #3C62BE;
+}
+
+body.patient-portal .border-blue-100,
+body.patient-portal .border-blue-200,
+body.patient-portal .border-indigo-300,
+body.patient-portal .border-slate-200,
+body.patient-portal .border-gray-200 {
+  border-color: #E2E8F0;
+}
+
+body.patient-portal :focus-visible {
+  outline: 3px solid #00BC8D;
+  outline-offset: 2px;
+}
+
+body.patient-portal input:focus-visible,
+body.patient-portal select:focus-visible,
+body.patient-portal textarea:focus-visible {
+  border-color: #335CD8;
+}
+
+/* Navegación del paciente */
+.patient-sidebar {
+  z-index: 50;
+  position: fixed;
+  inset: 0 auto 0 0;
+  height: 100vh;
+  height: 100dvh;
+  flex: 0 0 auto;
+  width: 16rem;
+  background: #263F9D;
+  color: #fff;
+}
+
+.patient-sidebar .border-indigo-500\/40 {
+  border-color: rgb(255 255 255 / 18%);
+}
+
+.patient-sidebar .patient-nav-active {
+  background: #3C62BE;
+  color: #fff;
+}
+
+.patient-sidebar nav a:not(.patient-nav-active) {
+  color: rgb(255 255 255 / 88%);
+}
+
+.patient-sidebar nav a:not(.patient-nav-active):hover,
+.patient-sidebar #toggleSidebar:hover,
+.patient-sidebar #btnAbrirConfirmacionCerrarSesion:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.patient-sidebar :focus-visible {
+  outline-color: #00BC8D;
+}
+
+.patient-dashboard-content {
+  min-height: 100vh;
+  margin-left: 16rem;
+  transition: margin-left 300ms ease-in-out;
+}
+
+.patient-mobile-menu-toggle,
+.patient-sidebar-overlay {
+  display: none;
+}
+
+body.patient-sidebar-collapsed .patient-dashboard-content {
+  margin-left: 5rem;
+}
+
+body.patient-sidebar-collapsed .patient-sidebar {
+  width: 5rem;
+}
+
+@media (max-width: 768px) {
+  .patient-sidebar {
+    width: min(18rem, calc(100vw - 3rem));
+    transform: translateX(-100%);
+    transition: transform 300ms ease-in-out;
+  }
+
+  .patient-mobile-menu-toggle {
+    position: fixed;
+    top: .75rem;
+    left: .75rem;
+    z-index: 40;
+    display: flex;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    border: 1px solid #E2E8F0;
+    border-radius: .75rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgb(15 23 42 / 14%);
+  }
+
+  .patient-mobile-menu-toggle span {
+    width: 1.125rem;
+    height: 2px;
+    border-radius: 2px;
+    background: #263F9D;
+  }
+
+  .patient-sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    display: block;
+    border: 0;
+    background: rgb(0 27 77 / 40%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms ease-in-out;
+  }
+
+  body.patient-sidebar-open .patient-sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  body.patient-sidebar-open .patient-mobile-menu-toggle {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body.patient-sidebar-open .patient-sidebar {
+    transform: translateX(0);
+  }
+
+  .patient-dashboard-content,
+  body.patient-sidebar-collapsed .patient-dashboard-content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .patient-dashboard-content > header {
+    padding-top: 4rem;
+  }
+
+  body.patient-sidebar-collapsed .patient-sidebar {
+    width: min(18rem, calc(100vw - 3rem));
+  }
+}
+
+@media (max-width: 640px) {
+  body.patient-portal header {
+    padding-inline: 1rem;
+  }
+
+  body.patient-portal main {
+    min-width: 0;
+    padding: 1rem;
+  }
+
+  body.patient-portal main > section,
+  body.patient-portal main > div,
+  body.patient-portal main form > div {
+    min-width: 0;
+  }
+
+  body.patient-portal .overflow-x-auto {
+    max-width: 100%;
+  }
+
+  #lista-diagnosticos,
+  #detalle-diagnostico {
+    height: auto !important;
+    min-height: 16rem;
+    max-height: 65vh;
+  }
+
+  #lista-diagnosticos > .diagnostic-card {
+    align-items: flex-start;
+  }
+
+  body.patient-portal .patient-modal-header {
+    padding-inline: 1rem;
+  }
+
+  body.patient-portal #modalNuevaCita,
+  body.patient-portal #modalReprogramarCita,
+  body.patient-portal #modalCodigoCita {
+    align-items: flex-end;
+    padding: .5rem;
+  }
+
+  body.patient-portal #modalNuevaCita > div,
+  body.patient-portal #modalReprogramarCita > div,
+  body.patient-portal #modalCodigoCita > div {
+    max-height: calc(100dvh - 1rem);
+    border-radius: 1rem;
+  }
+
+  body.patient-portal .max-w-6xl,
+  body.patient-portal .max-w-5xl {
+    margin-top: 1rem;
+  }
+
+  body.patient-portal header.bg-indigo-700,
+  body.patient-portal #formEditarPerfil > header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: .75rem;
+    padding: 1rem;
+  }
+
+  body.patient-portal header.bg-indigo-700 > div,
+  body.patient-portal #formEditarPerfil > header > div {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  body.patient-portal .mt-6.flex.gap-4.px-2 {
+    flex-direction: column;
+    padding-inline: 0;
+  }
+
+  body.patient-portal .mt-6.flex.gap-4.px-2 > a,
+  body.patient-portal .mt-6.flex.gap-4.px-2 > button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  body.patient-portal main form .flex.items-center.justify-end.gap-3 {
+    flex-wrap: wrap;
+  }
+
+  body.patient-portal main form .flex.items-center.justify-end.gap-3 > a,
+  body.patient-portal main form .flex.items-center.justify-end.gap-3 > button {
+    flex: 1 1 9rem;
+    min-height: 44px;
+  }
+
+  body.patient-portal #modalConfirmarCerrarSesion {
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  body.patient-portal #modalConfirmarCerrarSesion > .patient-logout-modal {
+    width: 100%;
+    max-width: 24rem;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    padding: 1.25rem;
+  }
+
+  body.patient-portal #modalConfirmarCerrarSesion h2 {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+
+  body.patient-portal #modalConfirmarCerrarSesion .patient-logout-actions {
+    flex-direction: column-reverse;
+    gap: .625rem;
+  }
+
+  body.patient-portal #modalConfirmarCerrarSesion .patient-logout-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  body.patient-portal #modalInactividad {
+    padding: 1rem;
+  }
+
+  body.patient-portal #modalInactividad > .patient-idle-modal {
+    width: 100%;
+    max-width: 24rem;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    padding: 1.25rem;
+  }
+
+  body.patient-portal #modalInactividad .patient-idle-actions {
+    flex-direction: column-reverse;
+    gap: .625rem;
+  }
+
+  body.patient-portal #modalInactividad .patient-idle-actions form,
+  body.patient-portal #modalInactividad .patient-idle-actions button {
+    width: 100%;
+  }
+
+  body.patient-portal #modalInactividad .patient-idle-actions button {
+    min-height: 44px;
+  }
+}
+
+/* Superficies, encabezados y tarjetas de todas las vistas del paciente */
+.patient-dashboard,
+body.patient-portal main.bg-gray-100,
+body.patient-portal main.bg-slate-100,
+body.patient-portal .min-h-screen.bg-blue-50 {
+  min-height: 100vh;
+  background: #F4F8FF;
+  color: #001B4D;
+}
+
+.patient-dashboard > .min-w-0.flex-1.flex.flex-col,
+body.patient-portal > div > .flex-1.flex.flex-col,
+body.patient-portal > div > .flex-1.flex.flex-col.overflow-y-auto {
+  min-width: 0;
+  background: #F4F8FF;
+}
+
+body.patient-portal header.bg-white,
+.patient-dashboard > .min-w-0.flex-1.flex.flex-col > header {
+  border-color: #E2E8F0;
+  background: rgb(255 255 255 / 94%);
+  color: #001B4D;
+}
+
+body.patient-portal .bg-white.rounded-2xl,
+body.patient-portal .bg-white.rounded-xl,
+.patient-dashboard main > section,
+.patient-quick-actions,
+.patient-support-card {
+  border-color: #E2E8F0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 10%);
+}
+
+.patient-appointment-card {
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  background: #F8FFFF;
+}
+
+.patient-appointment-card [data-lucide="calendar"] {
+  color: #335CD8;
+}
+
+.patient-quick-actions button#btnNuevaCita {
+  min-height: 44px;
+  background: #335CD8;
+  color: #fff;
+}
+
+.patient-quick-actions button#btnNuevaCita:hover {
+  background: #263F9D;
+}
+
+.patient-quick-actions a[href^="https://wa.me/"] {
+  min-height: 44px;
+  background: #00BC8D;
+  color: #fff;
+}
+
+.patient-quick-actions a[href^="https://wa.me/"]:hover {
+  background: #008F6D;
+}
+
+.patient-next-appointment {
+  border-radius: 1rem;
+  background: #263F9D;
+  color: #fff;
+}
+
+.patient-next-detail {
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: .75rem;
+  background: #3C62BE;
+  color: #fff;
+}
+
+.patient-support-card {
+  background: #F1FEF8;
+  color: #001B4D;
+}
+
+/* Historial diagnóstico */
+body.patient-portal .diagnostic-card {
+  border-color: #E2E8F0;
+  background: #fff;
+}
+
+body.patient-portal .diagnostic-card:hover {
+  border-color: #3C62BE;
+}
+
+body.patient-portal #lista-diagnosticos,
+body.patient-portal #detalle-diagnostico {
+  scrollbar-color: #3C62BE #F4F8FF;
+}
+
+/* Formularios de perfil, notificaciones y verificación */
+body.patient-portal form input,
+body.patient-portal form select,
+body.patient-portal form textarea {
+  border-color: #E2E8F0;
+}
+
+body.patient-portal form input:focus,
+body.patient-portal form select:focus,
+body.patient-portal form textarea:focus {
+  border-color: #335CD8;
+}
+
+body.patient-portal .patient-modal-header,
+#modalReprogramarCita .bg-indigo-600,
+#modalCodigoCita #confirmarCodigoCita {
+  background: #335CD8;
+  color: #fff;
+}
+
+#modalNuevaCita,
+#modalReprogramarCita,
+#modalCodigoCita,
+#modalConfirmarCerrarSesion {
+  background-color: rgb(0 27 77 / 42%);
+}
+
+#modalConfirmarCerrarSesion {
+  z-index: 100;
+}
+
+#modalInactividad {
+  z-index: 120;
+  background-color: rgb(0 27 77 / 48%);
+}
+
+#modalInactividad > .patient-idle-modal {
+  border: 1px solid #E2E8F0;
+  color: #001B4D;
+}
+
+#modalNuevaCita > div,
+#modalReprogramarCita > div,
+#modalCodigoCita > div,
+#modalConfirmarCerrarSesion > div {
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 16px 40px rgb(0 27 77 / 18%);
+}
+
+#modalNuevaCita input:focus-visible,
+#modalNuevaCita select:focus-visible,
+#modalReprogramarCita input:focus-visible,
+#modalReprogramarCita select:focus-visible,
+#modalCodigoCita input:focus-visible {
+  border-color: #335CD8;
+  outline-color: #00BC8D;
+}
+
+#avisoAccionCita {
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 8px 24px rgb(0 27 77 / 18%);
+}
+
+/* Tarjetas de perfil y verificación */
+body.patient-portal .bg-gradient-to-r.from-blue-700 {
+  background-image: linear-gradient(110deg, #263F9D, #335CD8);
+}
+
+body.patient-portal .bg-blue-50.rounded-xl,
+body.patient-portal .bg-blue-50.rounded-2xl,
+body.patient-portal .bg-indigo-100.rounded-full {
+  border-color: #E2E8F0;
+}
+
+@media (max-width: 639px) {
+  .patient-appointment-card {
+    align-items: flex-start;
+  }
+
+  .patient-appointment-card > .flex.flex-col.items-end {
+    align-items: flex-start;
+  }
+}
+
+/* Ajustes comunes a las vistas de perfil, historial y preferencias */
+body.patient-portal .text-slate-800,
+body.patient-portal .text-slate-900,
+body.patient-portal .text-gray-800 {
+  color: #001B4D;
+}
+
+body.patient-portal .text-indigo-700,
+body.patient-portal .text-indigo-800 {
+  color: #263F9D;
+}
+
+body.patient-portal .bg-blue-200,
+body.patient-portal .bg-blue-100\/60,
+body.patient-portal .bg-indigo-100\/60 {
+  background-color: #EAF0FF;
+}
+
+body.patient-portal .border-blue-300,
+body.patient-portal .border-slate-300,
+body.patient-portal .border-slate-100 {
+  border-color: #E2E8F0;
+}
+
+body.patient-portal .diagnostic-card .diagnostic-arrow {
+  background: #F1FEF8;
+  color: #335CD8;
+}
+
+body.patient-portal .diagnostic-card .diagnostic-arrow:hover {
+  background: #EAF0FF;
+  color: #263F9D;
+}
+
+#modalReprogramarCita .bg-indigo-600 {
+  background: #335CD8;
+  color: #fff;
+}
+
+#modalCodigoCita #cancelarCodigoCita {
+  border: 1px solid #E2E8F0;
+  background: #F4F8FF;
+  color: #001B4D;
+}
+
+#modalCodigoCita #confirmarCodigoCita {
+  background: #335CD8;
+  color: #fff;
+}
+
+#modalConfirmarCerrarSesion #btnCancelarCerrarSesion {
+  border-color: #E2E8F0;
+  color: #001B4D;
+}
+
+/* Pantallas de cancelación y verificación */
+body.patient-portal main.bg-slate-100 > .bg-white {
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+}
+
+body.patient-portal .bg-gradient-to-r.from-blue-700 {
+  background-image: linear-gradient(110deg, #263F9D, #335CD8);
+}
+
+body.patient-portal form button[type="submit"]:focus-visible,
+body.patient-portal form a:focus-visible,
+body.patient-portal form button:focus-visible {
+  outline-color: #00BC8D;
+}
+
+
+/* Emblema transparente junto al nombre del portal */
+.patient-sidebar .patient-logo-frame {
+  position: relative;
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  flex: none;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.patient-sidebar .patient-logo-image {
+  position: absolute;
+  top: -0.99rem;
+  left: -1.79rem;
+  width: 6.375rem;
+  max-width: none;
+  height: 6.375rem;
+  object-fit: contain;
+}
+
+.patient-date-chevron {
+  display: inline-flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: .5rem;
+  background: #EAF0FF;
+  color: #335CD8;
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.patient-date-chevron svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.patient-select-trigger[aria-expanded="true"] .patient-date-chevron,
+button[aria-controls^="calendario-"][aria-expanded="true"] .patient-date-chevron {
+  transform: rotate(180deg);
+  background: #335CD8;
+  color: #fff;
+}
+
+/* Historial de diagnósticos en pantallas estrechas */
+@media (max-width: 1023px) {
+  .patient-diagnostic-view,
+  .patient-diagnostic-view main,
+  .patient-diagnostic-shell,
+  .patient-diagnostic-content-shell,
+  .patient-diagnostic-layout,
+  .patient-diagnostic-panel,
+  .patient-diagnostic-panel > *,
+  .patient-diagnostic-view #contenido-detalle,
+  .patient-diagnostic-view #contenido-detalle > * {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .patient-diagnostic-panel {
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 1rem;
+    align-self: start;
+  }
+
+  .patient-diagnostic-detail-panel #detalle-diagnostico {
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+    flex: 0 0 auto;
+    overflow: visible;
+  }
+
+  .patient-diagnostic-detail-panel #contenido-detalle {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .patient-diagnostic-view:not(.patient-diagnostic-detail-open) .patient-diagnostic-detail-panel {
+    display: none;
+  }
+
+  .patient-diagnostic-view.patient-diagnostic-detail-open .patient-diagnostic-list-panel {
+    display: none;
+  }
+
+  .patient-diagnostic-view.patient-diagnostic-detail-open .patient-diagnostic-detail-panel {
+    display: flex;
+  }
+
+  .patient-diagnostic-list-panel #lista-diagnosticos {
+    flex: 0 1 auto;
+    max-height: min(60dvh, 34rem);
+    overflow-y: auto;
+  }
+
+  .patient-diagnostic-view .diagnostic-card {
+    align-items: flex-start;
+    gap: .75rem;
+  }
+
+  .patient-diagnostic-view .diagnostic-card h3,
+  .patient-diagnostic-view .diagnostic-card p,
+  .patient-diagnostic-view #contenido-detalle h3,
+  .patient-diagnostic-view #contenido-detalle p {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .patient-diagnostic-view #det-titulo,
+  .patient-diagnostic-view #det-sintomas-val {
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .patient-diagnostic-view #contenido-detalle > div,
+  .patient-diagnostic-view #contenido-detalle > div > div {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .patient-diagnostic-view #btn-back-mobile {
+    display: inline-flex;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border-radius: .75rem;
+    background: #F4F8FF;
+  }
+}
+
+@media (max-width: 420px) {
+  .patient-diagnostic-shell {
+    padding: .875rem;
+  }
+
+  .patient-diagnostic-content-shell {
+    padding: 0;
+  }
+
+  .patient-diagnostic-panel {
+    padding: .875rem;
+  }
+
+  .patient-diagnostic-view .diagnostic-card {
+    padding: .875rem;
+  }
+
+  .patient-diagnostic-view #contenido-detalle .grid.grid-cols-2 {
+    gap: .5rem;
+  }
+
+  .patient-diagnostic-view #contenido-detalle .grid.grid-cols-2 > div {
+    min-width: 0;
+    padding: .625rem;
+  }
+}

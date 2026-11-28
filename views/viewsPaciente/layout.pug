@@ -6,8 +6,12 @@ html(lang="es")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title SIGCMI - Portal del Paciente
     link(rel="stylesheet", href="/css/output.css")
+    link(rel="stylesheet", href="/patient/css/dashboard.css")
     script(src="https://unpkg.com/lucide@latest" defer)
     script(src="/patient/js/patient.js" defer)
+    script(src="/patient/js/appointmentCalendar.js" defer)
 
-  body
+  body.patient-portal(class="bg-[#F4F8FF] text-[#001B4D]")
     block content
+    include ./includes/modalInactividad
+    include ./includes/modalCerrarSesion

@@ -11,6 +11,8 @@ import pacienteRoutes from "./routes/paciente/pacienteRoutes.js";
 import asociarModelos from "./models/asociaciones.js";
 
 import whatsappRoutes from "./routes/whatsapp/whatsappRoutes.js";
+import { startAppointmentReminders } from "./services/paciente/appointmentReminders.js";
+import { iniciarRecordatorios } from "./services/notificaciones/recordatorios.js";
 // =====================================
 // ASOCIACIONES DE SEQUELIZE
 // =====================================
@@ -45,6 +47,8 @@ try {
 
     app.listen(PORT, () => {
         console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
+        startAppointmentReminders();
+        iniciarRecordatorios();
     });
 
 } catch (error) {

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const placeholder = document.getElementById('placeholder-detalle')
     const content = document.getElementById('contenido-detalle')
     const backButton = document.getElementById('btn-back-mobile')
+    const diagnosticView = document.querySelector('.patient-diagnostic-view')
     const leftPanel = document.querySelector('#lista-diagnosticos')?.parentElement
     const grid = leftPanel?.parentElement
     const rightPanel = grid?.children[1]
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const clearSelection = () => {
+        diagnosticView?.classList.remove('patient-diagnostic-detail-open')
         cards.forEach((card) => {
             card.classList.remove('border-indigo-500', 'bg-indigo-50/30', 'shadow-md')
         })
@@ -46,6 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const collapseDetail = () => {
         rightPanel?.classList.add('hidden')
+        if (window.matchMedia('(max-width: 1023px)').matches) {
+            diagnosticView?.classList.remove('patient-diagnostic-detail-open')
+        }
         grid?.classList.remove('lg:grid-cols-2')
         grid?.classList.add('lg:grid-cols-1')
         cards.forEach((card) => setArrowState(card))
@@ -57,6 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 setArrowState(item)
             })
             card.classList.add('border-indigo-500', 'bg-indigo-50/30', 'shadow-md')
+            diagnosticView?.classList.toggle(
+                'patient-diagnostic-detail-open',
+                window.matchMedia('(max-width: 1023px)').matches
+            )
 
             setText('det-titulo', card.dataset.diagnostico, 'Diagnóstico sin título')
             setText('det-fecha', card.dataset.fecha, 'Sin fecha')
@@ -82,6 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.stopPropagation()
                 if (card.classList.contains('border-indigo-500')) {
                     if (rightPanel?.classList.contains('hidden')) {
+                        diagnosticView?.classList.toggle(
+                            'patient-diagnostic-detail-open',
+                            window.matchMedia('(max-width: 1023px)').matches
+                        )
                         showDetail()
                         setArrowState(card, true)
                     }
@@ -97,4 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     backButton?.addEventListener('click', clearSelection)
+
+    window.addEventListener('resize', () => {
+        const tarjetaSeleccionada = [...cards].some((card) => card.classList.contains('border-indigo-500'))
+        diagnosticView?.classList.toggle(
+            'patient-diagnostic-detail-open',
+            tarjetaSeleccionada && window.matchMedia('(max-width: 1023px)').matches
+        )
+    })
 })

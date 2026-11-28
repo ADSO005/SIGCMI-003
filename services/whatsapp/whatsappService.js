@@ -6,6 +6,7 @@ import Horario from "../../models/Horario.js";
 import Cita from "../../models/Cita.js";
 import EstadoCita from "../../models/EstadoCita.js";
 import { soloCitasActivas } from "../estadosCita.js";
+import { notificarCitaPorId } from "../notificaciones/notificar.js";
 
 const sesiones = new Map();
 
@@ -745,6 +746,8 @@ Puede que haya sido cancelada o modificada anteriormente.
                 fecha_cancelacion: new Date()
             });
 
+            notificarCitaPorId(cita.id_cita, "cancelacion_cita");
+
             sesion.estado = "PACIENTE_VALIDADO";
 
             return {
@@ -1257,6 +1260,8 @@ Regresando al menú principal.`
                 reprogramado_por: sesion.usuarioId,
                 fecha_reprogramacion: new Date()
             });
+
+            notificarCitaPorId(cita.id_cita, "reprogramacion");
 
             const fechaAnterior = sesion.citaFechaAnterior
                 ? sesion.citaFechaAnterior.split("-").reverse().join("/")
@@ -1864,6 +1869,8 @@ Por favor selecciona nuevamente una fecha para consultar los horarios disponible
 
             // Guardar el ID de la cita
             sesion.citaId = nuevaCita.id_cita;
+
+            notificarCitaPorId(nuevaCita.id_cita, "confirmacion_cita");
 
             // Reiniciar estado
             sesion.estado = "PACIENTE_VALIDADO";

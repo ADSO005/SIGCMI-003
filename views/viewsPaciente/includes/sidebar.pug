@@ -73,18 +73,16 @@ aside#sidebar.sidebar.group(
 
   hr.line-3(class="relative z-10 -mx-6 mt-auto w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
 
-  form#formCerrarSesion.logout(class="relative z-10 mx-auto shrink-0" action="/auth/logout" method="POST" style="width:90%")
-    button#btnAbrirConfirmacionCerrarSesion(
-      type="button"
-      aria-haspopup="dialog"
-      aria-controls="modalConfirmarCerrarSesion"
-      aria-label="Cerrar sesión"
-      class="flex min-h-[68px] w-full cursor-pointer items-center gap-4 border-0 bg-transparent px-2 text-white group-[.collapsed]:justify-center group-[.collapsed]:gap-0 transition-opacity hover:opacity-75"
-    )
-      img.log-out(class="h-8 w-8 shrink-0 brightness-0 invert" src="/medico/img/icono-salir.svg" alt="")
-      span.sesionlogout.sidebar-text(class="text-lg font-semibold text-white group-[.collapsed]:hidden") Cerrar sesión
-
-  include ./modalCerrarSesion
+  button#btnAbrirConfirmacionCerrarSesion(
+    type="button"
+    aria-haspopup="dialog"
+    aria-controls="modalConfirmarCerrarSesion"
+    aria-label="Cerrar sesión"
+    class="relative z-10 mx-auto flex min-h-[68px] w-full shrink-0 cursor-pointer items-center gap-4 border-0 bg-transparent px-2 text-white group-[.collapsed]:justify-center group-[.collapsed]:gap-0 transition-opacity hover:opacity-75"
+    style="width:90%"
+  )
+    img.log-out(class="h-8 w-8 shrink-0 brightness-0 invert" src="/medico/img/icono-salir.svg" alt="")
+    span.sesionlogout.sidebar-text(class="text-lg font-semibold text-white group-[.collapsed]:hidden") Cerrar sesión
 
 div#sidebarOverlay(
   aria-hidden="true"
