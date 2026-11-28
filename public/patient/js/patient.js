@@ -357,53 +357,81 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sidebar = document.getElementById('sidebar')
     const sidebarToggle = document.getElementById('toggleSidebar')
+    const mobileToggle = document.getElementById('mobileSidebarToggle')
+    const overlay = document.getElementById('sidebarOverlay')
 
     if (!sidebar || !sidebarToggle) return
 
-    const textosSidebar = sidebar.querySelectorAll('.sidebar-text')
-    const enlacesNavegacion = sidebar.querySelectorAll('nav a')
-    const resumenPerfil = sidebar.querySelector('.p-4.border-b.flex.items-center.gap-3')
-    const botonCerrarSesion = sidebar.querySelector('form button')
-    const encabezadoSidebar = sidebar.querySelector(
-        '.flex.items-center.justify-between.p-4.border-b'
-    )
-    let sidebarColapsado = false
-
-    sidebar.style.width = '16rem'
-    sidebar.setAttribute('aria-label', 'Menú lateral expandido')
-    sidebarToggle.setAttribute('aria-expanded', 'true')
-    sidebarToggle.title = 'Contraer menú'
-    enlacesNavegacion.forEach((enlace) => {
-        const etiqueta = enlace.querySelector('.sidebar-text')
-        if (etiqueta) enlace.title = etiqueta.textContent.trim()
-    })
-
-    const alternarSidebar = () => {
-        sidebarColapsado = !sidebarColapsado
-        sidebar.style.width = sidebarColapsado ? '5rem' : '16rem'
-        sidebar.setAttribute(
-            'aria-label',
-            sidebarColapsado ? 'Menú lateral contraído' : 'Menú lateral expandido'
-        )
-        sidebarToggle.setAttribute('aria-expanded', String(!sidebarColapsado))
-        sidebarToggle.title = sidebarColapsado ? 'Expandir menú' : 'Contraer menú'
-
-        textosSidebar.forEach((texto) => {
-            texto.classList.toggle('hidden', sidebarColapsado)
-        })
-        enlacesNavegacion.forEach((enlace) => {
-            enlace.classList.toggle('justify-center', sidebarColapsado)
-            enlace.classList.toggle('gap-0', sidebarColapsado)
-            enlace.classList.toggle('px-0', sidebarColapsado)
-        })
-        resumenPerfil?.classList.toggle('justify-center', sidebarColapsado)
-        encabezadoSidebar?.classList.toggle('justify-center', sidebarColapsado)
-        botonCerrarSesion?.classList.toggle('justify-center', sidebarColapsado)
-        botonCerrarSesion?.classList.toggle('gap-0', sidebarColapsado)
-        botonCerrarSesion?.classList.toggle('px-0', sidebarColapsado)
+    const cerrarSidebarMovil = () => {
+        sidebar.classList.remove('open')
+        overlay?.classList.add('hidden')
+        if (window.innerWidth <= 768) {
+            sidebarToggle.setAttribute('aria-expanded', 'false')
+            mobileToggle?.setAttribute('aria-expanded', 'false')
+            mobileToggle?.setAttribute('aria-label', 'Abrir menú de navegación')
+        }
     }
 
-    sidebarToggle.addEventListener('click', alternarSidebar)
+    const aplicarEstadoInicialSidebar = () => {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('collapsed')
+            sidebarToggle.setAttribute('aria-expanded', 'false')
+            sidebarToggle.title = 'Cerrar menú'
+        } else {
+            sidebarToggle.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')))
+            sidebarToggle.title = sidebar.classList.contains('collapsed') ? 'Expandir menú' : 'Contraer menú'
+        }
+    }
+
+    aplicarEstadoInicialSidebar()
+
+    window.toggleSidebar = () => {
+        if (window.innerWidth <= 768) {
+            const abierto = sidebar.classList.toggle('open')
+            overlay?.classList.toggle('hidden', !abierto)
+            sidebarToggle.setAttribute('aria-expanded', String(abierto))
+            mobileToggle?.setAttribute('aria-expanded', String(abierto))
+            mobileToggle?.setAttribute(
+                'aria-label',
+                abierto ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'
+            )
+            if (abierto) sidebar.querySelector('nav a')?.focus()
+            return
+        }
+
+        const contraido = sidebar.classList.toggle('collapsed')
+        sidebar.setAttribute(
+            'aria-label',
+            contraido ? 'Menú lateral contraído' : 'Menú lateral expandido'
+        )
+        sidebarToggle.setAttribute('aria-expanded', String(!contraido))
+        sidebarToggle.title = contraido ? 'Expandir menú' : 'Contraer menú'
+    }
+
+    window.closeSidebar = cerrarSidebarMovil
+    overlay?.addEventListener('click', cerrarSidebarMovil)
+
+    document.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Escape' && sidebar.classList.contains('open')) {
+            cerrarSidebarMovil()
+            mobileToggle?.focus()
+        }
+    })
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            cerrarSidebarMovil()
+            sidebarToggle.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')))
+            sidebarToggle.title = sidebar.classList.contains('collapsed') ? 'Expandir menú' : 'Contraer menú'
+        } else {
+            sidebar.classList.remove('collapsed')
+            sidebar.setAttribute('aria-label', 'Menú principal del paciente')
+            sidebarToggle.setAttribute('aria-expanded', 'false')
+            sidebarToggle.title = 'Cerrar menú'
+            mobileToggle?.setAttribute('aria-expanded', 'false')
+            mobileToggle?.setAttribute('aria-label', 'Abrir menú de navegación')
+        }
+    })
 })
 
 //- CONFIRMAR CIERRE DE SESIÓN

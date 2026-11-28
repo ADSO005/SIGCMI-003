@@ -1,6 +1,3 @@
-//- Mismos estilos que el sidebar del portal médico (viewsMedico/includes/sidebar.pug).
-//- Hooks de toggleSidebar.js: #sidebar con las clases "collapsed" (escritorio) y "open" (móvil).
-
 dialog#logoutModal(
     aria-labelledby="logoutModalTitle"
     class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
@@ -27,50 +24,55 @@ dialog#logoutModal(
                 )
                     | Sí, cerrar sesión
 
-
 mixin enlaceAdmin(href, icono, texto)
     a.nav-link(
         href=href
         title=texto
-        class="mb-2 flex h-12 shrink-0 items-center gap-3 rounded-xl px-3 py-2 text-[15px] font-medium text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:!bg-[#3C62BE] [&.preActive]:!shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]"
+        class="mb-2 mx-auto flex h-14 shrink-0 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:h-10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 [&.preActive]:bg-[#315bd7] [&.preActive]:shadow-lg"
+        style="width:90%"
     )
-        i(class=`${icono} w-[18px] shrink-0 text-center text-[17px]`)
+        i(class=`${icono} w-6 shrink-0 text-center text-xl` aria-hidden="true")
         .nav-item(class="group-[.collapsed]:hidden")= texto
 
 aside#sidebar.sidebar.group(
-    class="sticky top-0 z-[1000] flex h-screen w-[290px] shrink-0 flex-col self-start overflow-hidden bg-[#263F9D] px-6 text-white shadow-xl font-[Arial,sans-serif] [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:fixed [@media(max-width:768px)]:left-0 [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
+    aria-label="Menú principal de administración"
+    class="sticky top-0 z-[1000] flex h-screen w-[290px] shrink-0 flex-col self-start overflow-hidden px-6 text-white shadow-[4px_0_20px_rgba(7,27,104,0.12)] font-[Arial,sans-serif] [&_.nav-link.preActive]:bg-linear-to-r [&_.nav-link.preActive]:from-[#315ce6] [&_.nav-link.preActive]:to-[#365ee4] [&_.nav-link]:focus-visible:outline-2 [&_.nav-link]:focus-visible:outline-offset-2 [&_.nav-link]:focus-visible:outline-white [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:fixed [@media(max-width:768px)]:left-0 [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
+    style="background:linear-gradient(165deg,#091b66 0%,#10378f 52%,#0a226e 100%);border-radius:0;"
 )
+    svg.sidebar-wave(class="pointer-events-none absolute left-0 top-[105px] z-0 h-[150px] w-full group-[.collapsed]:hidden" aria-hidden="true" viewBox="0 0 290 150" preserveAspectRatio="none")
+        defs
+            filter#sidebarWaveGlow(x="-30%" y="-100%" width="160%" height="300%")
+                feGaussianBlur(stdDeviation="7")
+            linearGradient#sidebarWaveColor(x1="0" y1="0" x2="1" y2="0")
+                stop(offset="0%" stop-color="#15b8ef" stop-opacity=".12")
+                stop(offset="40%" stop-color="#15b8ef" stop-opacity=".9")
+                stop(offset="100%" stop-color="#15b8ef" stop-opacity=".05")
+        path(d="M-12 45C45 125 100 106 162 82S252 42 302 57" fill="none" stroke="url(#sidebarWaveColor)" stroke-width="15" opacity=".65" filter="url(#sidebarWaveGlow)")
+        path(d="M-12 45C45 125 100 106 162 82S252 42 302 57" fill="none" stroke="url(#sidebarWaveColor)" stroke-width="1.5" opacity=".55")
 
-    .logo(class="flex h-[82px] shrink-0 items-center justify-between px-1 group-[.collapsed]:justify-center group-[.collapsed]:px-0")
-        span.logo-text(class="flex items-center gap-3 text-[26px] leading-none font-bold tracking-wide group-[.collapsed]:hidden")
-            svg(class="h-9 w-9 text-teal-300" viewBox="0 0 40 40" fill="none" aria-hidden="true")
-                path(d="M20 3v34M3 20h34" stroke="currentColor" stroke-width="10" stroke-linecap="round")
-                path(d="M20 9v22M9 20h22" stroke="#60a5fa" stroke-width="6" stroke-linecap="round")
-            | SIGCMI
+    .logo(class="relative z-10 flex h-[82px] shrink-0 items-center justify-between px-1 group-[.collapsed]:justify-center group-[.collapsed]:px-0")
+        img.logo-text(src="/medico/img/logo-sigcmi-blanco.png" alt="SIGCMI" class="max-w-full object-contain group-[.collapsed]:hidden" style="width:156px;height:auto")
         button#toggleBtn(
             type="button"
             class="flex h-10 w-10 shrink-0 items-center justify-center cursor-pointer border-0 bg-transparent text-[22px] text-white transition-transform duration-200 hover:scale-110"
             onclick="toggleSidebar()"
             aria-label="Abrir o cerrar menú"
-        ) ☰
+            aria-controls="sidebar"
+        )
+            svg(class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+                path(d="M4 6h16M4 12h16M4 18h16")
 
-    hr.line-1(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
+    .user(class="relative z-10 -mx-2 flex min-h-[140px] shrink-0 items-center gap-3 py-5 group-[.collapsed]:hidden")
+        .avatar(class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/45 bg-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]")
+            img.avatar-img(class="h-7 w-7 brightness-0 invert" src="/medico/img/icono-medico-avatar.svg" alt="")
+        div(class="flex min-w-0 flex-1 flex-col items-start gap-1 text-left")
+            p.bienvenido-txt(class="m-0 text-[13px] leading-4 text-blue-100") Bienvenido
+            h4(class="m-0 break-words text-base leading-5 font-semibold text-white")= usuarios.nombre
+            span(class="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-xs leading-4 text-blue-50") Administrador
 
-    .user(class="flex min-h-[120px] shrink-0 items-start gap-4 py-6 group-[.collapsed]:hidden")
-        .avatar(class="mt-1 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/40 bg-white/15 shadow-inner")
-            img.avatar-img(
-                class="h-8 w-8 brightness-0 invert"
-                src="/medico/img/icono-medico-avatar.svg"
-                alt="Avatar"
-            )
-        div(class="min-w-0 flex-1")
-            p.bienvenido-txt(class="text-sm leading-5 text-blue-100") Bienvenido
-            h4(class="truncate text-base leading-5 font-semibold text-white")= usuarios.nombre
-            span(class="mt-1 inline-block rounded-full bg-white/15 px-2.5 py-1 text-xs leading-4 text-blue-50") Administrador
+    hr.line-2(class="relative z-10 -mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20 group-[.collapsed]:hidden")
 
-    hr.line-2(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20 group-[.collapsed]:hidden")
-
-    nav(class="flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 [scrollbar-width:thin] [scrollbar-color:transparent_transparent] group-hover:[scrollbar-color:rgba(255,255,255,0.5)_transparent]")
+    nav(class="relative z-10 mt-6 flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 [scrollbar-width:thin] [scrollbar-color:transparent_transparent] group-hover:[scrollbar-color:rgba(255,255,255,0.5)_transparent]")
         +enlaceAdmin("/admin/dashboard", "fa-solid fa-house", "Dashboard")
         +enlaceAdmin("/admin/usuarios", "fa-solid fa-users", "Usuarios")
         +enlaceAdmin("/admin/pacientes", "fa-solid fa-heart-pulse", "Pacientes")
@@ -84,7 +86,7 @@ aside#sidebar.sidebar.group(
         +enlaceAdmin("/admin/whatsapp", "fa-brands fa-whatsapp", "WhatsApp")
         +enlaceAdmin("/admin/reportes", "fa-solid fa-chart-column", "Reportes")
 
-    hr.line-3(class="-mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
+    hr.line-3(class="relative z-10 -mx-6 mt-auto w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
 
     button(
         type="button"
@@ -92,14 +94,11 @@ aside#sidebar.sidebar.group(
         aria-haspopup="dialog"
         aria-controls="logoutModal"
         aria-label="Cerrar sesión"
-        class="flex min-h-[68px] w-full shrink-0 cursor-pointer items-center gap-3 border-0 bg-transparent px-1 text-white group-[.collapsed]:justify-center transition-opacity hover:opacity-75"
+        class="relative z-10 flex min-h-[68px] shrink-0 cursor-pointer items-center gap-4 self-center border-0 bg-transparent px-2 text-white group-[.collapsed]:justify-center group-[.collapsed]:gap-0 transition-opacity hover:opacity-75"
+        style="width:90%"
     )
-        img.log-out(
-            class="h-7 w-7 shrink-0 brightness-0 invert"
-            src="/medico/img/icono-salir.svg"
-            alt=""
-        )
-        span.sesionlogout(class="text-[16px] text-white group-[.collapsed]:hidden") Cerrar sesión
+        img.log-out(class="h-8 w-8 shrink-0 brightness-0 invert" src="/medico/img/icono-salir.svg" alt="")
+        span.sesionlogout(class="text-lg font-semibold text-white group-[.collapsed]:hidden") Cerrar sesión
 
 script.
     (function () {
@@ -109,23 +108,27 @@ script.
             var coincide = destino === '/admin/dashboard'
                 ? ruta === destino
                 : ruta === destino || ruta.indexOf(destino + '/') === 0;
-            if (coincide) enlace.classList.add('preActive');
+            if (coincide) {
+                enlace.classList.add('preActive');
+                enlace.setAttribute('aria-current', 'page');
+            }
         });
     })();
 
 //- Da acceso al menú en las páginas cuyo encabezado no tiene botón propio.
-//- Debajo del menú (z-1000) y de su fondo (z-999), y debajo de los modales (z-50 o más).
-div#barraMenuMovil(class="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-3 border-b border-[#E2E8F0] bg-white px-4 [@media(min-width:769px)]:hidden")
+//- El fondo y la barra quedan por debajo del menú lateral y sus controles.
+div#barraMenuMovil(class="fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-3 border-b border-white/10 px-4 [@media(min-width:769px)]:hidden" style="background:#091b66")
     button(
         type="button"
         aria-label="Abrir menú"
+        aria-controls="sidebar"
         onclick="toggleSidebar()"
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 text-[#335CD8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335CD8]"
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
     )
-        i(class="fa-solid fa-bars")
-    span(class="text-lg font-bold text-[#001B4D]") SIGCMI
+        svg(class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+            path(d="M4 6h16M4 12h16M4 18h16")
+    img(src="/medico/img/logo-sigcmi-blanco.png" alt="SIGCMI" class="h-7 w-auto object-contain")
 
-//- Si la página ya trae su propio botón de menú, se quita la barra; si no, se deja espacio para ella.
 script.
     document.addEventListener('DOMContentLoaded', function () {
         var barra = document.getElementById('barraMenuMovil');
