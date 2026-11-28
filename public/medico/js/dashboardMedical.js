@@ -69,45 +69,6 @@ if (window.location.hash === "#pacientesView") {
   }
 }
 
-// Confirma el cierre antes de enviar el formulario POST existente.
-const formularioLogout = document.getElementById("formLogout");
-const modalConfirmarLogout = document.getElementById("modalConfirmarLogout");
-const botonCancelarLogout = document.getElementById("cancelarLogout");
-const botonConfirmarLogout = document.getElementById("confirmarLogout");
-let focoAntesDeLogout = null;
-let confirmandoLogout = false;
-
-if (formularioLogout && modalConfirmarLogout && botonCancelarLogout && botonConfirmarLogout) {
-  formularioLogout.addEventListener("submit", event => {
-    if (confirmandoLogout) return;
-    event.preventDefault();
-    focoAntesDeLogout = event.submitter || document.activeElement;
-
-    if (typeof modalConfirmarLogout.showModal !== "function") {
-      if (window.confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-        confirmandoLogout = true;
-        formularioLogout.requestSubmit();
-      }
-      return;
-    }
-
-    modalConfirmarLogout.showModal();
-    botonCancelarLogout.focus();
-  });
-
-  botonCancelarLogout.addEventListener("click", () => modalConfirmarLogout.close());
-  botonConfirmarLogout.addEventListener("click", () => {
-    if (botonConfirmarLogout.disabled) return;
-    botonConfirmarLogout.disabled = true;
-    confirmandoLogout = true;
-    formularioLogout.requestSubmit();
-  });
-  modalConfirmarLogout.addEventListener("close", () => {
-    botonConfirmarLogout.disabled = false;
-    if (!confirmandoLogout && focoAntesDeLogout?.isConnected) focoAntesDeLogout.focus();
-  });
-}
-
 // INICIAR ATENCIÓN: el servidor valida nuevamente propietario, fecha y estado.
 function actualizarDisponibilidadInicio() {
   const botones = document.querySelectorAll(".btn-iniciar[data-fecha][data-hora]");

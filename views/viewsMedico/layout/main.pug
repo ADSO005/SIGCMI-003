@@ -5,6 +5,7 @@ html(lang='es')
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
     title SIGCMI - Portal Médico
     link(rel="stylesheet" href="/css/output.css")
+    link(rel="stylesheet" href="/shared/css/session.css")
     block styles
   body.portal-medico(class="bg-[#f4f8ff] text-slate-900 font-[Arial,sans-serif] [&_*]:font-[Arial,sans-serif]")
     .container(class="relative w-full max-w-none")
@@ -36,7 +37,7 @@ html(lang='es')
     include ../includes/modalGestion.pug
     include ../includes/modalHorarios.pug
     include ../includes/modalCierreConsulta.pug
-    include ../includes/modalConfirmarLogout.pug
+    include ../../shared/session/modals.pug
     if typeof contextoConsulta !== "undefined" && contextoConsulta
       include ../includes/modalAtencion.pug
 

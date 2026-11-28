@@ -1,29 +1,3 @@
-dialog#logoutModal(
-    aria-labelledby="logoutModalTitle"
-    class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60"
-)
-    div(class="p-6")
-        h2#logoutModalTitle(class="text-xl font-bold text-[#10285e]")
-            | Confirmar cierre de sesión
-
-        p(class="mt-2 text-slate-600")
-            | ¿Seguro que deseas cerrar tu sesión?
-
-        div(class="mt-6 flex justify-end gap-3")
-            button(
-                type="button"
-                onclick="document.getElementById('logoutModal').close()"
-                class="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-100"
-            )
-                | Cancelar
-
-            form(action="/auth/logout" method="POST")
-                button(
-                    type="submit"
-                    class="rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700"
-                )
-                    | Sí, cerrar sesión
-
 mixin enlaceAdmin(href, icono, texto)
     a.nav-link(
         href=href
@@ -89,10 +63,10 @@ aside#sidebar.sidebar.group(
 
     button(
         type="button"
-        onclick="document.getElementById('logoutModal').showModal()"
         aria-haspopup="dialog"
-        aria-controls="logoutModal"
+        aria-controls="sessionLogoutDialog"
         aria-label="Cerrar sesión"
+        data-session-logout-trigger
         class="relative z-10 flex min-h-[68px] shrink-0 cursor-pointer items-center gap-4 self-center border-0 bg-transparent px-2 text-white group-[.collapsed]:justify-center group-[.collapsed]:gap-0 transition-opacity hover:opacity-75"
         style="width:90%"
     )
@@ -113,6 +87,8 @@ script.
             }
         });
     })();
+
+include ../../shared/session/modals.pug
 
 //- Da acceso al menú en las páginas cuyo encabezado no tiene botón propio.
 //- El fondo y la barra quedan por debajo del menú lateral y sus controles.
