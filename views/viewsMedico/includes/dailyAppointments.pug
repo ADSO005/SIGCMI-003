@@ -38,9 +38,9 @@ mixin tarjetaAtencion(cita)
         else if cita.supera24Horas
           p(role="alert" class="text-xs text-rose-700 sm:col-span-2") No se pudo cargar el estado de cierre. Actualiza la agenda.
     else if ["Pendiente", "Confirmada"].includes(cita.estado)
-      button.btn-iniciar(type="button" data-cita=cita.id_cita data-estado-id=estadoEnCursoId disabled=!cita.puedeIniciar || !estadoEnCursoId onclick="iniciarConsulta(this)" class="mt-3 w-full rounded-xl bg-[#315bd7] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50") Iniciar Consulta
+      button.btn-iniciar(type="button" data-cita=cita.id_cita data-estado-id=estadoEnCursoId data-fecha=cita.fecha data-hora=cita.hora disabled=!cita.puedeIniciar || !estadoEnCursoId onclick="iniciarConsulta(this)" class="mt-3 w-full rounded-xl bg-[#315bd7] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2748b2] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-not-allowed disabled:opacity-50") Iniciar Consulta
       if !cita.puedeIniciar
-        p(class="mt-2 text-xs text-slate-600") Disponible desde la hora programada, únicamente en esta fecha.
+        p(data-mensaje-inicio role="status" class="mt-2 text-xs text-slate-600") Disponible desde la hora programada, únicamente en esta fecha.
       else if !estadoEnCursoId
         p(role="alert" class="mt-2 text-xs text-rose-700") No es posible iniciar consultas en este momento.
 

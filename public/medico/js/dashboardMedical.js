@@ -109,6 +109,68 @@ if (formularioLogout && modalConfirmarLogout && botonCancelarLogout && botonConf
 }
 
 // INICIAR ATENCIÓN: el servidor valida nuevamente propietario, fecha y estado.
+function actualizarDisponibilidadInicio() {
+  const botones = document.querySelectorAll(".btn-iniciar[data-fecha][data-hora]");
+  if (!botones.length) return false;
+
+  const ahora = new Date();
+  const partes = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Bogota",
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  }).formatToParts(ahora);
+  const reloj = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+  const fechaHoy = `${reloj.year}-${reloj.month}-${reloj.day}`;
+  const segundosActuales = Number(reloj.hour) * 3600
+    + Number(reloj.minute) * 60
+    + Number(reloj.second)
+    + ahora.getUTCMilliseconds() / 1000;
+  let hayCitaFuturaHoy = false;
+
+  botones.forEach(button => {
+    const hora = /^(\d{2}):([0-5]\d)(?::([0-5]\d)(?:\.(\d{1,6}))?)?$/.exec(button.dataset.hora || "");
+    if (!hora || Number(hora[1]) > 23) return;
+
+    const segundosCita = Number(hora[1]) * 3600
+      + Number(hora[2]) * 60
+      + Number(hora[3] || 0)
+      + Number(`0.${hora[4] || 0}`);
+    const esHoy = button.dataset.fecha === fechaHoy;
+    const tieneEstadoDestino = /^[1-9]\d*$/.test(button.dataset.estadoId || "");
+    const puedeIniciar = esHoy && segundosCita <= segundosActuales;
+    const habilitado = puedeIniciar && tieneEstadoDestino;
+
+    button.disabled = !habilitado;
+
+    const mensaje = button.nextElementSibling?.hasAttribute("data-mensaje-inicio")
+      ? button.nextElementSibling : null;
+    if (mensaje) {
+      if (habilitado) {
+        mensaje.hidden = true;
+      } else if (puedeIniciar && !tieneEstadoDestino) {
+        mensaje.textContent = "No se pudo cargar el estado de atención. Actualiza la agenda.";
+        mensaje.setAttribute("role", "alert");
+        mensaje.hidden = false;
+      }
+    }
+
+    if (esHoy && segundosCita > segundosActuales) hayCitaFuturaHoy = true;
+  });
+
+  return hayCitaFuturaHoy;
+}
+
+if (actualizarDisponibilidadInicio()) {
+  const temporizadorDisponibilidad = window.setInterval(() => {
+    if (!actualizarDisponibilidadInicio()) window.clearInterval(temporizadorDisponibilidad);
+  }, 1000);
+}
+
 const iniciosPendientes = new Set();
 window.iniciarConsulta = async button => {
   const id = button.dataset.cita;
