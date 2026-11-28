@@ -4,6 +4,7 @@ import app from "./app.js";
 import db from "./config/db.js";
 
 import userRoutes from "./routes/auth/userRoutes.js";
+import { mostrarHomepage } from "./controllers/auth/homepage.js";
 import adminRoutes from "./routes/admin/adminRoutes.js";
 import medicoRoutes from "./routes/medico/medicoRoutes.js";
 import pacienteRoutes from "./routes/paciente/pacienteRoutes.js";
@@ -23,6 +24,8 @@ asociarModelos();
 // =====================================
 // RUTAS
 // =====================================
+
+app.get(["/", "/homepage"], mostrarHomepage);
 
 app.use("/auth", userRoutes);
 app.use("/admin", adminRoutes);
