@@ -371,234 +371,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sidebar = document.getElementById('sidebar')
     const sidebarToggle = document.getElementById('toggleSidebar')
+    const mobileToggle = document.getElementById('mobileSidebarToggle')
+    const overlay = document.getElementById('sidebarOverlay')
 
     if (!sidebar || !sidebarToggle) return
 
-    const mobileToggle = document.createElement('button')
-    mobileToggle.type = 'button'
-    mobileToggle.className = 'patient-mobile-menu-toggle'
-    mobileToggle.setAttribute('aria-label', 'Abrir menú lateral')
-    mobileToggle.setAttribute('aria-controls', 'sidebar')
-    mobileToggle.setAttribute('aria-expanded', 'false')
-    mobileToggle.innerHTML = '<span></span><span></span><span></span>'
-    document.body.appendChild(mobileToggle)
+    const cerrarSidebarMovil = () => {
+        sidebar.classList.remove('open')
+        overlay?.classList.add('hidden')
+        if (window.innerWidth <= 768) {
+            sidebarToggle.setAttribute('aria-expanded', 'false')
+            mobileToggle?.setAttribute('aria-expanded', 'false')
+            mobileToggle?.setAttribute('aria-label', 'Abrir menú de navegación')
+        }
+    }
 
-    const sidebarOverlay = document.createElement('button')
-    sidebarOverlay.type = 'button'
-    sidebarOverlay.className = 'patient-sidebar-overlay'
-    sidebarOverlay.setAttribute('aria-label', 'Cerrar menú lateral')
-    document.body.appendChild(sidebarOverlay)
+    const aplicarEstadoInicialSidebar = () => {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('collapsed')
+            document.body.classList.remove('patient-sidebar-collapsed')
+            sidebarToggle.setAttribute('aria-expanded', 'false')
+            sidebarToggle.title = 'Cerrar menú'
+        } else {
+            sidebarToggle.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')))
+            sidebarToggle.title = sidebar.classList.contains('collapsed') ? 'Expandir menú' : 'Contraer menú'
+        }
+    }
 
-    const textosSidebar = sidebar.querySelectorAll('.sidebar-text')
-    const enlacesNavegacion = sidebar.querySelectorAll('nav a')
-    const resumenPerfil = sidebar.querySelector('.p-4.border-b.flex.items-center.gap-3')
-    const botonCerrarSesion = sidebar.querySelector('form button')
-    const encabezadoSidebar = sidebar.querySelector(
-        '.flex.items-center.justify-between.p-4.border-b'
-    )
-    let sidebarColapsado = false
+    aplicarEstadoInicialSidebar()
 
-    sidebar.style.width = '16rem'
-    sidebar.setAttribute('aria-label', 'Menú lateral expandido')
-    sidebarToggle.setAttribute('aria-expanded', 'true')
-    sidebarToggle.title = 'Contraer menú'
-    enlacesNavegacion.forEach((enlace) => {
-        const etiqueta = enlace.querySelector('.sidebar-text')
-        if (etiqueta) enlace.title = etiqueta.textContent.trim()
-    })
-
-    const alternarSidebar = () => {
-        if (window.matchMedia('(max-width: 768px)').matches) {
-            const abierto = document.body.classList.toggle('patient-sidebar-open')
+    window.toggleSidebar = () => {
+        if (window.innerWidth <= 768) {
+            const abierto = sidebar.classList.toggle('open')
+            overlay?.classList.toggle('hidden', !abierto)
             sidebarToggle.setAttribute('aria-expanded', String(abierto))
-            mobileToggle.setAttribute('aria-expanded', String(abierto))
-            mobileToggle.setAttribute('aria-label', abierto ? 'Cerrar menú lateral' : 'Abrir menú lateral')
-            sidebarToggle.title = abierto ? 'Cerrar menú' : 'Abrir menú'
-            sidebar.setAttribute('aria-label', abierto ? 'Menú lateral abierto' : 'Menú lateral cerrado')
+            mobileToggle?.setAttribute('aria-expanded', String(abierto))
+            mobileToggle?.setAttribute(
+                'aria-label',
+                abierto ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'
+            )
+            if (abierto) sidebar.querySelector('nav a')?.focus()
             return
         }
 
-        sidebarColapsado = !sidebarColapsado
-        document.body.classList.toggle('patient-sidebar-collapsed', sidebarColapsado)
-        sidebar.style.width = sidebarColapsado ? '5rem' : '16rem'
+        const contraido = sidebar.classList.toggle('collapsed')
+        document.body.classList.toggle('patient-sidebar-collapsed', contraido)
         sidebar.setAttribute(
             'aria-label',
-            sidebarColapsado ? 'Menú lateral contraído' : 'Menú lateral expandido'
+            contraido ? 'Menú lateral contraído' : 'Menú lateral expandido'
         )
-        sidebarToggle.setAttribute('aria-expanded', String(!sidebarColapsado))
-        sidebarToggle.title = sidebarColapsado ? 'Expandir menú' : 'Contraer menú'
-
-        textosSidebar.forEach((texto) => {
-            texto.classList.toggle('hidden', sidebarColapsado)
-        })
-        enlacesNavegacion.forEach((enlace) => {
-            enlace.classList.toggle('justify-center', sidebarColapsado)
-            enlace.classList.toggle('gap-0', sidebarColapsado)
-            enlace.classList.toggle('px-0', sidebarColapsado)
-        })
-        resumenPerfil?.classList.toggle('justify-center', sidebarColapsado)
-        encabezadoSidebar?.classList.toggle('justify-center', sidebarColapsado)
-        botonCerrarSesion?.classList.toggle('justify-center', sidebarColapsado)
-        botonCerrarSesion?.classList.toggle('gap-0', sidebarColapsado)
-        botonCerrarSesion?.classList.toggle('px-0', sidebarColapsado)
+        sidebarToggle.setAttribute('aria-expanded', String(!contraido))
+        sidebarToggle.title = contraido ? 'Expandir menú' : 'Contraer menú'
     }
 
-    sidebarToggle.addEventListener('click', alternarSidebar)
-    mobileToggle.addEventListener('click', alternarSidebar)
-    sidebarOverlay.addEventListener('click', () => {
-        document.body.classList.remove('patient-sidebar-open')
-        sidebarToggle.setAttribute('aria-expanded', 'false')
-        mobileToggle.setAttribute('aria-expanded', 'false')
-        mobileToggle.setAttribute('aria-label', 'Abrir menú lateral')
-    })
-    enlacesNavegacion.forEach((enlace) => enlace.addEventListener('click', () => {
-        if (window.matchMedia('(max-width: 768px)').matches) {
-            document.body.classList.remove('patient-sidebar-open')
-            sidebarToggle.setAttribute('aria-expanded', 'false')
-            mobileToggle.setAttribute('aria-expanded', 'false')
-            mobileToggle.setAttribute('aria-label', 'Abrir menú lateral')
-            sidebarToggle.title = 'Abrir menú'
+    window.closeSidebar = cerrarSidebarMovil
+    overlay?.addEventListener('click', cerrarSidebarMovil)
+
+    document.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Escape' && sidebar.classList.contains('open')) {
+            cerrarSidebarMovil()
+            mobileToggle?.focus()
         }
-    }))
+    })
 
     window.addEventListener('resize', () => {
-        if (!window.matchMedia('(max-width: 768px)').matches) {
-            document.body.classList.remove('patient-sidebar-open')
-            sidebarToggle.setAttribute('aria-expanded', String(!sidebarColapsado))
-            mobileToggle.setAttribute('aria-expanded', 'false')
+        if (window.innerWidth > 768) {
+            cerrarSidebarMovil()
+            sidebarToggle.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')))
+            sidebarToggle.title = sidebar.classList.contains('collapsed') ? 'Expandir menú' : 'Contraer menú'
         } else {
-            const abierto = document.body.classList.contains('patient-sidebar-open')
-            sidebarToggle.setAttribute('aria-expanded', String(abierto))
-            mobileToggle.setAttribute('aria-expanded', String(abierto))
-        }
-    })
-})
-
-//- AVISO DE INACTIVIDAD PARA LAS VISTAS AUTENTICADAS DEL PACIENTE
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('modalInactividad')
-    const modalConfirmacion = document.getElementById('modalConfirmarCerrarSesion')
-    const botonContinuar = document.getElementById('btnContinuarSesion')
-    const botonSalir = document.getElementById('btnSalirPorInactividad')
-    if (!modal || !botonContinuar) return
-
-    const tiempoInactividad = 10 * 60 * 1000
-    let ultimaActividad = Date.now()
-    let temporizador
-    let elementoEnfocadoAntesDelModal = null
-    let modalVisible = false
-
-    const mostrarModal = () => {
-        if (modalVisible) return
-        modalVisible = true
-        clearTimeout(temporizador)
-        elementoEnfocadoAntesDelModal = document.activeElement
-        modal.classList.remove('hidden')
-        modal.classList.add('flex')
-        botonContinuar.focus()
-    }
-
-    const revisarInactividad = () => {
-        if (modalVisible || document.visibilityState === 'hidden') return
-        const restante = tiempoInactividad - (Date.now() - ultimaActividad)
-        if (restante <= 0) mostrarModal()
-        else temporizador = window.setTimeout(revisarInactividad, restante)
-    }
-
-    const registrarActividad = () => {
-        if (modalVisible) return
-        ultimaActividad = Date.now()
-        clearTimeout(temporizador)
-        revisarInactividad()
-    }
-
-    const continuarEnPortal = () => {
-        modalVisible = false
-        modal.classList.add('hidden')
-        modal.classList.remove('flex')
-        ultimaActividad = Date.now()
-        revisarInactividad()
-        if (elementoEnfocadoAntesDelModal instanceof HTMLElement && elementoEnfocadoAntesDelModal.isConnected) {
-            elementoEnfocadoAntesDelModal.focus()
-        }
-    }
-
-    let ultimoMovimiento = 0
-    document.addEventListener('pointermove', () => {
-        const ahora = Date.now()
-        if (ahora - ultimoMovimiento < 1000) return
-        ultimoMovimiento = ahora
-        registrarActividad()
-    }, { passive: true })
-
-    ;['pointerdown', 'keydown', 'click', 'input', 'change', 'touchstart', 'scroll'].forEach((evento) => {
-        window.addEventListener(evento, registrarActividad, { passive: true, capture: true })
-    })
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') revisarInactividad()
-    })
-
-    document.addEventListener('keydown', (evento) => {
-        if (evento.key === 'Escape' && modalVisible && modalConfirmacion?.classList.contains('hidden')) continuarEnPortal()
-    })
-
-    botonContinuar.addEventListener('click', continuarEnPortal)
-    botonSalir?.addEventListener('click', () => {
-        modal.classList.add('hidden')
-        modal.classList.remove('flex')
-        document.dispatchEvent(new CustomEvent('paciente:confirmar-cierre', {
-            detail: { desdeInactividad: true }
-        }))
-    })
-    revisarInactividad()
-})
-
-//- CONFIRMAR CIERRE DE SESIÓN
-document.addEventListener('DOMContentLoaded', () => {
-    const modalCerrarSesion = document.getElementById('modalConfirmarCerrarSesion')
-    const formularioCerrarSesion = document.getElementById('formCerrarSesion')
-    const botonAbrir = document.getElementById('btnAbrirConfirmacionCerrarSesion')
-    const botonCancelar = document.getElementById('btnCancelarCerrarSesion')
-    const botonSalirInactividad = document.getElementById('btnSalirPorInactividad')
-    const modalInactividad = document.getElementById('modalInactividad')
-
-    if (!modalCerrarSesion || !formularioCerrarSesion) return
-    let volverAInactividad = false
-
-    const abrirModalCerrarSesion = (desdeInactividad = false) => {
-        volverAInactividad = desdeInactividad
-        modalCerrarSesion.classList.remove('hidden')
-        modalCerrarSesion.classList.add('flex')
-        botonCancelar?.focus()
-    }
-
-    const cerrarModalCerrarSesion = () => {
-        modalCerrarSesion.classList.add('hidden')
-        modalCerrarSesion.classList.remove('flex')
-        if (volverAInactividad && modalInactividad) {
-            modalInactividad.classList.remove('hidden')
-            modalInactividad.classList.add('flex')
-            botonSalirInactividad?.focus()
-        } else {
-            botonAbrir?.focus()
-        }
-        volverAInactividad = false
-    }
-
-    botonAbrir?.addEventListener('click', () => abrirModalCerrarSesion())
-    document.addEventListener('paciente:confirmar-cierre', (evento) => {
-        abrirModalCerrarSesion(Boolean(evento.detail?.desdeInactividad))
-    })
-    botonCancelar?.addEventListener('click', cerrarModalCerrarSesion)
-
-    modalCerrarSesion.addEventListener('click', (evento) => {
-        if (evento.target === modalCerrarSesion) cerrarModalCerrarSesion()
-    })
-
-    document.addEventListener('keydown', (evento) => {
-        if (evento.key === 'Escape' && !modalCerrarSesion.classList.contains('hidden')) {
-            cerrarModalCerrarSesion()
+            sidebar.classList.remove('collapsed')
+            document.body.classList.remove('patient-sidebar-collapsed')
+            sidebar.setAttribute('aria-label', 'Menú principal del paciente')
+            sidebarToggle.setAttribute('aria-expanded', 'false')
+            sidebarToggle.title = 'Cerrar menú'
+            mobileToggle?.setAttribute('aria-expanded', 'false')
+            mobileToggle?.setAttribute('aria-label', 'Abrir menú de navegación')
         }
     })
 })

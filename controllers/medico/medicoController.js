@@ -145,8 +145,10 @@ const dashboard = async (req, res) => {
         const agendaHoy = citasHoy.map(prepararAtencion);
         const consultasAnteriores = citas.filter(cita => cita.Estado?.nombre === "En Curso" && cita.fecha < hoy)
             .map(prepararAtencion).sort((a, b) => a.fecha.localeCompare(b.fecha) || a.hora.localeCompare(b.hora));
-        const estadoEnCurso = agendaHoy.some(cita => cita.puedeIniciar)
-            ? await EstadoCita.findOne({ where: { nombre: "En Curso" }, attributes: ["id_estado"] }) : null;
+        const estadoEnCurso = await EstadoCita.findOne({
+            where: { nombre: "En Curso" },
+            attributes: ["id_estado"]
+        });
         // El parámetro solo selecciona contexto de las citas propias que siguen En Curso.
         const consultaId = typeof req.query.consulta === "string" && /^[1-9]\d*$/.test(req.query.consulta)
             ? Number(req.query.consulta) : NaN;
