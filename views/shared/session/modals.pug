@@ -1,0 +1,28 @@
+dialog#sessionInactivityDialog.session-dialog(
+  aria-labelledby="sessionInactivityTitle"
+  aria-describedby="sessionInactivityDescription"
+)
+  section.session-dialog__panel
+    h2#sessionInactivityTitle.session-dialog__title ¿Sigues ahí?
+    p#sessionInactivityDescription.session-dialog__text
+      | Tu sesión se cerrará automáticamente en
+      = ' '
+      strong(data-session-countdown aria-live="polite") 60
+      = ' '
+      | segundos.
+    .session-dialog__actions
+      button#continueSessionButton.session-button.session-button--primary(type="button" data-session-continue) Continuar sesión
+      button#exitSessionButton.session-button.session-button--secondary(type="button" data-session-exit) Salir
+
+dialog#sessionLogoutDialog.session-dialog(
+  aria-labelledby="sessionLogoutTitle"
+  aria-describedby="sessionLogoutDescription"
+)
+  section.session-dialog__panel
+    h2#sessionLogoutTitle.session-dialog__title Confirmar cierre de sesión
+    p#sessionLogoutDescription.session-dialog__text ¿Seguro que deseas cerrar tu sesión?
+    form#sessionLogoutForm.session-dialog__actions(action="/auth/logout" method="POST")
+      button#cancelSessionLogout.session-button.session-button--secondary(type="button" data-session-cancel-logout) Cancelar
+      button#confirmSessionLogout.session-button.session-button--danger(type="submit") Sí, cerrar sesión
+
+script(src="/shared/js/sessionInactivity.js" defer)
