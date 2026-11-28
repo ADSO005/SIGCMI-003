@@ -67,7 +67,7 @@ aside#sidebar.sidebar.group(
             img.avatar-img(class="h-7 w-7 brightness-0 invert" src="/medico/img/icono-medico-avatar.svg" alt="")
         div(class="flex min-w-0 flex-1 flex-col items-start gap-1 text-left")
             p.bienvenido-txt(class="m-0 text-[13px] leading-4 text-blue-100") Bienvenido
-            h4(class="m-0 break-words text-base leading-5 font-semibold text-white")= usuarios.nombre
+            h4(class="m-0 break-words text-base leading-5 font-semibold text-white")= [usuarios.nombres, usuarios.apellidos].filter(Boolean).join(' ') || 'Administrador'
             span(class="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-xs leading-4 text-blue-50") Administrador
 
     hr.line-2(class="relative z-10 -mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20 group-[.collapsed]:hidden")
