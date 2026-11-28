@@ -1,0 +1,116 @@
+.session-dialog {
+  width: min(460px, calc(100vw - 2rem));
+  max-width: 460px;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 1rem;
+  background: transparent;
+  color: #1e293b;
+}
+
+.session-dialog::backdrop {
+  background: rgb(15 23 42 / 60%);
+  backdrop-filter: blur(2px);
+}
+
+.session-dialog__panel {
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 20px 45px rgb(15 23 42 / 22%);
+}
+
+.session-dialog__title {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.session-dialog__text {
+  margin: .75rem 0 0;
+  color: #475569;
+  font-size: .95rem;
+  line-height: 1.6;
+}
+
+.session-dialog__text [data-session-countdown] {
+  color: #b91c1c;
+  font-variant-numeric: tabular-nums;
+}
+
+.session-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+  margin-top: 1.5rem;
+}
+
+.session-button {
+  min-height: 2.75rem;
+  padding: .625rem 1rem;
+  border: 1px solid transparent;
+  border-radius: .625rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 600;
+  transition: background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+
+.session-button:focus-visible {
+  outline: 3px solid #00bc8d;
+  outline-offset: 2px;
+}
+
+.session-button:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.session-button--primary {
+  background: #335cd8;
+  color: #fff;
+}
+
+.session-button--primary:hover {
+  background: #263f9d;
+}
+
+.session-button--secondary {
+  border-color: #cbd5e1;
+  background: #fff;
+  color: #334155;
+}
+
+.session-button--secondary:hover {
+  background: #f8fafc;
+}
+
+.session-button--danger {
+  background: #dc2626;
+  color: #fff;
+}
+
+.session-button--danger:hover {
+  background: #b91c1c;
+}
+
+@media (max-width: 480px) {
+  .session-dialog__panel {
+    padding: 1.25rem;
+  }
+
+  .session-dialog__actions {
+    flex-direction: column-reverse;
+  }
+
+  .session-dialog__actions .session-button {
+    width: 100%;
+  }
+}

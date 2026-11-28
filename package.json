@@ -11,7 +11,8 @@
     "start": "node server.js",
     "server": "nodemon server.js",
     "css": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/output.css --watch",
-    "dev": "concurrently \"npm run server\" \"npm run css\"",
+    "css:build": "npx @tailwindcss/cli -i ./public/css/input.css -o ./public/css/output.css",
+    "dev": "npm run server",
     "test": "echo \"No hay pruebas configuradas\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"

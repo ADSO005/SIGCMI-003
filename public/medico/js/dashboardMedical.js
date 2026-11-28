@@ -69,46 +69,69 @@ if (window.location.hash === "#pacientesView") {
   }
 }
 
-// Confirma el cierre antes de enviar el formulario POST existente.
-const formularioLogout = document.getElementById("formLogout");
-const modalConfirmarLogout = document.getElementById("modalConfirmarLogout");
-const botonCancelarLogout = document.getElementById("cancelarLogout");
-const botonConfirmarLogout = document.getElementById("confirmarLogout");
-let focoAntesDeLogout = null;
-let confirmandoLogout = false;
+// INICIAR ATENCIÓN: el servidor valida nuevamente propietario, fecha y estado.
+function actualizarDisponibilidadInicio() {
+  const botones = document.querySelectorAll(".btn-iniciar[data-fecha][data-hora]");
+  if (!botones.length) return false;
 
-if (formularioLogout && modalConfirmarLogout && botonCancelarLogout && botonConfirmarLogout) {
-  formularioLogout.addEventListener("submit", event => {
-    if (confirmandoLogout) return;
-    event.preventDefault();
-    focoAntesDeLogout = event.submitter || document.activeElement;
+  const ahora = new Date();
+  const partes = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Bogota",
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  }).formatToParts(ahora);
+  const reloj = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+  const fechaHoy = `${reloj.year}-${reloj.month}-${reloj.day}`;
+  const segundosActuales = Number(reloj.hour) * 3600
+    + Number(reloj.minute) * 60
+    + Number(reloj.second)
+    + ahora.getUTCMilliseconds() / 1000;
+  let hayCitaFuturaHoy = false;
 
-    if (typeof modalConfirmarLogout.showModal !== "function") {
-      if (window.confirm("¿Estás seguro de que deseas cerrar sesión?")) {
-        confirmandoLogout = true;
-        formularioLogout.requestSubmit();
+  botones.forEach(button => {
+    const hora = /^(\d{2}):([0-5]\d)(?::([0-5]\d)(?:\.(\d{1,6}))?)?$/.exec(button.dataset.hora || "");
+    if (!hora || Number(hora[1]) > 23) return;
+
+    const segundosCita = Number(hora[1]) * 3600
+      + Number(hora[2]) * 60
+      + Number(hora[3] || 0)
+      + Number(`0.${hora[4] || 0}`);
+    const esHoy = button.dataset.fecha === fechaHoy;
+    const tieneEstadoDestino = /^[1-9]\d*$/.test(button.dataset.estadoId || "");
+    const puedeIniciar = esHoy && segundosCita <= segundosActuales;
+    const habilitado = puedeIniciar && tieneEstadoDestino;
+
+    button.disabled = !habilitado;
+
+    const mensaje = button.nextElementSibling?.hasAttribute("data-mensaje-inicio")
+      ? button.nextElementSibling : null;
+    if (mensaje) {
+      if (habilitado) {
+        mensaje.hidden = true;
+      } else if (puedeIniciar && !tieneEstadoDestino) {
+        mensaje.textContent = "No se pudo cargar el estado de atención. Actualiza la agenda.";
+        mensaje.setAttribute("role", "alert");
+        mensaje.hidden = false;
       }
-      return;
     }
 
-    modalConfirmarLogout.showModal();
-    botonCancelarLogout.focus();
+    if (esHoy && segundosCita > segundosActuales) hayCitaFuturaHoy = true;
   });
 
-  botonCancelarLogout.addEventListener("click", () => modalConfirmarLogout.close());
-  botonConfirmarLogout.addEventListener("click", () => {
-    if (botonConfirmarLogout.disabled) return;
-    botonConfirmarLogout.disabled = true;
-    confirmandoLogout = true;
-    formularioLogout.requestSubmit();
-  });
-  modalConfirmarLogout.addEventListener("close", () => {
-    botonConfirmarLogout.disabled = false;
-    if (!confirmandoLogout && focoAntesDeLogout?.isConnected) focoAntesDeLogout.focus();
-  });
+  return hayCitaFuturaHoy;
 }
 
-// INICIAR ATENCIÓN: el servidor valida nuevamente propietario, fecha y estado.
+if (actualizarDisponibilidadInicio()) {
+  const temporizadorDisponibilidad = window.setInterval(() => {
+    if (!actualizarDisponibilidadInicio()) window.clearInterval(temporizadorDisponibilidad);
+  }, 1000);
+}
+
 const iniciosPendientes = new Set();
 window.iniciarConsulta = async button => {
   const id = button.dataset.cita;

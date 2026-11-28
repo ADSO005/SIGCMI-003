@@ -1,72 +1,103 @@
-//- SIDEBAR LATERAL AZUL
-
-aside#sidebar.patient-sidebar.text-white.flex.flex-col.justify-between.shadow-xl.transition-all.duration-300.ease-in-out.shrink-0(
-  class="w-64 bg-[#263F9D] max-[768px]:fixed max-[768px]:inset-y-0 max-[768px]:left-0 max-[768px]:z-50"
+aside#sidebar.sidebar.patient-sidebar.group(
+  aria-label="Menú principal del paciente"
+  class="sticky top-0 z-[1000] flex h-screen w-[290px] shrink-0 flex-col self-start overflow-hidden px-6 text-white shadow-[4px_0_20px_rgba(7,27,104,0.12)] font-[Arial,sans-serif] [&.collapsed]:px-5 transition-all duration-300 ease-[ease] [&.collapsed]:w-[80px] [@media(max-width:768px)]:fixed [@media(max-width:768px)]:left-0 [@media(max-width:768px)]:w-[280px] [@media(max-width:768px)]:-translate-x-full [@media(max-width:768px)]:transition-transform [@media(max-width:768px)]:ease-[cubic-bezier(0.4,0,0.2,1)] [@media(max-width:768px)]:[&.open]:translate-x-0"
+  style="background:linear-gradient(165deg,#091b66 0%,#10378f 52%,#0a226e 100%);border-radius:0;"
 )
-  div
-    //- LOGO Y BOTÓN
-    .flex.items-center.justify-between.p-4.border-b(
-      class="border-indigo-500/40"
+  svg.sidebar-wave(class="pointer-events-none absolute left-0 top-[105px] z-0 h-[150px] w-full group-[.collapsed]:hidden" aria-hidden="true" viewBox="0 0 290 150" preserveAspectRatio="none")
+    defs
+      filter#sidebarWaveGlow(x="-30%" y="-100%" width="160%" height="300%")
+        feGaussianBlur(stdDeviation="7")
+      linearGradient#sidebarWaveColor(x1="0" y1="0" x2="1" y2="0")
+        stop(offset="0%" stop-color="#15b8ef" stop-opacity=".12")
+        stop(offset="40%" stop-color="#15b8ef" stop-opacity=".9")
+        stop(offset="100%" stop-color="#15b8ef" stop-opacity=".05")
+    path(d="M-12 45C45 125 100 106 162 82S252 42 302 57" fill="none" stroke="url(#sidebarWaveColor)" stroke-width="15" opacity=".65" filter="url(#sidebarWaveGlow)")
+    path(d="M-12 45C45 125 100 106 162 82S252 42 302 57" fill="none" stroke="url(#sidebarWaveColor)" stroke-width="1.5" opacity=".55")
+
+  .logo(class="relative z-10 flex h-[82px] shrink-0 items-center justify-between px-1 group-[.collapsed]:justify-center group-[.collapsed]:px-0")
+    img.logo-text(src="/medico/img/logo-sigcmi-blanco.png" alt="SIGCMI" class="max-w-full object-contain group-[.collapsed]:hidden" style="width:156px;height:auto")
+    button#toggleSidebar(
+      type="button"
+      aria-label="Contraer o expandir menú lateral"
+      aria-controls="sidebar"
+      aria-expanded="true"
+      title="Contraer menú"
+      class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent text-white transition-transform duration-200 hover:scale-110"
+      onclick="toggleSidebar()"
     )
-      .flex.items-center.gap-2.sidebar-text
-        span.patient-logo-frame(aria-hidden="true")
-          img.patient-logo-image(src="/patient/img/sigcmi-logo.png" alt="")
-        h1.text-2xl.font-bold.tracking-wide SIGCMI
-      button#toggleSidebar.flex.h-9.w-9.flex-col.items-center.justify-center.gap-1.rounded-lg.transition(
-        type="button"
-        aria-label="Mostrar u ocultar menú lateral"
-        aria-expanded="true"
-        class="hover:bg-indigo-500/50"
-        title="Menu"
-      )
-        span(class="block h-0.5 w-5 rounded bg-white")
-        span(class="block h-0.5 w-5 rounded bg-white")
-        span(class="block h-0.5 w-5 rounded bg-white")
-    //- SECCIÓN PERFIL DE USUARIO
-    .p-4.border-b.flex.items-center.gap-3(
-      class="border-indigo-500/40"
+      svg(class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+        path(d="M4 6h16M4 12h16M4 18h16")
+
+  .user(class="relative z-10 -mx-2 flex min-h-[140px] shrink-0 items-center gap-3 py-5 group-[.collapsed]:hidden")
+    .avatar(class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/45 bg-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]")
+      img.avatar-img(class="h-7 w-7 brightness-0 invert" src="/medico/img/icono-medico-avatar.svg" alt="")
+    div(class="flex min-w-0 flex-1 flex-col items-start gap-1 text-left")
+      p.bienvenido-txt(class="m-0 text-[13px] leading-4 text-blue-100") Bienvenido
+      h4(class="m-0 break-words text-base leading-5 font-semibold text-white")= paciente ? (paciente.nombre || paciente.nombres || 'Usuario') : 'Usuario'
+      span(class="inline-flex rounded-full bg-white/15 px-2.5 py-1 text-xs leading-4 text-blue-50")= paciente ? (paciente.rol || 'Paciente') : 'Paciente'
+      a.btn-ver-perfil(
+        href="/paciente/perfil"
+        class="mt-1 inline-flex rounded-md border border-white/30 bg-white/15 px-2.5 py-1 text-xs font-semibold leading-4 text-white no-underline shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-colors hover:bg-white/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+      ) Ver Mi Perfil
+
+  hr.line-2(class="relative z-10 -mx-6 w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20 group-[.collapsed]:hidden")
+
+  nav(class="relative z-10 mt-6 flex min-h-0 flex-1 flex-col overflow-y-auto pt-4")
+    a.nav-link(
+      href="/paciente/dashboard"
+      title="Mis Citas"
+      aria-current=typeof activeSection !== 'undefined' && activeSection === 'citas' ? 'page' : undefined
+      class=`mb-2 mx-auto flex h-14 shrink-0 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:h-10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 ${typeof activeSection !== 'undefined' && activeSection === 'citas' ? 'bg-[#315bd7] shadow-lg' : ''}`
+      style="width:90%"
     )
-      .w-10.h-10.rounded-full.flex.items-center.justify-center.border.border-indigo-300.shrink-0(
-        class="bg-indigo-400/40"
-      )
-        i(data-lucide="user").w-6.h-6.text-white
-      .flex.flex-col.sidebar-text.overflow-hidden
-        span.text-xs.text-indigo-200 Bienvenido
-        span.font-semibold.text-sm.truncate= paciente ? (paciente.nombre || paciente.nombres || 'Usuario') : 'Usuario'
-        span.text-xs.text-indigo-200= paciente ? (paciente.rol || 'Paciente') : 'Paciente'
-        a.mt-1.text-xs.text-white.px-3.py-1.rounded-md.text-center.border.w-max.transition(
-          href="/paciente/perfil"
-          class="bg-white/10 border-white/20 hover:bg-white/20 focus-visible:outline-white"
-        ) Ver Mi Perfil
-    //- OPCIONES DE NAVEGACIÓN
-    nav.p-3.space-y-2
-      a.flex.items-center.gap-3.px-3.py-2.rounded-xl.text-sm.font-medium.transition(
-        href="/paciente/dashboard"
-        class= typeof activeSection !== 'undefined' && activeSection === 'citas' ? 'patient-nav-active bg-[#3C62BE] text-white shadow-sm' : 'text-white/85 hover:bg-white/10'
-      )
-        i(data-lucide="calendar").w-5.h-5.shrink-0
-        span.sidebar-text Mis Citas
-      a.flex.items-center.gap-3.px-3.py-2.rounded-xl.text-sm.font-medium.transition(
-        href="/paciente/historial-diagnosticos"
-        class= typeof activeSection !== 'undefined' && activeSection === 'diagnosticos' ? 'patient-nav-active bg-[#3C62BE] text-white shadow-sm' : 'text-white/85 hover:bg-white/10'
-      )
-        i(data-lucide="file-text").w-5.h-5.shrink-0
-        span.sidebar-text Mis Diagnósticos
-      a.flex.items-center.gap-3.px-3.py-2.rounded-xl.text-sm.font-medium.transition(
-        href="/paciente/notificaciones"
-        class= typeof activeSection !== 'undefined' && activeSection === 'notificaciones' ? 'patient-nav-active bg-[#3C62BE] text-white shadow-sm' : 'text-white/85 hover:bg-white/10'
-      )
-        i(data-lucide="settings").w-5.h-5.shrink-0
-        span.sidebar-text Notificaciones
-  //- BOTÓN CERRAR SESIÓN
-  .p-4.border-t(
-    class="border-indigo-500/40"
+      i(data-lucide="calendar-check" class="h-6 w-6 shrink-0")
+      span.nav-item.sidebar-text(class="group-[.collapsed]:hidden") Mis Citas
+    a.nav-link(
+      href="/paciente/historial-diagnosticos"
+      title="Mis Diagnósticos"
+      aria-current=typeof activeSection !== 'undefined' && activeSection === 'diagnosticos' ? 'page' : undefined
+      class=`mb-2 mx-auto flex h-14 shrink-0 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:h-10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 ${typeof activeSection !== 'undefined' && activeSection === 'diagnosticos' ? 'bg-[#315bd7] shadow-lg' : ''}`
+      style="width:90%"
+    )
+      i(data-lucide="file-text" class="h-6 w-6 shrink-0")
+      span.nav-item.sidebar-text(class="group-[.collapsed]:hidden") Mis Diagnósticos
+    a.nav-link(
+      href="/paciente/notificaciones"
+      title="Notificaciones"
+      aria-current=typeof activeSection !== 'undefined' && activeSection === 'notificaciones' ? 'page' : undefined
+      class=`mb-2 mx-auto flex h-14 shrink-0 items-center gap-4 rounded-2xl px-4 py-2 text-base font-semibold text-white no-underline transition-colors hover:bg-white/10 group-[.collapsed]:h-10 group-[.collapsed]:w-10 group-[.collapsed]:mx-auto group-[.collapsed]:justify-center group-[.collapsed]:px-0 group-[.collapsed]:gap-0 ${typeof activeSection !== 'undefined' && activeSection === 'notificaciones' ? 'bg-[#315bd7] shadow-lg' : ''}`
+      style="width:90%"
+    )
+      i(data-lucide="bell" class="h-6 w-6 shrink-0")
+      span.nav-item.sidebar-text(class="group-[.collapsed]:hidden") Notificaciones
+
+  hr.line-3(class="relative z-10 -mx-6 mt-auto w-[calc(100%+48px)] shrink-0 border-0 border-t border-white/20")
+
+  button#btnAbrirConfirmacionCerrarSesion(
+    type="button"
+    aria-haspopup="dialog"
+  aria-controls="sessionLogoutDialog"
+    aria-label="Cerrar sesión"
+  data-session-logout-trigger
+    class="relative z-10 mx-auto flex min-h-[68px] w-full shrink-0 cursor-pointer items-center gap-4 border-0 bg-transparent px-2 text-white group-[.collapsed]:justify-center group-[.collapsed]:gap-0 transition-opacity hover:opacity-75"
+    style="width:90%"
   )
-    div
-      button.flex.w-full.items-center.gap-3.px-3.py-2.rounded-xl.text-left.text-sm.font-medium.text-indigo-100.transition(
-        type="button"
-        id="btnAbrirConfirmacionCerrarSesion"
-        class="hover:bg-white/15 focus-visible:outline-white"
-      )
-        i(data-lucide="log-out").w-5.h-5.shrink-0
-        span.sidebar-text Cerrar Sesión
+    img.log-out(class="h-8 w-8 shrink-0 brightness-0 invert" src="/medico/img/icono-salir.svg" alt="")
+    span.sesionlogout.sidebar-text(class="text-lg font-semibold text-white group-[.collapsed]:hidden") Cerrar sesión
+
+div#sidebarOverlay(
+  aria-hidden="true"
+  onclick="closeSidebar()"
+  class="fixed inset-0 z-[999] hidden bg-black/40 [@media(min-width:769px)]:!hidden"
+)
+
+button#mobileSidebarToggle(
+  type="button"
+  aria-label="Abrir menú de navegación"
+  aria-controls="sidebar"
+  aria-expanded="false"
+  class="fixed bottom-4 right-4 z-[1001] flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-[#315bd7] text-white shadow-lg min-[769px]:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+  onclick="toggleSidebar()"
+)
+  svg(class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true")
+    path(d="M4 6h16M4 12h16M4 18h16")
