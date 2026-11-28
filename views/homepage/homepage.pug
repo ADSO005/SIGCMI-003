@@ -1,0 +1,184 @@
+doctype html
+html.homepage(lang="es")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    meta(name="description" content="SIGCMI conecta pacientes y profesionales de salud en un solo lugar.")
+    title SIGCMI | Tu salud, mejor conectada
+    link(rel="stylesheet" href="/css/output.css")
+  body
+    header
+      .wrap.topbar
+        a.brand(href="#inicio" aria-label="SIGCMI, inicio")
+          img.brand-mark(src="/patient/img/logo-homepage.png" alt="")
+          | SIGCMI
+        nav#homepage-nav.nav(aria-label="Navegación principal")
+          a(href="#funcionalidades") Funcionalidades
+          a(href="#para-quien") Para quién es
+          a(href="#como-funciona") Cómo funciona
+          a.nav-mobile-action(href="/auth/login") Iniciar sesión
+          a.nav-mobile-action(href="/auth/register") Registro pacientes
+        .nav-actions
+          a.btn.login(href="/auth/login") Iniciar sesión
+          a.btn.btn-primary(href="/auth/register") Registro pacientes
+        button.nav-toggle(type="button" aria-label="Abrir menú de navegación" aria-controls="homepage-nav" aria-expanded="false")
+          span(aria-hidden="true") ☰
+    main#inicio
+      section.hero
+        .wrap.hero-grid
+          div
+            span.eyebrow Gestión de salud más sencilla
+            h1 Tu salud, #[span mejor conectada.]
+            p.lead Un espacio para organizar citas y acompañar la atención médica, conectando a pacientes y profesionales de salud.
+            .hero-actions
+              a.btn.btn-primary(href="/auth/register") Registrarme como paciente #[span(aria-hidden="true") →]
+              a.btn.btn-outline(href="#funcionalidades") Conocer SIGCMI
+            .hero-note
+              span.check(aria-hidden="true") ✓
+              | La información que necesitas, en un solo lugar.
+          .visual(aria-label="Ilustración de una agenda de citas")
+            .visual-orbit(aria-hidden="true")
+            .dashboard
+              .dash-top
+                div
+                  .dash-title Mi espacio de salud
+                  .dash-sub Tu agenda, organizada
+                .avatar(aria-hidden="true") +
+              .dash-heading Todo comienza aquí
+              .dash-copy Consulta y sigue tus citas fácilmente
+              .appointment
+                .calendar-icon(aria-hidden="true") ▦
+                div
+                  strong Tu próxima cita
+                  span Revisa los detalles en tu portal
+                span.status Tu agenda
+              .dash-lines
+                .mini
+                  b Historial
+                  span Consulta tu información
+                .mini
+                  b Perfil
+                  span Mantén tus datos al día
+              .float-label
+                span(aria-hidden="true") ●
+                | Una atención más conectada
+      section#funcionalidades.section
+        .wrap
+          .section-head.center
+            span.eyebrow Todo en un mismo lugar
+            h2 Herramientas que acompañan cada atención
+            p Desde la organización de citas hasta el seguimiento de la atención, SIGCMI reúne lo esencial para el día a día.
+          .cards
+            article.card
+              .feature-icon(aria-hidden="true") ▦
+              h3 Citas organizadas
+              p Consulta el estado y los detalles de las citas en un espacio claro y fácil de usar.
+            article.card
+              .feature-icon.teal(aria-hidden="true") ♡
+              h3 Seguimiento de la atención
+              p Accede a información de diagnósticos y prescripciones según tu perfil dentro de la plataforma.
+            article.card
+              .feature-icon.gold(aria-hidden="true") ◷
+              h3 Agendas y horarios
+              p Facilita la organización de horarios y la gestión de la agenda para el equipo de salud.
+      section#para-quien.section.audience
+        .wrap.audience-grid
+          div
+            span.eyebrow Un equipo conectado
+            h2 Una plataforma, diferentes necesidades
+            p.section-copy Cada persona cuenta con un espacio pensado para sus tareas y su participación en el proceso de atención.
+          .audience-list
+            article.audience-item
+              span.number 01
+              div
+                h3 Para pacientes
+                p Consulta tus citas, tu historial de diagnósticos y administra tu perfil.
+            article.audience-item
+              span.number 02
+              div
+                h3 Para profesionales de salud
+                p Organiza tu agenda y registra información relacionada con la atención de tus pacientes. El administrador crea las cuentas de los médicos.
+      section#como-funciona.section
+        .wrap
+          .section-head.center
+            span.eyebrow Comienza fácilmente
+            h2 Tu espacio de salud en tres pasos
+            p Accede a las herramientas disponibles para tu perfil y mantén tu información organizada.
+          .cards.steps
+            article.step
+              .step-number 01
+              h3 Crea tu cuenta de paciente
+              p Si eres paciente, regístrate y sigue los pasos de confirmación para comenzar. Si eres médico, solicita tu cuenta al administrador.
+            article.step
+              .step-number 02
+              h3 Ingresa a tu portal
+              p Inicia sesión para acceder al espacio correspondiente a tu perfil.
+            article.step
+              .step-number 03
+              h3 Mantente al día
+              p Consulta tu información y utiliza las herramientas disponibles para ti.
+      section.section(style="padding-top:0")
+        .wrap
+          .cta
+            div
+              h2 La atención comienza con una mejor organización.
+              p Ingresa a SIGCMI y descubre tu espacio.
+            a.btn(href="/auth/login") Iniciar sesión #[span(aria-hidden="true") →]
+    a.back-to-top(href="#" aria-label="Volver al inicio" title="Volver al inicio")
+      svg(width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
+        path(d="M12 19V5M5 12l7-7 7 7")
+    footer.footer
+      .wrap.footer-inner
+        div
+          a.brand(href="#inicio")
+            img.brand-mark(src="/patient/img/logo-homepage.png" alt="")
+            | SIGCMI
+          p Sistema de gestión de citas médicas.
+        nav.footer-links(aria-label="Enlaces del pie de página")
+          a(href="#funcionalidades") Funcionalidades
+          a(href="#para-quien") Para quién es
+          a(href="/auth/login") Iniciar sesión
+    .accessibility
+      button.accessibility-toggle(type="button" aria-label="Abrir opciones de accesibilidad" aria-expanded="false" aria-controls="accessibility-panel")
+        svg(width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
+          circle(cx="12" cy="4" r="2")
+          path(d="M4 8l8 2 8-2M12 10v5m0 0-4 6m4-6 4 6")
+      section#accessibility-panel.accessibility-panel(hidden aria-label="Opciones de accesibilidad")
+        .accessibility-header
+          h2 Menú de accesibilidad
+          button#close-accessibility(type="button" aria-label="Cerrar opciones de accesibilidad") ×
+        .accessibility-grid
+          button#underline-links(type="button" aria-pressed="false")
+            span.accessibility-icon(aria-hidden="true") ↗
+            span Resaltar enlaces
+          button#text-spacing(type="button" aria-pressed="false")
+            span.accessibility-icon(aria-hidden="true") ↔
+            span Espaciado de texto
+          button#readable-font(type="button" aria-pressed="false")
+            span.accessibility-icon(aria-hidden="true") Df
+            span Fuente legible
+          button#large-cursor(type="button" aria-pressed="false")
+            span.accessibility-icon(aria-hidden="true") ↖
+            span Cursor grande
+          button#line-height(type="button" aria-pressed="false")
+            span.accessibility-icon(aria-hidden="true") ↕
+            span Altura de la línea
+          button#saturation(type="button" aria-pressed="false")
+            span.accessibility-icon(aria-hidden="true") ◐
+            span Reducir saturación
+        .accessibility-control
+          .accessibility-control-heading
+            label(for="larger-text") Aumentar texto
+            output#text-value(for="larger-text") 100%
+          input#larger-text(type="range" min="100" max="150" step="10" value="100")
+        .accessibility-control
+          .accessibility-control-heading
+            label(for="high-contrast") Aumentar contraste
+            output#contrast-value(for="high-contrast") 100%
+          input#high-contrast(type="range" min="100" max="200" step="20" value="100")
+        label(for="language") Idioma / Language
+        select#language
+          option(value="es") Español
+          option(value="en") English
+        button#reset-accessibility(type="button") Restablecer ajustes
+    script(src="/js/homepage.js" defer)

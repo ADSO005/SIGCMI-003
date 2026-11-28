@@ -4,6 +4,7 @@ import { confirmRegister } from "../../controllers/auth/confirmation.js";
 import { formRecoverPassword, recoverPassword } from "../../controllers/auth/recoverPassword.js";
 import { formVerifyOTP, verifyOTP } from "../../controllers/auth/verifyOtp.js";
 import { formResetPassword, resetPassword } from "../../controllers/auth/resetPassword.js";
+import { mostrarHomepage } from "../../controllers/auth/homepage.js";
 
 import {
     formLogin,
@@ -17,6 +18,7 @@ const router = express.Router();
 // Login
 // ===============================
 
+router.get("/homepage", mostrarHomepage); // Muestra la página pública de entrada.
 router.get("/login", formLogin); // Muestra el formulario de inicio de sesión.
 router.post("/login", login); // Procesa las credenciales y crea la sesión.
 
